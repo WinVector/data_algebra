@@ -1,7 +1,6 @@
 
 
 import os
-from typing import Iterable
 import numpy as np
 import data_algebra.BigQuery
 import yaml
@@ -9,6 +8,7 @@ import yaml
 from data_algebra.data_ops import *
 import data_algebra.solutions
 import data_algebra.test_util
+import data_algebra.SQLite
 
 
 def test_xicor():
@@ -122,6 +122,7 @@ def test_xicor_frame_calc():
         descr(df=df),
         x_vars=['x1', 'x2'],
         y_name='y',
+        n_rep=200,
     )
     res = ops.eval({'df': df, rep_frame_name: rep_frame})
     expect = data_algebra.default_data_model.pd.DataFrame({
@@ -130,3 +131,11 @@ def test_xicor_frame_calc():
         'xicor_std': [0.0, 0.18],
     })
     assert data_algebra.test_util.equivalent_frames(res, expect, float_tol=0.1)
+    data_algebra.test_util.check_transform(
+        ops,
+        data={'df': df, rep_frame_name: rep_frame},
+        expect=expect,
+        valid_for_empty=False,
+        empty_produces_empty=False,
+        float_tol = 0.1,
+    )

@@ -9,6 +9,7 @@ import copy
 import numpy
 import numbers
 import warnings
+from abc import ABC
 
 import sqlite3
 
@@ -114,9 +115,9 @@ def _wrap_numpy_fn(f, x):
         return f([x])[0]
 
 
-class MedianAgg:
+class CollectingAgg(ABC):
     """
-    Aggregate as median. SQLite user class.
+    Aggregate from a collection. SQLite user class.
     """
 
     def __init__(self):
@@ -129,13 +130,62 @@ class MedianAgg:
         if not _check_scalar_bad(value):
             self.collection.append(value)
 
+    def calc(self) -> float:
+        """
+        Perform the calculation (only called with non-trivial data)
+        """
+        raise NotImplementedError("base class called")
+
     def finalize(self):
         """
         Return result.
         """
         if len(self.collection) < 1:
-            return numpy.nan
-        return numpy.median(self.collection)
+            res = numpy.nan
+        else:
+            res = self.calc()
+        self.collection = []
+        return res
+
+
+class MedianAgg(CollectingAgg):
+    """
+    Aggregate as median. SQLite user class.
+    """
+
+    def __init__(self):
+        CollectingAgg.__init__(self)
+
+    def calc(self) -> float:
+        "do it"
+        return float(numpy.median(self.collection))
+
+
+class SampVarDevAgg(CollectingAgg):
+    """
+    Aggregate as sample standard deviation. SQLite user class.
+    This version keeps the data instead of using the E[(x-E[x])^2] = E[x^2] - E[x]^2 formula
+    """
+
+    def __init__(self):
+        self.collection = []
+
+    def calc(self) -> float:
+        "do it"
+        return float(numpy.var(self.collection))
+
+
+class SampStdDevAgg(CollectingAgg):
+    """
+    Aggregate as sample standard deviation. SQLite user class.
+    This version keeps the data instead of using the E[(x-E[x])^2] = E[x^2] - E[x]^2 formula
+    """
+
+    def __init__(self):
+        self.collection = []
+
+    def calc(self) -> float:
+        return float(numpy.std(self.collection))
 
 
 class SQLiteModel(data_algebra.db_model.DBModel):
@@ -258,6 +308,8 @@ class SQLiteModel(data_algebra.db_model.DBModel):
 
         # https://docs.python.org/3/library/sqlite3.html
         conn.create_aggregate("median", 1, MedianAgg)
+        conn.create_aggregate("std", 1, SampStdDevAgg)
+        conn.create_aggregate("var", 1, SampVarDevAgg)
 
     def _emit_right_join_as_left_join(
         self, join_node, *, using=None, temp_id_source, sql_format_options=None

@@ -31,16 +31,55 @@
                     <h2>API Documentation</h2>
                         <ul class="memberlist">
             <li>
+                    <a class="class" href="#CollectingAgg">CollectingAgg</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#CollectingAgg.__init__">CollectingAgg</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#CollectingAgg.step">step</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#CollectingAgg.calc">calc</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#CollectingAgg.finalize">finalize</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
                     <a class="class" href="#MedianAgg">MedianAgg</a>
                             <ul class="memberlist">
                         <li>
                                 <a class="function" href="#MedianAgg.__init__">MedianAgg</a>
                         </li>
                         <li>
-                                <a class="function" href="#MedianAgg.step">step</a>
+                                <a class="function" href="#MedianAgg.calc">calc</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#SampVarDevAgg">SampVarDevAgg</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#SampVarDevAgg.__init__">SampVarDevAgg</a>
                         </li>
                         <li>
-                                <a class="function" href="#MedianAgg.finalize">finalize</a>
+                                <a class="function" href="#SampVarDevAgg.calc">calc</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#SampStdDevAgg">SampStdDevAgg</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#SampStdDevAgg.__init__">SampStdDevAgg</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#SampStdDevAgg.calc">calc</a>
                         </li>
                 </ul>
 
@@ -94,6 +133,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">numbers</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span>
 
 <span class="kn">import</span> <span class="nn">sqlite3</span>
 
@@ -199,9 +239,9 @@
         <span class="k">return</span> <span class="n">f</span><span class="p">([</span><span class="n">x</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
 
 
-<span class="k">class</span> <span class="nc">MedianAgg</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">CollectingAgg</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Aggregate as median. SQLite user class.</span>
+<span class="sd">    Aggregate from a collection. SQLite user class.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -214,13 +254,62 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">_check_scalar_bad</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">calc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform the calculation (only called with non-trivial data)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return result.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nan</span>
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="n">res</span>
+
+
+<span class="k">class</span> <span class="nc">MedianAgg</span><span class="p">(</span><span class="n">CollectingAgg</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Aggregate as median. SQLite user class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">CollectingAgg</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">calc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="s2">&quot;do it&quot;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">))</span>
+
+
+<span class="k">class</span> <span class="nc">SampVarDevAgg</span><span class="p">(</span><span class="n">CollectingAgg</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Aggregate as sample standard deviation. SQLite user class.</span>
+<span class="sd">    This version keeps the data instead of using the E[(x-E[x])^2] = E[x^2] - E[x]^2 formula</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">calc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="s2">&quot;do it&quot;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">))</span>
+
+
+<span class="k">class</span> <span class="nc">SampStdDevAgg</span><span class="p">(</span><span class="n">CollectingAgg</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Aggregate as sample standard deviation. SQLite user class.</span>
+<span class="sd">    This version keeps the data instead of using the E[(x-E[x])^2] = E[x^2] - E[x]^2 formula</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">calc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">))</span>
 
 
 <span class="k">class</span> <span class="nc">SQLiteModel</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">):</span>
@@ -343,6 +432,8 @@
 
         <span class="c1"># https://docs.python.org/3/library/sqlite3.html</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">create_aggregate</span><span class="p">(</span><span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">MedianAgg</span><span class="p">)</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">create_aggregate</span><span class="p">(</span><span class="s2">&quot;std&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">SampStdDevAgg</span><span class="p">)</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">create_aggregate</span><span class="p">(</span><span class="s2">&quot;var&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">SampVarDevAgg</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_emit_right_join_as_left_join</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
@@ -454,20 +545,20 @@
         </details>
 
             </section>
-                <section id="MedianAgg">
+                <section id="CollectingAgg">
                                 <div class="attr class">
-        <a class="headerlink" href="#MedianAgg">#&nbsp;&nbsp</a>
+        <a class="headerlink" href="#CollectingAgg">#&nbsp;&nbsp</a>
 
         
         <span class="def">class</span>
-        <span class="name">MedianAgg</span>:
+        <span class="name">CollectingAgg</span><wbr>(<span class="base">abc.ABC</span>):
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">MedianAgg</span><span class="p">:</span>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">CollectingAgg</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Aggregate as median. SQLite user class.</span>
+<span class="sd">    Aggregate from a collection. SQLite user class.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -480,26 +571,35 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">_check_scalar_bad</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">calc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform the calculation (only called with non-trivial data)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return result.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nan</span>
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="n">res</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Aggregate as median. SQLite user class.</p>
+            <div class="docstring"><p>Aggregate from a collection. SQLite user class.</p>
 </div>
 
 
-                            <div id="MedianAgg.__init__" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#MedianAgg.__init__">#&nbsp;&nbsp</a>
+                            <div id="CollectingAgg.__init__" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#CollectingAgg.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">MedianAgg</span><span class="signature">()</span>
+            <span class="name">CollectingAgg</span><span class="signature">()</span>
     </div>
 
                 <details>
@@ -513,8 +613,8 @@
     
 
                             </div>
-                            <div id="MedianAgg.step" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#MedianAgg.step">#&nbsp;&nbsp</a>
+                            <div id="CollectingAgg.step" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#CollectingAgg.step">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
@@ -538,8 +638,32 @@
 
 
                             </div>
-                            <div id="MedianAgg.finalize" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#MedianAgg.finalize">#&nbsp;&nbsp</a>
+                            <div id="CollectingAgg.calc" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#CollectingAgg.calc">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">calc</span><span class="signature">(self) -&gt; float</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">calc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform the calculation (only called with non-trivial data)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Perform the calculation (only called with non-trivial data)</p>
+</div>
+
+
+                            </div>
+                            <div id="CollectingAgg.finalize" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#CollectingAgg.finalize">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
@@ -553,8 +677,11 @@
 <span class="sd">        Return result.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nan</span>
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="n">res</span>
 </pre></div>
 
         </details>
@@ -563,6 +690,251 @@
 </div>
 
 
+                            </div>
+                </section>
+                <section id="MedianAgg">
+                                <div class="attr class">
+        <a class="headerlink" href="#MedianAgg">#&nbsp;&nbsp</a>
+
+        
+        <span class="def">class</span>
+        <span class="name">MedianAgg</span><wbr>(<span class="base"><a href="#CollectingAgg">CollectingAgg</a></span>):
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">MedianAgg</span><span class="p">(</span><span class="n">CollectingAgg</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Aggregate as median. SQLite user class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">CollectingAgg</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">calc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="s2">&quot;do it&quot;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">))</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Aggregate as median. SQLite user class.</p>
+</div>
+
+
+                            <div id="MedianAgg.__init__" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#MedianAgg.__init__">#&nbsp;&nbsp</a>
+
+        
+            <span class="name">MedianAgg</span><span class="signature">()</span>
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">CollectingAgg</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="MedianAgg.calc" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#MedianAgg.calc">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">calc</span><span class="signature">(self) -&gt; float</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">calc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="s2">&quot;do it&quot;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">))</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>do it</p>
+</div>
+
+
+                            </div>
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt><a href="#CollectingAgg">CollectingAgg</a></dt>
+                                <dd id="MedianAgg.step" class="function"><a href="#CollectingAgg.step">step</a></dd>
+                <dd id="MedianAgg.finalize" class="function"><a href="#CollectingAgg.finalize">finalize</a></dd>
+
+            </div>
+                                </dl>
+                            </div>
+                </section>
+                <section id="SampVarDevAgg">
+                                <div class="attr class">
+        <a class="headerlink" href="#SampVarDevAgg">#&nbsp;&nbsp</a>
+
+        
+        <span class="def">class</span>
+        <span class="name">SampVarDevAgg</span><wbr>(<span class="base"><a href="#CollectingAgg">CollectingAgg</a></span>):
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">SampVarDevAgg</span><span class="p">(</span><span class="n">CollectingAgg</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Aggregate as sample standard deviation. SQLite user class.</span>
+<span class="sd">    This version keeps the data instead of using the E[(x-E[x])^2] = E[x^2] - E[x]^2 formula</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">calc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="s2">&quot;do it&quot;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">))</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Aggregate as sample standard deviation. SQLite user class.
+This version keeps the data instead of using the E[(x-E[x])^2] = E[x^2] - E[x]^2 formula</p>
+</div>
+
+
+                            <div id="SampVarDevAgg.__init__" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#SampVarDevAgg.__init__">#&nbsp;&nbsp</a>
+
+        
+            <span class="name">SampVarDevAgg</span><span class="signature">()</span>
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="p">[]</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="SampVarDevAgg.calc" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#SampVarDevAgg.calc">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">calc</span><span class="signature">(self) -&gt; float</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">calc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="s2">&quot;do it&quot;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">))</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>do it</p>
+</div>
+
+
+                            </div>
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt><a href="#CollectingAgg">CollectingAgg</a></dt>
+                                <dd id="SampVarDevAgg.step" class="function"><a href="#CollectingAgg.step">step</a></dd>
+                <dd id="SampVarDevAgg.finalize" class="function"><a href="#CollectingAgg.finalize">finalize</a></dd>
+
+            </div>
+                                </dl>
+                            </div>
+                </section>
+                <section id="SampStdDevAgg">
+                                <div class="attr class">
+        <a class="headerlink" href="#SampStdDevAgg">#&nbsp;&nbsp</a>
+
+        
+        <span class="def">class</span>
+        <span class="name">SampStdDevAgg</span><wbr>(<span class="base"><a href="#CollectingAgg">CollectingAgg</a></span>):
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">SampStdDevAgg</span><span class="p">(</span><span class="n">CollectingAgg</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Aggregate as sample standard deviation. SQLite user class.</span>
+<span class="sd">    This version keeps the data instead of using the E[(x-E[x])^2] = E[x^2] - E[x]^2 formula</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">calc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">))</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Aggregate as sample standard deviation. SQLite user class.
+This version keeps the data instead of using the E[(x-E[x])^2] = E[x^2] - E[x]^2 formula</p>
+</div>
+
+
+                            <div id="SampStdDevAgg.__init__" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#SampStdDevAgg.__init__">#&nbsp;&nbsp</a>
+
+        
+            <span class="name">SampStdDevAgg</span><span class="signature">()</span>
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="p">[]</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="SampStdDevAgg.calc" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#SampStdDevAgg.calc">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">calc</span><span class="signature">(self) -&gt; float</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">calc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">))</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Perform the calculation (only called with non-trivial data)</p>
+</div>
+
+
+                            </div>
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt><a href="#CollectingAgg">CollectingAgg</a></dt>
+                                <dd id="SampStdDevAgg.step" class="function"><a href="#CollectingAgg.step">step</a></dd>
+                <dd id="SampStdDevAgg.finalize" class="function"><a href="#CollectingAgg.finalize">finalize</a></dd>
+
+            </div>
+                                </dl>
                             </div>
                 </section>
                 <section id="SQLiteModel">
@@ -696,6 +1068,8 @@
 
         <span class="c1"># https://docs.python.org/3/library/sqlite3.html</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">create_aggregate</span><span class="p">(</span><span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">MedianAgg</span><span class="p">)</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">create_aggregate</span><span class="p">(</span><span class="s2">&quot;std&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">SampStdDevAgg</span><span class="p">)</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">create_aggregate</span><span class="p">(</span><span class="s2">&quot;var&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">SampVarDevAgg</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_emit_right_join_as_left_join</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
@@ -934,6 +1308,8 @@
 
         <span class="c1"># https://docs.python.org/3/library/sqlite3.html</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">create_aggregate</span><span class="p">(</span><span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">MedianAgg</span><span class="p">)</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">create_aggregate</span><span class="p">(</span><span class="s2">&quot;std&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">SampStdDevAgg</span><span class="p">)</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">create_aggregate</span><span class="p">(</span><span class="s2">&quot;var&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">SampVarDevAgg</span><span class="p">)</span>
 </pre></div>
 
         </details>
