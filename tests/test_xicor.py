@@ -8,7 +8,6 @@ import yaml
 from data_algebra.data_ops import *
 import data_algebra.solutions
 import data_algebra.test_util
-import data_algebra.SQLite
 
 
 def test_xicor():

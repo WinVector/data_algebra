@@ -96,6 +96,8 @@
         <span class="n">op_replacements</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">db_default_op_replacements</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;log&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LN&#39;</span>
         <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;_uniform&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RANDOM&#39;</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;STDDEV_SAMP&#39;</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;var&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;VAR_SAMP&#39;</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">identifier_quote</span><span class="o">=</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span>
@@ -141,6 +143,8 @@
         <span class="n">op_replacements</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">db_default_op_replacements</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;log&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LN&#39;</span>
         <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;_uniform&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RANDOM&#39;</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;STDDEV_SAMP&#39;</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;var&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;VAR_SAMP&#39;</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">identifier_quote</span><span class="o">=</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span>
@@ -170,6 +174,8 @@ Assuming we are using a sqlalchemy engine as our connection</p>
         <span class="n">op_replacements</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">db_default_op_replacements</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;log&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LN&#39;</span>
         <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;_uniform&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RANDOM&#39;</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;STDDEV_SAMP&#39;</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;var&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;VAR_SAMP&#39;</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">identifier_quote</span><span class="o">=</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span>

@@ -88,10 +88,10 @@ median,x.median(),g,y,n,y,n,n,n,1.2.3
 min,x.min(),g,y,y,y,y,y,y,1.2.3
 nunique,x.nunique(),g,y,n,y,n,n,n,1.2.3
 size,x.size(),g,y,y,y,y,y,y,1.2.3
-std,x.std(),g,y,n,y,n,y,w,1.2.3
+std,x.std(),g,y,n,y,y,y,w,1.2.3
 sum,(1).sum(),g,y,y,y,y,y,y,1.2.3
 sum,x.sum(),g,y,y,y,y,y,y,1.2.3
-var,x.var(),g,y,n,n,n,n,n,1.2.3
+var,x.var(),g,y,n,n,y,n,n,1.2.3
 all,a.all(),p,y,y,n,n,n,y,1.2.3
 any,a.any(),p,y,y,n,n,n,y,1.2.3
 max,x.max(),p,y,y,y,y,y,y,1.2.3
@@ -100,10 +100,10 @@ median,x.median(),p,y,y,n,n,n,n,1.2.3
 min,x.min(),p,y,y,y,y,y,y,1.2.3
 nunique,x.nunique(),p,y,y,y,y,y,y,1.2.3
 size,x.size(),p,y,y,y,y,y,y,1.2.3
-std,x.std(),p,y,w,y,n,y,w,1.2.3
+std,x.std(),p,y,w,y,y,y,w,1.2.3
 sum,(1).sum(),p,y,y,y,y,y,y,1.2.3
 sum,x.sum(),p,y,y,y,y,y,y,1.2.3
-var,x.var(),p,y,w,n,n,n,n,1.2.3
+var,x.var(),p,y,w,n,y,n,n,1.2.3
 _uniform,_uniform(),u,y,y,y,y,y,y,1.2.3
 bfill,z.bfill(),w,y,n,n,n,n,n,1.2.3
 cumcount,z.cumcount(),w,y,n,n,n,n,n,1.2.3
