@@ -60,11 +60,15 @@ class MySQLModel(data_algebra.db_model.DBModel):
     """
 
     def __init__(self):
+        op_replacements = data_algebra.db_model.db_default_op_replacements.copy()
+        op_replacements['std'] = 'STDDEV_SAMP'
+        op_replacements['var'] = 'VAR_SAMP'
         data_algebra.db_model.DBModel.__init__(
             self,
             string_type="CHAR",
             identifier_quote="`",
             string_quote="'",
+            op_replacements=op_replacements,
             sql_formatters=MySQL_formatters,
         )
 

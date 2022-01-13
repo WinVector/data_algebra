@@ -128,11 +128,15 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">op_replacements</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">db_default_op_replacements</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;STDDEV_SAMP&#39;</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;var&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;VAR_SAMP&#39;</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">string_type</span><span class="o">=</span><span class="s2">&quot;CHAR&quot;</span><span class="p">,</span>
             <span class="n">identifier_quote</span><span class="o">=</span><span class="s2">&quot;`&quot;</span><span class="p">,</span>
             <span class="n">string_quote</span><span class="o">=</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span>
+            <span class="n">op_replacements</span><span class="o">=</span><span class="n">op_replacements</span><span class="p">,</span>
             <span class="n">sql_formatters</span><span class="o">=</span><span class="n">MySQL_formatters</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -179,11 +183,15 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">op_replacements</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">db_default_op_replacements</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;STDDEV_SAMP&#39;</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;var&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;VAR_SAMP&#39;</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">string_type</span><span class="o">=</span><span class="s2">&quot;CHAR&quot;</span><span class="p">,</span>
             <span class="n">identifier_quote</span><span class="o">=</span><span class="s2">&quot;`&quot;</span><span class="p">,</span>
             <span class="n">string_quote</span><span class="o">=</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span>
+            <span class="n">op_replacements</span><span class="o">=</span><span class="n">op_replacements</span><span class="p">,</span>
             <span class="n">sql_formatters</span><span class="o">=</span><span class="n">MySQL_formatters</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -214,11 +222,15 @@ Assuming we are using a sqlalchemy engine as our connection.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">op_replacements</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">db_default_op_replacements</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;STDDEV_SAMP&#39;</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;var&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;VAR_SAMP&#39;</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">string_type</span><span class="o">=</span><span class="s2">&quot;CHAR&quot;</span><span class="p">,</span>
             <span class="n">identifier_quote</span><span class="o">=</span><span class="s2">&quot;`&quot;</span><span class="p">,</span>
             <span class="n">string_quote</span><span class="o">=</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span>
+            <span class="n">op_replacements</span><span class="o">=</span><span class="n">op_replacements</span><span class="p">,</span>
             <span class="n">sql_formatters</span><span class="o">=</span><span class="n">MySQL_formatters</span><span class="p">,</span>
         <span class="p">)</span>
 </pre></div>

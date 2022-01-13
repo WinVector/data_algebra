@@ -296,7 +296,14 @@
 
     <span class="k">def</span> <span class="nf">calc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="s2">&quot;do it&quot;</span>
-        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">))</span>
+        <span class="c1"># pandas.DataFrame({&#39;x&#39;: [1., 3.], &#39;g&#39;: [&#39;a&#39;, &#39;a&#39;]}).groupby([&#39;g&#39;]).transform(&#39;var&#39;)[&#39;x&#39;]</span>
+        <span class="c1"># [2, 2]  # sample variance, what we want</span>
+        <span class="c1"># numpy.var([[1., 3.]])</span>
+        <span class="c1"># 1.0  # population variance- not what we want</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span> <span class="o">*</span> <span class="n">n</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
 
 
 <span class="k">class</span> <span class="nc">SampStdDevAgg</span><span class="p">(</span><span class="n">CollectingAgg</span><span class="p">):</span>
@@ -309,7 +316,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">def</span> <span class="nf">calc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">))</span>
+        <span class="s2">&quot;do it&quot;</span>
+        <span class="c1"># pandas.DataFrame({&#39;x&#39;: [1., 3.], &#39;g&#39;: [&#39;a&#39;, &#39;a&#39;]}).groupby([&#39;g&#39;]).transform(&#39;std&#39;)[&#39;x&#39;]</span>
+        <span class="c1"># [1.4124214, 1.4124214]  # sample std deviation, what we want</span>
+        <span class="c1"># numpy.std([[1., 3.]])</span>
+        <span class="c1"># 1.0  # population std deviation- not what we want</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
 
 
 <span class="k">class</span> <span class="nc">SQLiteModel</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">):</span>
@@ -795,7 +810,14 @@
 
     <span class="k">def</span> <span class="nf">calc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="s2">&quot;do it&quot;</span>
-        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">))</span>
+        <span class="c1"># pandas.DataFrame({&#39;x&#39;: [1., 3.], &#39;g&#39;: [&#39;a&#39;, &#39;a&#39;]}).groupby([&#39;g&#39;]).transform(&#39;var&#39;)[&#39;x&#39;]</span>
+        <span class="c1"># [2, 2]  # sample variance, what we want</span>
+        <span class="c1"># numpy.var([[1., 3.]])</span>
+        <span class="c1"># 1.0  # population variance- not what we want</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span> <span class="o">*</span> <span class="n">n</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
 </pre></div>
 
         </details>
@@ -835,7 +857,14 @@ This version keeps the data instead of using the E[(x-E[x])^2] = E[x^2] - E[x]^2
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">calc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="s2">&quot;do it&quot;</span>
-        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">))</span>
+        <span class="c1"># pandas.DataFrame({&#39;x&#39;: [1., 3.], &#39;g&#39;: [&#39;a&#39;, &#39;a&#39;]}).groupby([&#39;g&#39;]).transform(&#39;var&#39;)[&#39;x&#39;]</span>
+        <span class="c1"># [2, 2]  # sample variance, what we want</span>
+        <span class="c1"># numpy.var([[1., 3.]])</span>
+        <span class="c1"># 1.0  # population variance- not what we want</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span> <span class="o">*</span> <span class="n">n</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
 </pre></div>
 
         </details>
@@ -877,7 +906,15 @@ This version keeps the data instead of using the E[(x-E[x])^2] = E[x^2] - E[x]^2
         <span class="bp">self</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">def</span> <span class="nf">calc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">))</span>
+        <span class="s2">&quot;do it&quot;</span>
+        <span class="c1"># pandas.DataFrame({&#39;x&#39;: [1., 3.], &#39;g&#39;: [&#39;a&#39;, &#39;a&#39;]}).groupby([&#39;g&#39;]).transform(&#39;std&#39;)[&#39;x&#39;]</span>
+        <span class="c1"># [1.4124214, 1.4124214]  # sample std deviation, what we want</span>
+        <span class="c1"># numpy.std([[1., 3.]])</span>
+        <span class="c1"># 1.0  # population std deviation- not what we want</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
 </pre></div>
 
         </details>
@@ -916,12 +953,20 @@ This version keeps the data instead of using the E[(x-E[x])^2] = E[x^2] - E[x]^2
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">calc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">))</span>
+        <span class="s2">&quot;do it&quot;</span>
+        <span class="c1"># pandas.DataFrame({&#39;x&#39;: [1., 3.], &#39;g&#39;: [&#39;a&#39;, &#39;a&#39;]}).groupby([&#39;g&#39;]).transform(&#39;std&#39;)[&#39;x&#39;]</span>
+        <span class="c1"># [1.4124214, 1.4124214]  # sample std deviation, what we want</span>
+        <span class="c1"># numpy.std([[1., 3.]])</span>
+        <span class="c1"># 1.0  # population std deviation- not what we want</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Perform the calculation (only called with non-trivial data)</p>
+            <div class="docstring"><p>do it</p>
 </div>
 
 

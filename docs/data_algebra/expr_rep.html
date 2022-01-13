@@ -598,6 +598,13 @@
 <span class="p">}</span>
 
 
+<span class="c1"># fns that don&#39;t have consistent windowed implementations we want to support</span>
+<span class="n">fn_names_that_contradict_windowed_situation</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;std&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;var&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
 <span class="c1"># a competing idea should be to remove ordering if</span>
 <span class="c1"># operator is one of these (instead of forbid)</span>
 <span class="c1"># noinspection SpellCheckingInspection</span>
@@ -607,6 +614,8 @@
     <span class="s2">&quot;min&quot;</span><span class="p">,</span>
     <span class="s2">&quot;prod&quot;</span><span class="p">,</span>
     <span class="s2">&quot;sum&quot;</span><span class="p">,</span>
+    <span class="s1">&#39;std&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;var&#39;</span><span class="p">,</span>
 <span class="p">}</span>
 
 
@@ -1198,13 +1207,13 @@
 
     <span class="k">def</span> <span class="nf">std</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return standard devaition (vectorized).</span>
+<span class="sd">        Return sample standard devaition (vectorized).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;std&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">var</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return variance (vectorized).</span>
+<span class="sd">        Return sample variance (vectorized).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;var&quot;</span><span class="p">)</span>
 
@@ -2846,13 +2855,13 @@ str() method returns only the text for interoperability.</p>
 
     <span class="k">def</span> <span class="nf">std</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return standard devaition (vectorized).</span>
+<span class="sd">        Return sample standard devaition (vectorized).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;std&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">var</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return variance (vectorized).</span>
+<span class="sd">        Return sample variance (vectorized).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;var&quot;</span><span class="p">)</span>
 
@@ -4339,14 +4348,14 @@ str() method returns only the text for interoperability.</p>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">std</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return standard devaition (vectorized).</span>
+<span class="sd">        Return sample standard devaition (vectorized).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;std&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Return standard devaition (vectorized).</p>
+            <div class="docstring"><p>Return sample standard devaition (vectorized).</p>
 </div>
 
 
@@ -4363,14 +4372,14 @@ str() method returns only the text for interoperability.</p>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">var</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return variance (vectorized).</span>
+<span class="sd">        Return sample variance (vectorized).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;var&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Return variance (vectorized).</p>
+            <div class="docstring"><p>Return sample variance (vectorized).</p>
 </div>
 
 

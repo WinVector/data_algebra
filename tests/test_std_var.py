@@ -29,9 +29,6 @@ def test_std_var_project():
         data=d,
         expect=expect,
         valid_for_empty=False,
-        models_to_skip={
-            str(data_algebra.MySQL.MySQLModel()),
-        },
     )
 
 

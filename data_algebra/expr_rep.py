@@ -713,13 +713,13 @@ class Term(PreTerm, ABC):
 
     def std(self):
         """
-        Return standard devaition (vectorized).
+        Return sample standard devaition (vectorized).
         """
         return self.__uop_expr__("std")
 
     def var(self):
         """
-        Return variance (vectorized).
+        Return sample variance (vectorized).
         """
         return self.__uop_expr__("var")
 

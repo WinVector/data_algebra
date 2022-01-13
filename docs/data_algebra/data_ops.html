@@ -1672,6 +1672,13 @@
                                 <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="p">)</span>
                                 <span class="o">+</span> <span class="s2">&quot;&#39; term is too complex an expression&quot;</span>
                             <span class="p">)</span>
+                <span class="k">if</span> <span class="n">windowed_situation</span> <span class="ow">and</span> <span class="p">(</span>
+                    <span class="n">opk</span><span class="o">.</span><span class="n">op</span>
+                    <span class="ow">in</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">fn_names_that_contradict_windowed_situation</span>
+                <span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&#39; is not allowed in an ordered windowed situation&quot;</span>
+                    <span class="p">)</span>
                 <span class="k">if</span> <span class="n">ordered_windowed_situation</span> <span class="ow">and</span> <span class="p">(</span>
                     <span class="n">opk</span><span class="o">.</span><span class="n">op</span>
                     <span class="ow">in</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">fn_names_that_contradict_ordered_windowed_situation</span>
@@ -6197,6 +6204,13 @@ raise an exception if the values are not consistent</p>
                                 <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="p">)</span>
                                 <span class="o">+</span> <span class="s2">&quot;&#39; term is too complex an expression&quot;</span>
                             <span class="p">)</span>
+                <span class="k">if</span> <span class="n">windowed_situation</span> <span class="ow">and</span> <span class="p">(</span>
+                    <span class="n">opk</span><span class="o">.</span><span class="n">op</span>
+                    <span class="ow">in</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">fn_names_that_contradict_windowed_situation</span>
+                <span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&#39; is not allowed in an ordered windowed situation&quot;</span>
+                    <span class="p">)</span>
                 <span class="k">if</span> <span class="n">ordered_windowed_situation</span> <span class="ow">and</span> <span class="p">(</span>
                     <span class="n">opk</span><span class="o">.</span><span class="n">op</span>
                     <span class="ow">in</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">fn_names_that_contradict_ordered_windowed_situation</span>
@@ -6479,6 +6493,13 @@ raise an exception if the values are not consistent</p>
                                 <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="p">)</span>
                                 <span class="o">+</span> <span class="s2">&quot;&#39; term is too complex an expression&quot;</span>
                             <span class="p">)</span>
+                <span class="k">if</span> <span class="n">windowed_situation</span> <span class="ow">and</span> <span class="p">(</span>
+                    <span class="n">opk</span><span class="o">.</span><span class="n">op</span>
+                    <span class="ow">in</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">fn_names_that_contradict_windowed_situation</span>
+                <span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&#39; is not allowed in an ordered windowed situation&quot;</span>
+                    <span class="p">)</span>
                 <span class="k">if</span> <span class="n">ordered_windowed_situation</span> <span class="ow">and</span> <span class="p">(</span>
                     <span class="n">opk</span><span class="o">.</span><span class="n">op</span>
                     <span class="ow">in</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">fn_names_that_contradict_ordered_windowed_situation</span>

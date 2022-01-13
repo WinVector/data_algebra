@@ -911,12 +911,16 @@ class DBModel:
             op = expression.op
             if op in self.op_replacements.keys():
                 op = self.op_replacements[op]
-            elif op.lower() in  self.op_replacements.keys():
+            elif op.lower() in self.op_replacements.keys():
                 op = self.op_replacements[op.lower()]
+            elif op.upper() in self.op_replacements.keys():
+                op = self.op_replacements[op.upper()]
             if op in self.sql_formatters.keys():
                 return self.sql_formatters[op](self, expression)
             if op.lower() in self.sql_formatters.keys():
                 return self.sql_formatters[op.lower()](self, expression)
+            if op.upper() in self.sql_formatters.keys():
+                return self.sql_formatters[op.upper()](self, expression)
             if (len(expression.args) > 1) and expression.inline:
                 subs = [
                     self.expr_to_sql(ai, want_inline_parens=True)
