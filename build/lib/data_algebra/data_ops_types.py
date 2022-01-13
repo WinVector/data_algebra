@@ -2,7 +2,7 @@
 Type defs for data operations.
 """
 
-from typing import Dict, Optional
+from typing import Dict, Optional, Set
 import data_algebra.expr_rep
 import data_algebra.cdata
 import data_algebra.OrderedSet
@@ -137,6 +137,12 @@ class OperatorPlatform:
     def columns_produced(self):
         """
         Return list of columns produced by pipeline.
+        """
+        raise NotImplementedError("base class called")
+
+    def methods_used(self) -> Set[str]:
+        """
+        Return set of methods used.
         """
         raise NotImplementedError("base class called")
 

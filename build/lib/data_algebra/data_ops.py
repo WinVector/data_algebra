@@ -198,6 +198,24 @@ class ViewRepresentation(OperatorPlatform, ABC):
         """
         raise NotImplementedError("base method called")
 
+    def methods_used(self) -> Set[str]:
+        """
+        Return set of methods used.
+        """
+        res: Set[str] = set()
+        self.get_method_names_(res)
+        return res
+
+    def get_method_names_(self, methods_seen: Set[str]) -> None:
+        """
+        Implementation of get methods_used(), internal method.
+
+        :params methods_seen: set to collect results in.
+        :return: None
+        """
+        for s in self.sources:
+            s.get_method_names_(methods_seen)
+
     def columns_produced(self):
         """Return list of columns produced by operator dag."""
         return list(self.column_names)
@@ -1275,6 +1293,18 @@ class ExtendNode(ViewRepresentation):
                 return False
         return True
 
+    def get_method_names_(self, methods_seen: Set[str]) -> None:
+        """
+        Implementation of get methods_used(), internal method.
+
+        :params methods_seen: set to collect results in.
+        :return: None
+        """
+        for s in self.sources:
+            s.get_method_names_(methods_seen)
+        for opk in self.ops.values():
+            opk.get_method_names(methods_seen)
+
     def check_extend_window_fns_(self):
         """
         Confirm extend functions are all compatible with windowing in Pandas. Internal function.
@@ -1461,6 +1491,18 @@ class ProjectNode(ViewRepresentation):
         forbidden = set(forbidden).intersection(self.column_names)
         return self.sources[0].forbidden_columns(forbidden=forbidden)
 
+    def get_method_names_(self, methods_seen: Set[str]) -> None:
+        """
+        Implementation of get methods_used(), internal method.
+
+        :params methods_seen: set to collect results in.
+        :return: None
+        """
+        for s in self.sources:
+            s.get_method_names_(methods_seen)
+        for opk in self.ops.values():
+            opk.get_method_names(methods_seen)
+
     def apply_to(self, a, *, target_table_key=None):
         """
         Apply self to operator DAG a. Basic OperatorPlatform, composabile API.
@@ -1581,6 +1623,17 @@ class SelectRowsNode(ViewRepresentation):
             sources=[source],
             node_name="SelectRowsNode",
         )
+
+    def get_method_names_(self, methods_seen: Set[str]) -> None:
+        """
+        Implementation of get methods_used(), internal method.
+
+        :params methods_seen: set to collect results in.
+        :return: None
+        """
+        for s in self.sources:
+            s.get_method_names_(methods_seen)
+        self.expr.get_method_names(methods_seen)
 
     def apply_to(self, a, *, target_table_key=None):
         """

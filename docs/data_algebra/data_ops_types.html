@@ -64,6 +64,9 @@
                                 <a class="function" href="#OperatorPlatform.columns_produced">columns_produced</a>
                         </li>
                         <li>
+                                <a class="function" href="#OperatorPlatform.methods_used">methods_used</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#OperatorPlatform.to_near_sql_implementation_">to_near_sql_implementation_</a>
                         </li>
                         <li>
@@ -154,7 +157,7 @@
 <span class="sd">Type defs for data operations.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span>
 <span class="kn">import</span> <span class="nn">data_algebra.expr_rep</span>
 <span class="kn">import</span> <span class="nn">data_algebra.cdata</span>
 <span class="kn">import</span> <span class="nn">data_algebra.OrderedSet</span>
@@ -289,6 +292,12 @@
     <span class="k">def</span> <span class="nf">columns_produced</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return list of columns produced by pipeline.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">methods_used</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return set of methods used.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
@@ -639,6 +648,12 @@
     <span class="k">def</span> <span class="nf">columns_produced</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return list of columns produced by pipeline.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">methods_used</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return set of methods used.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
@@ -1157,6 +1172,30 @@ raise an exception if the values are not consistent.</p>
         </details>
 
             <div class="docstring"><p>Return list of columns produced by pipeline.</p>
+</div>
+
+
+                            </div>
+                            <div id="OperatorPlatform.methods_used" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OperatorPlatform.methods_used">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">methods_used</span><span class="signature">(self) -&gt; Set[str]</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">methods_used</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return set of methods used.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Return set of methods used.</p>
 </div>
 
 

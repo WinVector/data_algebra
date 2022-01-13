@@ -3,7 +3,7 @@ Represent data processing expressions.
 """
 
 from abc import ABC
-from typing import Any, List, Optional, Union
+from typing import Any, List, Optional, Set, Union
 
 import numpy
 
@@ -158,11 +158,19 @@ class PreTerm(ABC):
 
     # analysis
 
-    def get_column_names(self, columns_seen):
+    def get_column_names(self, columns_seen: Set[str]) -> None:
         """
         Add column names to columns_seen
         :param columns_seen: set of strings
-        :return:
+        :return: None
+        """
+        pass
+
+    def get_method_names(self, methods_seen: Set[str]) -> None:
+        """
+        Add method names to methods_seen
+        :param methods_seen: set of strings
+        :return: None
         """
         pass
 
@@ -1084,7 +1092,7 @@ class ListTerm(PreTerm):
             is_in_parens=False,
         )
 
-    def get_column_names(self, columns_seen):
+    def get_column_names(self, columns_seen: Set[str]) -> None:
         """
         Add column names to columns_seen
         :param columns_seen: set of strings
@@ -1149,14 +1157,6 @@ class DictTerm(PreTerm):
             li_to_python(k) + ": " + li_to_python(v) for k, v in self.value.items()
         ]
         return PythonText("{" + ", ".join(terms) + "}", is_in_parens=False)
-
-    def get_column_names(self, columns_seen):
-        """
-        Add column names to columns_seen
-        :param columns_seen: set of strings
-        :return:
-        """
-        pass
 
 
 def enc_value(value):
@@ -1232,7 +1232,7 @@ class ColumnReference(Term):
         """
         return PythonText(self.column_name, is_in_parens=False)
 
-    def get_column_names(self, columns_seen):
+    def get_column_names(self, columns_seen: Set[str]) -> None:
         """
         Add column names to columns_seen
         :param columns_seen: set of strings
@@ -1291,7 +1291,7 @@ class Expression(Term):
     """
     Class for carrying an expression.
     """
-    def __init__(self, op, args, *, params=None, inline=False, method=False):
+    def __init__(self, op: str, args, *, params=None, inline: bool = False, method: bool = False):
         assert isinstance(op, str)
         if not _can_find_method_by_name(op):
             raise KeyError(f"can't find implementation for function/method {op}")
@@ -1357,7 +1357,7 @@ class Expression(Term):
             method=self.method,
         )
 
-    def get_column_names(self, columns_seen):
+    def get_column_names(self, columns_seen: Set[str]) -> None:
         """
         Add column names to columns_seen
         :param columns_seen: set of strings
@@ -1365,6 +1365,15 @@ class Expression(Term):
         """
         for a in self.args:
             a.get_column_names(columns_seen)
+
+    def get_method_names(self, methods_seen: Set[str]) -> None:
+        """
+        Add names of methods used to methods_seen.
+
+        :param methods_seen: set to collect results
+        :return: None
+        """
+        methods_seen.add(self.op)
 
     def evaluate(self, data_frame):
         """
@@ -1476,19 +1485,19 @@ def standardize_join_type(join_str):
 
 
 # noinspection SpellCheckingInspection
-def get_columns_used(parsed_exprs):
+def get_columns_used(parsed_exprs) -> Set[str]:
     """
     Return set of columns used in an expression.
     """
     assert isinstance(parsed_exprs, dict)
-    columns_seen = set()
+    columns_seen: Set[str] = set()
     for node in parsed_exprs.values():
         node.get_column_names(columns_seen)
     return columns_seen
 
 
 # noinspection SpellCheckingInspection
-def implies_windowed(parsed_exprs):
+def implies_windowed(parsed_exprs: dict) -> bool:
     """
     Return true if expression implies a windowed calculation is needed.
     """

@@ -58,6 +58,9 @@
                                 <a class="function" href="#PreTerm.get_column_names">get_column_names</a>
                         </li>
                         <li>
+                                <a class="function" href="#PreTerm.get_method_names">get_method_names</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#PreTerm.evaluate">evaluate</a>
                         </li>
                         <li>
@@ -396,9 +399,6 @@
                         <li>
                                 <a class="function" href="#DictTerm.to_python">to_python</a>
                         </li>
-                        <li>
-                                <a class="function" href="#DictTerm.get_column_names">get_column_names</a>
-                        </li>
                 </ul>
 
             </li>
@@ -451,6 +451,9 @@
                                 <a class="function" href="#Expression.get_column_names">get_column_names</a>
                         </li>
                         <li>
+                                <a class="function" href="#Expression.get_method_names">get_method_names</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#Expression.evaluate">evaluate</a>
                         </li>
                         <li>
@@ -497,7 +500,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span>
 
@@ -652,11 +655,19 @@
 
     <span class="c1"># analysis</span>
 
-    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add column names to columns_seen</span>
 <span class="sd">        :param columns_seen: set of strings</span>
-<span class="sd">        :return:</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">get_method_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add method names to methods_seen</span>
+<span class="sd">        :param methods_seen: set of strings</span>
+<span class="sd">        :return: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
 
@@ -1578,7 +1589,7 @@
             <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add column names to columns_seen</span>
 <span class="sd">        :param columns_seen: set of strings</span>
@@ -1643,14 +1654,6 @@
             <span class="n">li_to_python</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span> <span class="o">+</span> <span class="n">li_to_python</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
         <span class="p">]</span>
         <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="s2">&quot;{&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">terms</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;}&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Add column names to columns_seen</span>
-<span class="sd">        :param columns_seen: set of strings</span>
-<span class="sd">        :return:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span>
 
 
 <span class="k">def</span> <span class="nf">enc_value</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
@@ -1726,7 +1729,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_name</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add column names to columns_seen</span>
 <span class="sd">        :param columns_seen: set of strings</span>
@@ -1785,7 +1788,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class for carrying an expression.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inline</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">_can_find_method_by_name</span><span class="p">(</span><span class="n">op</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;can&#39;t find implementation for function/method </span><span class="si">{</span><span class="n">op</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -1851,7 +1854,7 @@
             <span class="n">method</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add column names to columns_seen</span>
 <span class="sd">        :param columns_seen: set of strings</span>
@@ -1859,6 +1862,15 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
             <span class="n">a</span><span class="o">.</span><span class="n">get_column_names</span><span class="p">(</span><span class="n">columns_seen</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_method_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add names of methods used to methods_seen.</span>
+
+<span class="sd">        :param methods_seen: set to collect results</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">methods_seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_frame</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1970,19 +1982,19 @@
 
 
 <span class="c1"># noinspection SpellCheckingInspection</span>
-<span class="k">def</span> <span class="nf">get_columns_used</span><span class="p">(</span><span class="n">parsed_exprs</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">get_columns_used</span><span class="p">(</span><span class="n">parsed_exprs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return set of columns used in an expression.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parsed_exprs</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
-    <span class="n">columns_seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">columns_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">parsed_exprs</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
         <span class="n">node</span><span class="o">.</span><span class="n">get_column_names</span><span class="p">(</span><span class="n">columns_seen</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">columns_seen</span>
 
 
 <span class="c1"># noinspection SpellCheckingInspection</span>
-<span class="k">def</span> <span class="nf">implies_windowed</span><span class="p">(</span><span class="n">parsed_exprs</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">implies_windowed</span><span class="p">(</span><span class="n">parsed_exprs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return true if expression implies a windowed calculation is needed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -2103,11 +2115,19 @@ str() method returns only the text for interoperability.</p>
 
     <span class="c1"># analysis</span>
 
-    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add column names to columns_seen</span>
 <span class="sd">        :param columns_seen: set of strings</span>
-<span class="sd">        :return:</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">get_method_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add method names to methods_seen</span>
+<span class="sd">        :param methods_seen: set of strings</span>
+<span class="sd">        :return: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
 
@@ -2256,16 +2276,16 @@ str() method returns only the text for interoperability.</p>
 
         
             <span class="def">def</span>
-            <span class="name">get_column_names</span><span class="signature">(self, columns_seen)</span>:
+            <span class="name">get_column_names</span><span class="signature">(self, columns_seen: Set[str]) -&gt; None</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add column names to columns_seen</span>
 <span class="sd">        :param columns_seen: set of strings</span>
-<span class="sd">        :return:</span>
+<span class="sd">        :return: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
 </pre></div>
@@ -2274,7 +2294,35 @@ str() method returns only the text for interoperability.</p>
 
             <div class="docstring"><p>Add column names to columns_seen
 :param columns_seen: set of strings
-:return:</p>
+:return: None</p>
+</div>
+
+
+                            </div>
+                            <div id="PreTerm.get_method_names" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#PreTerm.get_method_names">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">get_method_names</span><span class="signature">(self, methods_seen: Set[str]) -&gt; None</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_method_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add method names to methods_seen</span>
+<span class="sd">        :param methods_seen: set of strings</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Add method names to methods_seen
+:param methods_seen: set of strings
+:return: None</p>
 </div>
 
 
@@ -5110,6 +5158,7 @@ str() method returns only the text for interoperability.</p>
                 <dd id="Term.get_views" class="function"><a href="#PreTerm.get_views">get_views</a></dd>
                 <dd id="Term.replace_view" class="function"><a href="#PreTerm.replace_view">replace_view</a></dd>
                 <dd id="Term.get_column_names" class="function"><a href="#PreTerm.get_column_names">get_column_names</a></dd>
+                <dd id="Term.get_method_names" class="function"><a href="#PreTerm.get_method_names">get_method_names</a></dd>
                 <dd id="Term.evaluate" class="function"><a href="#PreTerm.evaluate">evaluate</a></dd>
                 <dd id="Term.to_python" class="function"><a href="#PreTerm.to_python">to_python</a></dd>
                 <dd id="Term.to_source" class="function"><a href="#PreTerm.to_source">to_source</a></dd>
@@ -5475,6 +5524,7 @@ str() method returns only the text for interoperability.</p>
             </div>
             <div><dt><a href="#PreTerm">PreTerm</a></dt>
                                 <dd id="Value.get_column_names" class="function"><a href="#PreTerm.get_column_names">get_column_names</a></dd>
+                <dd id="Value.get_method_names" class="function"><a href="#PreTerm.get_method_names">get_method_names</a></dd>
                 <dd id="Value.to_source" class="function"><a href="#PreTerm.to_source">to_source</a></dd>
 
             </div>
@@ -5562,7 +5612,7 @@ str() method returns only the text for interoperability.</p>
             <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add column names to columns_seen</span>
 <span class="sd">        :param columns_seen: set of strings</span>
@@ -5760,12 +5810,12 @@ str() method returns only the text for interoperability.</p>
 
         
             <span class="def">def</span>
-            <span class="name">get_column_names</span><span class="signature">(self, columns_seen)</span>:
+            <span class="name">get_column_names</span><span class="signature">(self, columns_seen: Set[str]) -&gt; None</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add column names to columns_seen</span>
 <span class="sd">        :param columns_seen: set of strings</span>
@@ -5788,7 +5838,8 @@ str() method returns only the text for interoperability.</p>
                                 <h5>Inherited Members</h5>
                                 <dl>
                                     <div><dt><a href="#PreTerm">PreTerm</a></dt>
-                                <dd id="ListTerm.to_source" class="function"><a href="#PreTerm.to_source">to_source</a></dd>
+                                <dd id="ListTerm.get_method_names" class="function"><a href="#PreTerm.get_method_names">get_method_names</a></dd>
+                <dd id="ListTerm.to_source" class="function"><a href="#PreTerm.to_source">to_source</a></dd>
 
             </div>
                                 </dl>
@@ -5860,14 +5911,6 @@ str() method returns only the text for interoperability.</p>
             <span class="n">li_to_python</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span> <span class="o">+</span> <span class="n">li_to_python</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
         <span class="p">]</span>
         <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="s2">&quot;{&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">terms</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;}&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Add column names to columns_seen</span>
-<span class="sd">        :param columns_seen: set of strings</span>
-<span class="sd">        :return:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span>
 </pre></div>
 
         </details>
@@ -6040,39 +6083,13 @@ str() method returns only the text for interoperability.</p>
 
 
                             </div>
-                            <div id="DictTerm.get_column_names" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#DictTerm.get_column_names">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">get_column_names</span><span class="signature">(self, columns_seen)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Add column names to columns_seen</span>
-<span class="sd">        :param columns_seen: set of strings</span>
-<span class="sd">        :return:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>Add column names to columns_seen
-:param columns_seen: set of strings
-:return:</p>
-</div>
-
-
-                            </div>
                             <div class="inherited">
                                 <h5>Inherited Members</h5>
                                 <dl>
                                     <div><dt><a href="#PreTerm">PreTerm</a></dt>
-                                <dd id="DictTerm.to_source" class="function"><a href="#PreTerm.to_source">to_source</a></dd>
+                                <dd id="DictTerm.get_column_names" class="function"><a href="#PreTerm.get_column_names">get_column_names</a></dd>
+                <dd id="DictTerm.get_method_names" class="function"><a href="#PreTerm.get_method_names">get_method_names</a></dd>
+                <dd id="DictTerm.to_source" class="function"><a href="#PreTerm.to_source">to_source</a></dd>
 
             </div>
                                 </dl>
@@ -6179,7 +6196,7 @@ str() method returns only the text for interoperability.</p>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_name</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add column names to columns_seen</span>
 <span class="sd">        :param columns_seen: set of strings</span>
@@ -6365,12 +6382,12 @@ str() method returns only the text for interoperability.</p>
 
         
             <span class="def">def</span>
-            <span class="name">get_column_names</span><span class="signature">(self, columns_seen)</span>:
+            <span class="name">get_column_names</span><span class="signature">(self, columns_seen: Set[str]) -&gt; None</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add column names to columns_seen</span>
 <span class="sd">        :param columns_seen: set of strings</span>
@@ -6476,7 +6493,8 @@ str() method returns only the text for interoperability.</p>
 
             </div>
             <div><dt><a href="#PreTerm">PreTerm</a></dt>
-                                <dd id="ColumnReference.to_source" class="function"><a href="#PreTerm.to_source">to_source</a></dd>
+                                <dd id="ColumnReference.get_method_names" class="function"><a href="#PreTerm.get_method_names">get_method_names</a></dd>
+                <dd id="ColumnReference.to_source" class="function"><a href="#PreTerm.to_source">to_source</a></dd>
 
             </div>
                                 </dl>
@@ -6497,7 +6515,7 @@ str() method returns only the text for interoperability.</p>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class for carrying an expression.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inline</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">_can_find_method_by_name</span><span class="p">(</span><span class="n">op</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;can&#39;t find implementation for function/method </span><span class="si">{</span><span class="n">op</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -6563,7 +6581,7 @@ str() method returns only the text for interoperability.</p>
             <span class="n">method</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add column names to columns_seen</span>
 <span class="sd">        :param columns_seen: set of strings</span>
@@ -6571,6 +6589,15 @@ str() method returns only the text for interoperability.</p>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
             <span class="n">a</span><span class="o">.</span><span class="n">get_column_names</span><span class="p">(</span><span class="n">columns_seen</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_method_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add names of methods used to methods_seen.</span>
+
+<span class="sd">        :param methods_seen: set to collect results</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">methods_seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_frame</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -6671,12 +6698,19 @@ str() method returns only the text for interoperability.</p>
                                         <div class="attr function"><a class="headerlink" href="#Expression.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">Expression</span><span class="signature">(op, args, *, params=None, inline=False, method=False)</span>
+            <span class="name">Expression</span><span class="signature">(
+    op: str,
+    args,
+    *,
+    params=None,
+    inline: bool = False,
+    method: bool = False
+)</span>
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inline</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">_can_find_method_by_name</span><span class="p">(</span><span class="n">op</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;can&#39;t find implementation for function/method </span><span class="si">{</span><span class="n">op</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -6807,12 +6841,12 @@ str() method returns only the text for interoperability.</p>
 
         
             <span class="def">def</span>
-            <span class="name">get_column_names</span><span class="signature">(self, columns_seen)</span>:
+            <span class="name">get_column_names</span><span class="signature">(self, columns_seen: Set[str]) -&gt; None</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add column names to columns_seen</span>
 <span class="sd">        :param columns_seen: set of strings</span>
@@ -6827,6 +6861,36 @@ str() method returns only the text for interoperability.</p>
             <div class="docstring"><p>Add column names to columns_seen
 :param columns_seen: set of strings
 :return:</p>
+</div>
+
+
+                            </div>
+                            <div id="Expression.get_method_names" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Expression.get_method_names">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">get_method_names</span><span class="signature">(self, methods_seen: Set[str]) -&gt; None</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_method_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add names of methods used to methods_seen.</span>
+
+<span class="sd">        :param methods_seen: set to collect results</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">methods_seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Add names of methods used to methods_seen.</p>
+
+<p>:param methods_seen: set to collect results
+:return: None</p>
 </div>
 
 
@@ -7114,17 +7178,17 @@ str() method returns only the text for interoperability.</p>
 
         
             <span class="def">def</span>
-            <span class="name">get_columns_used</span><span class="signature">(parsed_exprs)</span>:
+            <span class="name">get_columns_used</span><span class="signature">(parsed_exprs) -&gt; Set[str]</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_columns_used</span><span class="p">(</span><span class="n">parsed_exprs</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_columns_used</span><span class="p">(</span><span class="n">parsed_exprs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return set of columns used in an expression.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parsed_exprs</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
-    <span class="n">columns_seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">columns_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">parsed_exprs</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
         <span class="n">node</span><span class="o">.</span><span class="n">get_column_names</span><span class="p">(</span><span class="n">columns_seen</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">columns_seen</span>
@@ -7142,12 +7206,12 @@ str() method returns only the text for interoperability.</p>
 
         
             <span class="def">def</span>
-            <span class="name">implies_windowed</span><span class="signature">(parsed_exprs)</span>:
+            <span class="name">implies_windowed</span><span class="signature">(parsed_exprs: dict) -&gt; bool</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">implies_windowed</span><span class="p">(</span><span class="n">parsed_exprs</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">implies_windowed</span><span class="p">(</span><span class="n">parsed_exprs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return true if expression implies a windowed calculation is needed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
