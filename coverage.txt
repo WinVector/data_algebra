@@ -108,12 +108,12 @@ tests/test_xicor.py ..                                                   [100%]
 ---------- coverage: platform darwin, python 3.9.7-final-0 -----------
 Name                                   Stmts   Miss  Cover
 ----------------------------------------------------------
-data_algebra/BigQuery.py                 110     67    39%
+data_algebra/BigQuery.py                 112     67    40%
 data_algebra/MySQL.py                     31     10    68%
 data_algebra/OrderedSet.py                73      9    88%
 data_algebra/PostgreSQL.py                23      7    70%
 data_algebra/SQLite.py                   165     22    87%
-data_algebra/SparkSQL.py                  81     45    44%
+data_algebra/SparkSQL.py                  85     45    47%
 data_algebra/__init__.py                   5      0   100%
 data_algebra/arrow.py                    141     32    77%
 data_algebra/cdata.py                    364     66    82%
@@ -136,7 +136,7 @@ data_algebra/solutions.py                 64      1    98%
 data_algebra/test_util.py                287     49    83%
 data_algebra/util.py                     140     29    79%
 ----------------------------------------------------------
-TOTAL                                   5332    882    83%
+TOTAL                                   5338    882    83%
 
 
-============================= 256 passed in 30.67s =============================
+============================= 256 passed in 30.64s =============================

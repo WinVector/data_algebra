@@ -175,12 +175,30 @@
     <span class="k">return</span> <span class="n">res</span>
 
 
+<span class="k">def</span> <span class="nf">_spark_var_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="s2">&quot;VAR_SAMP(&quot;</span>
+        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_spark_std_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="s2">&quot;STDDEV_SAMP(&quot;</span>
+        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+    <span class="p">)</span>
+
+
 <span class="c1"># map from op-name to special SQL formatting code</span>
 <span class="n">SparkSQL_formatters</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;___&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">to_python</span><span class="p">()),</span>
     <span class="s2">&quot;is_bad&quot;</span><span class="p">:</span> <span class="n">_sparksql_is_bad_expr</span><span class="p">,</span>
     <span class="s2">&quot;coalesce&quot;</span><span class="p">:</span> <span class="n">_sparksql_coalesce_expr</span><span class="p">,</span>
     <span class="s2">&quot;mapv&quot;</span><span class="p">:</span> <span class="n">_sparksql_db_mapv</span><span class="p">,</span>
+    <span class="s1">&#39;var&#39;</span><span class="p">:</span> <span class="n">_spark_var_expr</span><span class="p">,</span>
+    <span class="s1">&#39;std&#39;</span><span class="p">:</span> <span class="n">_spark_std_expr</span><span class="p">,</span>
 <span class="p">}</span>
 
 

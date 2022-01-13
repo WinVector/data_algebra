@@ -101,7 +101,7 @@ size,x.size(),p,y,y,y,y,y,y,1.2.3
 std,x.std(),p,y,y,y,y,y,y,1.2.3
 sum,(1).sum(),p,y,y,y,y,y,y,1.2.3
 sum,x.sum(),p,y,y,y,y,y,y,1.2.3
-var,x.var(),p,y,y,n,y,n,y,1.2.3
+var,x.var(),p,y,y,y,y,y,y,1.2.3
 _uniform,_uniform(),u,y,y,y,y,y,y,1.2.3
 bfill,z.bfill(),w,y,n,n,n,n,n,1.2.3
 cumcount,z.cumcount(),w,y,n,n,n,n,n,1.2.3

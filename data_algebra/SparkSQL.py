@@ -90,12 +90,30 @@ def _sparksql_db_mapv(dbmodel, expression):
     return res
 
 
+def _spark_var_expr(dbmodel, expression):
+    return (
+        "VAR_SAMP("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ")"
+    )
+
+
+def _spark_std_expr(dbmodel, expression):
+    return (
+        "STDDEV_SAMP("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ")"
+    )
+
+
 # map from op-name to special SQL formatting code
 SparkSQL_formatters = {
     "___": lambda dbmodel, expression: str(expression.to_python()),
     "is_bad": _sparksql_is_bad_expr,
     "coalesce": _sparksql_coalesce_expr,
     "mapv": _sparksql_db_mapv,
+    'var': _spark_var_expr,
+    'std': _spark_std_expr,
 }
 
 

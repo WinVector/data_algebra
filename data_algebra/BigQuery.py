@@ -31,6 +31,15 @@ def _bigquery_std_expr(dbmodel, expression):
         + ")"
     )
 
+
+def _bigquery_var_expr(dbmodel, expression):
+    return (
+        "VAR_SAMP("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ")"
+    )
+
+
 def _bigquery_is_bad_expr(dbmodel, expression):
     subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
     return (
@@ -54,6 +63,7 @@ BigQuery_formatters = {
     "median": _bigquery_median_expr,
     "is_bad": _bigquery_is_bad_expr,
     "std": _bigquery_std_expr,
+    "var": _bigquery_var_expr,
 }
 
 
