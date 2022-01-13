@@ -104,6 +104,13 @@ fn_names_not_allowed_in_project = {
 }
 
 
+# fns that don't have consistent windowed implementations we want to support
+fn_names_that_contradict_windowed_situation = {
+    'std',
+    'var',
+}
+
+
 # a competing idea should be to remove ordering if
 # operator is one of these (instead of forbid)
 # noinspection SpellCheckingInspection
@@ -113,6 +120,8 @@ fn_names_that_contradict_ordered_windowed_situation = {
     "min",
     "prod",
     "sum",
+    'std',
+    'var',
 }
 
 

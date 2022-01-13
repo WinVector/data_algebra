@@ -172,7 +172,14 @@ class SampVarDevAgg(CollectingAgg):
 
     def calc(self) -> float:
         "do it"
-        return float(numpy.var(self.collection))
+        # pandas.DataFrame({'x': [1., 3.], 'g': ['a', 'a']}).groupby(['g']).transform('var')['x']
+        # [2, 2]  # sample variance, what we want
+        # numpy.var([[1., 3.]])
+        # 1.0  # population variance- not what we want
+        n = len(self.collection)
+        if n < 2:
+            return numpy.nan
+        return float(numpy.var(self.collection) * n / (n-1))
 
 
 class SampStdDevAgg(CollectingAgg):
@@ -185,7 +192,15 @@ class SampStdDevAgg(CollectingAgg):
         self.collection = []
 
     def calc(self) -> float:
-        return float(numpy.std(self.collection))
+        "do it"
+        # pandas.DataFrame({'x': [1., 3.], 'g': ['a', 'a']}).groupby(['g']).transform('std')['x']
+        # [1.4124214, 1.4124214]  # sample std deviation, what we want
+        # numpy.std([[1., 3.]])
+        # 1.0  # population std deviation- not what we want
+        n = len(self.collection)
+        if n < 2:
+            return numpy.nan
+        return float(numpy.std(self.collection) * numpy.sqrt(n / (n-1)))
 
 
 class SQLiteModel(data_algebra.db_model.DBModel):

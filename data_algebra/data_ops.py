@@ -1214,6 +1214,13 @@ class ExtendNode(ViewRepresentation):
                                 + str(opk)
                                 + "' term is too complex an expression"
                             )
+                if windowed_situation and (
+                    opk.op
+                    in data_algebra.expr_rep.fn_names_that_contradict_windowed_situation
+                ):
+                    raise ValueError(
+                        str(opk) + "' is not allowed in an ordered windowed situation"
+                    )
                 if ordered_windowed_situation and (
                     opk.op
                     in data_algebra.expr_rep.fn_names_that_contradict_ordered_windowed_situation
