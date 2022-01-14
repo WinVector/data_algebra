@@ -7,14 +7,8 @@ from data_algebra.data_ops import *
 import data_algebra.SQLite
 import data_algebra.MySQL
 
-direct_test_sqlite = False
-
 
 def test_sqlite_joins_left_to_right():
-    sqlite_handle = None
-    if direct_test_sqlite:
-        sqlite_handle = data_algebra.SQLite.example_handle()
-
     # No none keys, as they treat missingness different
     # in Pandas and databases
     d1 = data_algebra.default_data_model.pd.DataFrame(
@@ -39,8 +33,6 @@ def test_sqlite_joins_left_to_right():
     )
     res_1 = ops_1.eval({"d1": d1, "d2": d2})
     assert data_algebra.test_util.equivalent_frames(res_1, expect_1)
-    if direct_test_sqlite:
-        print(sqlite_handle.to_sql(ops_1))
     data_algebra.test_util.check_transform(
         ops=ops_1,
         data={"d1": d1, "d2": d2},
@@ -58,8 +50,6 @@ def test_sqlite_joins_left_to_right():
     )
     res_2 = ops_2.eval({"d1": d1, "d2": d2})
     assert data_algebra.test_util.equivalent_frames(res_2, expect_2)
-    if direct_test_sqlite:
-        print(sqlite_handle.to_sql(ops_2))
     data_algebra.test_util.check_transform(
         ops=ops_2,
         data={"d1": d1, "d2": d2},
@@ -76,15 +66,8 @@ def test_sqlite_joins_left_to_right():
     assert not data_algebra.test_util.equivalent_frames(res_n, expect_1)
     assert not data_algebra.test_util.equivalent_frames(res_n, expect_2)
 
-    if sqlite_handle is not None:
-        sqlite_handle.close()
-
 
 def test_sqlite_joins_simulate_full_join():
-    sqlite_handle = None
-    if direct_test_sqlite:
-        sqlite_handle = data_algebra.SQLite.example_handle()
-
     d1 = data_algebra.default_data_model.pd.DataFrame(
         {
             "g": ["a", "a", "b", "b", "b"],
@@ -102,9 +85,6 @@ def test_sqlite_joins_simulate_full_join():
     ops = descr(d1=d1).natural_join(b=descr(d2=d2), by=join_columns, jointype="full")
 
     res_pandas = ops.eval({"d1": d1, "d2": d2})
-
-    if direct_test_sqlite:
-        print(sqlite_handle.to_sql(ops))
 
     data_algebra.test_util.check_transform(
         ops=ops,
@@ -131,15 +111,8 @@ def test_sqlite_joins_simulate_full_join():
         models_to_skip={str(data_algebra.MySQL.MySQLModel())},
     )
 
-    if sqlite_handle is not None:
-        sqlite_handle.close()
-
 
 def test_sqlite_joins_staged():
-    sqlite_handle = None
-    if direct_test_sqlite:
-        sqlite_handle = data_algebra.SQLite.example_handle()
-
     d1 = data_algebra.default_data_model.pd.DataFrame(
         {
             "g": ["a", "a", "b", "b", "b"],
@@ -164,15 +137,9 @@ def test_sqlite_joins_staged():
 
     res_pandas = ops.eval({"d1": d1, "d2": d2})
 
-    if direct_test_sqlite:
-        print(sqlite_handle.to_sql(ops))
-
     data_algebra.test_util.check_transform(
         ops=ops,
         data={"d1": d1, "d2": d2},
         expect=res_pandas,
         models_to_skip={str(data_algebra.MySQL.MySQLModel())},
     )
-
-    if sqlite_handle is not None:
-        sqlite_handle.close()

@@ -14,7 +14,7 @@ def load_global_test_cache(fname):
     with gzip.open(fname, "rb") as in_f:
         data_algebra.test_util.global_test_result_cache = pickle.load(in_f)
         n = len(data_algebra.test_util.global_test_result_cache)
-        print(f"len(data_algebra.test_util.global_test_result_cache) == {n}")
+        # print(f"len(data_algebra.test_util.global_test_result_cache) == {n}")
 
 
 # cache results to speed up re-testing in some situations
@@ -32,7 +32,7 @@ def user_pytest_start(request):
 
     def user_pytest_end():
         n = len(data_algebra.test_util.global_test_result_cache)
-        print(f"len(data_algebra.test_util.global_test_result_cache) == {n}")
+        # print(f"len(data_algebra.test_util.global_test_result_cache) == {n}")
         with gzip.open(global_test_result_cache_fname, "wb") as out_f:
             data_algebra.test_util.global_test_result_cache = pickle.dump(
                 data_algebra.test_util.global_test_result_cache, out_f

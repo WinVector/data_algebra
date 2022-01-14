@@ -65,7 +65,7 @@ def test_uniform_2():
 
     handles = data_algebra.test_util.get_test_dbs()
     for h in handles:
-        print(h)
+        # print(h)
         h.insert_table(d, table_name='d', allow_overwrite=True)
         res_h = h.read_query(ops)
         check_r(res_pandas)
