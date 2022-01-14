@@ -448,7 +448,7 @@ class Term(PreTerm, ABC):
         """
         Return trigometric arctan2() (in radians) of item (vectorized).
         """
-        return self.__op_expr__("arctan2", other)
+        return self.__op_expr__("arctan2", other, inline=False, method=True)
 
     def sinh(self):
         """

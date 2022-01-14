@@ -2,7 +2,7 @@
 platform darwin -- Python 3.9.7, pytest-6.2.4, py-1.10.0, pluggy-0.13.1
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: cov-2.12.1, anyio-2.2.0, typeguard-2.13.0
-collected 262 items
+collected 263 items
 
 tests/test_OrderedSet.py ....                                            [  1%]
 tests/test_agg.py .                                                      [  1%]
@@ -25,23 +25,23 @@ tests/test_container.py ..                                               [ 14%]
 tests/test_cross_product_join.py .                                       [ 14%]
 tests/test_data_model_isolation.py .                                     [ 15%]
 tests/test_db_model.py .                                                 [ 15%]
-tests/test_degenerate_project.py .                                       [ 16%]
+tests/test_degenerate_project.py .                                       [ 15%]
 tests/test_drop_columns.py .                                             [ 16%]
 tests/test_ex_examples.py ............                                   [ 20%]
 tests/test_example1.py ....                                              [ 22%]
 tests/test_exp.py .                                                      [ 22%]
 tests/test_exp_parens.py .                                               [ 23%]
 tests/test_expr_parse.py .                                               [ 23%]
-tests/test_expression_expectations.py .                                  [ 24%]
+tests/test_expression_expectations.py .                                  [ 23%]
 tests/test_extend.py ......                                              [ 26%]
 tests/test_extend_order.py .                                             [ 26%]
-tests/test_flow_text.py .                                                [ 27%]
+tests/test_flow_text.py .                                                [ 26%]
 tests/test_forbidden_calculation.py ..                                   [ 27%]
 tests/test_free_fn.py .                                                  [ 28%]
 tests/test_get_methods_used.py .                                         [ 28%]
-tests/test_ghost_col_issue.py .                                          [ 29%]
+tests/test_ghost_col_issue.py .                                          [ 28%]
 tests/test_idioms.py .................                                   [ 35%]
-tests/test_if_else.py ....                                               [ 37%]
+tests/test_if_else.py ....                                               [ 36%]
 tests/test_incomplete_agg.py .                                           [ 37%]
 tests/test_join_check.py .                                               [ 37%]
 tests/test_join_effects.py .                                             [ 38%]
@@ -52,14 +52,15 @@ tests/test_lark_parser.py .....                                          [ 41%]
 tests/test_logistic_example.py .                                         [ 41%]
 tests/test_mapv.py ..                                                    [ 42%]
 tests/test_math.py .                                                     [ 42%]
+tests/test_median.py .                                                   [ 42%]
 tests/test_method_catalog_issues.py ..                                   [ 43%]
-tests/test_minimum.py .                                                  [ 43%]
+tests/test_minimum.py .                                                  [ 44%]
 tests/test_mod_fns.py ..                                                 [ 44%]
 tests/test_multi_map.py .                                                [ 45%]
 tests/test_narrow.py .                                                   [ 45%]
-tests/test_natural_join.py .                                             [ 45%]
+tests/test_natural_join.py .                                             [ 46%]
 tests/test_neg.py .                                                      [ 46%]
-tests/test_null_bad.py ..                                                [ 46%]
+tests/test_null_bad.py ..                                                [ 47%]
 tests/test_one_row_cdata_convert.py .                                    [ 47%]
 tests/test_ops.py .                                                      [ 47%]
 tests/test_ops_eq.py .                                                   [ 48%]
@@ -68,7 +69,7 @@ tests/test_order_limit.py .                                              [ 50%]
 tests/test_ordered_agg_group.py .                                        [ 50%]
 tests/test_parse.py ..........................                           [ 60%]
 tests/test_project.py .....                                              [ 62%]
-tests/test_ranked_example.py .                                           [ 62%]
+tests/test_ranked_example.py .                                           [ 63%]
 tests/test_readme_example.py .                                           [ 63%]
 tests/test_ref_detect.py ..                                              [ 64%]
 tests/test_rename.py .                                                   [ 64%]
@@ -76,7 +77,7 @@ tests/test_round.py ...                                                  [ 65%]
 tests/test_scalar_columns.py .                                           [ 66%]
 tests/test_scatter_example.py .                                          [ 66%]
 tests/test_scoring_example.py .                                          [ 66%]
-tests/test_select.py ...                                                 [ 67%]
+tests/test_select.py ...                                                 [ 68%]
 tests/test_select_stacking.py .                                          [ 68%]
 tests/test_select_values.py ..                                           [ 69%]
 tests/test_set_quoting.py ......                                         [ 71%]
@@ -97,7 +98,7 @@ tests/test_t_test_example.py ..                                          [ 86%]
 tests/test_table_is_key_by_columns.py .                                  [ 87%]
 tests/test_table_q.py .                                                  [ 87%]
 tests/test_transform_examples.py ...........                             [ 91%]
-tests/test_types.py .                                                    [ 91%]
+tests/test_types.py .                                                    [ 92%]
 tests/test_uniform.py ..                                                 [ 92%]
 tests/test_use.py ..                                                     [ 93%]
 tests/test_user_sql.py .                                                 [ 93%]
@@ -110,7 +111,7 @@ tests/test_xicor.py ..                                                   [100%]
 ---------- coverage: platform darwin, python 3.9.7-final-0 -----------
 Name                                   Stmts   Miss  Cover
 ----------------------------------------------------------
-data_algebra/BigQuery.py                 112     67    40%
+data_algebra/BigQuery.py                 112     66    41%
 data_algebra/MySQL.py                     31      8    74%
 data_algebra/OrderedSet.py                73      9    88%
 data_algebra/PostgreSQL.py                23      7    70%
@@ -139,7 +140,7 @@ data_algebra/solutions.py                 64      1    98%
 data_algebra/test_util.py                293     55    81%
 data_algebra/util.py                     140     29    79%
 ----------------------------------------------------------
-TOTAL                                   5395    878    84%
+TOTAL                                   5395    877    84%
 
 
-============================= 262 passed in 47.21s =============================
+============================= 263 passed in 45.98s =============================
