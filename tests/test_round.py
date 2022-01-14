@@ -34,7 +34,8 @@ def test_floor_1():
     expect["v"] = numpy.floor(expect["x"])
 
     assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
-    data_algebra.test_util.check_transform(ops, data={"d": d}, expect=expect)
+    with pytest.warns(UserWarning):  # SparkSQL doesn't handle null
+        data_algebra.test_util.check_transform(ops, data={"d": d}, expect=expect)
 
 
 def test_ceil_1():
@@ -48,4 +49,5 @@ def test_ceil_1():
     expect["v"] = numpy.ceil(expect["x"])
 
     assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
-    data_algebra.test_util.check_transform(ops, data={"d": d}, expect=expect)
+    with pytest.warns(UserWarning):  # SparkSQL doesn't handle null
+        data_algebra.test_util.check_transform(ops, data={"d": d}, expect=expect)

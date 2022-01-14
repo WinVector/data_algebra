@@ -685,9 +685,13 @@ class DBModel:
         self.recommended_methods = None
         if str(self) in data_algebra.op_catalog.methods_table.columns:
             self.known_methods = set(data_algebra.op_catalog.methods_table['op'])
-            self.recommended_methods = set(
-                data_algebra.op_catalog.methods_table.loc[
-                    data_algebra.op_catalog.methods_table[str(self)] == 'y', 'op'])
+            # strict, recommend if known to work in all contexts
+            self.recommended_methods = (
+                set(data_algebra.op_catalog.methods_table.loc[
+                        data_algebra.op_catalog.methods_table[str(self)] == 'y', 'op'])
+                - set(data_algebra.op_catalog.methods_table.loc[
+                        data_algebra.op_catalog.methods_table[str(self)] != 'y', 'op'])
+            )
 
     def db_handle(self, conn, db_engine=None):
         """
