@@ -1,5 +1,6 @@
 op,expression,op_class,Pandas,SQLiteModel,BigQueryModel,PostgreSQLModel,SparkSQLModel,MySQLModel,version
 !=,x != y,e,y,y,y,y,y,y,1.2.3
+%,row_id % q,e,y,y,n,n,y,n,1.2.3
 *,x * y,e,y,y,y,y,y,y,1.2.3
 **,x ** y,e,y,y,y,y,y,y,1.2.3
 +,x + y,e,y,y,y,y,y,y,1.2.3
@@ -79,7 +80,9 @@ timestamp_diff,datetime_col_0.timestamp_diff(datetime_col_1),e,y,n,y,n,n,n,1.2.3
 trimstr,"g.trimstr(0, 2)",e,y,y,y,y,y,y,1.2.3
 weekofyear,date_col_0.weekofyear(),e,y,n,y,w,w,y,1.2.3
 year,date_col_0.year(),e,y,n,y,y,y,y,1.2.3
+_count,_count(),g,y,w,w,w,w,w,1.2.3
 _ngroup,_ngroup(),g,y,n,n,n,n,n,1.2.3
+_size,_size(),g,y,y,y,y,y,y,1.2.3
 all,a.all(),g,y,n,n,n,n,n,1.2.3
 any,a.any(),g,y,n,n,n,n,n,1.2.3
 max,x.max(),g,y,y,y,y,y,y,1.2.3
@@ -103,6 +106,7 @@ sum,(1).sum(),p,y,y,y,y,y,y,1.2.3
 sum,x.sum(),p,y,y,y,y,y,y,1.2.3
 var,x.var(),p,y,y,y,y,y,y,1.2.3
 _uniform,_uniform(),u,y,y,y,y,y,y,1.2.3
+_row_number,_row_number(),w,y,y,y,y,y,y,1.2.3
 bfill,z.bfill(),w,y,n,n,n,n,n,1.2.3
 cumcount,z.cumcount(),w,y,n,n,n,n,n,1.2.3
 cummax,x.cummax(),w,y,n,n,n,n,n,1.2.3

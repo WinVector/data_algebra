@@ -23,7 +23,6 @@ def test_ghost_col_issue():
             "min_v": "v.min()",
             "sum_v": "v.sum()",
             "mean_v": "v.mean()",
-            "count_v": "v.count()",
             "size_v": "v.size()",
         },
         partition_by=["g"],
@@ -42,7 +41,6 @@ def test_ghost_col_issue():
             "min_v": [10.0, 40.0, 40.0, 70.0, 70.0, 70.0],
             "sum_v": [10.0, 90.0, 90.0, 240.0, 240.0, 240.0],
             "mean_v": [10.0, 45.0, 45.0, 80.0, 80.0, 80.0],
-            "count_v": [1, 2, 2, 3, 3, 3],
             "size_v": [1, 2, 2, 3, 3, 3],
         }
     )

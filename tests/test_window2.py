@@ -30,7 +30,7 @@ def test_window2():
                 "min_v": "v.min()",
                 "sum_v": "v.sum()",
                 "mean_v": "v.mean()",
-                "count_v": "v.count()",
+                "count_v": "(1).sum()",
                 "size_v": "v.size()",
             },
             partition_by=["g"],

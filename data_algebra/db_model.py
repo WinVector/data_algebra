@@ -4,6 +4,7 @@ Base class for SQL adapters for data algebra.
 
 import math
 import re
+import warnings
 from collections import OrderedDict
 from typing import List, Optional
 from types import SimpleNamespace
@@ -19,6 +20,7 @@ import data_algebra.util
 import data_algebra.data_ops_types
 import data_algebra.data_ops
 from data_algebra.OrderedSet import OrderedSet
+import data_algebra.op_catalog
 
 
 # The db_model can be a bit tricky as SQL is represented a few ways depending
@@ -41,6 +43,8 @@ class SQLFormatOptions(SimpleNamespace):
         annotate: bool = True,
         sql_indent: str = " ",
         initial_commas: bool = False,
+        warn_on_method_support: bool = True,
+        warn_on_novel_methods: bool = True,
     ):
         assert isinstance(use_with, bool)
         assert isinstance(annotate, bool)
@@ -54,6 +58,8 @@ class SQLFormatOptions(SimpleNamespace):
             annotate=annotate,
             sql_indent=sql_indent,
             initial_commas=initial_commas,
+            warn_on_method_support=warn_on_method_support,
+            warn_on_novel_methods=warn_on_novel_methods,
         )
 
     def __str__(self):
@@ -625,6 +631,8 @@ class DBModel:
     default_SQL_format_options: SQLFormatOptions
     union_all_term_start: str
     union_all_term_end: str
+    known_methods: Optional[Set[str]]
+    recommended_methods: Optional[Set[str]]
 
     def __init__(
         self,
@@ -673,6 +681,13 @@ class DBModel:
         self.allow_extend_merges = allow_extend_merges
         self.union_all_term_start = union_all_term_start
         self.union_all_term_end = union_all_term_end
+        self.known_methods = None
+        self.recommended_methods = None
+        if str(self) in data_algebra.op_catalog.methods_table.columns:
+            self.known_methods = set(data_algebra.op_catalog.methods_table['op'])
+            self.recommended_methods = set(
+                data_algebra.op_catalog.methods_table.loc[
+                    data_algebra.op_catalog.methods_table[str(self)] == 'y', 'op'])
 
     def db_handle(self, conn, db_engine=None):
         """
@@ -1577,7 +1592,29 @@ class DBModel:
         )
         return near_sql
 
-    def to_sql(self, ops, *, sql_format_options=None) -> str:
+    def non_known_methods(self, ops: data_algebra.data_ops.ViewRepresentation) -> Set[str]:
+        """Return list of used non-recommended methods."""
+        if self.known_methods is None:
+            return []  # can't check, just pass
+        ops_seen = list(ops.methods_used())
+        ops_seen.sort()
+        non_recommended = [op for op in ops_seen if op not in self.known_methods]
+        return non_recommended
+
+    def non_recommended_methods(self, ops: data_algebra.data_ops.ViewRepresentation) -> Set[str]:
+        """Return list of used non-recommended methods."""
+        if (self.recommended_methods is None) or (self.known_methods is None):
+            return []  # can't check, just pass
+        ops_seen = list(ops.methods_used())
+        ops_seen.sort()
+        non_recommended = [op for op in ops_seen if (op not in self.recommended_methods) and (op in self.known_methods)]
+        return non_recommended
+
+    def to_sql(
+            self,
+            ops: data_algebra.data_ops.ViewRepresentation,
+            *,
+            sql_format_options: Optional[SQLFormatOptions] = None) -> str:
         """
         Convert ViewRepresentation into SQL string.
         """
@@ -1587,6 +1624,14 @@ class DBModel:
             sql_format_options = self.default_SQL_format_options
         assert isinstance(sql_format_options, SQLFormatOptions)
         ops.columns_used()  # for table consistency check/raise
+        if sql_format_options.warn_on_novel_methods:
+            non_known = self.non_known_methods(ops)
+            if len(non_known) > 0:
+                warnings.warn(f"{self} translation using undocumented method(s): {non_known}", UserWarning)
+        if sql_format_options.warn_on_method_support:
+            non_rec = self.non_recommended_methods(ops)
+            if len(non_rec) > 0:
+                warnings.warn(f"{self} translation doesn't fully support method(s): {non_rec}", UserWarning)
         temp_id_source = [0]
         near_sql = ops.to_near_sql_implementation_(
             db_model=self, using=None, temp_id_source=temp_id_source
@@ -2131,7 +2176,11 @@ class DBHandle:
         )
         return self.describe_table(table_name)
 
-    def to_sql(self, ops, *, sql_format_options=None) -> str:
+    def to_sql(
+            self,
+            ops: data_algebra.data_ops.ViewRepresentation,
+            *,
+            sql_format_options: Optional[SQLFormatOptions] = None) -> str:
         """
         Convert operations into SQL
         """

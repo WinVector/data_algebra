@@ -36,7 +36,6 @@ def test_window_fns():
             "min_v": "v.min()",
             "sum_v": "v.sum()",
             "mean_v": "v.mean()",
-            "count_v": "v.count()",
             "size_v": "v.size()",
         },
         partition_by=["g"],
@@ -56,7 +55,6 @@ def test_window_fns():
             "sum_v": [10, 90, 90, 240, 240, 240],
             "mean_v": [10, 45, 45, 80, 80, 80],
             # "shift_v": [None, None, 40.0, None, 70.0, 80.0],
-            "count_v": [1, 2, 2, 3, 3, 3],
             "size_v": [1, 2, 2, 3, 3, 3],
         }
     )
@@ -87,7 +85,6 @@ def test_window_fns_pandas_only():
             "min_v": "v.min()",
             "sum_v": "v.sum()",
             "mean_v": "v.mean()",
-            "count_v": "v.count()",
             "size_v": "v.size()",
         },
         partition_by=["g"],
@@ -107,7 +104,6 @@ def test_window_fns_pandas_only():
             "sum_v": [10, 90, 90, 240, 240, 240],
             "mean_v": [10, 45, 45, 80, 80, 80],
             "shift_v": [None, None, 40.0, None, 70.0, 80.0],
-            "count_v": [1, 2, 2, 3, 3, 3],
             "size_v": [1, 2, 2, 3, 3, 3],
         }
     )
@@ -139,7 +135,6 @@ def test_window_fns_project():
             "min_v": "v.min()",
             "sum_v": "v.sum()",
             "mean_v": "v.mean()",
-            "count_v": "v.count()",
             "size_v": "v.size()",
         },
         group_by=["g"],
@@ -154,7 +149,6 @@ def test_window_fns_project():
             "min_v": [10, 40, 70],
             "sum_v": [10, 90, 240],
             "mean_v": [10, 45, 80],
-            "count_v": [1, 2, 3],
             "size_v": [1, 2, 3],
         }
     )
@@ -186,7 +180,6 @@ def test_window_fns_project_no_ngroup_project():
                 "min_v": "v.min()",
                 "sum_v": "v.sum()",
                 "mean_v": "v.mean()",
-                "count_v": "v.count()",
                 "size_v": "v.size()",
             },
             group_by=["g"],
@@ -217,7 +210,6 @@ def test_window_fns_project_pandas_only():
             "min_v": "v.min()",
             "sum_v": "v.sum()",
             "mean_v": "v.mean()",
-            "count_v": "v.count()",
             "size_v": "v.size()",
         },
         group_by=["g"],
@@ -236,7 +228,6 @@ def test_window_fns_project_pandas_only():
             "min_v": [10, 40, 70],
             "sum_v": [10, 90, 240],
             "mean_v": [10, 45, 80],
-            "count_v": [1, 2, 3],
             "size_v": [1, 2, 3],
         }
     )

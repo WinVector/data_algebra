@@ -16,7 +16,6 @@ import data_algebra
 import data_algebra.expr_parse
 import data_algebra.flow_text
 import data_algebra.data_model
-import data_algebra.db_model
 import data_algebra.pandas_model
 import data_algebra.expr_rep
 from data_algebra.data_ops_types import *
@@ -377,9 +376,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
         :param sql_format_options: options for sql formatting
         :return: string representation of SQL query
         """
-        if isinstance(db_model, data_algebra.db_model.DBHandle):
-            db_model = db_model.db_model
-        assert isinstance(db_model, data_algebra.db_model.DBModel)
         if sql_format_options is None:
             sql_format_options = db_model.default_SQL_format_options
         return db_model.to_sql(ops=self, sql_format_options=sql_format_options,)

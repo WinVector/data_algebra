@@ -121,6 +121,12 @@
                                 <a class="function" href="#DBModel.concat_rows_to_near_sql">concat_rows_to_near_sql</a>
                         </li>
                         <li>
+                                <a class="function" href="#DBModel.non_known_methods">non_known_methods</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#DBModel.non_recommended_methods">non_recommended_methods</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#DBModel.to_sql">to_sql</a>
                         </li>
                         <li>
@@ -216,6 +222,7 @@
 
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 <span class="kn">from</span> <span class="nn">types</span> <span class="kn">import</span> <span class="n">SimpleNamespace</span>
@@ -231,6 +238,7 @@
 <span class="kn">import</span> <span class="nn">data_algebra.data_ops_types</span>
 <span class="kn">import</span> <span class="nn">data_algebra.data_ops</span>
 <span class="kn">from</span> <span class="nn">data_algebra.OrderedSet</span> <span class="kn">import</span> <span class="n">OrderedSet</span>
+<span class="kn">import</span> <span class="nn">data_algebra.op_catalog</span>
 
 
 <span class="c1"># The db_model can be a bit tricky as SQL is represented a few ways depending</span>
@@ -253,6 +261,8 @@
         <span class="n">annotate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">sql_indent</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="p">,</span>
         <span class="n">initial_commas</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">warn_on_method_support</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">warn_on_novel_methods</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">use_with</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annotate</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
@@ -266,6 +276,8 @@
             <span class="n">annotate</span><span class="o">=</span><span class="n">annotate</span><span class="p">,</span>
             <span class="n">sql_indent</span><span class="o">=</span><span class="n">sql_indent</span><span class="p">,</span>
             <span class="n">initial_commas</span><span class="o">=</span><span class="n">initial_commas</span><span class="p">,</span>
+            <span class="n">warn_on_method_support</span><span class="o">=</span><span class="n">warn_on_method_support</span><span class="p">,</span>
+            <span class="n">warn_on_novel_methods</span><span class="o">=</span><span class="n">warn_on_novel_methods</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -837,6 +849,8 @@
     <span class="n">default_SQL_format_options</span><span class="p">:</span> <span class="n">SQLFormatOptions</span>
     <span class="n">union_all_term_start</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">union_all_term_end</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">known_methods</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+    <span class="n">recommended_methods</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -885,6 +899,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">allow_extend_merges</span> <span class="o">=</span> <span class="n">allow_extend_merges</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">union_all_term_start</span> <span class="o">=</span> <span class="n">union_all_term_start</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">union_all_term_end</span> <span class="o">=</span> <span class="n">union_all_term_end</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">known_methods</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">recommended_methods</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="ow">in</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">op_catalog</span><span class="o">.</span><span class="n">methods_table</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">known_methods</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">op_catalog</span><span class="o">.</span><span class="n">methods_table</span><span class="p">[</span><span class="s1">&#39;op&#39;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">recommended_methods</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+                <span class="n">data_algebra</span><span class="o">.</span><span class="n">op_catalog</span><span class="o">.</span><span class="n">methods_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                    <span class="n">data_algebra</span><span class="o">.</span><span class="n">op_catalog</span><span class="o">.</span><span class="n">methods_table</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)]</span> <span class="o">==</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;op&#39;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">db_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">db_engine</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1789,7 +1810,29 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
-    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ops</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">non_known_methods</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ops</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return list of used non-recommended methods.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">known_methods</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>  <span class="c1"># can&#39;t check, just pass</span>
+        <span class="n">ops_seen</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ops</span><span class="o">.</span><span class="n">methods_used</span><span class="p">())</span>
+        <span class="n">ops_seen</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">non_recommended</span> <span class="o">=</span> <span class="p">[</span><span class="n">op</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">ops_seen</span> <span class="k">if</span> <span class="n">op</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">known_methods</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">non_recommended</span>
+
+    <span class="k">def</span> <span class="nf">non_recommended_methods</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ops</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return list of used non-recommended methods.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recommended_methods</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">known_methods</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[]</span>  <span class="c1"># can&#39;t check, just pass</span>
+        <span class="n">ops_seen</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ops</span><span class="o">.</span><span class="n">methods_used</span><span class="p">())</span>
+        <span class="n">ops_seen</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">non_recommended</span> <span class="o">=</span> <span class="p">[</span><span class="n">op</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">ops_seen</span> <span class="k">if</span> <span class="p">(</span><span class="n">op</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recommended_methods</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">known_methods</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">non_recommended</span>
+
+    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">ops</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">,</span>
+            <span class="o">*</span><span class="p">,</span>
+            <span class="n">sql_format_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SQLFormatOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert ViewRepresentation into SQL string.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1799,6 +1842,14 @@
             <span class="n">sql_format_options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
         <span class="n">ops</span><span class="o">.</span><span class="n">columns_used</span><span class="p">()</span>  <span class="c1"># for table consistency check/raise</span>
+        <span class="k">if</span> <span class="n">sql_format_options</span><span class="o">.</span><span class="n">warn_on_novel_methods</span><span class="p">:</span>
+            <span class="n">non_known</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_known_methods</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_known</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2"> translation using undocumented method(s): </span><span class="si">{</span><span class="n">non_known</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sql_format_options</span><span class="o">.</span><span class="n">warn_on_method_support</span><span class="p">:</span>
+            <span class="n">non_rec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_recommended_methods</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_rec</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2"> translation doesn&#39;t fully support method(s): </span><span class="si">{</span><span class="n">non_rec</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
         <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">to_near_sql_implementation_</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
@@ -2343,7 +2394,11 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">describe_table</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ops</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">ops</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">,</span>
+            <span class="o">*</span><span class="p">,</span>
+            <span class="n">sql_format_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SQLFormatOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert operations into SQL</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -2428,6 +2483,8 @@
         <span class="n">annotate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">sql_indent</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="p">,</span>
         <span class="n">initial_commas</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">warn_on_method_support</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">warn_on_novel_methods</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">use_with</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annotate</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
@@ -2441,6 +2498,8 @@
             <span class="n">annotate</span><span class="o">=</span><span class="n">annotate</span><span class="p">,</span>
             <span class="n">sql_indent</span><span class="o">=</span><span class="n">sql_indent</span><span class="p">,</span>
             <span class="n">initial_commas</span><span class="o">=</span><span class="n">initial_commas</span><span class="p">,</span>
+            <span class="n">warn_on_method_support</span><span class="o">=</span><span class="n">warn_on_method_support</span><span class="p">,</span>
+            <span class="n">warn_on_novel_methods</span><span class="o">=</span><span class="n">warn_on_novel_methods</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -2469,7 +2528,9 @@
     use_with: bool = True,
     annotate: bool = True,
     sql_indent: str = &#39; &#39;,
-    initial_commas: bool = False
+    initial_commas: bool = False,
+    warn_on_method_support: bool = True,
+    warn_on_novel_methods: bool = True
 )</span>
     </div>
 
@@ -2481,6 +2542,8 @@
         <span class="n">annotate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">sql_indent</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="p">,</span>
         <span class="n">initial_commas</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">warn_on_method_support</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">warn_on_novel_methods</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">use_with</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annotate</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
@@ -2494,6 +2557,8 @@
             <span class="n">annotate</span><span class="o">=</span><span class="n">annotate</span><span class="p">,</span>
             <span class="n">sql_indent</span><span class="o">=</span><span class="n">sql_indent</span><span class="p">,</span>
             <span class="n">initial_commas</span><span class="o">=</span><span class="n">initial_commas</span><span class="p">,</span>
+            <span class="n">warn_on_method_support</span><span class="o">=</span><span class="n">warn_on_method_support</span><span class="p">,</span>
+            <span class="n">warn_on_novel_methods</span><span class="o">=</span><span class="n">warn_on_novel_methods</span><span class="p">,</span>
         <span class="p">)</span>
 </pre></div>
 
@@ -2530,6 +2595,8 @@
     <span class="n">default_SQL_format_options</span><span class="p">:</span> <span class="n">SQLFormatOptions</span>
     <span class="n">union_all_term_start</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">union_all_term_end</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">known_methods</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+    <span class="n">recommended_methods</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -2578,6 +2645,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">allow_extend_merges</span> <span class="o">=</span> <span class="n">allow_extend_merges</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">union_all_term_start</span> <span class="o">=</span> <span class="n">union_all_term_start</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">union_all_term_end</span> <span class="o">=</span> <span class="n">union_all_term_end</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">known_methods</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">recommended_methods</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="ow">in</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">op_catalog</span><span class="o">.</span><span class="n">methods_table</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">known_methods</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">op_catalog</span><span class="o">.</span><span class="n">methods_table</span><span class="p">[</span><span class="s1">&#39;op&#39;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">recommended_methods</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+                <span class="n">data_algebra</span><span class="o">.</span><span class="n">op_catalog</span><span class="o">.</span><span class="n">methods_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                    <span class="n">data_algebra</span><span class="o">.</span><span class="n">op_catalog</span><span class="o">.</span><span class="n">methods_table</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)]</span> <span class="o">==</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;op&#39;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">db_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">db_engine</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -3482,7 +3556,29 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
-    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ops</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">non_known_methods</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ops</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return list of used non-recommended methods.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">known_methods</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>  <span class="c1"># can&#39;t check, just pass</span>
+        <span class="n">ops_seen</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ops</span><span class="o">.</span><span class="n">methods_used</span><span class="p">())</span>
+        <span class="n">ops_seen</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">non_recommended</span> <span class="o">=</span> <span class="p">[</span><span class="n">op</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">ops_seen</span> <span class="k">if</span> <span class="n">op</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">known_methods</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">non_recommended</span>
+
+    <span class="k">def</span> <span class="nf">non_recommended_methods</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ops</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return list of used non-recommended methods.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recommended_methods</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">known_methods</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[]</span>  <span class="c1"># can&#39;t check, just pass</span>
+        <span class="n">ops_seen</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ops</span><span class="o">.</span><span class="n">methods_used</span><span class="p">())</span>
+        <span class="n">ops_seen</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">non_recommended</span> <span class="o">=</span> <span class="p">[</span><span class="n">op</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">ops_seen</span> <span class="k">if</span> <span class="p">(</span><span class="n">op</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recommended_methods</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">known_methods</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">non_recommended</span>
+
+    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">ops</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">,</span>
+            <span class="o">*</span><span class="p">,</span>
+            <span class="n">sql_format_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SQLFormatOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert ViewRepresentation into SQL string.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -3492,6 +3588,14 @@
             <span class="n">sql_format_options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
         <span class="n">ops</span><span class="o">.</span><span class="n">columns_used</span><span class="p">()</span>  <span class="c1"># for table consistency check/raise</span>
+        <span class="k">if</span> <span class="n">sql_format_options</span><span class="o">.</span><span class="n">warn_on_novel_methods</span><span class="p">:</span>
+            <span class="n">non_known</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_known_methods</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_known</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2"> translation using undocumented method(s): </span><span class="si">{</span><span class="n">non_known</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sql_format_options</span><span class="o">.</span><span class="n">warn_on_method_support</span><span class="p">:</span>
+            <span class="n">non_rec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_recommended_methods</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_rec</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2"> translation doesn&#39;t fully support method(s): </span><span class="si">{</span><span class="n">non_rec</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
         <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">to_near_sql_implementation_</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
@@ -4049,6 +4153,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">allow_extend_merges</span> <span class="o">=</span> <span class="n">allow_extend_merges</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">union_all_term_start</span> <span class="o">=</span> <span class="n">union_all_term_start</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">union_all_term_end</span> <span class="o">=</span> <span class="n">union_all_term_end</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">known_methods</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">recommended_methods</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="ow">in</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">op_catalog</span><span class="o">.</span><span class="n">methods_table</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">known_methods</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">op_catalog</span><span class="o">.</span><span class="n">methods_table</span><span class="p">[</span><span class="s1">&#39;op&#39;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">recommended_methods</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+                <span class="n">data_algebra</span><span class="o">.</span><span class="n">op_catalog</span><span class="o">.</span><span class="n">methods_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                    <span class="n">data_algebra</span><span class="o">.</span><span class="n">op_catalog</span><span class="o">.</span><span class="n">methods_table</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)]</span> <span class="o">==</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;op&#39;</span><span class="p">])</span>
 </pre></div>
 
         </details>
@@ -5422,17 +5533,80 @@
 
 
                             </div>
+                            <div id="DBModel.non_known_methods" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#DBModel.non_known_methods">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">non_known_methods</span><span class="signature">(self, ops: <a href="data_ops.html#ViewRepresentation">data_algebra.data_ops.ViewRepresentation</a>) -&gt; Set[str]</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">non_known_methods</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ops</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return list of used non-recommended methods.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">known_methods</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>  <span class="c1"># can&#39;t check, just pass</span>
+        <span class="n">ops_seen</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ops</span><span class="o">.</span><span class="n">methods_used</span><span class="p">())</span>
+        <span class="n">ops_seen</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">non_recommended</span> <span class="o">=</span> <span class="p">[</span><span class="n">op</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">ops_seen</span> <span class="k">if</span> <span class="n">op</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">known_methods</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">non_recommended</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Return list of used non-recommended methods.</p>
+</div>
+
+
+                            </div>
+                            <div id="DBModel.non_recommended_methods" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#DBModel.non_recommended_methods">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">non_recommended_methods</span><span class="signature">(self, ops: <a href="data_ops.html#ViewRepresentation">data_algebra.data_ops.ViewRepresentation</a>) -&gt; Set[str]</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">non_recommended_methods</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ops</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return list of used non-recommended methods.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recommended_methods</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">known_methods</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[]</span>  <span class="c1"># can&#39;t check, just pass</span>
+        <span class="n">ops_seen</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ops</span><span class="o">.</span><span class="n">methods_used</span><span class="p">())</span>
+        <span class="n">ops_seen</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">non_recommended</span> <span class="o">=</span> <span class="p">[</span><span class="n">op</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">ops_seen</span> <span class="k">if</span> <span class="p">(</span><span class="n">op</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recommended_methods</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">known_methods</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">non_recommended</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Return list of used non-recommended methods.</p>
+</div>
+
+
+                            </div>
                             <div id="DBModel.to_sql" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#DBModel.to_sql">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">to_sql</span><span class="signature">(self, ops, *, sql_format_options=None) -&gt; str</span>:
+            <span class="name">to_sql</span><span class="signature">(
+    self,
+    ops: <a href="data_ops.html#ViewRepresentation">data_algebra.data_ops.ViewRepresentation</a>,
+    *,
+    sql_format_options: Optional[<a href="#SQLFormatOptions">data_algebra.db_model.SQLFormatOptions</a>] = None
+) -&gt; str</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ops</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">ops</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">,</span>
+            <span class="o">*</span><span class="p">,</span>
+            <span class="n">sql_format_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SQLFormatOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert ViewRepresentation into SQL string.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -5442,6 +5616,14 @@
             <span class="n">sql_format_options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
         <span class="n">ops</span><span class="o">.</span><span class="n">columns_used</span><span class="p">()</span>  <span class="c1"># for table consistency check/raise</span>
+        <span class="k">if</span> <span class="n">sql_format_options</span><span class="o">.</span><span class="n">warn_on_novel_methods</span><span class="p">:</span>
+            <span class="n">non_known</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_known_methods</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_known</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2"> translation using undocumented method(s): </span><span class="si">{</span><span class="n">non_known</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sql_format_options</span><span class="o">.</span><span class="n">warn_on_method_support</span><span class="p">:</span>
+            <span class="n">non_rec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_recommended_methods</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_rec</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2"> translation doesn&#39;t fully support method(s): </span><span class="si">{</span><span class="n">non_rec</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
         <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">to_near_sql_implementation_</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
@@ -6198,7 +6380,11 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">describe_table</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ops</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">ops</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">,</span>
+            <span class="o">*</span><span class="p">,</span>
+            <span class="n">sql_format_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SQLFormatOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert operations into SQL</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -6439,12 +6625,21 @@
 
         
             <span class="def">def</span>
-            <span class="name">to_sql</span><span class="signature">(self, ops, *, sql_format_options=None) -&gt; str</span>:
+            <span class="name">to_sql</span><span class="signature">(
+    self,
+    ops: <a href="data_ops.html#ViewRepresentation">data_algebra.data_ops.ViewRepresentation</a>,
+    *,
+    sql_format_options: Optional[<a href="#SQLFormatOptions">data_algebra.db_model.SQLFormatOptions</a>] = None
+) -&gt; str</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ops</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">ops</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">,</span>
+            <span class="o">*</span><span class="p">,</span>
+            <span class="n">sql_format_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SQLFormatOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert operations into SQL</span>
 <span class="sd">        &quot;&quot;&quot;</span>

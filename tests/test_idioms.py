@@ -67,9 +67,10 @@ def test_idiom_extend_special_count():
 
     expect = data_algebra.default_data_model.pd.DataFrame({"count": [4]})
 
-    data_algebra.test_util.check_transform(
-        ops=ops, data=d, expect=expect, empty_produces_empty=False
-    )
+    with pytest.warns(UserWarning):
+        data_algebra.test_util.check_transform(
+            ops=ops, data=d, expect=expect, empty_produces_empty=False
+        )
 
 
 # previously forbidden

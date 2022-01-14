@@ -1,5 +1,6 @@
 import numpy
 
+import data_algebra.db_model
 import data_algebra.test_util
 from data_algebra.data_ops import *
 
@@ -42,6 +43,9 @@ def test_free_fn():
 
     # can make SQL (the whole point of allowing this path)
     handle = data_algebra.SQLite.SQLiteModel().db_handle(conn=None)
-    sql = handle.to_sql(ops)
+    with pytest.warns(UserWarning):
+        sql = handle.to_sql(ops)
     assert isinstance(sql, str)
     assert 'FUNCTION_WE_DONT_KNOW_ABOUT("b")' in sql
+    sql_2 = handle.to_sql(ops, sql_format_options=data_algebra.db_model.SQLFormatOptions(warn_on_novel_methods=False))
+    assert sql == sql_2
