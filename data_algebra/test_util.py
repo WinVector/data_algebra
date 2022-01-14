@@ -550,9 +550,11 @@ def check_transform(
             valid_for_empty=valid_for_empty,
             empty_produces_empty=empty_produces_empty,
         )
-    except AssertionError:
+    except AssertionError as ase:
         traceback.print_exc()
+        caught = ase
     except Exception as exc:
+        traceback.print_exc()
         caught = exc
 
     for handle in db_handles:
