@@ -1,6 +1,7 @@
 import pytest
 
 import data_algebra
+from data_algebra.data_ops_types import *
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
 import data_algebra.SparkSQL
 import data_algebra.util
@@ -41,6 +42,6 @@ def test_spark_sql_non_rec():
     ).extend({"qty": "qty.ffill()"}, order_by=['date'])
     db_model = data_algebra.SparkSQL.SparkSQLModel()
     non_rec = db_model.non_recommended_methods(ops)
-    assert non_rec == ['ffill']
+    assert non_rec == [MethodUse(op_name='ffill', is_project=False, is_windowed=True, is_ordered=True)]
     with pytest.warns(UserWarning):
         db_model.to_sql(ops)

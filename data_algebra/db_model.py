@@ -1596,26 +1596,28 @@ class DBModel:
         )
         return near_sql
 
-    def non_known_methods(self, ops: data_algebra.data_ops.ViewRepresentation) -> List[str]:
+    def non_known_methods(
+            self,
+            ops: data_algebra.data_ops.ViewRepresentation) -> List[data_algebra.data_ops_types.MethodUse]:
         """Return list of used non-recommended methods."""
         if self.known_methods is None:
             return []  # can't check, just pass
         # TODO: use use context
         method_uses = ops.methods_used()
-        ops_seen = list(set([m.op_name for m in method_uses]))
-        ops_seen.sort()
-        non_recommended = [op for op in ops_seen if op not in self.known_methods]
+        non_recommended = [op for op in method_uses if op.op_name not in self.known_methods]
+        non_recommended.sort()
         return non_recommended
 
-    def non_recommended_methods(self, ops: data_algebra.data_ops.ViewRepresentation) -> List[str]:
+    def non_recommended_methods(
+            self,
+            ops: data_algebra.data_ops.ViewRepresentation) -> List[data_algebra.data_ops_types.MethodUse]:
         """Return list of used non-recommended methods."""
         if (self.recommended_methods is None) or (self.known_methods is None):
             return []  # can't check, just pass
         # TODO: use use context
         method_uses = ops.methods_used()
-        ops_seen = list(set([m.op_name for m in method_uses]))
-        ops_seen.sort()
-        non_recommended = [op for op in ops_seen if (op not in self.recommended_methods) and (op in self.known_methods)]
+        non_recommended = [op for op in method_uses if
+                           (op.op_name not in self.recommended_methods) and (op.op_name in self.known_methods)]
         return non_recommended
 
     def to_sql(
