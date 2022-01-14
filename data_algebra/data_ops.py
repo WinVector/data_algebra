@@ -1233,7 +1233,7 @@ class ExtendNode(ViewRepresentation):
                     in data_algebra.expr_rep.fn_names_that_contradict_windowed_situation
                 ):
                     raise ValueError(
-                        str(opk) + "' is not allowed in an ordered windowed situation"
+                        str(opk) + "' is not allowed in a windowed situation"
                     )
                 if ordered_windowed_situation and (
                     opk.op
