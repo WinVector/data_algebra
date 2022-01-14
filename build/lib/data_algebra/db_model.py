@@ -1592,7 +1592,7 @@ class DBModel:
         )
         return near_sql
 
-    def non_known_methods(self, ops: data_algebra.data_ops.ViewRepresentation) -> Set[str]:
+    def non_known_methods(self, ops: data_algebra.data_ops.ViewRepresentation) -> List[str]:
         """Return list of used non-recommended methods."""
         if self.known_methods is None:
             return []  # can't check, just pass
@@ -1601,7 +1601,7 @@ class DBModel:
         non_recommended = [op for op in ops_seen if op not in self.known_methods]
         return non_recommended
 
-    def non_recommended_methods(self, ops: data_algebra.data_ops.ViewRepresentation) -> Set[str]:
+    def non_recommended_methods(self, ops: data_algebra.data_ops.ViewRepresentation) -> List[str]:
         """Return list of used non-recommended methods."""
         if (self.recommended_methods is None) or (self.known_methods is None):
             return []  # can't check, just pass
