@@ -1277,13 +1277,6 @@ def _can_find_method_by_name(op):
             return True
     except AttributeError:
         pass
-    # new see if numpy can do this
-    try:
-        fn = numpy.__dict__[op]
-        if callable(fn):
-            return True
-    except KeyError:
-        pass
     return False
 
 

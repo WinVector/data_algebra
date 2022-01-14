@@ -1774,13 +1774,6 @@
             <span class="k">return</span> <span class="kc">True</span>
     <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
         <span class="k">pass</span>
-    <span class="c1"># new see if numpy can do this</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">fn</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
-            <span class="k">return</span> <span class="kc">True</span>
-    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-        <span class="k">pass</span>
     <span class="k">return</span> <span class="kc">False</span>
 
 
