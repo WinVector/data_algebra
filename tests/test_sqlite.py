@@ -243,8 +243,7 @@ def test_sqlite_median():
     assert data_algebra.test_util.equivalent_frames(expect, res_pandas)
     sqlite_handle = data_algebra.SQLite.example_handle()
     sqlite_handle.insert_table(d, table_name='d', allow_overwrite=True)
-    with pytest.warns(UserWarning):  # don't have median in all contexts
-        res_db = sqlite_handle.read_query(ops)
+    res_db = sqlite_handle.read_query(ops)
     sqlite_handle.close()
     assert data_algebra.test_util.equivalent_frames(expect, res_db)
 
@@ -357,8 +356,7 @@ def test_sqlite_any_all_project():
     assert data_algebra.test_util.equivalent_frames(expect, res_pandas)
     sqlite_handle = data_algebra.SQLite.example_handle()
     sqlite_handle.insert_table(d, table_name='d', allow_overwrite=True)
-    with pytest.warns(UserWarning):  # don't have any and all in all contexts
-        res_db = sqlite_handle.read_query(ops)
+    res_db = sqlite_handle.read_query(ops)
     sqlite_handle.close()
     assert data_algebra.test_util.equivalent_frames(expect, res_db)
 

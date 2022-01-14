@@ -109,8 +109,7 @@ def test_method_catalog_issues_project_median():
     res_pandas = ops.transform(d)
     db_handle = data_algebra.SQLite.example_handle()
     db_handle.insert_table(d, table_name='d', allow_overwrite=True)
-    with pytest.warns(UserWarning):  # BigQuery only implements quantile on extend, not project
-        res_db = db_handle.read_query(ops)
+    res_db = db_handle.read_query(ops)
     db_handle.drop_table('d')
     db_handle.close()
     assert data_algebra.test_util.equivalent_frames(res_pandas, res_db)

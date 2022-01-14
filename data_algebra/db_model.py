@@ -615,6 +615,61 @@ db_default_op_replacements = {
 }
 
 
+def _annotated_method_catalogue(model_name: str) -> Tuple[
+    Set[data_algebra.data_ops_types.MethodUse],
+    Set[data_algebra.data_ops_types.MethodUse]
+    ]:
+    """
+    Prepare method lookup tables
+
+    :param: model name (used as column key)
+    :return: (known_method_uses, recommended_method_uses)
+    """
+    known_method_uses: Set[data_algebra.data_ops_types.MethodUse] = set()
+    recommended_method_uses: Set[data_algebra.data_ops_types.MethodUse] = set()
+    for i in range(data_algebra.op_catalog.methods_table.shape[0]):
+        row = data_algebra.op_catalog.methods_table.loc[i, :]
+        matches = []
+        if row['op_class'] == 'p':
+            matches.append(data_algebra.data_ops_types.MethodUse(
+                row['op'],
+                is_project=True,
+                is_windowed=False,
+                is_ordered=False,
+            ))
+        elif row['op_class'] == 'g':
+            matches.append(data_algebra.data_ops_types.MethodUse(
+                row['op'],
+                is_project=False,
+                is_windowed=True,
+                is_ordered=False,
+            ))
+        elif row['op_class'] == 'w':
+            matches.append(data_algebra.data_ops_types.MethodUse(
+                row['op'],
+                is_project=False,
+                is_windowed=True,
+                is_ordered=True,
+            ))
+        else:
+            matches.append(data_algebra.data_ops_types.MethodUse(
+                row['op'],
+                is_project=False,
+                is_windowed=False,
+                is_ordered=False,
+            ))
+        if len(matches) > 0:
+            good_use = (
+                (model_name in data_algebra.op_catalog.methods_table.columns)
+                and (data_algebra.op_catalog.methods_table[model_name].values[i] == 'y'))
+            for m in matches:
+                known_method_uses.add(m)
+                if good_use:
+                    recommended_method_uses.add(m)
+    return known_method_uses, recommended_method_uses
+
+
+
 class DBModel:
     """A model of how SQL should be generated for a given database.
        """
@@ -631,8 +686,8 @@ class DBModel:
     default_SQL_format_options: SQLFormatOptions
     union_all_term_start: str
     union_all_term_end: str
-    known_methods: Optional[Set[str]]
-    recommended_methods: Optional[Set[str]]
+    known_methods: Optional[Set[data_algebra.data_ops_types.MethodUse]]
+    recommended_methods: Optional[Set[data_algebra.data_ops_types.MethodUse]]
 
     def __init__(
         self,
@@ -684,14 +739,9 @@ class DBModel:
         self.known_methods = None
         self.recommended_methods = None
         if str(self) in data_algebra.op_catalog.methods_table.columns:
-            self.known_methods = set(data_algebra.op_catalog.methods_table['op'])
-            # strict, recommend if known to work in all contexts
-            self.recommended_methods = (
-                set(data_algebra.op_catalog.methods_table.loc[
-                        data_algebra.op_catalog.methods_table[str(self)] == 'y', 'op'])
-                - set(data_algebra.op_catalog.methods_table.loc[
-                        data_algebra.op_catalog.methods_table[str(self)] != 'y', 'op'])
-            )
+            k, r = _annotated_method_catalogue(str(self))
+            self.known_methods = k
+            self.recommended_methods = r
 
     def db_handle(self, conn, db_engine=None):
         """
@@ -1602,9 +1652,8 @@ class DBModel:
         """Return list of used non-recommended methods."""
         if self.known_methods is None:
             return []  # can't check, just pass
-        # TODO: use use context
         method_uses = ops.methods_used()
-        non_recommended = [op for op in method_uses if op.op_name not in self.known_methods]
+        non_recommended = [op for op in method_uses if op not in self.known_methods]
         non_recommended.sort()
         return non_recommended
 
@@ -1614,10 +1663,9 @@ class DBModel:
         """Return list of used non-recommended methods."""
         if (self.recommended_methods is None) or (self.known_methods is None):
             return []  # can't check, just pass
-        # TODO: use use context
         method_uses = ops.methods_used()
         non_recommended = [op for op in method_uses if
-                           (op.op_name not in self.recommended_methods) and (op.op_name in self.known_methods)]
+                           (op not in self.recommended_methods) and (op in self.known_methods)]
         return non_recommended
 
     def to_sql(
@@ -1637,11 +1685,11 @@ class DBModel:
         if sql_format_options.warn_on_novel_methods:
             non_known = self.non_known_methods(ops)
             if len(non_known) > 0:
-                warnings.warn(f"{self} translation using undocumented method(s): {non_known}", UserWarning)
+                warnings.warn(f"{self} translation using undocumented method context: {non_known}", UserWarning)
         if sql_format_options.warn_on_method_support:
             non_rec = self.non_recommended_methods(ops)
             if len(non_rec) > 0:
-                warnings.warn(f"{self} translation doesn't fully support method(s): {non_rec}", UserWarning)
+                warnings.warn(f"{self} translation doesn't fully support method context: {non_rec}", UserWarning)
         temp_id_source = [0]
         near_sql = ops.to_near_sql_implementation_(
             db_model=self, using=None, temp_id_source=temp_id_source
