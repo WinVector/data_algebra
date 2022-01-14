@@ -31,6 +31,27 @@
                     <h2>API Documentation</h2>
                         <ul class="memberlist">
             <li>
+                    <a class="class" href="#MethodUse">MethodUse</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#MethodUse.__init__">MethodUse</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#MethodUse.op_name">op_name</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#MethodUse.is_project">is_project</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#MethodUse.is_windowed">is_windowed</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#MethodUse.is_ordered">is_ordered</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
                     <a class="class" href="#OperatorPlatform">OperatorPlatform</a>
                             <ul class="memberlist">
                         <li>
@@ -157,10 +178,19 @@
 <span class="sd">Type defs for data operations.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">NamedTuple</span>
+
 <span class="kn">import</span> <span class="nn">data_algebra.expr_rep</span>
 <span class="kn">import</span> <span class="nn">data_algebra.cdata</span>
 <span class="kn">import</span> <span class="nn">data_algebra.OrderedSet</span>
+
+
+<span class="k">class</span> <span class="nc">MethodUse</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Carry description of a method use&quot;&quot;&quot;</span>
+    <span class="n">op_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">is_project</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">is_windowed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">is_ordered</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 
 
 <span class="k">class</span> <span class="nc">OperatorPlatform</span><span class="p">:</span>
@@ -295,7 +325,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">methods_used</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">methods_used</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">MethodUse</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return set of methods used.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -508,6 +538,104 @@
         </details>
 
             </section>
+                <section id="MethodUse">
+                                <div class="attr class">
+        <a class="headerlink" href="#MethodUse">#&nbsp;&nbsp</a>
+
+        
+        <span class="def">class</span>
+        <span class="name">MethodUse</span><wbr>(<span class="base">typing.NamedTuple</span>):
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">MethodUse</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Carry description of a method use&quot;&quot;&quot;</span>
+    <span class="n">op_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">is_project</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">is_windowed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">is_ordered</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Carry description of a method use</p>
+</div>
+
+
+                            <div id="MethodUse.__init__" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#MethodUse.__init__">#&nbsp;&nbsp</a>
+
+        
+            <span class="name">MethodUse</span><span class="signature">(
+    op_name: str,
+    is_project: bool = False,
+    is_windowed: bool = False,
+    is_ordered: bool = False
+)</span>
+    </div>
+
+        
+            <div class="docstring"><p>Create new instance of MethodUse(op_name, is_project, is_windowed, is_ordered)</p>
+</div>
+
+
+                            </div>
+                            <div id="MethodUse.op_name" class="classattr">
+                                            <div class="attr variable"><a class="headerlink" href="#MethodUse.op_name">#&nbsp;&nbsp</a>
+
+        <span class="name">op_name</span><span class="annotation">: str</span>
+    </div>
+
+            <div class="docstring"><p>Alias for field number 0</p>
+</div>
+
+
+                            </div>
+                            <div id="MethodUse.is_project" class="classattr">
+                                            <div class="attr variable"><a class="headerlink" href="#MethodUse.is_project">#&nbsp;&nbsp</a>
+
+        <span class="name">is_project</span><span class="annotation">: bool</span>
+    </div>
+
+            <div class="docstring"><p>Alias for field number 1</p>
+</div>
+
+
+                            </div>
+                            <div id="MethodUse.is_windowed" class="classattr">
+                                            <div class="attr variable"><a class="headerlink" href="#MethodUse.is_windowed">#&nbsp;&nbsp</a>
+
+        <span class="name">is_windowed</span><span class="annotation">: bool</span>
+    </div>
+
+            <div class="docstring"><p>Alias for field number 2</p>
+</div>
+
+
+                            </div>
+                            <div id="MethodUse.is_ordered" class="classattr">
+                                            <div class="attr variable"><a class="headerlink" href="#MethodUse.is_ordered">#&nbsp;&nbsp</a>
+
+        <span class="name">is_ordered</span><span class="annotation">: bool</span>
+    </div>
+
+            <div class="docstring"><p>Alias for field number 3</p>
+</div>
+
+
+                            </div>
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt>builtins.tuple</dt>
+                                <dd id="MethodUse.index" class="function">index</dd>
+                <dd id="MethodUse.count" class="function">count</dd>
+
+            </div>
+                                </dl>
+                            </div>
+                </section>
                 <section id="OperatorPlatform">
                                 <div class="attr class">
         <a class="headerlink" href="#OperatorPlatform">#&nbsp;&nbsp</a>
@@ -651,7 +779,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">methods_used</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">methods_used</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">MethodUse</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return set of methods used.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1181,12 +1309,12 @@ raise an exception if the values are not consistent.</p>
 
         
             <span class="def">def</span>
-            <span class="name">methods_used</span><span class="signature">(self) -&gt; Set[str]</span>:
+            <span class="name">methods_used</span><span class="signature">(self) -&gt; Set[<a href="#MethodUse">data_algebra.data_ops_types.MethodUse</a>]</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">methods_used</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">methods_used</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">MethodUse</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return set of methods used.</span>
 <span class="sd">        &quot;&quot;&quot;</span>

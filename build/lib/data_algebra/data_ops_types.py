@@ -2,10 +2,19 @@
 Type defs for data operations.
 """
 
-from typing import Dict, Optional, Set
+from typing import Dict, Optional, Set, NamedTuple
+
 import data_algebra.expr_rep
 import data_algebra.cdata
 import data_algebra.OrderedSet
+
+
+class MethodUse(NamedTuple):
+    """Carry description of a method use"""
+    op_name: str
+    is_project: bool = False
+    is_windowed: bool = False
+    is_ordered: bool = False
 
 
 class OperatorPlatform:
@@ -140,7 +149,7 @@ class OperatorPlatform:
         """
         raise NotImplementedError("base class called")
 
-    def methods_used(self) -> Set[str]:
+    def methods_used(self) -> Set[MethodUse]:
         """
         Return set of methods used.
         """

@@ -197,15 +197,15 @@ class ViewRepresentation(OperatorPlatform, ABC):
         """
         raise NotImplementedError("base method called")
 
-    def methods_used(self) -> Set[str]:
+    def methods_used(self) -> Set[MethodUse]:
         """
         Return set of methods used.
         """
-        res: Set[str] = set()
-        self.get_method_names_(res)
+        res: Set[MethodUse] = set()
+        self.get_method_uses_(res)
         return res
 
-    def get_method_names_(self, methods_seen: Set[str]) -> None:
+    def get_method_uses_(self, methods_seen: Set[MethodUse]) -> None:
         """
         Implementation of get methods_used(), internal method.
 
@@ -213,7 +213,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         :return: None
         """
         for s in self.sources:
-            s.get_method_names_(methods_seen)
+            s.get_method_uses_(methods_seen)
 
     def columns_produced(self):
         """Return list of columns produced by operator dag."""
@@ -1128,6 +1128,11 @@ class ExtendNode(ViewRepresentation):
     """
     Class representation of .extend() method/step.
     """
+
+    windowed_situation: bool
+    ordered_windowed_situation: bool
+    partition_by: List[str]
+
     def __init__(
         self, *, source, parsed_ops, partition_by=None, order_by=None, reverse=None
     ):
@@ -1249,6 +1254,7 @@ class ExtendNode(ViewRepresentation):
                     raise ValueError(
                         str(opk) + "' is not allowed in not-ordered windowed situation"
                     )
+        self.ordered_windowed_situation = ordered_windowed_situation
         ViewRepresentation.__init__(
             self, column_names=column_names, sources=[source], node_name="ExtendNode"
         )
@@ -1289,7 +1295,7 @@ class ExtendNode(ViewRepresentation):
                 return False
         return True
 
-    def get_method_names_(self, methods_seen: Set[str]) -> None:
+    def get_method_uses_(self, methods_seen: Set[MethodUse]) -> None:
         """
         Implementation of get methods_used(), internal method.
 
@@ -1297,9 +1303,15 @@ class ExtendNode(ViewRepresentation):
         :return: None
         """
         for s in self.sources:
-            s.get_method_names_(methods_seen)
+            s.get_method_uses_(methods_seen)
+        method_names_seen: Set[str] = set()
         for opk in self.ops.values():
-            opk.get_method_names(methods_seen)
+            opk.get_method_names(method_names_seen)
+        for k in method_names_seen:
+            methods_seen.add(MethodUse(k,
+                            is_project=False,
+                            is_windowed=self.windowed_situation,
+                            is_ordered=self.ordered_windowed_situation))
 
     def check_extend_window_fns_(self):
         """
@@ -1487,7 +1499,7 @@ class ProjectNode(ViewRepresentation):
         forbidden = set(forbidden).intersection(self.column_names)
         return self.sources[0].forbidden_columns(forbidden=forbidden)
 
-    def get_method_names_(self, methods_seen: Set[str]) -> None:
+    def get_method_uses_(self, methods_seen: Set[MethodUse]) -> None:
         """
         Implementation of get methods_used(), internal method.
 
@@ -1495,9 +1507,12 @@ class ProjectNode(ViewRepresentation):
         :return: None
         """
         for s in self.sources:
-            s.get_method_names_(methods_seen)
+            s.get_method_uses_(methods_seen)
+        method_names_seen: Set[str] = set()
         for opk in self.ops.values():
-            opk.get_method_names(methods_seen)
+            opk.get_method_names(method_names_seen)
+        for k in method_names_seen:
+            methods_seen.add(MethodUse(k, is_project=True, is_windowed=False, is_ordered=False))
 
     def apply_to(self, a, *, target_table_key=None):
         """
@@ -1620,7 +1635,7 @@ class SelectRowsNode(ViewRepresentation):
             node_name="SelectRowsNode",
         )
 
-    def get_method_names_(self, methods_seen: Set[str]) -> None:
+    def get_method_uses_(self, methods_seen: Set[MethodUse]) -> None:
         """
         Implementation of get methods_used(), internal method.
 
@@ -1628,8 +1643,11 @@ class SelectRowsNode(ViewRepresentation):
         :return: None
         """
         for s in self.sources:
-            s.get_method_names_(methods_seen)
-        self.expr.get_method_names(methods_seen)
+            s.get_method_uses_(methods_seen)
+        method_names_seen: Set[str] = set()
+        self.expr.get_method_names(method_names_seen)
+        for k in method_names_seen:
+            methods_seen.add(MethodUse(k, is_project=False, is_windowed=False, is_ordered=False))
 
     def apply_to(self, a, *, target_table_key=None):
         """

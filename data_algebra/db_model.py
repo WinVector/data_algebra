@@ -1600,7 +1600,9 @@ class DBModel:
         """Return list of used non-recommended methods."""
         if self.known_methods is None:
             return []  # can't check, just pass
-        ops_seen = list(ops.methods_used())
+        # TODO: use use context
+        method_uses = ops.methods_used()
+        ops_seen = list(set([m.op_name for m in method_uses]))
         ops_seen.sort()
         non_recommended = [op for op in ops_seen if op not in self.known_methods]
         return non_recommended
@@ -1609,7 +1611,9 @@ class DBModel:
         """Return list of used non-recommended methods."""
         if (self.recommended_methods is None) or (self.known_methods is None):
             return []  # can't check, just pass
-        ops_seen = list(ops.methods_used())
+        # TODO: use use context
+        method_uses = ops.methods_used()
+        ops_seen = list(set([m.op_name for m in method_uses]))
         ops_seen.sort()
         non_recommended = [op for op in ops_seen if (op not in self.recommended_methods) and (op in self.known_methods)]
         return non_recommended

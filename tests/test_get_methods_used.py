@@ -1,4 +1,5 @@
 
+from data_algebra.data_ops_types import MethodUse
 from data_algebra.data_ops import TableDescription
 
 
@@ -12,4 +13,12 @@ def test_get_methods_used():
             .extend({'z': 'p + q'})
     )
     found = ops.methods_used()
-    assert found == {'**', '+', '/', '<', 'min', 'max'}
+    expect = {
+        MethodUse(op_name='**', is_project=False, is_windowed=False, is_ordered=False),
+        MethodUse(op_name='+', is_project=False, is_windowed=False, is_ordered=False),
+        MethodUse(op_name='/', is_project=False, is_windowed=False, is_ordered=False),
+        MethodUse(op_name='<', is_project=False, is_windowed=False, is_ordered=False),
+        MethodUse(op_name='max', is_project=True, is_windowed=False, is_ordered=False),
+        MethodUse(op_name='min', is_project=True, is_windowed=False, is_ordered=False),
+    }
+    assert found == expect

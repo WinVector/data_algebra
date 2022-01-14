@@ -58,7 +58,7 @@
                                 <a class="function" href="#ViewRepresentation.methods_used">methods_used</a>
                         </li>
                         <li>
-                                <a class="function" href="#ViewRepresentation.get_method_names_">get_method_names_</a>
+                                <a class="function" href="#ViewRepresentation.get_method_uses_">get_method_uses_</a>
                         </li>
                         <li>
                                 <a class="function" href="#ViewRepresentation.columns_produced">columns_produced</a>
@@ -196,7 +196,7 @@
                                 <a class="function" href="#ExtendNode.apply_to">apply_to</a>
                         </li>
                         <li>
-                                <a class="function" href="#ExtendNode.get_method_names_">get_method_names_</a>
+                                <a class="function" href="#ExtendNode.get_method_uses_">get_method_uses_</a>
                         </li>
                         <li>
                                 <a class="function" href="#ExtendNode.check_extend_window_fns_">check_extend_window_fns_</a>
@@ -223,7 +223,7 @@
                                 <a class="function" href="#ProjectNode.forbidden_columns">forbidden_columns</a>
                         </li>
                         <li>
-                                <a class="function" href="#ProjectNode.get_method_names_">get_method_names_</a>
+                                <a class="function" href="#ProjectNode.get_method_uses_">get_method_uses_</a>
                         </li>
                         <li>
                                 <a class="function" href="#ProjectNode.apply_to">apply_to</a>
@@ -247,7 +247,7 @@
                                 <a class="function" href="#SelectRowsNode.__init__">SelectRowsNode</a>
                         </li>
                         <li>
-                                <a class="function" href="#SelectRowsNode.get_method_names_">get_method_names_</a>
+                                <a class="function" href="#SelectRowsNode.get_method_uses_">get_method_uses_</a>
                         </li>
                         <li>
                                 <a class="function" href="#SelectRowsNode.apply_to">apply_to</a>
@@ -670,15 +670,15 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">methods_used</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">methods_used</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">MethodUse</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return set of methods used.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">res</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">get_method_names_</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+        <span class="n">res</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">MethodUse</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_method_uses_</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">res</span>
 
-    <span class="k">def</span> <span class="nf">get_method_names_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">get_method_uses_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">MethodUse</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Implementation of get methods_used(), internal method.</span>
 
@@ -686,7 +686,7 @@
 <span class="sd">        :return: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">:</span>
-            <span class="n">s</span><span class="o">.</span><span class="n">get_method_names_</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">get_method_uses_</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">columns_produced</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return list of columns produced by operator dag.&quot;&quot;&quot;</span>
@@ -1601,6 +1601,11 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class representation of .extend() method/step.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">windowed_situation</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">ordered_windowed_situation</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">partition_by</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">parsed_ops</span><span class="p">,</span> <span class="n">partition_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
@@ -1722,6 +1727,7 @@
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                         <span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&#39; is not allowed in not-ordered windowed situation&quot;</span>
                     <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ordered_windowed_situation</span> <span class="o">=</span> <span class="n">ordered_windowed_situation</span>
         <span class="n">ViewRepresentation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span> <span class="n">sources</span><span class="o">=</span><span class="p">[</span><span class="n">source</span><span class="p">],</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;ExtendNode&quot;</span>
         <span class="p">)</span>
@@ -1762,7 +1768,7 @@
                 <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">get_method_names_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">get_method_uses_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">MethodUse</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Implementation of get methods_used(), internal method.</span>
 
@@ -1770,9 +1776,15 @@
 <span class="sd">        :return: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">:</span>
-            <span class="n">s</span><span class="o">.</span><span class="n">get_method_names_</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">get_method_uses_</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
+        <span class="n">method_names_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">opk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-            <span class="n">opk</span><span class="o">.</span><span class="n">get_method_names</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
+            <span class="n">opk</span><span class="o">.</span><span class="n">get_method_names</span><span class="p">(</span><span class="n">method_names_seen</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">method_names_seen</span><span class="p">:</span>
+            <span class="n">methods_seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">MethodUse</span><span class="p">(</span><span class="n">k</span><span class="p">,</span>
+                            <span class="n">is_project</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                            <span class="n">is_windowed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">windowed_situation</span><span class="p">,</span>
+                            <span class="n">is_ordered</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ordered_windowed_situation</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">check_extend_window_fns_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1960,7 +1972,7 @@
         <span class="n">forbidden</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">forbidden</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">forbidden_columns</span><span class="p">(</span><span class="n">forbidden</span><span class="o">=</span><span class="n">forbidden</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_method_names_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">get_method_uses_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">MethodUse</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Implementation of get methods_used(), internal method.</span>
 
@@ -1968,9 +1980,12 @@
 <span class="sd">        :return: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">:</span>
-            <span class="n">s</span><span class="o">.</span><span class="n">get_method_names_</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">get_method_uses_</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
+        <span class="n">method_names_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">opk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-            <span class="n">opk</span><span class="o">.</span><span class="n">get_method_names</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
+            <span class="n">opk</span><span class="o">.</span><span class="n">get_method_names</span><span class="p">(</span><span class="n">method_names_seen</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">method_names_seen</span><span class="p">:</span>
+            <span class="n">methods_seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">MethodUse</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">is_project</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">is_windowed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_ordered</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_table_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -2093,7 +2108,7 @@
             <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;SelectRowsNode&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_method_names_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">get_method_uses_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">MethodUse</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Implementation of get methods_used(), internal method.</span>
 
@@ -2101,8 +2116,11 @@
 <span class="sd">        :return: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">:</span>
-            <span class="n">s</span><span class="o">.</span><span class="n">get_method_names_</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">expr</span><span class="o">.</span><span class="n">get_method_names</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">get_method_uses_</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
+        <span class="n">method_names_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expr</span><span class="o">.</span><span class="n">get_method_names</span><span class="p">(</span><span class="n">method_names_seen</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">method_names_seen</span><span class="p">:</span>
+            <span class="n">methods_seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">MethodUse</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">is_project</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_windowed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_ordered</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_table_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -3343,15 +3361,15 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">methods_used</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">methods_used</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">MethodUse</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return set of methods used.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">res</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">get_method_names_</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+        <span class="n">res</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">MethodUse</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_method_uses_</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">res</span>
 
-    <span class="k">def</span> <span class="nf">get_method_names_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">get_method_uses_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">MethodUse</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Implementation of get methods_used(), internal method.</span>
 
@@ -3359,7 +3377,7 @@
 <span class="sd">        :return: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">:</span>
-            <span class="n">s</span><span class="o">.</span><span class="n">get_method_names_</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">get_method_uses_</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">columns_produced</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return list of columns produced by operator dag.&quot;&quot;&quot;</span>
@@ -4174,17 +4192,17 @@ raise an exception if the values are not consistent.</p>
 
         
             <span class="def">def</span>
-            <span class="name">methods_used</span><span class="signature">(self) -&gt; Set[str]</span>:
+            <span class="name">methods_used</span><span class="signature">(self) -&gt; Set[<a href="data_ops_types.html#MethodUse">data_algebra.data_ops_types.MethodUse</a>]</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">methods_used</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">methods_used</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">MethodUse</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return set of methods used.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">res</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">get_method_names_</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+        <span class="n">res</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">MethodUse</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_method_uses_</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">res</span>
 </pre></div>
 
@@ -4195,17 +4213,20 @@ raise an exception if the values are not consistent.</p>
 
 
                             </div>
-                            <div id="ViewRepresentation.get_method_names_" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#ViewRepresentation.get_method_names_">#&nbsp;&nbsp</a>
+                            <div id="ViewRepresentation.get_method_uses_" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#ViewRepresentation.get_method_uses_">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">get_method_names_</span><span class="signature">(self, methods_seen: Set[str]) -&gt; None</span>:
+            <span class="name">get_method_uses_</span><span class="signature">(
+    self,
+    methods_seen: Set[<a href="data_ops_types.html#MethodUse">data_algebra.data_ops_types.MethodUse</a>]
+) -&gt; None</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_method_names_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_method_uses_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">MethodUse</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Implementation of get methods_used(), internal method.</span>
 
@@ -4213,7 +4234,7 @@ raise an exception if the values are not consistent.</p>
 <span class="sd">        :return: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">:</span>
-            <span class="n">s</span><span class="o">.</span><span class="n">get_method_names_</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">get_method_uses_</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -5984,7 +6005,7 @@ raise an exception if the values are not consistent</p>
                                 <dd id="TableDescription.column_map" class="function"><a href="#ViewRepresentation.column_map">column_map</a></dd>
                 <dd id="TableDescription.ex" class="function"><a href="#ViewRepresentation.ex">ex</a></dd>
                 <dd id="TableDescription.methods_used" class="function"><a href="#ViewRepresentation.methods_used">methods_used</a></dd>
-                <dd id="TableDescription.get_method_names_" class="function"><a href="#ViewRepresentation.get_method_names_">get_method_names_</a></dd>
+                <dd id="TableDescription.get_method_uses_" class="function"><a href="#ViewRepresentation.get_method_uses_">get_method_uses_</a></dd>
                 <dd id="TableDescription.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="TableDescription.columns_used_implementation_" class="function"><a href="#ViewRepresentation.columns_used_implementation_">columns_used_implementation_</a></dd>
                 <dd id="TableDescription.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
@@ -6239,6 +6260,11 @@ raise an exception if the values are not consistent</p>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class representation of .extend() method/step.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">windowed_situation</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">ordered_windowed_situation</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">partition_by</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">parsed_ops</span><span class="p">,</span> <span class="n">partition_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
@@ -6360,6 +6386,7 @@ raise an exception if the values are not consistent</p>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                         <span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&#39; is not allowed in not-ordered windowed situation&quot;</span>
                     <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ordered_windowed_situation</span> <span class="o">=</span> <span class="n">ordered_windowed_situation</span>
         <span class="n">ViewRepresentation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span> <span class="n">sources</span><span class="o">=</span><span class="p">[</span><span class="n">source</span><span class="p">],</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;ExtendNode&quot;</span>
         <span class="p">)</span>
@@ -6400,7 +6427,7 @@ raise an exception if the values are not consistent</p>
                 <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">get_method_names_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">get_method_uses_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">MethodUse</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Implementation of get methods_used(), internal method.</span>
 
@@ -6408,9 +6435,15 @@ raise an exception if the values are not consistent</p>
 <span class="sd">        :return: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">:</span>
-            <span class="n">s</span><span class="o">.</span><span class="n">get_method_names_</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">get_method_uses_</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
+        <span class="n">method_names_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">opk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-            <span class="n">opk</span><span class="o">.</span><span class="n">get_method_names</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
+            <span class="n">opk</span><span class="o">.</span><span class="n">get_method_names</span><span class="p">(</span><span class="n">method_names_seen</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">method_names_seen</span><span class="p">:</span>
+            <span class="n">methods_seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">MethodUse</span><span class="p">(</span><span class="n">k</span><span class="p">,</span>
+                            <span class="n">is_project</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                            <span class="n">is_windowed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">windowed_situation</span><span class="p">,</span>
+                            <span class="n">is_ordered</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ordered_windowed_situation</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">check_extend_window_fns_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -6661,6 +6694,7 @@ raise an exception if the values are not consistent</p>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                         <span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&#39; is not allowed in not-ordered windowed situation&quot;</span>
                     <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ordered_windowed_situation</span> <span class="o">=</span> <span class="n">ordered_windowed_situation</span>
         <span class="n">ViewRepresentation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span> <span class="n">sources</span><span class="o">=</span><span class="p">[</span><span class="n">source</span><span class="p">],</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;ExtendNode&quot;</span>
         <span class="p">)</span>
@@ -6711,17 +6745,20 @@ raise an exception if the values are not consistent</p>
 
 
                             </div>
-                            <div id="ExtendNode.get_method_names_" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#ExtendNode.get_method_names_">#&nbsp;&nbsp</a>
+                            <div id="ExtendNode.get_method_uses_" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#ExtendNode.get_method_uses_">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">get_method_names_</span><span class="signature">(self, methods_seen: Set[str]) -&gt; None</span>:
+            <span class="name">get_method_uses_</span><span class="signature">(
+    self,
+    methods_seen: Set[<a href="data_ops_types.html#MethodUse">data_algebra.data_ops_types.MethodUse</a>]
+) -&gt; None</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_method_names_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_method_uses_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">MethodUse</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Implementation of get methods_used(), internal method.</span>
 
@@ -6729,9 +6766,15 @@ raise an exception if the values are not consistent</p>
 <span class="sd">        :return: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">:</span>
-            <span class="n">s</span><span class="o">.</span><span class="n">get_method_names_</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">get_method_uses_</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
+        <span class="n">method_names_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">opk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-            <span class="n">opk</span><span class="o">.</span><span class="n">get_method_names</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
+            <span class="n">opk</span><span class="o">.</span><span class="n">get_method_names</span><span class="p">(</span><span class="n">method_names_seen</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">method_names_seen</span><span class="p">:</span>
+            <span class="n">methods_seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">MethodUse</span><span class="p">(</span><span class="n">k</span><span class="p">,</span>
+                            <span class="n">is_project</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                            <span class="n">is_windowed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">windowed_situation</span><span class="p">,</span>
+                            <span class="n">is_ordered</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ordered_windowed_situation</span><span class="p">))</span>
 </pre></div>
 
         </details>
@@ -7083,7 +7126,7 @@ raise an exception if the values are not consistent</p>
         <span class="n">forbidden</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">forbidden</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">forbidden_columns</span><span class="p">(</span><span class="n">forbidden</span><span class="o">=</span><span class="n">forbidden</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_method_names_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">get_method_uses_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">MethodUse</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Implementation of get methods_used(), internal method.</span>
 
@@ -7091,9 +7134,12 @@ raise an exception if the values are not consistent</p>
 <span class="sd">        :return: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">:</span>
-            <span class="n">s</span><span class="o">.</span><span class="n">get_method_names_</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">get_method_uses_</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
+        <span class="n">method_names_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">opk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-            <span class="n">opk</span><span class="o">.</span><span class="n">get_method_names</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
+            <span class="n">opk</span><span class="o">.</span><span class="n">get_method_names</span><span class="p">(</span><span class="n">method_names_seen</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">method_names_seen</span><span class="p">:</span>
+            <span class="n">methods_seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">MethodUse</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">is_project</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">is_windowed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_ordered</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_table_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -7311,17 +7357,20 @@ raise an exception if the values are not consistent</p>
 
 
                             </div>
-                            <div id="ProjectNode.get_method_names_" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#ProjectNode.get_method_names_">#&nbsp;&nbsp</a>
+                            <div id="ProjectNode.get_method_uses_" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#ProjectNode.get_method_uses_">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">get_method_names_</span><span class="signature">(self, methods_seen: Set[str]) -&gt; None</span>:
+            <span class="name">get_method_uses_</span><span class="signature">(
+    self,
+    methods_seen: Set[<a href="data_ops_types.html#MethodUse">data_algebra.data_ops_types.MethodUse</a>]
+) -&gt; None</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_method_names_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_method_uses_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">MethodUse</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Implementation of get methods_used(), internal method.</span>
 
@@ -7329,9 +7378,12 @@ raise an exception if the values are not consistent</p>
 <span class="sd">        :return: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">:</span>
-            <span class="n">s</span><span class="o">.</span><span class="n">get_method_names_</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">get_method_uses_</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
+        <span class="n">method_names_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">opk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-            <span class="n">opk</span><span class="o">.</span><span class="n">get_method_names</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
+            <span class="n">opk</span><span class="o">.</span><span class="n">get_method_names</span><span class="p">(</span><span class="n">method_names_seen</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">method_names_seen</span><span class="p">:</span>
+            <span class="n">methods_seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">MethodUse</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">is_project</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">is_windowed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_ordered</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
 </pre></div>
 
         </details>
@@ -7609,7 +7661,7 @@ raise an exception if the values are not consistent</p>
             <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;SelectRowsNode&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_method_names_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">get_method_uses_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">MethodUse</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Implementation of get methods_used(), internal method.</span>
 
@@ -7617,8 +7669,11 @@ raise an exception if the values are not consistent</p>
 <span class="sd">        :return: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">:</span>
-            <span class="n">s</span><span class="o">.</span><span class="n">get_method_names_</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">expr</span><span class="o">.</span><span class="n">get_method_names</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">get_method_uses_</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
+        <span class="n">method_names_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expr</span><span class="o">.</span><span class="n">get_method_names</span><span class="p">(</span><span class="n">method_names_seen</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">method_names_seen</span><span class="p">:</span>
+            <span class="n">methods_seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">MethodUse</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">is_project</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_windowed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_ordered</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_table_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -7731,17 +7786,20 @@ raise an exception if the values are not consistent</p>
     
 
                             </div>
-                            <div id="SelectRowsNode.get_method_names_" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#SelectRowsNode.get_method_names_">#&nbsp;&nbsp</a>
+                            <div id="SelectRowsNode.get_method_uses_" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#SelectRowsNode.get_method_uses_">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">get_method_names_</span><span class="signature">(self, methods_seen: Set[str]) -&gt; None</span>:
+            <span class="name">get_method_uses_</span><span class="signature">(
+    self,
+    methods_seen: Set[<a href="data_ops_types.html#MethodUse">data_algebra.data_ops_types.MethodUse</a>]
+) -&gt; None</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_method_names_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_method_uses_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">MethodUse</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Implementation of get methods_used(), internal method.</span>
 
@@ -7749,8 +7807,11 @@ raise an exception if the values are not consistent</p>
 <span class="sd">        :return: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">:</span>
-            <span class="n">s</span><span class="o">.</span><span class="n">get_method_names_</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">expr</span><span class="o">.</span><span class="n">get_method_names</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">get_method_uses_</span><span class="p">(</span><span class="n">methods_seen</span><span class="p">)</span>
+        <span class="n">method_names_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expr</span><span class="o">.</span><span class="n">get_method_names</span><span class="p">(</span><span class="n">method_names_seen</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">method_names_seen</span><span class="p">:</span>
+            <span class="n">methods_seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">MethodUse</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">is_project</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_windowed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_ordered</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
 </pre></div>
 
         </details>
@@ -8335,7 +8396,7 @@ raise an exception if the values are not consistent</p>
                 <dd id="SelectColumnsNode.ex" class="function"><a href="#ViewRepresentation.ex">ex</a></dd>
                 <dd id="SelectColumnsNode.get_tables" class="function"><a href="#ViewRepresentation.get_tables">get_tables</a></dd>
                 <dd id="SelectColumnsNode.methods_used" class="function"><a href="#ViewRepresentation.methods_used">methods_used</a></dd>
-                <dd id="SelectColumnsNode.get_method_names_" class="function"><a href="#ViewRepresentation.get_method_names_">get_method_names_</a></dd>
+                <dd id="SelectColumnsNode.get_method_uses_" class="function"><a href="#ViewRepresentation.get_method_uses_">get_method_uses_</a></dd>
                 <dd id="SelectColumnsNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="SelectColumnsNode.columns_used_implementation_" class="function"><a href="#ViewRepresentation.columns_used_implementation_">columns_used_implementation_</a></dd>
                 <dd id="SelectColumnsNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
@@ -8738,7 +8799,7 @@ raise an exception if the values are not consistent</p>
                 <dd id="DropColumnsNode.ex" class="function"><a href="#ViewRepresentation.ex">ex</a></dd>
                 <dd id="DropColumnsNode.get_tables" class="function"><a href="#ViewRepresentation.get_tables">get_tables</a></dd>
                 <dd id="DropColumnsNode.methods_used" class="function"><a href="#ViewRepresentation.methods_used">methods_used</a></dd>
-                <dd id="DropColumnsNode.get_method_names_" class="function"><a href="#ViewRepresentation.get_method_names_">get_method_names_</a></dd>
+                <dd id="DropColumnsNode.get_method_uses_" class="function"><a href="#ViewRepresentation.get_method_uses_">get_method_uses_</a></dd>
                 <dd id="DropColumnsNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="DropColumnsNode.columns_used_implementation_" class="function"><a href="#ViewRepresentation.columns_used_implementation_">columns_used_implementation_</a></dd>
                 <dd id="DropColumnsNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
@@ -9156,7 +9217,7 @@ raise an exception if the values are not consistent</p>
                 <dd id="OrderRowsNode.ex" class="function"><a href="#ViewRepresentation.ex">ex</a></dd>
                 <dd id="OrderRowsNode.get_tables" class="function"><a href="#ViewRepresentation.get_tables">get_tables</a></dd>
                 <dd id="OrderRowsNode.methods_used" class="function"><a href="#ViewRepresentation.methods_used">methods_used</a></dd>
-                <dd id="OrderRowsNode.get_method_names_" class="function"><a href="#ViewRepresentation.get_method_names_">get_method_names_</a></dd>
+                <dd id="OrderRowsNode.get_method_uses_" class="function"><a href="#ViewRepresentation.get_method_uses_">get_method_uses_</a></dd>
                 <dd id="OrderRowsNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="OrderRowsNode.columns_used_implementation_" class="function"><a href="#ViewRepresentation.columns_used_implementation_">columns_used_implementation_</a></dd>
                 <dd id="OrderRowsNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
@@ -9603,7 +9664,7 @@ raise an exception if the values are not consistent</p>
                 <dd id="RenameColumnsNode.ex" class="function"><a href="#ViewRepresentation.ex">ex</a></dd>
                 <dd id="RenameColumnsNode.get_tables" class="function"><a href="#ViewRepresentation.get_tables">get_tables</a></dd>
                 <dd id="RenameColumnsNode.methods_used" class="function"><a href="#ViewRepresentation.methods_used">methods_used</a></dd>
-                <dd id="RenameColumnsNode.get_method_names_" class="function"><a href="#ViewRepresentation.get_method_names_">get_method_names_</a></dd>
+                <dd id="RenameColumnsNode.get_method_uses_" class="function"><a href="#ViewRepresentation.get_method_uses_">get_method_uses_</a></dd>
                 <dd id="RenameColumnsNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="RenameColumnsNode.columns_used_implementation_" class="function"><a href="#ViewRepresentation.columns_used_implementation_">columns_used_implementation_</a></dd>
                 <dd id="RenameColumnsNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
@@ -10083,7 +10144,7 @@ raise an exception if the values are not consistent</p>
                 <dd id="NaturalJoinNode.ex" class="function"><a href="#ViewRepresentation.ex">ex</a></dd>
                 <dd id="NaturalJoinNode.get_tables" class="function"><a href="#ViewRepresentation.get_tables">get_tables</a></dd>
                 <dd id="NaturalJoinNode.methods_used" class="function"><a href="#ViewRepresentation.methods_used">methods_used</a></dd>
-                <dd id="NaturalJoinNode.get_method_names_" class="function"><a href="#ViewRepresentation.get_method_names_">get_method_names_</a></dd>
+                <dd id="NaturalJoinNode.get_method_uses_" class="function"><a href="#ViewRepresentation.get_method_uses_">get_method_uses_</a></dd>
                 <dd id="NaturalJoinNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="NaturalJoinNode.columns_used_implementation_" class="function"><a href="#ViewRepresentation.columns_used_implementation_">columns_used_implementation_</a></dd>
                 <dd id="NaturalJoinNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
@@ -10515,7 +10576,7 @@ raise an exception if the values are not consistent</p>
                 <dd id="ConcatRowsNode.ex" class="function"><a href="#ViewRepresentation.ex">ex</a></dd>
                 <dd id="ConcatRowsNode.get_tables" class="function"><a href="#ViewRepresentation.get_tables">get_tables</a></dd>
                 <dd id="ConcatRowsNode.methods_used" class="function"><a href="#ViewRepresentation.methods_used">methods_used</a></dd>
-                <dd id="ConcatRowsNode.get_method_names_" class="function"><a href="#ViewRepresentation.get_method_names_">get_method_names_</a></dd>
+                <dd id="ConcatRowsNode.get_method_uses_" class="function"><a href="#ViewRepresentation.get_method_uses_">get_method_uses_</a></dd>
                 <dd id="ConcatRowsNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="ConcatRowsNode.columns_used_implementation_" class="function"><a href="#ViewRepresentation.columns_used_implementation_">columns_used_implementation_</a></dd>
                 <dd id="ConcatRowsNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
@@ -10931,7 +10992,7 @@ raise an exception if the values are not consistent</p>
                 <dd id="ConvertRecordsNode.ex" class="function"><a href="#ViewRepresentation.ex">ex</a></dd>
                 <dd id="ConvertRecordsNode.get_tables" class="function"><a href="#ViewRepresentation.get_tables">get_tables</a></dd>
                 <dd id="ConvertRecordsNode.methods_used" class="function"><a href="#ViewRepresentation.methods_used">methods_used</a></dd>
-                <dd id="ConvertRecordsNode.get_method_names_" class="function"><a href="#ViewRepresentation.get_method_names_">get_method_names_</a></dd>
+                <dd id="ConvertRecordsNode.get_method_uses_" class="function"><a href="#ViewRepresentation.get_method_uses_">get_method_uses_</a></dd>
                 <dd id="ConvertRecordsNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="ConvertRecordsNode.columns_used_implementation_" class="function"><a href="#ViewRepresentation.columns_used_implementation_">columns_used_implementation_</a></dd>
                 <dd id="ConvertRecordsNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
@@ -11316,7 +11377,7 @@ raise an exception if the values are not consistent.</p>
                 <dd id="SQLNode.merged_rep_id" class="function"><a href="#ViewRepresentation.merged_rep_id">merged_rep_id</a></dd>
                 <dd id="SQLNode.ex" class="function"><a href="#ViewRepresentation.ex">ex</a></dd>
                 <dd id="SQLNode.methods_used" class="function"><a href="#ViewRepresentation.methods_used">methods_used</a></dd>
-                <dd id="SQLNode.get_method_names_" class="function"><a href="#ViewRepresentation.get_method_names_">get_method_names_</a></dd>
+                <dd id="SQLNode.get_method_uses_" class="function"><a href="#ViewRepresentation.get_method_uses_">get_method_uses_</a></dd>
                 <dd id="SQLNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="SQLNode.columns_used_implementation_" class="function"><a href="#ViewRepresentation.columns_used_implementation_">columns_used_implementation_</a></dd>
                 <dd id="SQLNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
