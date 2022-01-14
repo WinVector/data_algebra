@@ -190,7 +190,7 @@ def test_t_test_example_2():
         d_sub = d_grouped.get_group(g)
         v_s1 = d_sub.loc[d_sub['sensor'] == 's1', 'value']
         v_s2 = d_sub.loc[d_sub['sensor'] == 's2', 'value']
-        res_g = scipy.stats.ttest_ind(v_s1, v_s2)
+        res_g = scipy.stats.ttest_ind(v_s1, v_s2, equal_var=False)
         return data_algebra.default_data_model.pd.DataFrame({
             'group': [g],
             't': [res_g.statistic],
