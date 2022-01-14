@@ -49,9 +49,24 @@ def _sqlite_RAND_expr(dbmodel, expression):
     )
 
 
+def _sqlite_remainder_expr(dbmodel, expression):
+    """
+    Return SQL to check for bad values.
+    """
+
+    return (
+        "("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
+        + ' % '
+        + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
+        + ")"
+    )
+
+
 SQLite_formatters = {
     "is_bad": _sqlite_is_bad_expr,
     "rand": _sqlite_RAND_expr,
+    "remainder": _sqlite_remainder_expr,
 }
 
 

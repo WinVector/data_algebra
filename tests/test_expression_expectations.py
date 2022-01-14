@@ -5,6 +5,7 @@ import pandas as pd
 import pickle
 import gzip
 
+import data_algebra
 from data_algebra.data_ops import *
 import data_algebra.SQLite
 import data_algebra.test_util
@@ -13,8 +14,6 @@ import data_algebra.test_util
 def test_expression_expectations_1():
     dir_path = os.path.dirname(os.path.realpath(__file__))
     # https://github.com/WinVector/data_algebra/blob/main/Examples/Methods/data_algebra_catalog.ipynb
-    datetime_format = "%Y-%m-%d %H:%M:%S"
-    date_format = "%Y-%m-%d"
 
     def f(expression):
         return (
@@ -58,7 +57,9 @@ def test_expression_expectations_1():
 
     ops_list = e_expectations + g_expectations + w_expectations
     for op, op_class, exp, ops, expect in ops_list:
-        res = ops.transform(d)
-        assert data_algebra.test_util.equivalent_frames(res, expect)
+        if data_algebra.default_data_model.is_appropriate_data_instance(expect):
+            res = ops.transform(d)
+            assert data_algebra.test_util.equivalent_frames(res, expect)
     for op, op_class, exp, ops, expect in u_results:
-        res = ops.transform(d)
+        # re-run, but don't check value
+        ops.transform(d)
