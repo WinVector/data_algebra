@@ -249,8 +249,12 @@ def _run_handle_experiments(
                         and (res_db_sql_i is not None)
                     ):
                         test_result_cache[mk_key(i)] = res_db_sql_i.copy()
-        except Exception as e:
-            caught = e
+        except AssertionError as ase:
+            traceback.print_exc()
+            caught = ase
+        except Exception as exc:
+            traceback.print_exc()
+            caught = exc
         for k in to_del:
             db_handle.drop_table(k)
         if caught is not None:
@@ -550,9 +554,11 @@ def check_transform(
             valid_for_empty=valid_for_empty,
             empty_produces_empty=empty_produces_empty,
         )
-    except AssertionError:
+    except AssertionError as ase:
         traceback.print_exc()
+        caught = ase
     except Exception as exc:
+        traceback.print_exc()
         caught = exc
 
     for handle in db_handles:

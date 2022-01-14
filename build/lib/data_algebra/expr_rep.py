@@ -550,7 +550,7 @@ class Term(PreTerm, ABC):
         """
         Return modulo of items (vectorized).
         """
-        return self.__op_expr__("mod", other)
+        return self.__op_expr__("mod", other, inline=False, method=True)
 
     def remainder(self, other):
         """
