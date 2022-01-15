@@ -745,7 +745,7 @@ class DBModel:
             self.known_methods = k_meth
             self.recommended_methods = r_meth
 
-    def db_handle(self, conn, db_engine=None):
+    def db_handle(self, conn, *, db_engine=None):
         """
 
         :param conn: database connection

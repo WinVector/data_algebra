@@ -162,7 +162,7 @@ class BigQueryModel(data_algebra.db_model.DBModel):
         job = conn.load_table_from_dataframe(d, prepped_table_name)
         job.result()
 
-    def db_handle(self, conn):
+    def db_handle(self, conn, *, db_engine=None):
         return BigQuery_DBHandle(db_model=self, conn=conn)
 
 
@@ -173,19 +173,19 @@ class BigQuery_DBHandle(data_algebra.db_model.DBHandle):
 
     def describe_bq_table(
         self, *, table_catalog, table_schema, table_name, row_limit=7
-    ):
+    ) -> data_algebra.data_ops.TableDescription:
         full_name = f"{table_catalog}.{table_schema}.{table_name}"
         head = self.db_model.read_query(
             conn=self.conn,
             q="SELECT * FROM "
-            + self.db_model.quote_table_name(full_name)
+            + self.db_model.quote_identifier(full_name)  # don't quote table name: adds more qualifiers
             + " LIMIT "
             + str(row_limit),
         )
         cat_name = f"{table_catalog}.{table_schema}.INFORMATION_SCHEMA.COLUMNS"
         sql_meta = self.db_model.read_query(
             self.conn,
-            f"SELECT * FROM {self.db_model.quote_table_name(cat_name)} "
+            f"SELECT * FROM {self.db_model.quote_identifier(cat_name)} "
             + f"WHERE table_name={self.db_model.quote_string(table_name)}",
         )
         qualifiers = {
@@ -203,14 +203,26 @@ class BigQuery_DBHandle(data_algebra.db_model.DBHandle):
         )
         return td
 
-    def query_to_csv(self, q, *, res_name):
+    def query_to_csv(self, q, *, res_name) -> None:
+        """Write query to csv"""
         if isinstance(q, data_algebra.data_ops.ViewRepresentation):
             q = q.to_sql(self.db_model)
         else:
             q = str(q)
-        op = lambda: open(res_name, "w")
+
+        def open_regular():
+            """open regular"""
+            return lambda: open(res_name, "w")
+
+        def open_gzip():
+            """open gzipped"""
+            return lambda: gzip.open(res_name, "w")
+
         if res_name.endswith(".gz"):
-            op = lambda: gzip.open(res_name, "w")
+            op = open_gzip
+        else:
+            op = open_regular()
+
         with op() as res:
             res_iter = self.conn.query(q).result().to_dataframe_iterable()
             is_first = True

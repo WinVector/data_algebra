@@ -963,7 +963,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">known_methods</span> <span class="o">=</span> <span class="n">k_meth</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">recommended_methods</span> <span class="o">=</span> <span class="n">r_meth</span>
 
-    <span class="k">def</span> <span class="nf">db_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">db_engine</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">db_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">db_engine</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        :param conn: database connection</span>
@@ -2714,7 +2714,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">known_methods</span> <span class="o">=</span> <span class="n">k_meth</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">recommended_methods</span> <span class="o">=</span> <span class="n">r_meth</span>
 
-    <span class="k">def</span> <span class="nf">db_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">db_engine</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">db_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">db_engine</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        :param conn: database connection</span>
@@ -4238,12 +4238,12 @@
 
         
             <span class="def">def</span>
-            <span class="name">db_handle</span><span class="signature">(self, conn, db_engine=None)</span>:
+            <span class="name">db_handle</span><span class="signature">(self, conn, *, db_engine=None)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">db_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">db_engine</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">db_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">db_engine</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        :param conn: database connection</span>
