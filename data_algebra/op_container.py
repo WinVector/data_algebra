@@ -44,6 +44,7 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         return self
 
     def methods_used(self) -> Set[MethodUse]:
+        assert self.ops is not None  # type hint and guard
         return self.ops.methods_used()
 
     def get_ops(self):

@@ -2,14 +2,14 @@
 Utils that help with testing. This module is allowed to import many other modules.
 """
 
-import numpy
-
-import data_algebra
-
 import pickle
 import hashlib
 import traceback
+from typing import Any, Optional
 
+import numpy
+
+import data_algebra
 import data_algebra.db_model
 import data_algebra.SQLite
 import data_algebra.BigQuery
@@ -231,7 +231,7 @@ def _run_handle_experiments(
     # generate any new needed results
     if need_to_run:
         to_del = set()
-        caught = None
+        caught: Optional[Any] = None
         for (k, v) in data.items():
             db_handle.insert_table(v, table_name=k, allow_overwrite=True)
             to_del.add(k)
@@ -539,7 +539,7 @@ def check_transform(
         models_to_skip = set(models_to_skip)
         db_handles = [h for h in db_handles if str(h.db_model) not in models_to_skip]
 
-    caught = None
+    caught: Optional[Any] = None
     try:
         check_transform_on_handles(
             ops=ops,

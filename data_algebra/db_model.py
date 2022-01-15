@@ -615,10 +615,11 @@ db_default_op_replacements = {
 }
 
 
-def _annotated_method_catalogue(model_name: str) -> Tuple[
-    Set[data_algebra.data_ops_types.MethodUse],
-    Set[data_algebra.data_ops_types.MethodUse]
-    ]:
+def _annotated_method_catalogue(
+        model_name: str) -> Tuple[
+            Set[data_algebra.data_ops_types.MethodUse],
+            Set[data_algebra.data_ops_types.MethodUse]
+            ]:
     """
     Prepare method lookup tables
 
@@ -667,7 +668,6 @@ def _annotated_method_catalogue(model_name: str) -> Tuple[
                 if good_use:
                     recommended_method_uses.add(m)
     return known_method_uses, recommended_method_uses
-
 
 
 class DBModel:
@@ -739,9 +739,11 @@ class DBModel:
         self.known_methods = None
         self.recommended_methods = None
         if str(self) in data_algebra.op_catalog.methods_table.columns:
-            k, r = _annotated_method_catalogue(str(self))
-            self.known_methods = k
-            self.recommended_methods = r
+            k_meth, r_meth = _annotated_method_catalogue(str(self))
+            assert k_meth is not None  # type hint
+            assert r_meth is not None  # type hint
+            self.known_methods = k_meth
+            self.recommended_methods = r_meth
 
     def db_handle(self, conn, db_engine=None):
         """
