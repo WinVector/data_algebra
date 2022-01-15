@@ -2,7 +2,7 @@
 Represent data processing expressions.
 """
 
-from abc import ABC
+import abc
 from typing import Any, List, Optional, Set, Union
 
 import numpy
@@ -125,7 +125,7 @@ fn_names_that_contradict_ordered_windowed_situation = {
 }
 
 
-class PreTerm(ABC):
+class PreTerm(abc.ABC):
     """
     abstract base class, without combination ability
     """
@@ -135,26 +135,26 @@ class PreTerm(ABC):
     def __init__(self):
         self.source_string = None
 
+    @abc.abstractmethod
     def is_equal(self, other):
         """
         Check if this expression code is the same as another expression.
         """
         # can't use == as that builds a larger expression
-        raise NotImplementedError("base method called")
 
     # tree re-write
 
+    @abc.abstractmethod
     def get_views(self):
         """
         return list of unique views, expectation list is of size zero or one
         """
-        raise NotImplementedError("base class called")
 
+    @abc.abstractmethod
     def replace_view(self, view):
         """
         Move expression to a new view.
         """
-        raise NotImplementedError("base class called")
 
     # analysis
 
@@ -176,14 +176,15 @@ class PreTerm(ABC):
 
     # eval
 
+    @abc.abstractmethod
     def evaluate(self, data_frame):
         """
         Evaluate expression, taking data from data_frame.
         """
-        raise NotImplementedError("base class called")
 
     # emitters
 
+    @abc.abstractmethod
     def to_python(self, *, want_inline_parens: bool = False) -> PythonText:
         """
         Convert parsed expression into a string
@@ -191,9 +192,6 @@ class PreTerm(ABC):
         :param want_inline_parens: bool, if True put parens around complex expressions that don't already have a grouper.
         :return: PythonText
         """
-        raise NotImplementedError(
-            "base class method called"
-        )  # https://docs.python.org/3/library/exceptions.html
 
     def to_source(self, *, want_inline_parens=False, dialect="Python") -> PythonText:
         """
@@ -257,7 +255,7 @@ def _check_expr_incompatible_types(a, b):
 
 
 # noinspection SpellCheckingInspection
-class Term(PreTerm, ABC):
+class Term(PreTerm, abc.ABC):
     """
     Abstract intermediate class with combination ability
     """

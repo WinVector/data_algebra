@@ -3,8 +3,7 @@ Realization of data operations.
 """
 
 
-from abc import ABC
-from collections.abc import Iterable
+import abc
 import collections
 from typing import Iterable, Set, Dict, List, Optional, Tuple, Union
 import numbers
@@ -87,7 +86,7 @@ def _work_col_group_arg(arg, *, arg_name: str, columns: Iterable[str]):
     assert ValueError(f"Need {arg_name} to be a list of strings or 1, got {arg}")
 
 
-class ViewRepresentation(OperatorPlatform, ABC):
+class ViewRepresentation(OperatorPlatform, abc.ABC):
     """Structure to represent the columns of a query or a table.
        Abstract base class."""
 
@@ -188,6 +187,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
                     visit_stack.append(s)
         return tables
 
+    @abc.abstractmethod
     def columns_used_from_sources(self, using: Optional[set] = None) -> List:
         """
         Get columns used from sources. Internal method.
@@ -195,7 +195,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
         :param using: optional column restriction.
         :return: list of order sets (list parallel to sources).
         """
-        raise NotImplementedError("base method called")
 
     def methods_used(self) -> Set[MethodUse]:
         """
@@ -323,9 +322,9 @@ class ViewRepresentation(OperatorPlatform, ABC):
         return self.to_python(strict=True, pretty=True)
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
+    @abc.abstractmethod
     def _equiv_nodes(self, other):
         """Check if immediate ops structure is equivalent, does not check child nodes"""
-        raise NotImplementedError("base method called")
 
     def __eq__(self, other):
         if not isinstance(other, ViewRepresentation):
@@ -352,6 +351,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
 
     # query generation
 
+    @abc.abstractmethod
     def to_near_sql_implementation_(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
@@ -364,7 +364,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
         :param sql_format_options: options for sql formatting
         :return: data_algebra.near_sql.NearSQL
         """
-        raise NotImplementedError("base method called")
 
     def to_sql(
         self, db_model, *, sql_format_options=None,
@@ -1308,10 +1307,12 @@ class ExtendNode(ViewRepresentation):
         for opk in self.ops.values():
             opk.get_method_names(method_names_seen)
         for k in method_names_seen:
-            methods_seen.add(MethodUse(k,
-                            is_project=False,
-                            is_windowed=self.windowed_situation,
-                            is_ordered=self.ordered_windowed_situation))
+            methods_seen.add(
+                MethodUse(
+                    k,
+                    is_project=False,
+                    is_windowed=self.windowed_situation,
+                    is_ordered=self.ordered_windowed_situation))
 
     def check_extend_window_fns_(self):
         """

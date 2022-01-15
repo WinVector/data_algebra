@@ -2,7 +2,7 @@
 Representation for operations that are nearly translated into SQL.
 """
 
-from abc import ABC
+import abc
 from typing import Dict, Iterable, List, Optional, Tuple
 
 import numpy
@@ -52,7 +52,7 @@ class SQLWithList:
         self.previous_steps = previous_steps
 
 
-class NearSQL(ABC):
+class NearSQL(abc.ABC):
     """
     Represent SQL queries in a mostly string-form
     """
@@ -92,6 +92,7 @@ class NearSQL(ABC):
             near_sql=self, columns=columns, force_sql=force_sql, constants=constants
         )
 
+    @abc.abstractmethod
     def to_sql_str_list(
         self,
         *,
@@ -101,10 +102,11 @@ class NearSQL(ABC):
         db_model,
         sql_format_options=None,
     ) -> List[str]:
-        raise NotImplementedError("base method called")
+        """export"""
 
+    @abc.abstractmethod
     def to_with_form(self) -> SQLWithList:
-        raise NotImplementedError("base method called")
+        """convert ot with form"""
 
 
 class NearSQLContainer:
@@ -188,6 +190,7 @@ class NearSQLNamedEntity(NearSQL):
     def to_with_form(self) -> SQLWithList:
         return SQLWithList(last_step=self, previous_steps=[])
 
+    @abc.abstractmethod
     def to_sql_str_list(
         self,
         *,
@@ -197,7 +200,7 @@ class NearSQLNamedEntity(NearSQL):
         db_model,
         sql_format_options=None,
     ) -> List[str]:
-        raise NotImplementedError("abstract class method called")
+        """export"""
 
 
 class NearSQLCommonTableExpression(NearSQLNamedEntity):

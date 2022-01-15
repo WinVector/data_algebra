@@ -3,11 +3,11 @@ Interface for realizing the data algebra as a sequence of steps over an object.
 """
 
 
-from abc import ABC
+import abc
 from typing import Dict, Optional
 
 
-class DataModel(ABC):
+class DataModel(abc.ABC):
     """
     Interface for realizing the data algebra as a sequence of steps over a Pandas like object.
     """
@@ -20,6 +20,7 @@ class DataModel(ABC):
 
     # helper functions
 
+    @abc.abstractmethod
     def data_frame(self, arg=None):
         """
         Build a new emtpy data frame.
@@ -27,16 +28,16 @@ class DataModel(ABC):
         :param arg: optional argument passed to constructor.
         :return: data frame
         """
-        raise NotImplementedError("base method called")
 
+    @abc.abstractmethod
     def is_appropriate_data_instance(self, df) -> bool:
         """
         Check if df is our type of data frame.
         """
-        raise NotImplementedError("base method called")
 
     # evaluate
 
+    @abc.abstractmethod
     def eval(self, op, *, data_map: Optional[Dict] = None, narrow: bool = False):
         """
         Implementation of Pandas evaluation of operators
@@ -46,4 +47,3 @@ class DataModel(ABC):
         :param narrow: if True narrow results to only columns anticipated
         :return: data frame result
         """
-        raise NotImplementedError("base method called")

@@ -40,6 +40,9 @@
                                 <a class="function" href="#OpC.set">set</a>
                         </li>
                         <li>
+                                <a class="function" href="#OpC.methods_used">methods_used</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#OpC.get_ops">get_ops</a>
                         </li>
                         <li>
@@ -157,9 +160,9 @@
 <span class="sd">Redirecting container.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">from</span> <span class="nn">types</span> <span class="kn">import</span> <span class="n">SimpleNamespace</span>
 <span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Set</span>
 
 <span class="kn">import</span> <span class="nn">data_algebra.data_ops_types</span>
 <span class="kn">import</span> <span class="nn">data_algebra.data_ops</span>
@@ -167,6 +170,8 @@
 
 
 <span class="c1"># for use in building expressions such as one.sum()</span>
+<span class="kn">from</span> <span class="nn">data_algebra.data_ops_types</span> <span class="kn">import</span> <span class="n">MethodUse</span>
+
 <span class="n">one</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
 
@@ -179,7 +184,7 @@
     <span class="n">column_namespace</span><span class="p">:</span> <span class="n">SimpleNamespace</span>  <span class="c1"># don&#39;t replace the reference, instead mutate (reference shared!)</span>
     <span class="n">used_result</span><span class="p">:</span> <span class="nb">bool</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">column_namespace</span> <span class="o">=</span> <span class="n">SimpleNamespace</span><span class="p">()</span>  <span class="c1"># allows a dot notation</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">used_result</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -195,6 +200,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">column_namespace</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">column_namespace</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">column_map</span><span class="p">())</span>
         <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">methods_used</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">MethodUse</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">methods_used</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">get_ops</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">used_result</span> <span class="o">=</span> <span class="kc">True</span>
@@ -406,7 +414,7 @@
     <span class="n">column_namespace</span><span class="p">:</span> <span class="n">SimpleNamespace</span>  <span class="c1"># don&#39;t replace the reference, instead mutate (reference shared!)</span>
     <span class="n">used_result</span><span class="p">:</span> <span class="nb">bool</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">column_namespace</span> <span class="o">=</span> <span class="n">SimpleNamespace</span><span class="p">()</span>  <span class="c1"># allows a dot notation</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">used_result</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -422,6 +430,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">column_namespace</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">column_namespace</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">column_map</span><span class="p">())</span>
         <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">methods_used</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">MethodUse</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">methods_used</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">get_ops</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">used_result</span> <span class="o">=</span> <span class="kc">True</span>
@@ -605,12 +616,12 @@
                                         <div class="attr function"><a class="headerlink" href="#OpC.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">OpC</span><span class="signature">(other)</span>
+            <span class="name">OpC</span><span class="signature">(other: <a href="data_ops.html#ViewRepresentation">data_algebra.data_ops.ViewRepresentation</a>)</span>
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">column_namespace</span> <span class="o">=</span> <span class="n">SimpleNamespace</span><span class="p">()</span>  <span class="c1"># allows a dot notation</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">used_result</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -647,6 +658,27 @@
         </details>
 
     
+
+                            </div>
+                            <div id="OpC.methods_used" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OpC.methods_used">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">methods_used</span><span class="signature">(self) -&gt; Set[<a href="data_ops_types.html#MethodUse">data_algebra.data_ops_types.MethodUse</a>]</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">methods_used</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">MethodUse</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">methods_used</span><span class="p">()</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Return set of methods used.</p>
+</div>
+
 
                             </div>
                             <div id="OpC.get_ops" class="classattr">
@@ -1388,7 +1420,6 @@ raise an exception if the values are not consistent.</p>
                                 <dl>
                                     <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="OpC.use" class="function"><a href="data_ops_types.html#OperatorPlatform.use">use</a></dd>
-                <dd id="OpC.methods_used" class="function"><a href="data_ops_types.html#OperatorPlatform.methods_used">methods_used</a></dd>
                 <dd id="OpC.get_params" class="function"><a href="data_ops_types.html#OperatorPlatform.get_params">get_params</a></dd>
                 <dd id="OpC.set_params" class="function"><a href="data_ops_types.html#OperatorPlatform.set_params">set_params</a></dd>
                 <dd id="OpC.inverse_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.inverse_transform">inverse_transform</a></dd>

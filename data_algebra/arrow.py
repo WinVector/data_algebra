@@ -1,30 +1,33 @@
+
+import abc
+
 import data_algebra
 import data_algebra.data_ops
 import data_algebra.flow_text
 
 
-class Arrow:
+class Arrow(abc.ABC):
     """Arrow from category theory: see Steve Awody, "Category Theory, 2nd Edition", Oxford Univ. Press, 2010 pg. 4."""
 
     def __init__(self):
         pass
 
+    @abc.abstractmethod
     def dom(self):
         """return domain, object at base of arrow"""
-        raise NotImplementedError("base class called")
 
+    @abc.abstractmethod
     def cod(self):
         """return co-domain, object at head of arrow"""
-        raise NotImplementedError("base class called")
 
+    @abc.abstractmethod
     def apply_to(self, b):
         """ apply_to b, compose arrows (right to left) """
-        raise NotImplementedError("base class called")
 
     # noinspection PyPep8Naming
+    @abc.abstractmethod
     def act_on(self, X):
         """ act on X, must associate with composition """
-        raise NotImplementedError("base class called")
 
     # noinspection PyPep8Naming
     def transform(self, X):
@@ -51,8 +54,9 @@ class Arrow:
         return self.transform(X)
 
     # noinspection PyUnusedLocal
+    @abc.abstractmethod
     def get_feature_names(self, input_features=None):
-        raise NotImplementedError("base class called")
+        """sklearn api"""
 
     # noinspection PyUnusedLocal,PyMethodMayBeStatic
     def get_params(self, deep=False):
@@ -157,14 +161,14 @@ class DataOpArrow(Arrow):
     def fit(self, X, y=None):
         """Learn input and output types from example, and return self"""
         # assume a pandas.DataFrame compatible object
-        out = self.act_on(X)
+        self.act_on(X)
         return self
 
     # noinspection PyPep8Naming
     def fit_transform(self, X, y=None):
         """Learn input and output types from example, and return transform."""
         out = self.transform(X)
-        return self.transform(X)
+        return out
 
     def dom(self):
         return DataOpArrow(

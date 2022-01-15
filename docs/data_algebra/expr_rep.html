@@ -43,9 +43,6 @@
                     <a class="class" href="#PreTerm">PreTerm</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="function" href="#PreTerm.__init__">PreTerm</a>
-                        </li>
-                        <li>
                                 <a class="function" href="#PreTerm.is_equal">is_equal</a>
                         </li>
                         <li>
@@ -75,9 +72,6 @@
             <li>
                     <a class="class" href="#Term">Term</a>
                             <ul class="memberlist">
-                        <li>
-                                <a class="function" href="#Term.__init__">Term</a>
-                        </li>
                         <li>
                                 <a class="function" href="#Term.sign">sign</a>
                         </li>
@@ -499,7 +493,7 @@
 <span class="sd">Represent data processing expressions.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span>
+<span class="kn">import</span> <span class="nn">abc</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span>
@@ -622,7 +616,7 @@
 <span class="p">}</span>
 
 
-<span class="k">class</span> <span class="nc">PreTerm</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">PreTerm</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    abstract base class, without combination ability</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -632,26 +626,26 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">source_string</span> <span class="o">=</span> <span class="kc">None</span>
 
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">is_equal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if this expression code is the same as another expression.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># can&#39;t use == as that builds a larger expression</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="c1"># tree re-write</span>
 
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        return list of unique views, expectation list is of size zero or one</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">replace_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Move expression to a new view.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
     <span class="c1"># analysis</span>
 
@@ -673,14 +667,15 @@
 
     <span class="c1"># eval</span>
 
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_frame</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluate expression, taking data from data_frame.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
     <span class="c1"># emitters</span>
 
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PythonText</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert parsed expression into a string</span>
@@ -688,9 +683,6 @@
 <span class="sd">        :param want_inline_parens: bool, if True put parens around complex expressions that don&#39;t already have a grouper.</span>
 <span class="sd">        :return: PythonText</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-            <span class="s2">&quot;base class method called&quot;</span>
-        <span class="p">)</span>  <span class="c1"># https://docs.python.org/3/library/exceptions.html</span>
 
     <span class="k">def</span> <span class="nf">to_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="s2">&quot;Python&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PythonText</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -754,7 +746,7 @@
 
 
 <span class="c1"># noinspection SpellCheckingInspection</span>
-<span class="k">class</span> <span class="nc">Term</span><span class="p">(</span><span class="n">PreTerm</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">Term</span><span class="p">(</span><span class="n">PreTerm</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Abstract intermediate class with combination ability</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -2075,7 +2067,7 @@ str() method returns only the text for interoperability.</p>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">PreTerm</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">PreTerm</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    abstract base class, without combination ability</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -2085,26 +2077,26 @@ str() method returns only the text for interoperability.</p>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">source_string</span> <span class="o">=</span> <span class="kc">None</span>
 
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">is_equal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if this expression code is the same as another expression.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># can&#39;t use == as that builds a larger expression</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="c1"># tree re-write</span>
 
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        return list of unique views, expectation list is of size zero or one</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">replace_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Move expression to a new view.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
     <span class="c1"># analysis</span>
 
@@ -2126,14 +2118,15 @@ str() method returns only the text for interoperability.</p>
 
     <span class="c1"># eval</span>
 
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_frame</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluate expression, taking data from data_frame.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
     <span class="c1"># emitters</span>
 
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PythonText</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert parsed expression into a string</span>
@@ -2141,9 +2134,6 @@ str() method returns only the text for interoperability.</p>
 <span class="sd">        :param want_inline_parens: bool, if True put parens around complex expressions that don&#39;t already have a grouper.</span>
 <span class="sd">        :return: PythonText</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-            <span class="s2">&quot;base class method called&quot;</span>
-        <span class="p">)</span>  <span class="c1"># https://docs.python.org/3/library/exceptions.html</span>
 
     <span class="k">def</span> <span class="nf">to_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="s2">&quot;Python&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PythonText</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -2173,40 +2163,23 @@ str() method returns only the text for interoperability.</p>
 </div>
 
 
-                            <div id="PreTerm.__init__" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#PreTerm.__init__">#&nbsp;&nbsp</a>
-
-        
-            <span class="name">PreTerm</span><span class="signature">()</span>
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">source_string</span> <span class="o">=</span> <span class="kc">None</span>
-</pre></div>
-
-        </details>
-
-    
-
-                            </div>
                             <div id="PreTerm.is_equal" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#PreTerm.is_equal">#&nbsp;&nbsp</a>
 
-        
+                <div class="decorator">@abc.abstractmethod</div>
+
             <span class="def">def</span>
             <span class="name">is_equal</span><span class="signature">(self, other)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">is_equal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">is_equal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if this expression code is the same as another expression.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># can&#39;t use == as that builds a larger expression</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -2219,18 +2192,19 @@ str() method returns only the text for interoperability.</p>
                             <div id="PreTerm.get_views" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#PreTerm.get_views">#&nbsp;&nbsp</a>
 
-        
+                <div class="decorator">@abc.abstractmethod</div>
+
             <span class="def">def</span>
             <span class="name">get_views</span><span class="signature">(self)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        return list of unique views, expectation list is of size zero or one</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -2243,18 +2217,19 @@ str() method returns only the text for interoperability.</p>
                             <div id="PreTerm.replace_view" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#PreTerm.replace_view">#&nbsp;&nbsp</a>
 
-        
+                <div class="decorator">@abc.abstractmethod</div>
+
             <span class="def">def</span>
             <span class="name">replace_view</span><span class="signature">(self, view)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">replace_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">replace_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Move expression to a new view.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -2323,18 +2298,19 @@ str() method returns only the text for interoperability.</p>
                             <div id="PreTerm.evaluate" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#PreTerm.evaluate">#&nbsp;&nbsp</a>
 
-        
+                <div class="decorator">@abc.abstractmethod</div>
+
             <span class="def">def</span>
             <span class="name">evaluate</span><span class="signature">(self, data_frame)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_frame</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_frame</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluate expression, taking data from data_frame.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -2347,7 +2323,8 @@ str() method returns only the text for interoperability.</p>
                             <div id="PreTerm.to_python" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#PreTerm.to_python">#&nbsp;&nbsp</a>
 
-        
+                <div class="decorator">@abc.abstractmethod</div>
+
             <span class="def">def</span>
             <span class="name">to_python</span><span class="signature">(
     self,
@@ -2358,16 +2335,14 @@ str() method returns only the text for interoperability.</p>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PythonText</span><span class="p">:</span>
+            <div class="codehilite"><pre><span></span>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PythonText</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert parsed expression into a string</span>
 
 <span class="sd">        :param want_inline_parens: bool, if True put parens around complex expressions that don&#39;t already have a grouper.</span>
 <span class="sd">        :return: PythonText</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-            <span class="s2">&quot;base class method called&quot;</span>
-        <span class="p">)</span>  <span class="c1"># https://docs.python.org/3/library/exceptions.html</span>
 </pre></div>
 
         </details>
@@ -2432,7 +2407,7 @@ str() method returns only the text for interoperability.</p>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Term</span><span class="p">(</span><span class="n">PreTerm</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Term</span><span class="p">(</span><span class="n">PreTerm</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Abstract intermediate class with combination ability</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -3134,24 +3109,6 @@ str() method returns only the text for interoperability.</p>
 </div>
 
 
-                            <div id="Term.__init__" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#Term.__init__">#&nbsp;&nbsp</a>
-
-        
-            <span class="name">Term</span><span class="signature">()</span>
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">PreTerm</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-    
-
-                            </div>
                             <div id="Term.sign" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#Term.sign">#&nbsp;&nbsp</a>
 

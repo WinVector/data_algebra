@@ -37,9 +37,6 @@
                     <a class="class" href="#ViewRepresentation">ViewRepresentation</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="function" href="#ViewRepresentation.__init__">ViewRepresentation</a>
-                        </li>
-                        <li>
                                 <a class="function" href="#ViewRepresentation.column_map">column_map</a>
                         </li>
                         <li>
@@ -476,8 +473,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 
-<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span>
-<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span>
+<span class="kn">import</span> <span class="nn">abc</span>
 <span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 <span class="kn">import</span> <span class="nn">numbers</span>
@@ -560,7 +556,7 @@
     <span class="k">assert</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Need </span><span class="si">{</span><span class="n">arg_name</span><span class="si">}</span><span class="s2"> to be a list of strings or 1, got </span><span class="si">{</span><span class="n">arg</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">ViewRepresentation</span><span class="p">(</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">ViewRepresentation</span><span class="p">(</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Structure to represent the columns of a query or a table.</span>
 <span class="sd">       Abstract base class.&quot;&quot;&quot;</span>
 
@@ -661,6 +657,7 @@
                     <span class="n">visit_stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">tables</span>
 
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">columns_used_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">set</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get columns used from sources. Internal method.</span>
@@ -668,7 +665,6 @@
 <span class="sd">        :param using: optional column restriction.</span>
 <span class="sd">        :return: list of order sets (list parallel to sources).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">methods_used</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">MethodUse</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -796,9 +792,9 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="c1"># noinspection PyMethodMayBeStatic,PyUnusedLocal</span>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">_equiv_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Check if immediate ops structure is equivalent, does not check child nodes&quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">ViewRepresentation</span><span class="p">):</span>
@@ -825,6 +821,7 @@
 
     <span class="c1"># query generation</span>
 
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">to_near_sql_implementation_</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">:</span>
@@ -837,7 +834,6 @@
 <span class="sd">        :param sql_format_options: options for sql formatting</span>
 <span class="sd">        :return: data_algebra.near_sql.NearSQL</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1781,10 +1777,12 @@
         <span class="k">for</span> <span class="n">opk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="n">opk</span><span class="o">.</span><span class="n">get_method_names</span><span class="p">(</span><span class="n">method_names_seen</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">method_names_seen</span><span class="p">:</span>
-            <span class="n">methods_seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">MethodUse</span><span class="p">(</span><span class="n">k</span><span class="p">,</span>
-                            <span class="n">is_project</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                            <span class="n">is_windowed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">windowed_situation</span><span class="p">,</span>
-                            <span class="n">is_ordered</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ordered_windowed_situation</span><span class="p">))</span>
+            <span class="n">methods_seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                <span class="n">MethodUse</span><span class="p">(</span>
+                    <span class="n">k</span><span class="p">,</span>
+                    <span class="n">is_project</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">is_windowed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">windowed_situation</span><span class="p">,</span>
+                    <span class="n">is_ordered</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ordered_windowed_situation</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">check_extend_window_fns_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -3251,7 +3249,7 @@
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">ViewRepresentation</span><span class="p">(</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">ViewRepresentation</span><span class="p">(</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Structure to represent the columns of a query or a table.</span>
 <span class="sd">       Abstract base class.&quot;&quot;&quot;</span>
 
@@ -3352,6 +3350,7 @@
                     <span class="n">visit_stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">tables</span>
 
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">columns_used_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">set</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get columns used from sources. Internal method.</span>
@@ -3359,7 +3358,6 @@
 <span class="sd">        :param using: optional column restriction.</span>
 <span class="sd">        :return: list of order sets (list parallel to sources).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">methods_used</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">MethodUse</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -3487,9 +3485,9 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="c1"># noinspection PyMethodMayBeStatic,PyUnusedLocal</span>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">_equiv_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Check if immediate ops structure is equivalent, does not check child nodes&quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">ViewRepresentation</span><span class="p">):</span>
@@ -3516,6 +3514,7 @@
 
     <span class="c1"># query generation</span>
 
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">to_near_sql_implementation_</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">:</span>
@@ -3528,7 +3527,6 @@
 <span class="sd">        :param sql_format_options: options for sql formatting</span>
 <span class="sd">        :return: data_algebra.near_sql.NearSQL</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -3971,53 +3969,6 @@ Abstract base class.</p>
 </div>
 
 
-                            <div id="ViewRepresentation.__init__" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#ViewRepresentation.__init__">#&nbsp;&nbsp</a>
-
-        
-            <span class="name">ViewRepresentation</span><span class="signature">(
-    column_names: Iterable[str],
-    *,
-    sources: Optional[Iterable[<a href="#ViewRepresentation">data_algebra.data_ops.ViewRepresentation</a>]] = None,
-    node_name: str
-)</span>
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">column_names</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-        <span class="o">*</span><span class="p">,</span>
-        <span class="n">sources</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="s2">&quot;ViewRepresentation&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">node_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="c1"># don&#39;t let instances masquerade as iterables</span>
-        <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column_names</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sources</span><span class="p">,</span> <span class="n">OperatorPlatform</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column_names</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
-            <span class="n">column_names</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">column_names</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">column_names</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span> <span class="o">=</span> <span class="n">column_names</span>
-        <span class="k">if</span> <span class="n">sources</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">sources</span> <span class="o">=</span> <span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sources</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
-                <span class="n">sources</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">sources</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">si</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">si</span><span class="p">,</span> <span class="n">ViewRepresentation</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sources</span> <span class="o">=</span> <span class="n">sources</span>
-        <span class="n">OperatorPlatform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="n">node_name</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-    
-
-                            </div>
                             <div id="ViewRepresentation.column_map" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#ViewRepresentation.column_map">#&nbsp;&nbsp</a>
 
@@ -4160,21 +4111,22 @@ raise an exception if the values are not consistent.</p>
                             <div id="ViewRepresentation.columns_used_from_sources" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#ViewRepresentation.columns_used_from_sources">#&nbsp;&nbsp</a>
 
-        
+                <div class="decorator">@abc.abstractmethod</div>
+
             <span class="def">def</span>
             <span class="name">columns_used_from_sources</span><span class="signature">(self, using: Optional[set] = None) -&gt; List</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">columns_used_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">set</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+            <div class="codehilite"><pre><span></span>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">columns_used_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">set</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get columns used from sources. Internal method.</span>
 
 <span class="sd">        :param using: optional column restriction.</span>
 <span class="sd">        :return: list of order sets (list parallel to sources).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -4469,7 +4421,8 @@ raise an exception if the values are not consistent.</p>
                             <div id="ViewRepresentation.to_near_sql_implementation_" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#ViewRepresentation.to_near_sql_implementation_">#&nbsp;&nbsp</a>
 
-        
+                <div class="decorator">@abc.abstractmethod</div>
+
             <span class="def">def</span>
             <span class="name">to_near_sql_implementation_</span><span class="signature">(
     self,
@@ -4483,7 +4436,8 @@ raise an exception if the values are not consistent.</p>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_near_sql_implementation_</span><span class="p">(</span>
+            <div class="codehilite"><pre><span></span>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">to_near_sql_implementation_</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -4495,7 +4449,6 @@ raise an exception if the values are not consistent.</p>
 <span class="sd">        :param sql_format_options: options for sql formatting</span>
 <span class="sd">        :return: data_algebra.near_sql.NearSQL</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -6440,10 +6393,12 @@ raise an exception if the values are not consistent</p>
         <span class="k">for</span> <span class="n">opk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="n">opk</span><span class="o">.</span><span class="n">get_method_names</span><span class="p">(</span><span class="n">method_names_seen</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">method_names_seen</span><span class="p">:</span>
-            <span class="n">methods_seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">MethodUse</span><span class="p">(</span><span class="n">k</span><span class="p">,</span>
-                            <span class="n">is_project</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                            <span class="n">is_windowed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">windowed_situation</span><span class="p">,</span>
-                            <span class="n">is_ordered</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ordered_windowed_situation</span><span class="p">))</span>
+            <span class="n">methods_seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                <span class="n">MethodUse</span><span class="p">(</span>
+                    <span class="n">k</span><span class="p">,</span>
+                    <span class="n">is_project</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">is_windowed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">windowed_situation</span><span class="p">,</span>
+                    <span class="n">is_ordered</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ordered_windowed_situation</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">check_extend_window_fns_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -6771,10 +6726,12 @@ raise an exception if the values are not consistent</p>
         <span class="k">for</span> <span class="n">opk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="n">opk</span><span class="o">.</span><span class="n">get_method_names</span><span class="p">(</span><span class="n">method_names_seen</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">method_names_seen</span><span class="p">:</span>
-            <span class="n">methods_seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">MethodUse</span><span class="p">(</span><span class="n">k</span><span class="p">,</span>
-                            <span class="n">is_project</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                            <span class="n">is_windowed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">windowed_situation</span><span class="p">,</span>
-                            <span class="n">is_ordered</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ordered_windowed_situation</span><span class="p">))</span>
+            <span class="n">methods_seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                <span class="n">MethodUse</span><span class="p">(</span>
+                    <span class="n">k</span><span class="p">,</span>
+                    <span class="n">is_project</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">is_windowed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">windowed_situation</span><span class="p">,</span>
+                    <span class="n">is_ordered</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ordered_windowed_situation</span><span class="p">))</span>
 </pre></div>
 
         </details>

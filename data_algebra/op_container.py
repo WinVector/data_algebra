@@ -2,9 +2,9 @@
 Redirecting container.
 """
 
-import collections
 from types import SimpleNamespace
 import typing
+from typing import Set
 
 import data_algebra.data_ops_types
 import data_algebra.data_ops
@@ -12,6 +12,8 @@ import data_algebra.expr_rep
 
 
 # for use in building expressions such as one.sum()
+from data_algebra.data_ops_types import MethodUse
+
 one = data_algebra.expr_rep.Value(1)
 
 
@@ -24,7 +26,7 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
     column_namespace: SimpleNamespace  # don't replace the reference, instead mutate (reference shared!)
     used_result: bool
 
-    def __init__(self, other):
+    def __init__(self, other: data_algebra.data_ops.ViewRepresentation):
         self.column_namespace = SimpleNamespace()  # allows a dot notation
         self.used_result = False
         data_algebra.data_ops_types.OperatorPlatform.__init__(
@@ -40,6 +42,9 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         self.column_namespace.__dict__.clear()
         self.column_namespace.__dict__.update(self.ops.column_map())
         return self
+
+    def methods_used(self) -> Set[MethodUse]:
+        return self.ops.methods_used()
 
     def get_ops(self):
         self.used_result = True

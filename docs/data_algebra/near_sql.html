@@ -43,9 +43,6 @@
                     <a class="class" href="#NearSQL">NearSQL</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="function" href="#NearSQL.__init__">NearSQL</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#NearSQL.is_table">is_table</a>
                         </li>
                         <li>
@@ -84,9 +81,6 @@
             <li>
                     <a class="class" href="#NearSQLNamedEntity">NearSQLNamedEntity</a>
                             <ul class="memberlist">
-                        <li>
-                                <a class="function" href="#NearSQLNamedEntity.__init__">NearSQLNamedEntity</a>
-                        </li>
                         <li>
                                 <a class="function" href="#NearSQLNamedEntity.to_with_form">to_with_form</a>
                         </li>
@@ -190,7 +184,7 @@
 <span class="sd">Representation for operations that are nearly translated into SQL.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span>
+<span class="kn">import</span> <span class="nn">abc</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span>
@@ -240,7 +234,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">previous_steps</span> <span class="o">=</span> <span class="n">previous_steps</span>
 
 
-<span class="k">class</span> <span class="nc">NearSQL</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">NearSQL</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Represent SQL queries in a mostly string-form</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -280,6 +274,7 @@
             <span class="n">near_sql</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="n">force_sql</span><span class="p">,</span> <span class="n">constants</span><span class="o">=</span><span class="n">constants</span>
         <span class="p">)</span>
 
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -289,10 +284,11 @@
         <span class="n">db_model</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot;export&quot;&quot;&quot;</span>
 
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">to_with_form</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SQLWithList</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot;convert ot with form&quot;&quot;&quot;</span>
 
 
 <span class="k">class</span> <span class="nc">NearSQLContainer</span><span class="p">:</span>
@@ -376,6 +372,7 @@
     <span class="k">def</span> <span class="nf">to_with_form</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SQLWithList</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">SQLWithList</span><span class="p">(</span><span class="n">last_step</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">previous_steps</span><span class="o">=</span><span class="p">[])</span>
 
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -385,7 +382,7 @@
         <span class="n">db_model</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract class method called&quot;</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot;export&quot;&quot;&quot;</span>
 
 
 <span class="k">class</span> <span class="nc">NearSQLCommonTableExpression</span><span class="p">(</span><span class="n">NearSQLNamedEntity</span><span class="p">):</span>
@@ -778,7 +775,7 @@
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">NearSQL</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">NearSQL</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Represent SQL queries in a mostly string-form</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -818,6 +815,7 @@
             <span class="n">near_sql</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="n">force_sql</span><span class="p">,</span> <span class="n">constants</span><span class="o">=</span><span class="n">constants</span>
         <span class="p">)</span>
 
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -827,10 +825,11 @@
         <span class="n">db_model</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot;export&quot;&quot;&quot;</span>
 
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">to_with_form</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SQLWithList</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot;convert ot with form&quot;&quot;&quot;</span>
 </pre></div>
 
         </details>
@@ -839,52 +838,6 @@
 </div>
 
 
-                            <div id="NearSQL.__init__" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#NearSQL.__init__">#&nbsp;&nbsp</a>
-
-        
-            <span class="name">NearSQL</span><span class="signature">(
-    *,
-    terms: Optional[Dict[str, Optional[str]]],
-    query_name: Optional[str] = None,
-    quoted_query_name: str,
-    is_table: bool = False,
-    annotation: Optional[str] = None
-)</span>
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="o">*</span><span class="p">,</span>
-        <span class="n">terms</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]],</span>
-        <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">quoted_query_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">is_table</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">annotation</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">terms</span><span class="p">,</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)))</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">query_name</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)))</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">quoted_query_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">is_table</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annotation</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">terms</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">terms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">terms</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">terms</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">terms</span> <span class="o">=</span> <span class="n">terms</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">query_name</span> <span class="o">=</span> <span class="n">query_name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">quoted_query_name</span> <span class="o">=</span> <span class="n">quoted_query_name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">is_table</span> <span class="o">=</span> <span class="n">is_table</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">annotation</span> <span class="o">=</span> <span class="n">annotation</span>
-</pre></div>
-
-        </details>
-
-    
-
-                            </div>
                             <div id="NearSQL.is_table" class="classattr">
                                             <div class="attr variable"><a class="headerlink" href="#NearSQL.is_table">#&nbsp;&nbsp</a>
 
@@ -927,7 +880,8 @@
                             <div id="NearSQL.to_sql_str_list" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#NearSQL.to_sql_str_list">#&nbsp;&nbsp</a>
 
-        
+                <div class="decorator">@abc.abstractmethod</div>
+
             <span class="def">def</span>
             <span class="name">to_sql_str_list</span><span class="signature">(
     self,
@@ -942,7 +896,8 @@
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span>
+            <div class="codehilite"><pre><span></span>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -951,31 +906,37 @@
         <span class="n">db_model</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot;export&quot;&quot;&quot;</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>export</p>
+</div>
+
 
                             </div>
                             <div id="NearSQL.to_with_form" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#NearSQL.to_with_form">#&nbsp;&nbsp</a>
 
-        
+                <div class="decorator">@abc.abstractmethod</div>
+
             <span class="def">def</span>
             <span class="name">to_with_form</span><span class="signature">(self) -&gt; <a href="#SQLWithList">data_algebra.near_sql.SQLWithList</a></span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_with_form</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SQLWithList</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
+            <div class="codehilite"><pre><span></span>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">to_with_form</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SQLWithList</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;convert ot with form&quot;&quot;&quot;</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>convert ot with form</p>
+</div>
+
 
                             </div>
                 </section>
@@ -1213,6 +1174,7 @@
     <span class="k">def</span> <span class="nf">to_with_form</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SQLWithList</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">SQLWithList</span><span class="p">(</span><span class="n">last_step</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">previous_steps</span><span class="o">=</span><span class="p">[])</span>
 
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1222,7 +1184,7 @@
         <span class="n">db_model</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract class method called&quot;</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot;export&quot;&quot;&quot;</span>
 </pre></div>
 
         </details>
@@ -1231,30 +1193,6 @@
 </div>
 
 
-                            <div id="NearSQLNamedEntity.__init__" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#NearSQLNamedEntity.__init__">#&nbsp;&nbsp</a>
-
-        
-            <span class="name">NearSQLNamedEntity</span><span class="signature">(*, terms, query_name, quoted_query_name)</span>
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">terms</span><span class="p">,</span> <span class="n">query_name</span><span class="p">,</span> <span class="n">quoted_query_name</span><span class="p">):</span>
-        <span class="n">NearSQL</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
-            <span class="n">query_name</span><span class="o">=</span><span class="n">query_name</span><span class="p">,</span>
-            <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">quoted_query_name</span><span class="p">,</span>
-            <span class="n">is_table</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="p">)</span>
-</pre></div>
-
-        </details>
-
-    
-
-                            </div>
                             <div id="NearSQLNamedEntity.to_with_form" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#NearSQLNamedEntity.to_with_form">#&nbsp;&nbsp</a>
 
@@ -1271,13 +1209,16 @@
 
         </details>
 
-    
+            <div class="docstring"><p>convert ot with form</p>
+</div>
+
 
                             </div>
                             <div id="NearSQLNamedEntity.to_sql_str_list" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#NearSQLNamedEntity.to_sql_str_list">#&nbsp;&nbsp</a>
 
-        
+                <div class="decorator">@abc.abstractmethod</div>
+
             <span class="def">def</span>
             <span class="name">to_sql_str_list</span><span class="signature">(
     self,
@@ -1292,7 +1233,8 @@
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span>
+            <div class="codehilite"><pre><span></span>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1301,12 +1243,14 @@
         <span class="n">db_model</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract class method called&quot;</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot;export&quot;&quot;&quot;</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>export</p>
+</div>
+
 
                             </div>
                             <div class="inherited">
@@ -1420,7 +1364,9 @@
 
         </details>
 
-    
+            <div class="docstring"><p>export</p>
+</div>
+
 
                             </div>
                             <div class="inherited">
@@ -1548,7 +1494,9 @@
 
         </details>
 
-    
+            <div class="docstring"><p>export</p>
+</div>
+
 
                             </div>
                             <div class="inherited">
@@ -1748,7 +1696,9 @@
 
         </details>
 
-    
+            <div class="docstring"><p>export</p>
+</div>
+
 
                             </div>
                             <div id="NearSQLUnaryStep.to_with_form" class="classattr">
@@ -1780,7 +1730,9 @@
 
         </details>
 
-    
+            <div class="docstring"><p>convert ot with form</p>
+</div>
+
 
                             </div>
                             <div class="inherited">
@@ -1987,7 +1939,9 @@
 
         </details>
 
-    
+            <div class="docstring"><p>export</p>
+</div>
+
 
                             </div>
                             <div id="NearSQLBinaryStep.to_with_form" class="classattr">
@@ -2034,7 +1988,9 @@
 
         </details>
 
-    
+            <div class="docstring"><p>convert ot with form</p>
+</div>
+
 
                             </div>
                             <div class="inherited">
@@ -2232,7 +2188,9 @@
 
         </details>
 
-    
+            <div class="docstring"><p>export</p>
+</div>
+
 
                             </div>
                             <div id="NearSQLRawQStep.to_with_form" class="classattr">
@@ -2269,7 +2227,9 @@
 
         </details>
 
-    
+            <div class="docstring"><p>convert ot with form</p>
+</div>
+
 
                             </div>
                             <div class="inherited">

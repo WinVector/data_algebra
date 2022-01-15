@@ -9,7 +9,7 @@ import copy
 import numpy
 import numbers
 import warnings
-from abc import ABC
+import abc
 
 import sqlite3
 
@@ -130,7 +130,7 @@ def _wrap_numpy_fn(f, x):
         return f([x])[0]
 
 
-class CollectingAgg(ABC):
+class CollectingAgg(abc.ABC):
     """
     Aggregate from a collection. SQLite user class.
     """
@@ -145,11 +145,11 @@ class CollectingAgg(ABC):
         if not _check_scalar_bad(value):
             self.collection.append(value)
 
+    @abc.abstractmethod
     def calc(self) -> float:
         """
         Perform the calculation (only called with non-trivial data)
         """
-        raise NotImplementedError("base class called")
 
     def finalize(self):
         """
@@ -183,7 +183,7 @@ class SampVarDevAgg(CollectingAgg):
     """
 
     def __init__(self):
-        self.collection = []
+        CollectingAgg.__init__(self)
 
     def calc(self) -> float:
         "do it"
@@ -204,7 +204,7 @@ class SampStdDevAgg(CollectingAgg):
     """
 
     def __init__(self):
-        self.collection = []
+        CollectingAgg.__init__(self)
 
     def calc(self) -> float:
         "do it"

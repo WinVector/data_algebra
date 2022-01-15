@@ -2,6 +2,7 @@
 Type defs for data operations.
 """
 
+import abc
 from typing import Dict, Optional, Set, NamedTuple
 
 import data_algebra.expr_rep
@@ -17,7 +18,7 @@ class MethodUse(NamedTuple):
     is_ordered: bool = False
 
 
-class OperatorPlatform:
+class OperatorPlatform(abc.ABC):
     """Abstract class representing ability to apply data_algebra operations."""
 
     node_name: str
@@ -26,6 +27,7 @@ class OperatorPlatform:
         assert isinstance(node_name, str)
         self.node_name = node_name
 
+    @abc.abstractmethod
     def eval(self, data_map, *, data_model=None, narrow=True):
         """
         Evaluate operators with respect to Pandas data frames.
@@ -35,9 +37,9 @@ class OperatorPlatform:
         :param narrow: logical, if True don't copy unexpected columns
         :return: table result
         """
-        raise NotImplementedError("base class called")
 
     # noinspection PyPep8Naming
+    @abc.abstractmethod
     def transform(self, X, *, data_model=None, narrow: bool = True, check_incoming_data_constraints: bool = False):
         """
         apply self to data frame X, may or may not commute with composition
@@ -48,7 +50,6 @@ class OperatorPlatform:
         :param check_incoming_data_constraints: logical, if True check incoming data meets constraints
         :return: transformed data frame
         """
-        raise NotImplementedError("base class called")
 
     # noinspection PyPep8Naming
     def act_on(self, X, *, data_model=None):
@@ -61,6 +62,7 @@ class OperatorPlatform:
         """
         return self.transform(X=X, data_model=data_model, narrow=False, check_incoming_data_constraints=True)
 
+    @abc.abstractmethod
     def apply_to(self, a, *, target_table_key=None):
         """
         apply self to operator DAG a
@@ -69,7 +71,6 @@ class OperatorPlatform:
         :param target_table_key: table key to replace with self, None counts as "match all"
         :return: new operator DAG
         """
-        raise NotImplementedError("base class called")
 
     def __rrshift__(self, other):  # override other >> self
         """
@@ -120,6 +121,7 @@ class OperatorPlatform:
 
     # convenience
 
+    @abc.abstractmethod
     def ex(self, *, data_model=None, narrow=True, allow_limited_tables=False):
         """
         Evaluate operators with respect to Pandas data frames already stored in the operator chain.
@@ -129,34 +131,33 @@ class OperatorPlatform:
         :param allow_limited_tables: logical, if True allow execution on non-complete tables
         :return: table result
         """
-        raise NotImplementedError("base class called")
 
     # characterization
 
+    @abc.abstractmethod
     def get_tables(self):
         """
         Get a dictionary of all tables used in an operator DAG,
         raise an exception if the values are not consistent.
         """
 
-        raise NotImplementedError("base class called")
-
     # info
 
+    @abc.abstractmethod
     def columns_produced(self):
         """
         Return list of columns produced by pipeline.
         """
-        raise NotImplementedError("base class called")
 
+    @abc.abstractmethod
     def methods_used(self) -> Set[MethodUse]:
         """
         Return set of methods used.
         """
-        raise NotImplementedError("base class called")
 
     # query generation
 
+    @abc.abstractmethod
     def to_near_sql_implementation_(self, db_model, *, using, temp_id_source):
         """
         Convert to NearSQL as a step in converting to a SQL string. Internal method.
@@ -166,8 +167,8 @@ class OperatorPlatform:
         :param temp_id_source: temporary id source.
         :return: compose operator directed acyclic graph
         """
-        raise NotImplementedError("base method called")
 
+    @abc.abstractmethod
     def extend_parsed_(
         self, parsed_ops, *, partition_by=None, order_by=None, reverse=None
     ):
@@ -180,8 +181,8 @@ class OperatorPlatform:
         :param reverse: optional order reversal specification.
         :return: compose operator directed acyclic graph
         """
-        raise NotImplementedError("base class called")
 
+    @abc.abstractmethod
     def project_parsed_(self, parsed_ops=None, *, group_by=None):
         """
         Compute projection, or grouped calculation for parsed ops. Internal method.
@@ -190,8 +191,8 @@ class OperatorPlatform:
         :param group_by: optional group key(s) specification.
         :return: compose operator directed acyclic graph
         """
-        raise NotImplementedError("base class called")
 
+    @abc.abstractmethod
     def select_rows_parsed_(self, parsed_expr):
         """
         Select rows matching parsed expr criteria. Internal method.
@@ -199,10 +200,10 @@ class OperatorPlatform:
         :param parsed_expr: logical expression specifying desired rows.
         :return: compose operator directed acyclic graph
         """
-        raise NotImplementedError("base class called")
 
     # main API
 
+    @abc.abstractmethod
     def extend(self, ops, *, partition_by=None, order_by=None, reverse=None):
         """
         Add new derived columns, can replace existing columns.
@@ -213,8 +214,8 @@ class OperatorPlatform:
         :param reverse: optional order reversal specification.
         :return: compose operator directed acyclic graph
         """
-        raise NotImplementedError("base class called")
 
+    @abc.abstractmethod
     def project(self, ops=None, *, group_by=None):
         """
         Compute projection, or grouped calculation.
@@ -223,8 +224,8 @@ class OperatorPlatform:
         :param group_by: optional group key(s) specification.
         :return: compose operator directed acyclic graph
         """
-        raise NotImplementedError("base class called")
 
+    @abc.abstractmethod
     def natural_join(self, b, *, by, jointype, check_all_common_keys_in_by=False):
         """
         Join self (left) results with b (right).
@@ -235,8 +236,8 @@ class OperatorPlatform:
         :param check_all_common_keys_in_by: if True, raise if any non-key columns are common to tables.
         :return: compose operator directed acyclic graph
         """
-        raise NotImplementedError("base class called")
 
+    @abc.abstractmethod
     def concat_rows(self, b, *, id_column="source_name", a_name="a", b_name="b"):
         """
         Union or concatenate rows of self with rows of b.
@@ -247,8 +248,8 @@ class OperatorPlatform:
         :param b_name: source annotation to use for b.
         :return: compose operator directed acyclic graph
         """
-        raise NotImplementedError("base class called")
 
+    @abc.abstractmethod
     def select_rows(self, expr):
         """
         Select rows matching expr criteria.
@@ -256,8 +257,8 @@ class OperatorPlatform:
         :param expr: logical expression specifying desired rows.
         :return: compose operator directed acyclic graph
         """
-        raise NotImplementedError("base class called")
 
+    @abc.abstractmethod
     def drop_columns(self, column_deletions):
         """
         Remove columns from result.
@@ -265,8 +266,8 @@ class OperatorPlatform:
         :param column_deletions: list of columns to remove.
         :return: compose operator directed acyclic graph
         """
-        raise NotImplementedError("base class called")
 
+    @abc.abstractmethod
     def select_columns(self, columns):
         """
         Narrow to columns in result.
@@ -274,8 +275,8 @@ class OperatorPlatform:
         :param columns: list of columns to keep.
         :return: compose operator directed acyclic graph
         """
-        raise NotImplementedError("base class called")
 
+    @abc.abstractmethod
     def rename_columns(self, column_remapping: Dict[str, str]):
         """
         Rename columns.
@@ -284,8 +285,8 @@ class OperatorPlatform:
                                  direction as extend).
         :return: compose operator directed acyclic graph
         """
-        raise NotImplementedError("base class called")
 
+    @abc.abstractmethod
     def order_rows(self, columns, *, reverse=None, limit=None):
         """
         Order rows by column set.
@@ -295,8 +296,8 @@ class OperatorPlatform:
         :param limit: optional row limit to impose on result.
         :return: compose operator directed acyclic graph
         """
-        raise NotImplementedError("base class called")
 
+    @abc.abstractmethod
     def convert_records(self, record_map: data_algebra.cdata.RecordMap):
         """
         Apply a record mapping taking blocks_in to blocks_out structures.
@@ -304,7 +305,6 @@ class OperatorPlatform:
         :param record_map: data_algebra.cdata.RecordMap transform specification
         :return: compose operator directed acyclic graph
         """
-        raise NotImplementedError("base class called")
 
     def map_records(
             self,
