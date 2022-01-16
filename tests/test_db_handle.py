@@ -22,7 +22,7 @@ def test_db_handle_services_to_csv():
         h.insert_table(d, table_name='d', allow_overwrite=False)
         with pytest.raises(ValueError):
             h.insert_table(d, table_name='d', allow_overwrite=False)
-        with tempfile.NamedTemporaryFile() as tmp:
+        with tempfile.NamedTemporaryFile(suffix='.csv', delete=True) as tmp:
             h.query_to_csv(td, res_name=tmp.name)
             d_back = pd.read_csv(tmp.name)
             assert data_algebra.test_util.equivalent_frames(d, d_back)
