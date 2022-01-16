@@ -189,7 +189,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dirty</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">result_cache</span><span class="p">[</span><span class="n">op_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="c1"># values saved for debugging</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirty</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">data_map</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="p">[</span><span class="n">res</span><span class="p">]):</span>
                 <span class="n">d_key</span> <span class="o">=</span> <span class="n">hash_data_frame</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
                 <span class="c1"># assuming no spurious key collisions</span>
@@ -422,7 +422,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dirty</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">result_cache</span><span class="p">[</span><span class="n">op_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="c1"># values saved for debugging</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirty</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">data_map</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="p">[</span><span class="n">res</span><span class="p">]):</span>
                 <span class="n">d_key</span> <span class="o">=</span> <span class="n">hash_data_frame</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
                 <span class="c1"># assuming no spurious key collisions</span>
@@ -532,7 +532,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dirty</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">result_cache</span><span class="p">[</span><span class="n">op_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="c1"># values saved for debugging</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirty</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">data_map</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="p">[</span><span class="n">res</span><span class="p">]):</span>
                 <span class="n">d_key</span> <span class="o">=</span> <span class="n">hash_data_frame</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
                 <span class="c1"># assuming no spurious key collisions</span>

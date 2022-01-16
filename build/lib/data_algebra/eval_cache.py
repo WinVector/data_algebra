@@ -98,7 +98,7 @@ class ResultCache:
         self.dirty = True
         self.result_cache[op_key] = res.copy()
         # values saved for debugging
-        if self.dirty is not None:
+        if self.data_cache is not None:
             for d in (list(data_map.values()) + [res]):
                 d_key = hash_data_frame(d)
                 # assuming no spurious key collisions
