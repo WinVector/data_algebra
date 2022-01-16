@@ -1,4 +1,6 @@
 
+"""direct tests from op catalog"""
+
 import os
 import pickle
 import gzip
@@ -44,6 +46,7 @@ def test_expression_expectations_1():
                 for c in too_expensive_to_include_in_rechecks:
                     to_skip.add(c)
                 if len(to_skip) < len(to_test):
+                    # goes into cache
                     data_algebra.test_util.check_transform(
                         ops=ops,
                         data=d,
@@ -56,3 +59,48 @@ def test_expression_expectations_1():
         # re-run, but don't check value
         res = ops.transform(d)
         assert data_algebra.default_data_model.is_appropriate_data_instance(res)
+
+
+def test_expression_expectations_direct():
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    # https://github.com/WinVector/data_algebra/blob/main/Examples/Methods/data_algebra_catalog.ipynb
+    # includes not cached tests
+    expectation_path = os.path.join(dir_path, "expr_expectations.pkl.gz")
+    with gzip.open(expectation_path, 'rb') as in_f:
+        expectation_map = pickle.load(in_f)
+    d = expectation_map['d']
+    e_expectations = expectation_map['e_expectations']
+    g_expectations = expectation_map['g_expectations']
+    w_expectations = expectation_map['w_expectations']
+    u_results = expectation_map['u_results']
+    ops_list = e_expectations + g_expectations + w_expectations
+    db_handles = data_algebra.test_util.get_test_dbs()
+    for h in db_handles:
+        h.insert_table(d, table_name='d', allow_overwrite=True)
+    for op, op_class, exp, ops, expect in ops_list:
+        if data_algebra.default_data_model.is_appropriate_data_instance(expect):
+            res = ops.transform(d)
+            assert data_algebra.test_util.equivalent_frames(res, expect)
+            matching = methods_table.loc[methods_table['expression'] == exp, :]
+            if matching.shape[0] == 1:
+                to_test = {c for c in matching.columns if 'Model' in c}
+                for h in db_handles:
+                    model_name = str(h.db_model)
+                    if (model_name in to_test) and (matching[model_name].values[0] == 'y'):
+                        res_db = h.read_query(ops)
+                        assert data_algebra.test_util.equivalent_frames(res_db, expect)
+    for op, op_class, exp, ops, expect in u_results:
+        if data_algebra.default_data_model.is_appropriate_data_instance(expect):
+            res = ops.transform(d)
+            assert data_algebra.default_data_model.is_appropriate_data_instance(res)
+            matching = methods_table.loc[methods_table['expression'] == exp, :]
+            if matching.shape[0] == 1:
+                to_test = {c for c in matching.columns if 'Model' in c}
+                for h in db_handles:
+                    model_name = str(h.db_model)
+                    if (model_name in to_test) and (matching[model_name].values[0] == 'y'):
+                        res_db = h.read_query(ops)
+                        assert data_algebra.default_data_model.is_appropriate_data_instance(res_db)
+    for h in db_handles:
+        h.drop_table('d')
+        h.close()
