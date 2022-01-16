@@ -16,6 +16,7 @@ data_algebra/data_ops.py
 data_algebra/data_ops_types.py
 data_algebra/data_ops_utils.py
 data_algebra/db_model.py
+data_algebra/eval_cache.py
 data_algebra/expr_parse.py
 data_algebra/expr_rep.py
 data_algebra/flow_text.py

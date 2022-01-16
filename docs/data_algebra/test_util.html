@@ -31,6 +31,9 @@
                     <h2>API Documentation</h2>
                         <ul class="memberlist">
             <li>
+                    <a class="variable" href="#global_test_result_cache">global_test_result_cache</a>
+            </li>
+            <li>
                     <a class="function" href="#re_parse">re_parse</a>
             </li>
             <li>
@@ -38,9 +41,6 @@
             </li>
             <li>
                     <a class="function" href="#equivalent_frames">equivalent_frames</a>
-            </li>
-            <li>
-                    <a class="function" href="#hash_data_frame">hash_data_frame</a>
             </li>
             <li>
                     <a class="function" href="#check_transform_on_handles">check_transform_on_handles</a>
@@ -77,13 +77,13 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">import</span> <span class="nn">hashlib</span>
 <span class="kn">import</span> <span class="nn">traceback</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span>
 
 <span class="kn">import</span> <span class="nn">data_algebra</span>
+<span class="kn">import</span> <span class="nn">data_algebra.eval_cache</span>
 <span class="kn">import</span> <span class="nn">data_algebra.db_model</span>
 <span class="kn">import</span> <span class="nn">data_algebra.SQLite</span>
 <span class="kn">import</span> <span class="nn">data_algebra.BigQuery</span>
@@ -103,12 +103,12 @@
 <span class="n">run_direct_ops_path_tests</span> <span class="o">=</span> <span class="kc">False</span>
 
 <span class="c1"># global test result cache</span>
-<span class="n">global_test_result_cache</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">global_test_result_cache</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">eval_cache</span><span class="o">.</span><span class="n">ResultCache</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
 
 <span class="k">def</span> <span class="nf">re_parse</span><span class="p">(</span><span class="n">ops</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Return copy of object made by dumpint to string via repr() and then evaluating that string.</span>
+<span class="sd">    Return copy of object made by dumping to string via repr() and then evaluating that string.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">str1</span> <span class="o">=</span> <span class="nb">repr</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
     <span class="n">ops2</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span>
@@ -241,22 +241,10 @@
     <span class="k">return</span> <span class="kc">True</span>
 
 
-<span class="k">def</span> <span class="nf">hash_data_frame</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Get a hash code representing a data frame.</span>
-
-<span class="sd">    :param d: data frame</span>
-<span class="sd">    :return: hash code as a string</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span>
-        <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hash_pandas_object</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
-
-
 <span class="k">def</span> <span class="nf">_run_handle_experiments</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">db_handle</span><span class="p">,</span>
-    <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
     <span class="n">ops</span><span class="p">:</span> <span class="n">ViewRepresentation</span><span class="p">,</span>
     <span class="n">sql_statements</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">expect</span><span class="p">,</span>
@@ -264,7 +252,7 @@
     <span class="n">check_column_order</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">cols_case_sensitive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">check_row_order</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">test_result_cache</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">test_result_cache</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">eval_cache</span><span class="o">.</span><span class="n">ResultCache</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">alter_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">test_direct_ops_path</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
@@ -277,26 +265,19 @@
     <span class="k">assert</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">SQLiteModel</span><span class="p">):</span>
         <span class="n">test_direct_ops_path</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="n">db_handle_key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="p">)</span>
     <span class="n">sql_statements</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">sql_statements</span><span class="p">)</span>
     <span class="n">res_db_sql</span> <span class="o">=</span> <span class="nb">list</span><span class="p">([</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">sql_statements</span><span class="p">))</span>  <span class="c1"># extra list() wrapper for PyCharm&#39;s type checker</span>
     <span class="n">res_db_ops</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">need_to_run</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="n">dict_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-    <span class="n">dict_keys</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
-    <span class="n">data_key</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="n">hash_data_frame</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">dict_keys</span><span class="p">])</span>
-
-    <span class="k">def</span> <span class="nf">mk_key</span><span class="p">(</span><span class="n">ii</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Build sql statement key.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">db_handle_key</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">sql_statements</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">data_key</span>
-
     <span class="c1"># inspect result cache for any prior results</span>
     <span class="k">if</span> <span class="n">test_result_cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sql_statements</span><span class="p">)):</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">res_db_sql</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_result_cache</span><span class="p">[</span><span class="n">mk_key</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">res_db_sql</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_result_cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                    <span class="n">db_model</span><span class="o">=</span><span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="p">,</span>
+                    <span class="n">sql</span><span class="o">=</span><span class="n">sql_statements</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                    <span class="n">data_map</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                <span class="p">)</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
                 <span class="k">pass</span>
         <span class="n">need_to_run</span> <span class="o">=</span> <span class="n">test_direct_ops_path</span> <span class="ow">or</span> <span class="n">numpy</span><span class="o">.</span><span class="n">any</span><span class="p">(</span>
@@ -322,7 +303,12 @@
                         <span class="ow">and</span> <span class="p">(</span><span class="n">test_result_cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
                         <span class="ow">and</span> <span class="p">(</span><span class="n">res_db_sql_i</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
                     <span class="p">):</span>
-                        <span class="n">test_result_cache</span><span class="p">[</span><span class="n">mk_key</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="n">res_db_sql_i</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                        <span class="n">test_result_cache</span><span class="o">.</span><span class="n">store</span><span class="p">(</span>
+                            <span class="n">db_model</span><span class="o">=</span><span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="p">,</span>
+                            <span class="n">sql</span><span class="o">=</span><span class="n">sql_statements</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                            <span class="n">data_map</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                            <span class="n">res</span><span class="o">=</span><span class="n">res_db_sql_i</span><span class="p">,</span>
+                        <span class="p">)</span>
         <span class="k">except</span> <span class="ne">AssertionError</span> <span class="k">as</span> <span class="n">ase</span><span class="p">:</span>
             <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
             <span class="n">caught</span> <span class="o">=</span> <span class="n">ase</span>
@@ -649,6 +635,15 @@
         </details>
 
             </section>
+                <section id="global_test_result_cache">
+                                <div class="attr variable"><a class="headerlink" href="#global_test_result_cache">#&nbsp;&nbsp</a>
+
+        <span class="name">global_test_result_cache</span><span class="annotation">: Optional[<a href="eval_cache.html#ResultCache">data_algebra.eval_cache.ResultCache</a>]</span><span class="default_value"> = None</span>
+    </div>
+
+    
+
+                </section>
                 <section id="re_parse">
                             <div class="attr function"><a class="headerlink" href="#re_parse">#&nbsp;&nbsp</a>
 
@@ -661,7 +656,7 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">re_parse</span><span class="p">(</span><span class="n">ops</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Return copy of object made by dumpint to string via repr() and then evaluating that string.</span>
+<span class="sd">    Return copy of object made by dumping to string via repr() and then evaluating that string.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">str1</span> <span class="o">=</span> <span class="nb">repr</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
     <span class="n">ops2</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span>
@@ -676,7 +671,7 @@
 
         </details>
 
-            <div class="docstring"><p>Return copy of object made by dumpint to string via repr() and then evaluating that string.</p>
+            <div class="docstring"><p>Return copy of object made by dumping to string via repr() and then evaluating that string.</p>
 </div>
 
 
@@ -845,38 +840,6 @@ Can raise exceptions. Also checks pickling.</p>
 
             <div class="docstring"><p>return False if the frames are equivalent (up to column re-ordering and possible row-reordering).
 Ignores indexing. None and nan are considered equivalent in numeric contexts.</p>
-</div>
-
-
-                </section>
-                <section id="hash_data_frame">
-                            <div class="attr function"><a class="headerlink" href="#hash_data_frame">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">hash_data_frame</span><span class="signature">(d) -&gt; str</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">hash_data_frame</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Get a hash code representing a data frame.</span>
-
-<span class="sd">    :param d: data frame</span>
-<span class="sd">    :return: hash code as a string</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span>
-        <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hash_pandas_object</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>Get a hash code representing a data frame.</p>
-
-<p>:param d: data frame
-:return: hash code as a string</p>
 </div>
 
 

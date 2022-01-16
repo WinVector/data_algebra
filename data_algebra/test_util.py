@@ -3,13 +3,13 @@ Utils that help with testing. This module is allowed to import many other module
 """
 
 import pickle
-import hashlib
 import traceback
 from typing import Any, Optional
 
 import numpy
 
 import data_algebra
+import data_algebra.eval_cache
 import data_algebra.db_model
 import data_algebra.SQLite
 import data_algebra.BigQuery
@@ -29,12 +29,12 @@ test_Spark = True  # causes an external dependency
 run_direct_ops_path_tests = False
 
 # global test result cache
-global_test_result_cache = None
+global_test_result_cache: Optional[data_algebra.eval_cache.ResultCache] = None
 
 
 def re_parse(ops):
     """
-    Return copy of object made by dumpint to string via repr() and then evaluating that string.
+    Return copy of object made by dumping to string via repr() and then evaluating that string.
     """
     str1 = repr(ops)
     ops2 = eval(
@@ -167,22 +167,10 @@ def equivalent_frames(
     return True
 
 
-def hash_data_frame(d) -> str:
-    """
-    Get a hash code representing a data frame.
-
-    :param d: data frame
-    :return: hash code as a string
-    """
-    return hashlib.sha256(
-        data_algebra.default_data_model.pd.util.hash_pandas_object(d).values
-    ).hexdigest()
-
-
 def _run_handle_experiments(
     *,
     db_handle,
-    data: Dict,
+    data: Dict[str, Any],
     ops: ViewRepresentation,
     sql_statements: Iterable[str],
     expect,
@@ -190,7 +178,7 @@ def _run_handle_experiments(
     check_column_order: bool = False,
     cols_case_sensitive: bool = False,
     check_row_order: bool = False,
-    test_result_cache: Optional[dict] = None,
+    test_result_cache: Optional[data_algebra.eval_cache.ResultCache] = None,
     alter_cache: bool = True,
     test_direct_ops_path=False,
 ):
@@ -203,26 +191,19 @@ def _run_handle_experiments(
     assert db_handle.conn is not None
     if isinstance(db_handle.db_model, data_algebra.SQLite.SQLiteModel):
         test_direct_ops_path = True
-    db_handle_key = str(db_handle.db_model)
     sql_statements = list(sql_statements)
     res_db_sql = list([None] * len(sql_statements))  # extra list() wrapper for PyCharm's type checker
     res_db_ops = None
     need_to_run = True
-    dict_keys = list(data.keys())
-    dict_keys.sort()
-    data_key = " ".join([k + ":" + hash_data_frame(data[k]) for k in dict_keys])
-
-    def mk_key(ii):
-        """
-        Build sql statement key.
-        """
-        return db_handle_key + " " + sql_statements[ii] + " " + data_key
-
     # inspect result cache for any prior results
     if test_result_cache is not None:
         for i in range(len(sql_statements)):
             try:
-                res_db_sql[i] = test_result_cache[mk_key(i)].copy()
+                res_db_sql[i] = test_result_cache.get(
+                    db_model=db_handle.db_model,
+                    sql=sql_statements[i],
+                    data_map=data,
+                )
             except KeyError:
                 pass
         need_to_run = test_direct_ops_path or numpy.any(
@@ -248,7 +229,12 @@ def _run_handle_experiments(
                         and (test_result_cache is not None)
                         and (res_db_sql_i is not None)
                     ):
-                        test_result_cache[mk_key(i)] = res_db_sql_i.copy()
+                        test_result_cache.store(
+                            db_model=db_handle.db_model,
+                            sql=sql_statements[i],
+                            data_map=data,
+                            res=res_db_sql_i,
+                        )
         except AssertionError as ase:
             traceback.print_exc()
             caught = ase
