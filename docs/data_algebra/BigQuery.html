@@ -165,6 +165,10 @@
     <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;LOGICAL_AND(</span><span class="si">{</span><span class="n">subexpr</span><span class="si">}</span><span class="s1">)&#39;</span>
 
 
+<span class="k">def</span> <span class="nf">_bigquery_any_value_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s1">&#39;ANY_VALUE(&#39;</span> <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+
+
 <span class="n">BigQuery_formatters</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;median&quot;</span><span class="p">:</span> <span class="n">_bigquery_median_expr</span><span class="p">,</span>
     <span class="s2">&quot;is_bad&quot;</span><span class="p">:</span> <span class="n">_bigquery_is_bad_expr</span><span class="p">,</span>
@@ -172,6 +176,7 @@
     <span class="s2">&quot;var&quot;</span><span class="p">:</span> <span class="n">_bigquery_var_expr</span><span class="p">,</span>
     <span class="s2">&quot;any&quot;</span><span class="p">:</span> <span class="n">_bigquery_any_expr</span><span class="p">,</span>
     <span class="s2">&quot;all&quot;</span><span class="p">:</span> <span class="n">_bigquery_all_expr</span><span class="p">,</span>
+    <span class="s2">&quot;any_value&quot;</span><span class="p">:</span> <span class="n">_bigquery_any_value_expr</span><span class="p">,</span>
 <span class="p">}</span>
 
 

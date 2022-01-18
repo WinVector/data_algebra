@@ -439,13 +439,17 @@ def _trimstr(dbmodel, expression):
 
 
 def _any_expr(dbmodel, expression):
-    derived = expression.args[0].max() >= data_algebra.expr_rep.Value(1)
+    derived = expression.args[0].if_else(1, 0).max() >= data_algebra.expr_rep.Value(1)
     return dbmodel.expr_to_sql(derived, want_inline_parens=True)
 
 
 def _all_expr(dbmodel, expression):
-    derived = expression.args[0].min() >= data_algebra.expr_rep.Value(1)
+    derived = expression.args[0].if_else(1, 0).min() >= data_algebra.expr_rep.Value(1)
     return dbmodel.expr_to_sql(derived, want_inline_parens=True)
+
+
+def _any_value_expr(dbmodel, expression):
+    return 'MAX(' + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + ')'
 
 
 # date/time fns
@@ -611,6 +615,7 @@ db_expr_formatters = {
     "trimstr": _trimstr,
     "any": _any_expr,
     "all": _all_expr,
+    "any_value": _any_value_expr,
     "datetime_to_date": _datetime_to_date,
     "parse_datetime": _parse_datetime,
     "parse_date": _parse_date,

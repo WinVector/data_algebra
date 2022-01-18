@@ -546,7 +546,7 @@ WITH
   SELECT  -- .extend({ 'new_column': 'a.all()'}, partition_by=['g'])
    "g" ,
    "row_id" ,
-   (MIN("a") >= 1) OVER ( PARTITION BY "g"  )  AS "new_column"
+   (MIN(CASE WHEN "a" THEN 1 WHEN NOT "a" THEN 0 ELSE NULL END) >= 1) OVER ( PARTITION BY "g"  )  AS "new_column"
   FROM
    "table_reference_0"
  )
@@ -579,7 +579,7 @@ WITH
   SELECT  -- .extend({ 'new_column': 'a.any()'}, partition_by=['g'])
    "g" ,
    "row_id" ,
-   (MAX("a") >= 1) OVER ( PARTITION BY "g"  )  AS "new_column"
+   (MAX(CASE WHEN "a" THEN 1 WHEN NOT "a" THEN 0 ELSE NULL END) >= 1) OVER ( PARTITION BY "g"  )  AS "new_column"
   FROM
    "table_reference_0"
  )
@@ -1002,42 +1002,10 @@ ORDER BY
 
 
 error (n)
-op: any_value, op_class: up, example expression: x.any_value(), db: SQLiteModel
-caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
---       string quote: '
---   identifier quote: "
-WITH
- "table_reference_0" AS (
-  SELECT
-   "x" ,
-   "g"
-  FROM
-   "d"
- ) ,
- "project_1" AS (
-  SELECT  -- .project({ 'new_column': 'x.any_value()'}, group_by=['g'])
-   ANY_VALUE("x") AS "new_column" ,
-   "g"
-  FROM
-   "table_reference_0"
-  GROUP BY
-   "g"
- )
-SELECT  -- .order_rows(['g'])
- *
-FROM
- "project_1"
-ORDER BY
- "g"
-': no such function: ANY_VALUE
-
-
-error (n)
 op: arcsin, op_class: e, example expression: x.arcsin(), db: BigQueryModel
 caught: 400 Function not found: ARCSIN; Did you mean asin? at [16:4]
 
-(job ID: 0545130a-2273-4262-ad92-8f7e5f76b81f)
+(job ID: c6a5084f-997f-49fc-b3e2-75030b94ad98)
 
                  -----Query Job SQL Follows-----                  
 
@@ -1074,7 +1042,7 @@ error (n)
 op: arccos, op_class: e, example expression: x.arccos(), db: BigQueryModel
 caught: 400 Function not found: ARCCOS; Did you mean acos? at [16:4]
 
-(job ID: 83694c0e-2ddc-47cf-9a9d-cb96bbe30089)
+(job ID: 18768a1c-8b22-4acf-88e8-b05d7cafefe4)
 
                  -----Query Job SQL Follows-----                  
 
@@ -1111,7 +1079,7 @@ error (n)
 op: arctan, op_class: e, example expression: x.arctan(), db: BigQueryModel
 caught: 400 Function not found: ARCTAN; Did you mean atan? at [16:4]
 
-(job ID: 93696a9e-0090-4a3d-b7b3-da25a377d2d9)
+(job ID: 68b802b0-38ec-45a5-bb71-22fa4fdef28a)
 
                  -----Query Job SQL Follows-----                  
 
@@ -1148,7 +1116,7 @@ error (n)
 op: arctan2, op_class: e, example expression: x.arctan2(y), db: BigQueryModel
 caught: 400 Function not found: ARCTAN2; Did you mean atan2? at [17:4]
 
-(job ID: 21aeb9e0-6d59-45a7-9500-c40dcf8261e2)
+(job ID: 87c89fc1-44d4-453a-9ca6-a4d629d5df3c)
 
                  -----Query Job SQL Follows-----                  
 
@@ -1186,7 +1154,7 @@ error (n)
 op: arcsinh, op_class: e, example expression: x.arcsinh(), db: BigQueryModel
 caught: 400 Function not found: ARCSINH; Did you mean asinh? at [16:4]
 
-(job ID: 81a78f9b-dfb0-4d53-8036-097ea30cd4f6)
+(job ID: b7904ef5-320f-40c3-9125-cf211d856f5e)
 
                  -----Query Job SQL Follows-----                  
 
@@ -1223,7 +1191,7 @@ error (n)
 op: arccosh, op_class: e, example expression: x.arccosh(), db: BigQueryModel
 caught: 400 Function not found: ARCCOSH; Did you mean acosh? at [16:4]
 
-(job ID: 228fd225-d414-4add-bf8c-3f9f038818a4)
+(job ID: 4c6ece4b-e2c9-46e2-8058-e9daaeaf788b)
 
                  -----Query Job SQL Follows-----                  
 
@@ -1260,7 +1228,7 @@ error (n)
 op: arctanh, op_class: e, example expression: x.arctanh(), db: BigQueryModel
 caught: 400 Function not found: ARCTANH; Did you mean atanh? at [16:4]
 
-(job ID: 36cd7efe-7a75-44ce-90dd-b7f05f3dea6b)
+(job ID: 6b5f1305-68aa-4047-a487-9a95041e563e)
 
                  -----Query Job SQL Follows-----                  
 
@@ -1297,7 +1265,7 @@ error (n)
 op: expm1, op_class: e, example expression: y.expm1(), db: BigQueryModel
 caught: 400 Function not found: EXPM1; Did you mean exp? at [16:4]
 
-(job ID: 32d5c724-4926-4f86-88e1-96adc8544cfa)
+(job ID: cbd763bb-7fab-402e-83a9-348ede3f4a37)
 
                  -----Query Job SQL Follows-----                  
 
@@ -1334,7 +1302,7 @@ error (n)
 op: log1p, op_class: e, example expression: x.log1p(), db: BigQueryModel
 caught: 400 Function not found: LOG1P; Did you mean log10? at [16:4]
 
-(job ID: 88b9fb7a-a336-46d6-801d-0ae4a7e5d1ae)
+(job ID: dffb8e3a-fc03-429f-a504-e378f26296d4)
 
                  -----Query Job SQL Follows-----                  
 
@@ -1371,7 +1339,7 @@ error (n)
 op: _ngroup, op_class: g, example expression: _ngroup(), db: BigQueryModel
 caught: 400 Function not found: NGROUP at [17:4]
 
-(job ID: 53370347-82d3-4a62-ae86-f99c3b5b610e)
+(job ID: 322c316a-519c-40bd-9ddd-b7f1a6eb667b)
 
                       -----Query Job SQL Follows-----                      
 
@@ -1455,7 +1423,7 @@ error (n)
 op: median, op_class: p, example expression: x.median(), db: BigQueryModel
 caught: 400 percentile_cont aggregate function is not supported.
 
-(job ID: 9fcb6fe8-c47c-4a2a-ae6f-32e32576b7ec)
+(job ID: 3e972bad-682f-434f-8e7d-09e1b477541b)
 
                      -----Query Job SQL Follows-----                     
 
@@ -1467,8 +1435,8 @@ caught: 400 percentile_cont aggregate function is not supported.
    5:WITH
    6: `table_reference_0` AS (
    7:  SELECT
-   8:   `x` ,
-   9:   `g`
+   8:   `g` ,
+   9:   `x`
   10:  FROM
   11:   `data-algebra-test.test_1.d`
   12: ) ,
@@ -1494,7 +1462,7 @@ error (n)
 op: bfill, op_class: w, example expression: z.bfill(), db: BigQueryModel
 caught: 400 Function not found: BFILL at [18:4]
 
-(job ID: 56d8042c-d078-4097-904a-3e461154f352)
+(job ID: 515c507c-4c8f-4333-ae2f-242a926ba28d)
 
                                 -----Query Job SQL Follows-----                                 
 
@@ -1534,7 +1502,7 @@ error (n)
 op: ffill, op_class: w, example expression: z.ffill(), db: BigQueryModel
 caught: 400 Function not found: FFILL at [18:4]
 
-(job ID: aaaefea4-82c3-4144-9325-4794d0a41cae)
+(job ID: 99a9bcac-b30a-48e9-b272-17d96e020c71)
 
                                 -----Query Job SQL Follows-----                                 
 
@@ -1574,7 +1542,7 @@ error (n)
 op: first, op_class: w, example expression: x.first(), db: BigQueryModel
 caught: 400 Function not found: FIRST at [18:4]
 
-(job ID: b9b3dcc5-d880-4b20-a333-ae8faa68d990)
+(job ID: 2e6f7400-5423-43a4-b7e3-c60311d7280f)
 
                                 -----Query Job SQL Follows-----                                 
 
@@ -1614,7 +1582,7 @@ error (n)
 op: last, op_class: w, example expression: x.last(), db: BigQueryModel
 caught: 400 Function not found: LAST; Did you mean least? at [18:4]
 
-(job ID: 255c255c-316f-443e-a26a-a2b9f532e06b)
+(job ID: cddc6a3d-215b-4e32-a4cb-6b564c488132)
 
                                 -----Query Job SQL Follows-----                                
 
@@ -1654,7 +1622,7 @@ error (n)
 op: rank, op_class: w, example expression: x.rank(), db: BigQueryModel
 caught: 400 Number of arguments does not match for analytic function RANK. Supported signature: RANK() at [18:4]
 
-(job ID: 6da9c37e-7a16-4537-83f7-7e5f740ff9e1)
+(job ID: ffb1facf-cffa-494f-8742-beaf181a1468)
 
                                 -----Query Job SQL Follows-----                                
 
@@ -1694,7 +1662,7 @@ error (n)
 op: cumprod, op_class: w, example expression: x.cumprod(), db: BigQueryModel
 caught: 400 Function not found: CUMPROD at [18:4]
 
-(job ID: e52d0a53-258e-4ddc-abaf-4b0db5c144f2)
+(job ID: 2683259b-67fb-4a89-9cf2-5295a10e50bf)
 
                                  -----Query Job SQL Follows-----                                  
 
@@ -1734,7 +1702,7 @@ error (n)
 op: cumcount, op_class: w, example expression: z.cumcount(), db: BigQueryModel
 caught: 400 Function not found: CUMCOUNT at [18:4]
 
-(job ID: 9fc078da-0160-4107-8fe6-685d70cad4fb)
+(job ID: 74b13a33-277f-4eaa-a1fb-2ff3b536f1ac)
 
                                   -----Query Job SQL Follows-----                                  
 
@@ -1774,7 +1742,7 @@ error (n)
 op: cummax, op_class: w, example expression: x.cummax(), db: BigQueryModel
 caught: 400 Function not found: CUMMAX at [18:4]
 
-(job ID: 9ca21ad2-b659-4ce5-bc96-59ec9d2d971d)
+(job ID: 14e17feb-65bf-4f6e-b4f0-157cfed64b3b)
 
                                  -----Query Job SQL Follows-----                                 
 
@@ -1814,7 +1782,7 @@ error (n)
 op: cummin, op_class: w, example expression: x.cummin(), db: BigQueryModel
 caught: 400 Function not found: CUMMIN at [18:4]
 
-(job ID: 5c18a0f2-ae2b-4d96-b6e2-9e96436be4f8)
+(job ID: 3593083b-d71a-49ee-88ad-1c389d0b97cf)
 
                                  -----Query Job SQL Follows-----                                 
 
@@ -2181,41 +2149,6 @@ ORDER BY
 
 
 error (n)
-op: as_int64, op_class: e, example expression: y.as_int64(), db: PostgreSQLModel
-caught: (psycopg2.errors.UndefinedObject) type "int64" does not exist
-LINE 16:    CAST("y" AS INT64) AS "new_column"
-                        ^
-
-[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
---       string quote: '
---   identifier quote: "
-WITH
- "table_reference_0" AS (
-  SELECT
-   "row_id" ,
-   "y"
-  FROM
-   "d"
- ) ,
- "extend_1" AS (
-  SELECT  -- .extend({ 'new_column': 'y.as_int64()'})
-   "row_id" ,
-   CAST("y" AS INT64) AS "new_column"
-  FROM
-   "table_reference_0"
- )
-SELECT  -- .order_rows(['row_id'])
- *
-FROM
- "extend_1"
-ORDER BY
- "row_id"
-]
-(Background on this error at: https://sqlalche.me/e/14/f405)
-
-
-error (n)
 op: parse_date, op_class: e, example expression: str_date_col.parse_date(), db: PostgreSQLModel
 caught: dict is not a sequence
 
@@ -2492,8 +2425,8 @@ ORDER BY
 error (n)
 op: all, op_class: g, example expression: a.all(), db: PostgreSQLModel
 caught: (psycopg2.errors.SyntaxError) syntax error at or near "OVER"
-LINE 18:    (MIN("a") >= 1) OVER ( PARTITION BY "g"  )  AS "new_colum...
-                            ^
+LINE 18: ..." THEN 1 WHEN NOT "a" THEN 0 ELSE NULL END) >= 1) OVER ( PAR...
+                                                              ^
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
 --  dialect: PostgreSQLModel
@@ -2512,7 +2445,7 @@ WITH
   SELECT  -- .extend({ 'new_column': 'a.all()'}, partition_by=['g'])
    "g" ,
    "row_id" ,
-   (MIN("a") >= 1) OVER ( PARTITION BY "g"  )  AS "new_column"
+   (MIN(CASE WHEN "a" THEN 1 WHEN NOT "a" THEN 0 ELSE NULL END) >= 1) OVER ( PARTITION BY "g"  )  AS "new_column"
   FROM
    "table_reference_0"
  )
@@ -2530,8 +2463,8 @@ ORDER BY
 error (n)
 op: any, op_class: g, example expression: a.any(), db: PostgreSQLModel
 caught: (psycopg2.errors.SyntaxError) syntax error at or near "OVER"
-LINE 18:    (MAX("a") >= 1) OVER ( PARTITION BY "g"  )  AS "new_colum...
-                            ^
+LINE 18: ..." THEN 1 WHEN NOT "a" THEN 0 ELSE NULL END) >= 1) OVER ( PAR...
+                                                              ^
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
 --  dialect: PostgreSQLModel
@@ -2550,7 +2483,7 @@ WITH
   SELECT  -- .extend({ 'new_column': 'a.any()'}, partition_by=['g'])
    "g" ,
    "row_id" ,
-   (MAX("a") >= 1) OVER ( PARTITION BY "g"  )  AS "new_column"
+   (MAX(CASE WHEN "a" THEN 1 WHEN NOT "a" THEN 0 ELSE NULL END) >= 1) OVER ( PARTITION BY "g"  )  AS "new_column"
   FROM
    "table_reference_0"
  )
@@ -2688,82 +2621,6 @@ ORDER BY
 
 
 error (n)
-op: all, op_class: p, example expression: a.all(), db: PostgreSQLModel
-caught: (psycopg2.errors.UndefinedFunction) function min(boolean) does not exist
-LINE 15:    (MIN("a") >= 1) AS "new_column" ,
-             ^
-HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
-
-[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
---       string quote: '
---   identifier quote: "
-WITH
- "table_reference_0" AS (
-  SELECT
-   "a" ,
-   "g"
-  FROM
-   "d"
- ) ,
- "project_1" AS (
-  SELECT  -- .project({ 'new_column': 'a.all()'}, group_by=['g'])
-   (MIN("a") >= 1) AS "new_column" ,
-   "g"
-  FROM
-   "table_reference_0"
-  GROUP BY
-   "g"
- )
-SELECT  -- .order_rows(['g'])
- *
-FROM
- "project_1"
-ORDER BY
- "g"
-]
-(Background on this error at: https://sqlalche.me/e/14/f405)
-
-
-error (n)
-op: any, op_class: p, example expression: a.any(), db: PostgreSQLModel
-caught: (psycopg2.errors.UndefinedFunction) function max(boolean) does not exist
-LINE 15:    (MAX("a") >= 1) AS "new_column" ,
-             ^
-HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
-
-[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
---       string quote: '
---   identifier quote: "
-WITH
- "table_reference_0" AS (
-  SELECT
-   "a" ,
-   "g"
-  FROM
-   "d"
- ) ,
- "project_1" AS (
-  SELECT  -- .project({ 'new_column': 'a.any()'}, group_by=['g'])
-   (MAX("a") >= 1) AS "new_column" ,
-   "g"
-  FROM
-   "table_reference_0"
-  GROUP BY
-   "g"
- )
-SELECT  -- .order_rows(['g'])
- *
-FROM
- "project_1"
-ORDER BY
- "g"
-]
-(Background on this error at: https://sqlalche.me/e/14/f405)
-
-
-error (n)
 op: median, op_class: p, example expression: x.median(), db: PostgreSQLModel
 caught: (psycopg2.errors.UndefinedFunction) function median(double precision) does not exist
 LINE 15:    MEDIAN("x") AS "new_column" ,
@@ -2777,8 +2634,8 @@ HINT:  No function matches the given name and argument types. You might need to 
 WITH
  "table_reference_0" AS (
   SELECT
-   "x" ,
-   "g"
+   "g" ,
+   "x"
   FROM
    "d"
  ) ,
@@ -3152,44 +3009,6 @@ ORDER BY
 
 
 error (n)
-op: any_value, op_class: up, example expression: x.any_value(), db: PostgreSQLModel
-caught: (psycopg2.errors.UndefinedFunction) function any_value(double precision) does not exist
-LINE 15:    ANY_VALUE("x") AS "new_column" ,
-            ^
-HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
-
-[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
---       string quote: '
---   identifier quote: "
-WITH
- "table_reference_0" AS (
-  SELECT
-   "x" ,
-   "g"
-  FROM
-   "d"
- ) ,
- "project_1" AS (
-  SELECT  -- .project({ 'new_column': 'x.any_value()'}, group_by=['g'])
-   ANY_VALUE("x") AS "new_column" ,
-   "g"
-  FROM
-   "table_reference_0"
-  GROUP BY
-   "g"
- )
-SELECT  -- .order_rows(['g'])
- *
-FROM
- "project_1"
-ORDER BY
- "g"
-]
-(Background on this error at: https://sqlalche.me/e/14/f405)
-
-
-error (n)
 op: arcsin, op_class: e, example expression: x.arcsin(), db: SparkSQLModel
 caught: Undefined function: 'ARCSIN'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 16 pos 3
 
@@ -3509,7 +3328,7 @@ caught: Undefined function: 'NGROUP'. This function is neither a registered temp
 error (n)
 op: all, op_class: g, example expression: a.all(), db: SparkSQLModel
 caught: 
-no viable alternative at input 'WITH\n `table_reference_0` AS (\n  SELECT\n   `row_id` ,\n   `a` ,\n   `g`\n  FROM\n   `d`\n ) ,\n `extend_1` AS (\n  SELECT  -- .extend({ 'new_column': 'a.all()'}, partition_by=['g'])\n   `g` ,\n   `row_id` ,\n   (MIN(`a`) >= 1) OVER ('(line 18, pos 24)
+no viable alternative at input 'WITH\n `table_reference_0` AS (\n  SELECT\n   `row_id` ,\n   `a` ,\n   `g`\n  FROM\n   `d`\n ) ,\n `extend_1` AS (\n  SELECT  -- .extend({ 'new_column': 'a.all()'}, partition_by=['g'])\n   `g` ,\n   `row_id` ,\n   (MIN(CASE WHEN `a` THEN 1 WHEN NOT `a` THEN 0 ELSE NULL END) >= 1) OVER ('(line 18, pos 75)
 
 == SQL ==
 -- data_algebra SQL https://github.com/WinVector/data_algebra
@@ -3529,8 +3348,8 @@ WITH
   SELECT  -- .extend({ 'new_column': 'a.all()'}, partition_by=['g'])
    `g` ,
    `row_id` ,
-   (MIN(`a`) >= 1) OVER ( PARTITION BY `g`  )  AS `new_column`
-------------------------^^^
+   (MIN(CASE WHEN `a` THEN 1 WHEN NOT `a` THEN 0 ELSE NULL END) >= 1) OVER ( PARTITION BY `g`  )  AS `new_column`
+---------------------------------------------------------------------------^^^
   FROM
    `table_reference_0`
  )
@@ -3547,7 +3366,7 @@ ORDER BY
 error (n)
 op: any, op_class: g, example expression: a.any(), db: SparkSQLModel
 caught: 
-no viable alternative at input 'WITH\n `table_reference_0` AS (\n  SELECT\n   `row_id` ,\n   `a` ,\n   `g`\n  FROM\n   `d`\n ) ,\n `extend_1` AS (\n  SELECT  -- .extend({ 'new_column': 'a.any()'}, partition_by=['g'])\n   `g` ,\n   `row_id` ,\n   (MAX(`a`) >= 1) OVER ('(line 18, pos 24)
+no viable alternative at input 'WITH\n `table_reference_0` AS (\n  SELECT\n   `row_id` ,\n   `a` ,\n   `g`\n  FROM\n   `d`\n ) ,\n `extend_1` AS (\n  SELECT  -- .extend({ 'new_column': 'a.any()'}, partition_by=['g'])\n   `g` ,\n   `row_id` ,\n   (MAX(CASE WHEN `a` THEN 1 WHEN NOT `a` THEN 0 ELSE NULL END) >= 1) OVER ('(line 18, pos 75)
 
 == SQL ==
 -- data_algebra SQL https://github.com/WinVector/data_algebra
@@ -3567,8 +3386,8 @@ WITH
   SELECT  -- .extend({ 'new_column': 'a.any()'}, partition_by=['g'])
    `g` ,
    `row_id` ,
-   (MAX(`a`) >= 1) OVER ( PARTITION BY `g`  )  AS `new_column`
-------------------------^^^
+   (MAX(CASE WHEN `a` THEN 1 WHEN NOT `a` THEN 0 ELSE NULL END) >= 1) OVER ( PARTITION BY `g`  )  AS `new_column`
+---------------------------------------------------------------------------^^^
   FROM
    `table_reference_0`
  )
@@ -3704,50 +3523,6 @@ ORDER BY
 
 
 error (n)
-op: all, op_class: p, example expression: a.all(), db: SparkSQLModel
-caught: cannot resolve '(min(table_reference_0.a) >= 1)' due to data type mismatch: differing types in '(min(table_reference_0.a) >= 1)' (boolean and int).; line 15 pos 4;
-'WithCTE
-:- CTERelationDef 184
-:  +- SubqueryAlias table_reference_0
-:     +- Project [a#1, g#7]
-:        +- SubqueryAlias d
-:           +- View (`d`, [row_id#0L,a#1,b#2,q#3L,x#4,y#5,z#6,g#7,s2#8,str_datetime_col#9,str_date_col#10,datetime_col_0#11,datetime_col_1#12,date_col_0#13,date_col_1#14])
-:              +- LogicalRDD [row_id#0L, a#1, b#2, q#3L, x#4, y#5, z#6, g#7, s2#8, str_datetime_col#9, str_date_col#10, datetime_col_0#11, datetime_col_1#12, date_col_0#13, date_col_1#14], false
-:- 'CTERelationDef 185
-:  +- 'SubqueryAlias project_1
-:     +- 'Aggregate [g#7], [(min(a#1) >= 1) AS new_column#338, g#7]
-:        +- SubqueryAlias table_reference_0
-:           +- CTERelationRef 184, true, [a#1, g#7]
-+- 'Sort ['g ASC NULLS FIRST], true
-   +- 'Project [*]
-      +- 'SubqueryAlias project_1
-         +- 'CTERelationRef 185, false
-
-
-
-error (n)
-op: any, op_class: p, example expression: a.any(), db: SparkSQLModel
-caught: cannot resolve '(max(table_reference_0.a) >= 1)' due to data type mismatch: differing types in '(max(table_reference_0.a) >= 1)' (boolean and int).; line 15 pos 4;
-'WithCTE
-:- CTERelationDef 186
-:  +- SubqueryAlias table_reference_0
-:     +- Project [a#1, g#7]
-:        +- SubqueryAlias d
-:           +- View (`d`, [row_id#0L,a#1,b#2,q#3L,x#4,y#5,z#6,g#7,s2#8,str_datetime_col#9,str_date_col#10,datetime_col_0#11,datetime_col_1#12,date_col_0#13,date_col_1#14])
-:              +- LogicalRDD [row_id#0L, a#1, b#2, q#3L, x#4, y#5, z#6, g#7, s2#8, str_datetime_col#9, str_date_col#10, datetime_col_0#11, datetime_col_1#12, date_col_0#13, date_col_1#14], false
-:- 'CTERelationDef 187
-:  +- 'SubqueryAlias project_1
-:     +- 'Aggregate [g#7], [(max(a#1) >= 1) AS new_column#340, g#7]
-:        +- SubqueryAlias table_reference_0
-:           +- CTERelationRef 186, true, [a#1, g#7]
-+- 'Sort ['g ASC NULLS FIRST], true
-   +- 'Project [*]
-      +- 'SubqueryAlias project_1
-         +- 'CTERelationRef 187, false
-
-
-
-error (n)
 op: median, op_class: p, example expression: x.median(), db: SparkSQLModel
 caught: Undefined function: 'MEDIAN'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 15 pos 3
 
@@ -3772,8 +3547,8 @@ query
 WITH
  `table_reference_0` AS (
   SELECT
-   `z` ,
-   `g`
+   `g` ,
+   `z`
   FROM
    `d`
  ) ,
@@ -3869,11 +3644,6 @@ caught: Undefined function: 'CUMMAX'. This function is neither a registered temp
 error (n)
 op: cummin, op_class: w, example expression: x.cummin(), db: SparkSQLModel
 caught: Undefined function: 'CUMMIN'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 18 pos 3
-
-
-error (n)
-op: any_value, op_class: up, example expression: x.any_value(), db: SparkSQLModel
-caught: Undefined function: 'ANY_VALUE'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 15 pos 3
 
 
 error (n)
@@ -4534,7 +4304,7 @@ WITH
   SELECT  -- .extend({ 'new_column': 'a.all()'}, partition_by=['g'])
    `g` ,
    `row_id` ,
-   (MIN(`a`) >= 1) OVER ( PARTITION BY `g`  )  AS `new_column`
+   (MIN(CASE WHEN `a` THEN 1 WHEN NOT `a` THEN 0 ELSE NULL END) >= 1) OVER ( PARTITION BY `g`  )  AS `new_column`
   FROM
    `table_reference_0`
  )
@@ -4569,7 +4339,7 @@ WITH
   SELECT  -- .extend({ 'new_column': 'a.any()'}, partition_by=['g'])
    `g` ,
    `row_id` ,
-   (MAX(`a`) >= 1) OVER ( PARTITION BY `g`  )  AS `new_column`
+   (MAX(CASE WHEN `a` THEN 1 WHEN NOT `a` THEN 0 ELSE NULL END) >= 1) OVER ( PARTITION BY `g`  )  AS `new_column`
   FROM
    `table_reference_0`
  )
@@ -4709,8 +4479,8 @@ caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.MEDIAN does not e
 WITH
  `table_reference_0` AS (
   SELECT
-   `x` ,
-   `g`
+   `g` ,
+   `x`
   FROM
    `d`
  ) ,

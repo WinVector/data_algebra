@@ -69,6 +69,10 @@ def _bigquery_all_expr(dbmodel, expression):
     return f'LOGICAL_AND({subexpr})'
 
 
+def _bigquery_any_value_expr(dbmodel, expression):
+    return 'ANY_VALUE(' + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + ')'
+
+
 BigQuery_formatters = {
     "median": _bigquery_median_expr,
     "is_bad": _bigquery_is_bad_expr,
@@ -76,6 +80,7 @@ BigQuery_formatters = {
     "var": _bigquery_var_expr,
     "any": _bigquery_any_expr,
     "all": _bigquery_all_expr,
+    "any_value": _bigquery_any_value_expr,
 }
 
 
