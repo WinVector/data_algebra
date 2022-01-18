@@ -67,7 +67,7 @@ or,a | b,e,y,y,y,y,y,y,1.3.1
 parse_date,str_date_col.parse_date(),e,y,n,y,n,n,n,1.3.1
 parse_datetime,str_datetime_col.parse_datetime(),e,y,n,y,n,n,n,1.3.1
 quarter,date_col_0.quarter(),e,y,n,y,y,y,y,1.3.1
-remainder,row_id.remainder(2),e,y,y,n,n,n,n,1.3.1
+remainder,row_id.remainder(2),e,y,y,y,y,y,y,1.3.1
 round,y.round(),e,y,y,y,y,y,y,1.3.1
 sign,z.sign(),e,y,y,y,y,y,y,1.3.1
 sin,x.sin(),e,y,y,y,y,y,y,1.3.1

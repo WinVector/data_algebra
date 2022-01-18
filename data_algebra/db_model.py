@@ -110,6 +110,16 @@ def _db_lag_expr(dbmodel, expression):
         raise ValueError("too many arguments to SQL LAG/LEAD")
 
 
+# Note, mod should not always equal remainder:
+# https://rob.conery.io/2018/08/21/mod-and-remainder-are-not-the-same/
+# But they do in numpy, which we will use as the
+# reference implementation.
+# import numpy as np
+# np.mod([5, 5, -5, 5], [2, -2, 2, -2])
+# # array([ 1, -1,  1, -1])
+# np.remainder([5, 5, -5, 5], [2, -2, 2, -2])
+# # array([ 1, -1,  1, -1])
+# so we are just going to send it out and use destination semantics
 def _db_mod_expr(dbmodel, expression):
     return (
         "MOD("
@@ -118,6 +128,17 @@ def _db_mod_expr(dbmodel, expression):
         + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
         + ")"
     )
+
+# extend to floating point
+# import numpy as np
+# e0 = np.array([5, 5, -5, -5])
+# e1 = np.array([2, -2, 2, -2])
+# (e0 - np.floor(e0 / (1.0 * e1)) * e1)
+# # array([ 1., -1.,  1., -1.])
+def _db_remainder_expr(dbmodel, expression):
+    e0 = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
+    e1 = dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
+    return f"({e0} - FLOOR({e0} / (1.0 * {e1})) * {e1})"
 
 
 def _db_mean_expr(dbmodel, expression):
@@ -582,6 +603,8 @@ db_expr_formatters = {
     "nunique": _db_nunique_expr,
     "mapv": _db_mapv,
     "%": _db_mod_expr,
+    "mod": _db_mod_expr,
+    "remainder": _db_remainder_expr,
     # additional fns
     "as_int64": _as_int64,
     "as_str": _as_str,
