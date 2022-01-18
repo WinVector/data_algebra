@@ -28,18 +28,13 @@ def test_any_project_value():
         'new_column': [0.1, 0.3, 0.4],
     })
     assert data_algebra.test_util.equivalent_frames(res, expect)
-    # TODO: turn this next step on for more dbs
     data_algebra.test_util.check_transform(
         ops=ops,
         data=d,
         expect=expect,
-        models_to_skip={
-            # data_algebra.SQLite.SQLiteModel(),
-            data_algebra.MySQL.MySQLModel(),
-            data_algebra.SparkSQL.SparkSQLModel(),
-            data_algebra.PostgreSQL.PostgreSQLModel(),
-        },
         valid_for_empty=False)
+    bq_sql = data_algebra.BigQuery.BigQueryModel().to_sql(ops)
+    assert 'ANY_VALUE(`x`)' in bq_sql
 
 
 def test_any_project_logical():
@@ -77,7 +72,6 @@ def test_any_project_logical():
         'all_d': [True],
         })
     assert data_algebra.test_util.equivalent_frames(res, expect)
-    # TODO: turn this next step on for more dbs
     data_algebra.test_util.check_transform(
         ops=ops,
         data=d,
