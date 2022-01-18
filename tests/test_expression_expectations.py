@@ -28,13 +28,10 @@ def test_expression_expectations_1():
     with gzip.open(expectation_path, 'rb') as in_f:
         expectation_map = pickle.load(in_f)
     d = expectation_map['d']
-    e_expectations = expectation_map['e_expectations']
-    g_expectations = expectation_map['g_expectations']
-    w_expectations = expectation_map['w_expectations']
+    expectations = expectation_map['expectations']
     u_results = expectation_map['u_results']
 
-    ops_list = e_expectations + g_expectations + w_expectations
-    for op, op_class, exp, ops, expect in ops_list:
+    for op, op_class, exp, ops, expect in expectations:
         if data_algebra.default_data_model.is_appropriate_data_instance(expect):
             res = ops.transform(d)
             assert data_algebra.test_util.equivalent_frames(res, expect)
@@ -69,15 +66,12 @@ def test_expression_expectations_direct():
     with gzip.open(expectation_path, 'rb') as in_f:
         expectation_map = pickle.load(in_f)
     d = expectation_map['d']
-    e_expectations = expectation_map['e_expectations']
-    g_expectations = expectation_map['g_expectations']
-    w_expectations = expectation_map['w_expectations']
+    expectations = expectation_map['expectations']
     u_results = expectation_map['u_results']
-    ops_list = e_expectations + g_expectations + w_expectations
     db_handles = data_algebra.test_util.get_test_dbs()
     for h in db_handles:
         h.insert_table(d, table_name='d', allow_overwrite=True)
-    for op, op_class, exp, ops, expect in ops_list:
+    for op, op_class, exp, ops, expect in expectations:
         if data_algebra.default_data_model.is_appropriate_data_instance(expect):
             res = ops.transform(d)
             assert data_algebra.test_util.equivalent_frames(res, expect)

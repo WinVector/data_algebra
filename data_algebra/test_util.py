@@ -481,7 +481,7 @@ def check_transform(
     cols_case_sensitive: bool = False,
     check_row_order: bool = False,
     check_parse: bool = True,
-    models_to_skip: Optional[Iterable[str]] = None,
+    models_to_skip: Optional[Iterable] = None,
     valid_for_empty: bool = True,
     empty_produces_empty: bool = True,
 ) -> None:
@@ -497,7 +497,7 @@ def check_transform(
     :param cols_case_sensitive: passed to equivalent_frames()
     :param check_row_order: passed to equivalent_frames()
     :param check_parse: if True check expression parses/formats to self
-    :param models_to_skip: None or set of model names to skip testing
+    :param models_to_skip: None or set of model names or models to skip testing
     :param valid_for_empty: logical, if True perform tests on empty inputs
     :param empty_produces_empty: logical, if True assume emtpy inputs should produce empty output
     :return: nothing
@@ -522,7 +522,7 @@ def check_transform(
     db_handles = db_handles + test_dbs
 
     if models_to_skip is not None:
-        models_to_skip = set(models_to_skip)
+        models_to_skip = {str(m) for m in models_to_skip}
         db_handles = [h for h in db_handles if str(h.db_model) not in models_to_skip]
 
     caught: Optional[Any] = None

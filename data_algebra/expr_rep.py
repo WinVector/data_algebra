@@ -669,6 +669,18 @@ class Term(PreTerm, abc.ABC):
         """
         return self.__uop_expr__("is_monotonic_increasing")
 
+    def any_value(self):
+        """
+        Return any_value (vectorized).
+        """
+        return self.__uop_expr__("any_value")
+
+    def first(self):
+        """
+        Return first (vectorized).
+        """
+        return self.__uop_expr__("first")
+
     def last(self):
         """
         Return last (vectorized).
@@ -677,7 +689,7 @@ class Term(PreTerm, abc.ABC):
 
     def max(self):
         """
-        Return last (vectorized).
+        Return max (vectorized).
         """
         return self.__uop_expr__("max")
 

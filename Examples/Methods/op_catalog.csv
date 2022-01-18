@@ -94,8 +94,8 @@ size,x.size(),g,y,y,y,y,y,y,1.3.1
 sum,(1).sum(),g,y,y,y,y,y,y,1.3.1
 sum,x.sum(),g,y,y,y,y,y,y,1.3.1
 _size,_size(),p,y,y,y,y,y,y,1.3.1
-all,a.all(),p,y,n,y,n,n,n,1.3.1
-any,a.any(),p,y,n,y,n,n,n,1.3.1
+all,a.all(),p,y,y,y,n,n,y,1.3.1
+any,a.any(),p,y,y,y,n,n,y,1.3.1
 count,z.count(),p,y,y,y,y,w,y,1.3.1
 max,x.max(),p,y,y,y,y,y,y,1.3.1
 mean,x.mean(),p,y,y,y,y,y,y,1.3.1
@@ -108,6 +108,7 @@ sum,(1).sum(),p,y,y,y,y,y,y,1.3.1
 sum,x.sum(),p,y,y,y,y,y,y,1.3.1
 var,x.var(),p,y,y,y,y,y,y,1.3.1
 _uniform,_uniform(),u,y,y,y,y,y,y,1.3.1
+any_value,x.any_value(),up,y,n,y,n,n,y,1.3.1
 _row_number,_row_number(),w,y,y,y,y,y,y,1.3.1
 bfill,z.bfill(),w,y,n,n,n,n,n,1.3.1
 cumcount,z.cumcount(),w,y,n,n,n,n,n,1.3.1
@@ -116,6 +117,7 @@ cummin,x.cummin(),w,y,n,n,n,n,n,1.3.1
 cumprod,x.cumprod(),w,y,n,n,n,n,n,1.3.1
 cumsum,x.cumsum(),w,y,y,y,y,y,y,1.3.1
 ffill,z.ffill(),w,y,n,n,n,n,n,1.3.1
+first,x.first(),w,y,n,n,n,y,n,1.3.1
 last,x.last(),w,y,n,n,n,w,n,1.3.1
 rank,x.rank(),w,y,n,n,n,y,n,1.3.1
 shift,x.shift(),w,y,y,y,y,y,y,1.3.1

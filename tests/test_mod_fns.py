@@ -18,7 +18,6 @@ def test_mod_fns_one():
     d = data_algebra.default_data_model.pd.DataFrame(
         {"a": [1, 2, 3, 4], "b": [2, 2, 3, 3],}
     )
-
     ops = (
         descr(d=d)
             .extend({
@@ -27,7 +26,6 @@ def test_mod_fns_one():
                 'r': 'a.remainder(b)',
             })
     )
-
     expect = data_algebra.default_data_model.pd.DataFrame({
         'a': [1, 2, 3, 4],
         'b': [2, 2, 3, 3],
@@ -37,26 +35,23 @@ def test_mod_fns_one():
         })
     res_pandas = ops.transform(d)
     assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
-
-    with pytest.warns(UserWarning):  # TODO: elim these warnings
-        data_algebra.test_util.check_transform(
-            ops=ops,
-            data=d,
-            expect=expect,
-            models_to_skip={
-                # TODO: run these down
-                str(data_algebra.PostgreSQL.PostgreSQLModel()),  # SQLAlchemy throws a type error on conversion
-                str(data_algebra.BigQuery.BigQueryModel()),
-                str(data_algebra.MySQL.MySQLModel()),
-                str(data_algebra.SparkSQL.SparkSQLModel())
-            })
+    data_algebra.test_util.check_transform(
+        ops=ops,
+        data=d,
+        expect=expect,
+        models_to_skip={
+            # TODO: run these down
+            str(data_algebra.PostgreSQL.PostgreSQLModel()),  # SQLAlchemy throws a type error on conversion
+            str(data_algebra.BigQuery.BigQueryModel()),
+            str(data_algebra.MySQL.MySQLModel()),
+            str(data_algebra.SparkSQL.SparkSQLModel())
+        })
 
 
 def test_mod_fns_one_edited():
     d = data_algebra.default_data_model.pd.DataFrame(
         {"a": [1, 2, 3, 4], "b": [2, 2, 3, 3],}
     )
-
     ops = (
         descr(d=d)
             .extend({
@@ -64,7 +59,6 @@ def test_mod_fns_one_edited():
                 'r': 'a.remainder(b)',
             })
     )
-
     expect = data_algebra.default_data_model.pd.DataFrame({
         'a': [1, 2, 3, 4],
         'b': [2, 2, 3, 3],
@@ -73,17 +67,15 @@ def test_mod_fns_one_edited():
         })
     res_pandas = ops.transform(d)
     assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
-
-    with pytest.warns(UserWarning):  # TODO: elim these warnings
-        data_algebra.test_util.check_transform(
-            ops=ops,
-            data=d,
-            expect=expect,
-            models_to_skip={
-                # TODO: run these down
-                str(data_algebra.PostgreSQL.PostgreSQLModel()),  # REMAINDER not applicable to given column types
-                str(data_algebra.BigQuery.BigQueryModel()),  # fn not named REMAINDER
-                str(data_algebra.MySQL.MySQLModel()),  # fn not named REMAINDER
-                str(data_algebra.SparkSQL.SparkSQLModel()),  # fn not named REMAINDER
-            }
-        )
+    data_algebra.test_util.check_transform(
+        ops=ops,
+        data=d,
+        expect=expect,
+        models_to_skip={
+            # TODO: run these down
+            str(data_algebra.PostgreSQL.PostgreSQLModel()),  # REMAINDER not applicable to given column types
+            str(data_algebra.BigQuery.BigQueryModel()),  # fn not named REMAINDER
+            str(data_algebra.MySQL.MySQLModel()),  # fn not named REMAINDER
+            str(data_algebra.SparkSQL.SparkSQLModel()),  # fn not named REMAINDER
+        }
+    )

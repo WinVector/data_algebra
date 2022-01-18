@@ -640,8 +640,6 @@ db_default_op_replacements = {
     "||": "OR",
     "!": "NOT",
     "~": "NOT",
-    "all": "LOGICAL_AND",
-    "any": "LOGICAL_OR",
     "_count": "COUNT",
     "_ngroup": "NGROUP",
     "_row_number": "ROW_NUMBER",
@@ -667,7 +665,7 @@ def _annotated_method_catalogue(
     for i in range(data_algebra.op_catalog.methods_table.shape[0]):
         row = data_algebra.op_catalog.methods_table.loc[i, :]
         matches = []
-        if row['op_class'] == 'p':
+        if row['op_class'] in {'p', 'up'}:
             matches.append(data_algebra.data_ops_types.MethodUse(
                 row['op'],
                 is_project=True,
@@ -688,7 +686,7 @@ def _annotated_method_catalogue(
                 is_windowed=True,
                 is_ordered=True,
             ))
-        else:
+        else:  # e and u case
             matches.append(data_algebra.data_ops_types.MethodUse(
                 row['op'],
                 is_project=False,

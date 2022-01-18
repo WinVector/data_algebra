@@ -268,6 +268,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
 
     pd: types.ModuleType
     impl_map: Dict[str, Callable]
+    transform_op_map: Dict[str, str]
     user_fun_map: Dict[str, Callable]
     _method_dispatch_table: Dict[str, Callable]
 
@@ -278,6 +279,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         )
         self.pd = pd
         self.impl_map = populate_impl_map(data_model=self)
+        self.transform_op_map = {
+            'any_value': 'first'
+        }
         self.user_fun_map = dict()
         self._method_dispatch_table = {
             "ConcatRowsNode": self.concat_rows_step,
@@ -563,8 +567,13 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                     elif zero_op in {"ngroup"}:
                         subframe[k] = opframe.ngroup()
                     elif zero_op in {"size"}:
+                        transform_op = zero_op
+                        try:
+                            transform_op = self.transform_op_map[transform_op]
+                        except KeyError:
+                            pass
                         subframe[k] = opframe[standin_name].transform(
-                            zero_op
+                            transform_op
                         )  # Pandas transform, not data_algebra
                     else:
                         raise KeyError("not implemented in windowed situation: " + str(k) + ": " + str(opk))
@@ -580,16 +589,26 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                         value_name = opk.args[0].column_name
                         if value_name not in set(col_list):
                             col_list = col_list + [value_name]
+                        transform_op = opk.op
+                        try:
+                            transform_op = self.transform_op_map[transform_op]
+                        except KeyError:
+                            pass
                         subframe[k] = opframe[value_name].transform(
-                            opk.op, *transform_args
+                            transform_op, *transform_args
                         )  # Pandas transform, not data_algegra
                     elif isinstance(opk.args[0], data_algebra.expr_rep.Value):
                         value_name = data_algebra_temp_cols[str(opk.args[0].value)]
+                        transform_op = opk.op
+                        try:
+                            transform_op = self.transform_op_map[transform_op]
+                        except KeyError:
+                            pass
                         subframe[k] = opframe[value_name].transform(
-                            opk.op, *transform_args
+                            transform_op, *transform_args
                         )  # Pandas transform, not data_algegra
                     else:
-                        raise ValueError("opk must be a ColumnReference or Value")
+                        raise ValueError(f"opk must be a ColumnReference or Value ({opk})")
             # clear some temps
             for value_name in data_algebra_temp_cols.values():
                 del res[value_name]
@@ -647,14 +666,25 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                     value_name = str(opk.args[0])
                     if isinstance(opk.args[0], data_algebra.expr_rep.Value):
                         value_name = data_algebra_temp_cols[value_name]
+                transform_op = opk.op
                 if len(opk.args) > 0:
-                    vk = res[value_name].agg(opk.op)
+                    transform_op = opk.op
+                    try:
+                        transform_op = self.transform_op_map[transform_op]
+                    except KeyError:
+                        pass
+                    vk = res[value_name].agg(transform_op)
                 else:
                     # expect and strip off initial underbar
-                    assert isinstance(opk.op, str)
-                    assert len(opk.op) > 1
-                    assert opk.op[0] == '_'
-                    vk = res["_data_table_temp_col"].agg(opk.op[1:])
+                    assert isinstance(transform_op, str)
+                    assert len(transform_op) > 1
+                    assert transform_op[0] == '_'
+                    transform_op = transform_op[1:]
+                    try:
+                        transform_op = self.transform_op_map[transform_op]
+                    except KeyError:
+                        pass
+                    vk = res["_data_table_temp_col"].agg(transform_op)
                 cols[k] = vk
         else:
             cols = {"_data_table_temp_col": res["_data_table_temp_col"].agg("sum")}

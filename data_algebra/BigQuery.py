@@ -59,11 +59,23 @@ def _bigquery_is_bad_expr(dbmodel, expression):
     )
 
 
+def _bigquery_any_expr(dbmodel, expression):
+    subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+    return f'LOGICAL_OR({subexpr})'
+
+
+def _bigquery_all_expr(dbmodel, expression):
+    subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+    return f'LOGICAL_AND({subexpr})'
+
+
 BigQuery_formatters = {
     "median": _bigquery_median_expr,
     "is_bad": _bigquery_is_bad_expr,
     "std": _bigquery_std_expr,
     "var": _bigquery_var_expr,
+    "any": _bigquery_any_expr,
+    "all": _bigquery_all_expr,
 }
 
 
