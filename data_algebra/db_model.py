@@ -439,12 +439,12 @@ def _trimstr(dbmodel, expression):
 
 
 def _any_expr(dbmodel, expression):
-    derived = expression.args[0].max() >= data_algebra.expr_rep.Value(1)
+    derived = expression.args[0].if_else(1, 0).max() >= data_algebra.expr_rep.Value(1)
     return dbmodel.expr_to_sql(derived, want_inline_parens=True)
 
 
 def _all_expr(dbmodel, expression):
-    derived = expression.args[0].min() >= data_algebra.expr_rep.Value(1)
+    derived = expression.args[0].if_else(1, 0).min() >= data_algebra.expr_rep.Value(1)
     return dbmodel.expr_to_sql(derived, want_inline_parens=True)
 
 

@@ -16,9 +16,18 @@ except ImportError:
     have_sqlalchemy = False
 
 
+def _postgresql_as_int64(dbmodel, expression):
+    return (
+        "CAST("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + " AS BIGINT)"
+    )
+
+
 # map from op-name to special SQL formatting code
 PostgreSQL_formatters = {
     "___": lambda dbmodel, expression: str(expression.to_python()),
+    "as_int64": _postgresql_as_int64,
 }
 
 
