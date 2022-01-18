@@ -110,6 +110,16 @@ def _db_lag_expr(dbmodel, expression):
         raise ValueError("too many arguments to SQL LAG/LEAD")
 
 
+def _db_mod_expr(dbmodel, expression):
+    return (
+        "MOD("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ", "
+        + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
+        + ")"
+    )
+
+
 def _db_mean_expr(dbmodel, expression):
     return (
         "AVG(" + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + ")"
@@ -571,6 +581,7 @@ db_expr_formatters = {
     "**": _db_pow_expr,
     "nunique": _db_nunique_expr,
     "mapv": _db_mapv,
+    "%": _db_mod_expr,
     # additional fns
     "as_int64": _as_int64,
     "as_str": _as_str,
