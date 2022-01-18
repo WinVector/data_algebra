@@ -256,7 +256,7 @@ def _run_handle_experiments(
             cols_case_sensitive=cols_case_sensitive,
             check_row_order=check_row_order,
         ):
-            raise ValueError(f"{db_handle} SQL result did not match expect")
+            raise ValueError(f"{db_handle.db_model} SQL result did not match expect")
     if res_db_ops is not None:
         if not equivalent_frames(
             res_db_ops,
