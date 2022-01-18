@@ -1,0 +1,5124 @@
+
+error (n)
+op: arctan2, op_class: e, example expression: x.arctan2(y), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "x" ,
+   "y"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'x.arctan2(y)'})
+   "row_id" ,
+   ARCTAN2("x", "y") AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+': no such function: ARCTAN2
+
+
+difference (w)
+op: remainder, op_class: e, example expression: y.remainder(0.5), db: SQLiteModel
+Pandas result (expectation):
+   row_id  new_column
+0       0        0.40
+1       1        0.33
+2       2        0.20
+3       3        0.10
+DB result:
+   row_id new_column
+0       0       None
+1       1       None
+2       2       None
+3       3       None
+query
+-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "y"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'y.remainder(0.5)'})
+   "row_id" ,
+   ("y" % 0.5) AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+
+
+
+difference (w)
+op: datetime_to_date, op_class: e, example expression: datetime_col_0.datetime_to_date(), db: SQLiteModel
+Pandas result (expectation):
+   row_id  new_column
+0       0  2010-01-01
+1       1  2030-04-05
+2       2  2010-01-01
+3       3  2030-04-05
+DB result:
+   row_id  new_column
+0       0  2010-01-01
+1       1  2030-04-05
+2       2  2010-01-01
+3       3  2030-04-05
+query
+-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "datetime_col_0"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'datetime_col_0.datetime_to_date()'})
+   "row_id" ,
+   DATE("datetime_col_0") AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+
+
+
+error (n)
+op: parse_date, op_class: e, example expression: str_date_col.parse_date(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "str_date_col"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': "str_date_col.parse_date('%Y-%m-%d')"})
+   "row_id" ,
+   PARSE_DATE('%Y-%m-%d', "str_date_col") AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+': no such function: PARSE_DATE
+
+
+error (n)
+op: parse_datetime, op_class: e, example expression: str_datetime_col.parse_datetime(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "str_datetime_col"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': "str_datetime_col.parse_datetime('%Y-%m-%d %H:%M:%S')"})
+   "row_id" ,
+   PARSE_DATETIME('%Y-%m-%d %H:%M:%S', "str_datetime_col") AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+': no such function: PARSE_DATETIME
+
+
+error (n)
+op: format_datetime, op_class: e, example expression: datetime_col_0.format_datetime(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "datetime_col_0"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': "datetime_col_0.format_datetime('%Y-%m-%d %H:%M:%S')"})
+   "row_id" ,
+   FORMAT_DATETIME('%Y-%m-%d %H:%M:%S', "datetime_col_0") AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+': no such function: FORMAT_DATETIME
+
+
+error (n)
+op: format_date, op_class: e, example expression: date_col_0.format_date(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "date_col_0"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': "date_col_0.format_date('%Y-%m-%d')"})
+   "row_id" ,
+   FORMAT_DATE('%Y-%m-%d', "date_col_0") AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+': no such function: FORMAT_DATE
+
+
+error (n)
+op: dayofweek, op_class: e, example expression: date_col_0.dayofweek(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "date_col_0"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'date_col_0.dayofweek()'})
+   "row_id" ,
+   EXTRACT(DAYOFWEEK FROM "date_col_0") AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+': near "FROM": syntax error
+
+
+error (n)
+op: dayofyear, op_class: e, example expression: date_col_0.dayofyear(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "date_col_0"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'date_col_0.dayofyear()'})
+   "row_id" ,
+   EXTRACT(DAYOFYEAR FROM "date_col_0") AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+': near "FROM": syntax error
+
+
+error (n)
+op: dayofmonth, op_class: e, example expression: date_col_0.dayofmonth(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "date_col_0"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'date_col_0.dayofmonth()'})
+   "row_id" ,
+   EXTRACT(DAY FROM "date_col_0") AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+': near "FROM": syntax error
+
+
+error (n)
+op: weekofyear, op_class: e, example expression: date_col_0.weekofyear(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "date_col_0"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'date_col_0.weekofyear()'})
+   "row_id" ,
+   EXTRACT(WEEK FROM "date_col_0") AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+': near "FROM": syntax error
+
+
+error (n)
+op: month, op_class: e, example expression: date_col_0.month(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "date_col_0"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'date_col_0.month()'})
+   "row_id" ,
+   EXTRACT(MONTH FROM "date_col_0") AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+': near "FROM": syntax error
+
+
+error (n)
+op: quarter, op_class: e, example expression: date_col_0.quarter(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "date_col_0"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'date_col_0.quarter()'})
+   "row_id" ,
+   EXTRACT(QUARTER FROM "date_col_0") AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+': near "FROM": syntax error
+
+
+error (n)
+op: year, op_class: e, example expression: date_col_0.year(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "date_col_0"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'date_col_0.year()'})
+   "row_id" ,
+   EXTRACT(YEAR FROM "date_col_0") AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+': near "FROM": syntax error
+
+
+error (n)
+op: timestamp_diff, op_class: e, example expression: datetime_col_0.timestamp_diff(datetime_col_1), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "datetime_col_0" ,
+   "datetime_col_1"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'datetime_col_0.timestamp_diff(datetime_col_1)'})
+   "row_id" ,
+   TIMESTAMP_DIFF("datetime_col_0", "datetime_col_1", SECOND) AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+': no such column: SECOND
+
+
+error (n)
+op: date_diff, op_class: e, example expression: date_col_0.date_diff(date_col_1), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "date_col_0" ,
+   "date_col_1"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'date_col_0.date_diff(date_col_1)'})
+   "row_id" ,
+   TIMESTAMP_DIFF("date_col_0", "date_col_1", DAY) AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+': no such column: DAY
+
+
+error (n)
+op: base_Sunday, op_class: e, example expression: date_col_1.base_Sunday(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "date_col_1"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'date_col_1.base_Sunday()'})
+   "row_id" ,
+   DATE_SUB("date_col_1", INTERVAL (EXTRACT(DAYOFWEEK FROM "date_col_1") - 1) DAY) AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+': near "FROM": syntax error
+
+
+error (n)
+op: _ngroup, op_class: g, example expression: _ngroup(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': '_ngroup()'}, partition_by=['g'])
+   "g" ,
+   "row_id" ,
+   NGROUP() OVER ( PARTITION BY "g"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+': no such function: NGROUP
+
+
+error (n)
+op: all, op_class: g, example expression: a.all(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "a" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'a.all()'}, partition_by=['g'])
+   "g" ,
+   "row_id" ,
+   LOGICAL_AND("a") OVER ( PARTITION BY "g"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+': no such function: LOGICAL_AND
+
+
+error (n)
+op: any, op_class: g, example expression: a.any(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "a" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'a.any()'}, partition_by=['g'])
+   "g" ,
+   "row_id" ,
+   LOGICAL_OR("a") OVER ( PARTITION BY "g"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+': no such function: LOGICAL_OR
+
+
+error (n)
+op: median, op_class: g, example expression: x.median(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "x" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'x.median()'}, partition_by=['g'])
+   "g" ,
+   "row_id" ,
+   MEDIAN("x") OVER ( PARTITION BY "g"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+': MEDIAN() may not be used as a window function
+
+
+error (n)
+op: nunique, op_class: g, example expression: x.nunique(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "x" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'x.nunique()'}, partition_by=['g'])
+   "g" ,
+   "row_id" ,
+   COUNT(DISTINCT ("x")) OVER ( PARTITION BY "g"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+': DISTINCT is not supported for window functions
+
+
+difference (w)
+op: _count, op_class: g, example expression: _count(), db: SQLiteModel
+Pandas result (expectation):
+     g  row_id  new_column
+0    a       0           1
+1    a       1           2
+2    b       2           1
+3  ccc       3           1
+DB result:
+     g  row_id  new_column
+0    a       0           2
+1    a       1           2
+2    b       2           1
+3  ccc       3           1
+query
+-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': '_count()'}, partition_by=['g'])
+   "g" ,
+   "row_id" ,
+   SUM(1) OVER ( PARTITION BY "g"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+
+
+
+error (n)
+op: all, op_class: p, example expression: a.all(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "g" ,
+   "a"
+  FROM
+   "d"
+ ) ,
+ "project_1" AS (
+  SELECT  -- .project({ 'new_column': 'a.all()'}, group_by=['g'])
+   LOGICAL_AND("a") AS "new_column" ,
+   "g"
+  FROM
+   "table_reference_0"
+  GROUP BY
+   "g"
+ )
+SELECT  -- .order_rows(['g'])
+ *
+FROM
+ "project_1"
+ORDER BY
+ "g"
+': no such function: LOGICAL_AND
+
+
+error (n)
+op: any, op_class: p, example expression: a.any(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "g" ,
+   "a"
+  FROM
+   "d"
+ ) ,
+ "project_1" AS (
+  SELECT  -- .project({ 'new_column': 'a.any()'}, group_by=['g'])
+   LOGICAL_OR("a") AS "new_column" ,
+   "g"
+  FROM
+   "table_reference_0"
+  GROUP BY
+   "g"
+ )
+SELECT  -- .order_rows(['g'])
+ *
+FROM
+ "project_1"
+ORDER BY
+ "g"
+': no such function: LOGICAL_OR
+
+
+error (n)
+op: bfill, op_class: w, example expression: z.bfill(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "z" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'z.bfill()'}, partition_by=['g'], order_by=['row_id'])
+   "g" ,
+   "row_id" ,
+   BFILL("z") OVER ( PARTITION BY "g" ORDER BY "row_id"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+': no such function: BFILL
+
+
+error (n)
+op: ffill, op_class: w, example expression: z.ffill(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "z" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'z.ffill()'}, partition_by=['g'], order_by=['row_id'])
+   "g" ,
+   "row_id" ,
+   FFILL("z") OVER ( PARTITION BY "g" ORDER BY "row_id"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+': no such function: FFILL
+
+
+error (n)
+op: last, op_class: w, example expression: x.last(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "x" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'x.last()'}, partition_by=['g'], order_by=['row_id'])
+   "g" ,
+   "row_id" ,
+   LAST("x") OVER ( PARTITION BY "g" ORDER BY "row_id"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+': no such function: LAST
+
+
+error (n)
+op: rank, op_class: w, example expression: x.rank(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "x" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'x.rank()'}, partition_by=['g'], order_by=['row_id'])
+   "g" ,
+   "row_id" ,
+   RANK("x") OVER ( PARTITION BY "g" ORDER BY "row_id"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+': wrong number of arguments to function RANK()
+
+
+error (n)
+op: cumprod, op_class: w, example expression: x.cumprod(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "x" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'x.cumprod()'}, partition_by=['g'], order_by=['row_id'])
+   "g" ,
+   "row_id" ,
+   CUMPROD("x") OVER ( PARTITION BY "g" ORDER BY "row_id"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+': no such function: CUMPROD
+
+
+error (n)
+op: cumcount, op_class: w, example expression: z.cumcount(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "z" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'z.cumcount()'}, partition_by=['g'], order_by=['row_id'])
+   "g" ,
+   "row_id" ,
+   CUMCOUNT("z") OVER ( PARTITION BY "g" ORDER BY "row_id"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+': no such function: CUMCOUNT
+
+
+error (n)
+op: cummax, op_class: w, example expression: x.cummax(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "x" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'x.cummax()'}, partition_by=['g'], order_by=['row_id'])
+   "g" ,
+   "row_id" ,
+   CUMMAX("x") OVER ( PARTITION BY "g" ORDER BY "row_id"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+': no such function: CUMMAX
+
+
+error (n)
+op: cummin, op_class: w, example expression: x.cummin(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "x" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'x.cummin()'}, partition_by=['g'], order_by=['row_id'])
+   "g" ,
+   "row_id" ,
+   CUMMIN("x") OVER ( PARTITION BY "g" ORDER BY "row_id"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+': no such function: CUMMIN
+
+
+error (n)
+op: %, op_class: e, example expression: row_id % q, db: BigQueryModel
+caught: 400 Syntax error: Illegal input character "%" at [16:13]
+
+(job ID: 63d5da6e-5567-4ecb-bb72-d2f269bcee95)
+
+                 -----Query Job SQL Follows-----                  
+
+    |    .    |    .    |    .    |    .    |    .    |    .    |
+   1:-- data_algebra SQL https://github.com/WinVector/data_algebra
+   2:--  dialect: BigQueryModel
+   3:--       string quote: "
+   4:--   identifier quote: `
+   5:WITH
+   6: `table_reference_0` AS (
+   7:  SELECT
+   8:   `row_id` ,
+   9:   `q`
+  10:  FROM
+  11:   `data-algebra-test.test_1.d`
+  12: ) ,
+  13: `extend_1` AS (
+  14:  SELECT  -- .extend({ 'new_column': 'row_id % q'})
+  15:   `row_id` ,
+  16:   `row_id` % `q` AS `new_column`
+  17:  FROM
+  18:   `table_reference_0`
+  19: )
+  20:SELECT  -- .order_rows(['row_id'])
+  21: *
+  22:FROM
+  23: `extend_1`
+  24:ORDER BY
+  25: `row_id`
+    |    .    |    .    |    .    |    .    |    .    |    .    |
+
+
+error (n)
+op: arcsin, op_class: e, example expression: x.arcsin(), db: BigQueryModel
+caught: 400 Function not found: ARCSIN; Did you mean asin? at [16:4]
+
+(job ID: 37bf40f7-0021-4f1f-8559-c17ac0ed0c34)
+
+                 -----Query Job SQL Follows-----                  
+
+    |    .    |    .    |    .    |    .    |    .    |    .    |
+   1:-- data_algebra SQL https://github.com/WinVector/data_algebra
+   2:--  dialect: BigQueryModel
+   3:--       string quote: "
+   4:--   identifier quote: `
+   5:WITH
+   6: `table_reference_0` AS (
+   7:  SELECT
+   8:   `row_id` ,
+   9:   `x`
+  10:  FROM
+  11:   `data-algebra-test.test_1.d`
+  12: ) ,
+  13: `extend_1` AS (
+  14:  SELECT  -- .extend({ 'new_column': 'x.arcsin()'})
+  15:   `row_id` ,
+  16:   ARCSIN(`x`) AS `new_column`
+  17:  FROM
+  18:   `table_reference_0`
+  19: )
+  20:SELECT  -- .order_rows(['row_id'])
+  21: *
+  22:FROM
+  23: `extend_1`
+  24:ORDER BY
+  25: `row_id`
+    |    .    |    .    |    .    |    .    |    .    |    .    |
+
+
+error (n)
+op: arccos, op_class: e, example expression: x.arccos(), db: BigQueryModel
+caught: 400 Function not found: ARCCOS; Did you mean acos? at [16:4]
+
+(job ID: 7b86c869-86a6-4162-9340-ba0cbc95a45e)
+
+                 -----Query Job SQL Follows-----                  
+
+    |    .    |    .    |    .    |    .    |    .    |    .    |
+   1:-- data_algebra SQL https://github.com/WinVector/data_algebra
+   2:--  dialect: BigQueryModel
+   3:--       string quote: "
+   4:--   identifier quote: `
+   5:WITH
+   6: `table_reference_0` AS (
+   7:  SELECT
+   8:   `row_id` ,
+   9:   `x`
+  10:  FROM
+  11:   `data-algebra-test.test_1.d`
+  12: ) ,
+  13: `extend_1` AS (
+  14:  SELECT  -- .extend({ 'new_column': 'x.arccos()'})
+  15:   `row_id` ,
+  16:   ARCCOS(`x`) AS `new_column`
+  17:  FROM
+  18:   `table_reference_0`
+  19: )
+  20:SELECT  -- .order_rows(['row_id'])
+  21: *
+  22:FROM
+  23: `extend_1`
+  24:ORDER BY
+  25: `row_id`
+    |    .    |    .    |    .    |    .    |    .    |    .    |
+
+
+error (n)
+op: arctan, op_class: e, example expression: x.arctan(), db: BigQueryModel
+caught: 400 Function not found: ARCTAN; Did you mean atan? at [16:4]
+
+(job ID: d3d943df-4cb1-462e-b15e-6fc213d383ae)
+
+                 -----Query Job SQL Follows-----                  
+
+    |    .    |    .    |    .    |    .    |    .    |    .    |
+   1:-- data_algebra SQL https://github.com/WinVector/data_algebra
+   2:--  dialect: BigQueryModel
+   3:--       string quote: "
+   4:--   identifier quote: `
+   5:WITH
+   6: `table_reference_0` AS (
+   7:  SELECT
+   8:   `row_id` ,
+   9:   `x`
+  10:  FROM
+  11:   `data-algebra-test.test_1.d`
+  12: ) ,
+  13: `extend_1` AS (
+  14:  SELECT  -- .extend({ 'new_column': 'x.arctan()'})
+  15:   `row_id` ,
+  16:   ARCTAN(`x`) AS `new_column`
+  17:  FROM
+  18:   `table_reference_0`
+  19: )
+  20:SELECT  -- .order_rows(['row_id'])
+  21: *
+  22:FROM
+  23: `extend_1`
+  24:ORDER BY
+  25: `row_id`
+    |    .    |    .    |    .    |    .    |    .    |    .    |
+
+
+error (n)
+op: arctan2, op_class: e, example expression: x.arctan2(y), db: BigQueryModel
+caught: 400 Function not found: ARCTAN2; Did you mean atan2? at [17:4]
+
+(job ID: a61e6a90-aeab-4a95-9625-b55fe8727085)
+
+                 -----Query Job SQL Follows-----                  
+
+    |    .    |    .    |    .    |    .    |    .    |    .    |
+   1:-- data_algebra SQL https://github.com/WinVector/data_algebra
+   2:--  dialect: BigQueryModel
+   3:--       string quote: "
+   4:--   identifier quote: `
+   5:WITH
+   6: `table_reference_0` AS (
+   7:  SELECT
+   8:   `row_id` ,
+   9:   `x` ,
+  10:   `y`
+  11:  FROM
+  12:   `data-algebra-test.test_1.d`
+  13: ) ,
+  14: `extend_1` AS (
+  15:  SELECT  -- .extend({ 'new_column': 'x.arctan2(y)'})
+  16:   `row_id` ,
+  17:   ARCTAN2(`x`, `y`) AS `new_column`
+  18:  FROM
+  19:   `table_reference_0`
+  20: )
+  21:SELECT  -- .order_rows(['row_id'])
+  22: *
+  23:FROM
+  24: `extend_1`
+  25:ORDER BY
+  26: `row_id`
+    |    .    |    .    |    .    |    .    |    .    |    .    |
+
+
+error (n)
+op: arcsinh, op_class: e, example expression: x.arcsinh(), db: BigQueryModel
+caught: 400 Function not found: ARCSINH; Did you mean asinh? at [16:4]
+
+(job ID: 60c5d218-61a5-4852-8632-d97be9e11990)
+
+                 -----Query Job SQL Follows-----                  
+
+    |    .    |    .    |    .    |    .    |    .    |    .    |
+   1:-- data_algebra SQL https://github.com/WinVector/data_algebra
+   2:--  dialect: BigQueryModel
+   3:--       string quote: "
+   4:--   identifier quote: `
+   5:WITH
+   6: `table_reference_0` AS (
+   7:  SELECT
+   8:   `row_id` ,
+   9:   `x`
+  10:  FROM
+  11:   `data-algebra-test.test_1.d`
+  12: ) ,
+  13: `extend_1` AS (
+  14:  SELECT  -- .extend({ 'new_column': 'x.arcsinh()'})
+  15:   `row_id` ,
+  16:   ARCSINH(`x`) AS `new_column`
+  17:  FROM
+  18:   `table_reference_0`
+  19: )
+  20:SELECT  -- .order_rows(['row_id'])
+  21: *
+  22:FROM
+  23: `extend_1`
+  24:ORDER BY
+  25: `row_id`
+    |    .    |    .    |    .    |    .    |    .    |    .    |
+
+
+error (n)
+op: arccosh, op_class: e, example expression: x.arccosh(), db: BigQueryModel
+caught: 400 Function not found: ARCCOSH; Did you mean acosh? at [16:4]
+
+(job ID: 294e62f6-9f1e-4732-a244-ee642e1dcf3e)
+
+                 -----Query Job SQL Follows-----                  
+
+    |    .    |    .    |    .    |    .    |    .    |    .    |
+   1:-- data_algebra SQL https://github.com/WinVector/data_algebra
+   2:--  dialect: BigQueryModel
+   3:--       string quote: "
+   4:--   identifier quote: `
+   5:WITH
+   6: `table_reference_0` AS (
+   7:  SELECT
+   8:   `row_id` ,
+   9:   `x`
+  10:  FROM
+  11:   `data-algebra-test.test_1.d`
+  12: ) ,
+  13: `extend_1` AS (
+  14:  SELECT  -- .extend({ 'new_column': 'x.arccosh()'})
+  15:   `row_id` ,
+  16:   ARCCOSH(`x`) AS `new_column`
+  17:  FROM
+  18:   `table_reference_0`
+  19: )
+  20:SELECT  -- .order_rows(['row_id'])
+  21: *
+  22:FROM
+  23: `extend_1`
+  24:ORDER BY
+  25: `row_id`
+    |    .    |    .    |    .    |    .    |    .    |    .    |
+
+
+error (n)
+op: arctanh, op_class: e, example expression: x.arctanh(), db: BigQueryModel
+caught: 400 Function not found: ARCTANH; Did you mean atanh? at [16:4]
+
+(job ID: a26aea46-6f14-4317-8cd2-570d88643e05)
+
+                 -----Query Job SQL Follows-----                  
+
+    |    .    |    .    |    .    |    .    |    .    |    .    |
+   1:-- data_algebra SQL https://github.com/WinVector/data_algebra
+   2:--  dialect: BigQueryModel
+   3:--       string quote: "
+   4:--   identifier quote: `
+   5:WITH
+   6: `table_reference_0` AS (
+   7:  SELECT
+   8:   `row_id` ,
+   9:   `x`
+  10:  FROM
+  11:   `data-algebra-test.test_1.d`
+  12: ) ,
+  13: `extend_1` AS (
+  14:  SELECT  -- .extend({ 'new_column': 'x.arctanh()'})
+  15:   `row_id` ,
+  16:   ARCTANH(`x`) AS `new_column`
+  17:  FROM
+  18:   `table_reference_0`
+  19: )
+  20:SELECT  -- .order_rows(['row_id'])
+  21: *
+  22:FROM
+  23: `extend_1`
+  24:ORDER BY
+  25: `row_id`
+    |    .    |    .    |    .    |    .    |    .    |    .    |
+
+
+error (n)
+op: expm1, op_class: e, example expression: y.expm1(), db: BigQueryModel
+caught: 400 Function not found: EXPM1; Did you mean exp? at [16:4]
+
+(job ID: 54a9c9b4-84ef-4de4-a8c7-ff4e48a56312)
+
+                 -----Query Job SQL Follows-----                  
+
+    |    .    |    .    |    .    |    .    |    .    |    .    |
+   1:-- data_algebra SQL https://github.com/WinVector/data_algebra
+   2:--  dialect: BigQueryModel
+   3:--       string quote: "
+   4:--   identifier quote: `
+   5:WITH
+   6: `table_reference_0` AS (
+   7:  SELECT
+   8:   `row_id` ,
+   9:   `y`
+  10:  FROM
+  11:   `data-algebra-test.test_1.d`
+  12: ) ,
+  13: `extend_1` AS (
+  14:  SELECT  -- .extend({ 'new_column': 'y.expm1()'})
+  15:   `row_id` ,
+  16:   EXPM1(`y`) AS `new_column`
+  17:  FROM
+  18:   `table_reference_0`
+  19: )
+  20:SELECT  -- .order_rows(['row_id'])
+  21: *
+  22:FROM
+  23: `extend_1`
+  24:ORDER BY
+  25: `row_id`
+    |    .    |    .    |    .    |    .    |    .    |    .    |
+
+
+error (n)
+op: log1p, op_class: e, example expression: x.log1p(), db: BigQueryModel
+caught: 400 Function not found: LOG1P; Did you mean log10? at [16:4]
+
+(job ID: bf76da1a-1505-4524-92d2-12967496a078)
+
+                 -----Query Job SQL Follows-----                  
+
+    |    .    |    .    |    .    |    .    |    .    |    .    |
+   1:-- data_algebra SQL https://github.com/WinVector/data_algebra
+   2:--  dialect: BigQueryModel
+   3:--       string quote: "
+   4:--   identifier quote: `
+   5:WITH
+   6: `table_reference_0` AS (
+   7:  SELECT
+   8:   `row_id` ,
+   9:   `x`
+  10:  FROM
+  11:   `data-algebra-test.test_1.d`
+  12: ) ,
+  13: `extend_1` AS (
+  14:  SELECT  -- .extend({ 'new_column': 'x.log1p()'})
+  15:   `row_id` ,
+  16:   LOG1P(`x`) AS `new_column`
+  17:  FROM
+  18:   `table_reference_0`
+  19: )
+  20:SELECT  -- .order_rows(['row_id'])
+  21: *
+  22:FROM
+  23: `extend_1`
+  24:ORDER BY
+  25: `row_id`
+    |    .    |    .    |    .    |    .    |    .    |    .    |
+
+
+error (n)
+op: mod, op_class: e, example expression: y.mod(0.5), db: BigQueryModel
+caught: 400 No matching signature for function MOD for argument types: FLOAT64, FLOAT64. Supported signatures: MOD(INT64, INT64); MOD(NUMERIC, NUMERIC); MOD(BIGNUMERIC, BIGNUMERIC) at [16:4]
+
+(job ID: f8cc85fe-4291-44f5-90ff-89d7fe95a82e)
+
+                 -----Query Job SQL Follows-----                  
+
+    |    .    |    .    |    .    |    .    |    .    |    .    |
+   1:-- data_algebra SQL https://github.com/WinVector/data_algebra
+   2:--  dialect: BigQueryModel
+   3:--       string quote: "
+   4:--   identifier quote: `
+   5:WITH
+   6: `table_reference_0` AS (
+   7:  SELECT
+   8:   `row_id` ,
+   9:   `y`
+  10:  FROM
+  11:   `data-algebra-test.test_1.d`
+  12: ) ,
+  13: `extend_1` AS (
+  14:  SELECT  -- .extend({ 'new_column': 'y.mod(0.5)'})
+  15:   `row_id` ,
+  16:   MOD(`y`, 0.5) AS `new_column`
+  17:  FROM
+  18:   `table_reference_0`
+  19: )
+  20:SELECT  -- .order_rows(['row_id'])
+  21: *
+  22:FROM
+  23: `extend_1`
+  24:ORDER BY
+  25: `row_id`
+    |    .    |    .    |    .    |    .    |    .    |    .    |
+
+
+error (n)
+op: remainder, op_class: e, example expression: y.remainder(0.5), db: BigQueryModel
+caught: 400 Function not found: REMAINDER at [16:4]
+
+(job ID: b8659d39-9731-4b21-a115-65bd4e4d44c8)
+
+                 -----Query Job SQL Follows-----                  
+
+    |    .    |    .    |    .    |    .    |    .    |    .    |
+   1:-- data_algebra SQL https://github.com/WinVector/data_algebra
+   2:--  dialect: BigQueryModel
+   3:--       string quote: "
+   4:--   identifier quote: `
+   5:WITH
+   6: `table_reference_0` AS (
+   7:  SELECT
+   8:   `row_id` ,
+   9:   `y`
+  10:  FROM
+  11:   `data-algebra-test.test_1.d`
+  12: ) ,
+  13: `extend_1` AS (
+  14:  SELECT  -- .extend({ 'new_column': 'y.remainder(0.5)'})
+  15:   `row_id` ,
+  16:   REMAINDER(`y`, 0.5) AS `new_column`
+  17:  FROM
+  18:   `table_reference_0`
+  19: )
+  20:SELECT  -- .order_rows(['row_id'])
+  21: *
+  22:FROM
+  23: `extend_1`
+  24:ORDER BY
+  25: `row_id`
+    |    .    |    .    |    .    |    .    |    .    |    .    |
+
+
+error (n)
+op: _ngroup, op_class: g, example expression: _ngroup(), db: BigQueryModel
+caught: 400 Function not found: NGROUP at [17:4]
+
+(job ID: f8d07802-376b-495a-9e17-a5b22b540e57)
+
+                      -----Query Job SQL Follows-----                      
+
+    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
+   1:-- data_algebra SQL https://github.com/WinVector/data_algebra
+   2:--  dialect: BigQueryModel
+   3:--       string quote: "
+   4:--   identifier quote: `
+   5:WITH
+   6: `table_reference_0` AS (
+   7:  SELECT
+   8:   `row_id` ,
+   9:   `g`
+  10:  FROM
+  11:   `data-algebra-test.test_1.d`
+  12: ) ,
+  13: `extend_1` AS (
+  14:  SELECT  -- .extend({ 'new_column': '_ngroup()'}, partition_by=['g'])
+  15:   `g` ,
+  16:   `row_id` ,
+  17:   NGROUP() OVER ( PARTITION BY `g`  )  AS `new_column`
+  18:  FROM
+  19:   `table_reference_0`
+  20: )
+  21:SELECT  -- .order_rows(['g', 'row_id'])
+  22: *
+  23:FROM
+  24: `extend_1`
+  25:ORDER BY
+  26: `g` ,
+  27: `row_id`
+    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
+
+
+difference (w)
+op: _count, op_class: g, example expression: _count(), db: BigQueryModel
+Pandas result (expectation):
+     g  row_id  new_column
+0    a       0           1
+1    a       1           2
+2    b       2           1
+3  ccc       3           1
+DB result:
+     g  row_id  new_column
+0    a       0           2
+1    a       1           2
+2    b       2           1
+3  ccc       3           1
+query
+-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: BigQueryModel
+--       string quote: "
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `g`
+  FROM
+   `data-algebra-test.test_1.d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': '_count()'}, partition_by=['g'])
+   `g` ,
+   `row_id` ,
+   SUM(1) OVER ( PARTITION BY `g`  )  AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `g` ,
+ `row_id`
+
+
+
+error (n)
+op: median, op_class: p, example expression: x.median(), db: BigQueryModel
+caught: 400 percentile_cont aggregate function is not supported.
+
+(job ID: b97050f0-a50e-473f-a314-b2c66841a334)
+
+                     -----Query Job SQL Follows-----                     
+
+    |    .    |    .    |    .    |    .    |    .    |    .    |
+   1:-- data_algebra SQL https://github.com/WinVector/data_algebra
+   2:--  dialect: BigQueryModel
+   3:--       string quote: "
+   4:--   identifier quote: `
+   5:WITH
+   6: `table_reference_0` AS (
+   7:  SELECT
+   8:   `x` ,
+   9:   `g`
+  10:  FROM
+  11:   `data-algebra-test.test_1.d`
+  12: ) ,
+  13: `project_1` AS (
+  14:  SELECT  -- .project({ 'new_column': 'x.median()'}, group_by=['g'])
+  15:   PERCENTILE_CONT(`x`, 0.5) AS `new_column` ,
+  16:   `g`
+  17:  FROM
+  18:   `table_reference_0`
+  19:  GROUP BY
+  20:   `g`
+  21: )
+  22:SELECT  -- .order_rows(['g'])
+  23: *
+  24:FROM
+  25: `project_1`
+  26:ORDER BY
+  27: `g`
+    |    .    |    .    |    .    |    .    |    .    |    .    |
+
+
+error (n)
+op: bfill, op_class: w, example expression: z.bfill(), db: BigQueryModel
+caught: 400 Function not found: BFILL at [18:4]
+
+(job ID: 843448dd-e1d9-4e50-92a6-89e89a1e7f4b)
+
+                                -----Query Job SQL Follows-----                                 
+
+    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
+   1:-- data_algebra SQL https://github.com/WinVector/data_algebra
+   2:--  dialect: BigQueryModel
+   3:--       string quote: "
+   4:--   identifier quote: `
+   5:WITH
+   6: `table_reference_0` AS (
+   7:  SELECT
+   8:   `row_id` ,
+   9:   `z` ,
+  10:   `g`
+  11:  FROM
+  12:   `data-algebra-test.test_1.d`
+  13: ) ,
+  14: `extend_1` AS (
+  15:  SELECT  -- .extend({ 'new_column': 'z.bfill()'}, partition_by=['g'], order_by=['row_id'])
+  16:   `g` ,
+  17:   `row_id` ,
+  18:   BFILL(`z`) OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`
+  19:  FROM
+  20:   `table_reference_0`
+  21: )
+  22:SELECT  -- .order_rows(['g', 'row_id'])
+  23: *
+  24:FROM
+  25: `extend_1`
+  26:ORDER BY
+  27: `g` ,
+  28: `row_id`
+    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
+
+
+error (n)
+op: ffill, op_class: w, example expression: z.ffill(), db: BigQueryModel
+caught: 400 Function not found: FFILL at [18:4]
+
+(job ID: cd24499f-3fc7-447e-9556-e40e04333189)
+
+                                -----Query Job SQL Follows-----                                 
+
+    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
+   1:-- data_algebra SQL https://github.com/WinVector/data_algebra
+   2:--  dialect: BigQueryModel
+   3:--       string quote: "
+   4:--   identifier quote: `
+   5:WITH
+   6: `table_reference_0` AS (
+   7:  SELECT
+   8:   `row_id` ,
+   9:   `z` ,
+  10:   `g`
+  11:  FROM
+  12:   `data-algebra-test.test_1.d`
+  13: ) ,
+  14: `extend_1` AS (
+  15:  SELECT  -- .extend({ 'new_column': 'z.ffill()'}, partition_by=['g'], order_by=['row_id'])
+  16:   `g` ,
+  17:   `row_id` ,
+  18:   FFILL(`z`) OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`
+  19:  FROM
+  20:   `table_reference_0`
+  21: )
+  22:SELECT  -- .order_rows(['g', 'row_id'])
+  23: *
+  24:FROM
+  25: `extend_1`
+  26:ORDER BY
+  27: `g` ,
+  28: `row_id`
+    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
+
+
+error (n)
+op: last, op_class: w, example expression: x.last(), db: BigQueryModel
+caught: 400 Function not found: LAST; Did you mean least? at [18:4]
+
+(job ID: a41aa49c-a520-44ec-8430-4ed5e8a6bdfe)
+
+                                -----Query Job SQL Follows-----                                
+
+    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
+   1:-- data_algebra SQL https://github.com/WinVector/data_algebra
+   2:--  dialect: BigQueryModel
+   3:--       string quote: "
+   4:--   identifier quote: `
+   5:WITH
+   6: `table_reference_0` AS (
+   7:  SELECT
+   8:   `row_id` ,
+   9:   `x` ,
+  10:   `g`
+  11:  FROM
+  12:   `data-algebra-test.test_1.d`
+  13: ) ,
+  14: `extend_1` AS (
+  15:  SELECT  -- .extend({ 'new_column': 'x.last()'}, partition_by=['g'], order_by=['row_id'])
+  16:   `g` ,
+  17:   `row_id` ,
+  18:   LAST(`x`) OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`
+  19:  FROM
+  20:   `table_reference_0`
+  21: )
+  22:SELECT  -- .order_rows(['g', 'row_id'])
+  23: *
+  24:FROM
+  25: `extend_1`
+  26:ORDER BY
+  27: `g` ,
+  28: `row_id`
+    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
+
+
+error (n)
+op: rank, op_class: w, example expression: x.rank(), db: BigQueryModel
+caught: 400 Number of arguments does not match for analytic function RANK. Supported signature: RANK() at [18:4]
+
+(job ID: 5e01c9a4-d013-434b-aa0b-1ec267ea23e0)
+
+                                -----Query Job SQL Follows-----                                
+
+    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
+   1:-- data_algebra SQL https://github.com/WinVector/data_algebra
+   2:--  dialect: BigQueryModel
+   3:--       string quote: "
+   4:--   identifier quote: `
+   5:WITH
+   6: `table_reference_0` AS (
+   7:  SELECT
+   8:   `row_id` ,
+   9:   `x` ,
+  10:   `g`
+  11:  FROM
+  12:   `data-algebra-test.test_1.d`
+  13: ) ,
+  14: `extend_1` AS (
+  15:  SELECT  -- .extend({ 'new_column': 'x.rank()'}, partition_by=['g'], order_by=['row_id'])
+  16:   `g` ,
+  17:   `row_id` ,
+  18:   RANK(`x`) OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`
+  19:  FROM
+  20:   `table_reference_0`
+  21: )
+  22:SELECT  -- .order_rows(['g', 'row_id'])
+  23: *
+  24:FROM
+  25: `extend_1`
+  26:ORDER BY
+  27: `g` ,
+  28: `row_id`
+    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
+
+
+error (n)
+op: cumprod, op_class: w, example expression: x.cumprod(), db: BigQueryModel
+caught: 400 Function not found: CUMPROD at [18:4]
+
+(job ID: f9778efc-03af-4b1d-bbbe-72f3c4c19d33)
+
+                                 -----Query Job SQL Follows-----                                  
+
+    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
+   1:-- data_algebra SQL https://github.com/WinVector/data_algebra
+   2:--  dialect: BigQueryModel
+   3:--       string quote: "
+   4:--   identifier quote: `
+   5:WITH
+   6: `table_reference_0` AS (
+   7:  SELECT
+   8:   `row_id` ,
+   9:   `x` ,
+  10:   `g`
+  11:  FROM
+  12:   `data-algebra-test.test_1.d`
+  13: ) ,
+  14: `extend_1` AS (
+  15:  SELECT  -- .extend({ 'new_column': 'x.cumprod()'}, partition_by=['g'], order_by=['row_id'])
+  16:   `g` ,
+  17:   `row_id` ,
+  18:   CUMPROD(`x`) OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`
+  19:  FROM
+  20:   `table_reference_0`
+  21: )
+  22:SELECT  -- .order_rows(['g', 'row_id'])
+  23: *
+  24:FROM
+  25: `extend_1`
+  26:ORDER BY
+  27: `g` ,
+  28: `row_id`
+    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
+
+
+error (n)
+op: cumcount, op_class: w, example expression: z.cumcount(), db: BigQueryModel
+caught: 400 Function not found: CUMCOUNT at [18:4]
+
+(job ID: eb1f9ff4-688c-471e-a927-98af8979e3b5)
+
+                                  -----Query Job SQL Follows-----                                  
+
+    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
+   1:-- data_algebra SQL https://github.com/WinVector/data_algebra
+   2:--  dialect: BigQueryModel
+   3:--       string quote: "
+   4:--   identifier quote: `
+   5:WITH
+   6: `table_reference_0` AS (
+   7:  SELECT
+   8:   `row_id` ,
+   9:   `z` ,
+  10:   `g`
+  11:  FROM
+  12:   `data-algebra-test.test_1.d`
+  13: ) ,
+  14: `extend_1` AS (
+  15:  SELECT  -- .extend({ 'new_column': 'z.cumcount()'}, partition_by=['g'], order_by=['row_id'])
+  16:   `g` ,
+  17:   `row_id` ,
+  18:   CUMCOUNT(`z`) OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`
+  19:  FROM
+  20:   `table_reference_0`
+  21: )
+  22:SELECT  -- .order_rows(['g', 'row_id'])
+  23: *
+  24:FROM
+  25: `extend_1`
+  26:ORDER BY
+  27: `g` ,
+  28: `row_id`
+    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
+
+
+error (n)
+op: cummax, op_class: w, example expression: x.cummax(), db: BigQueryModel
+caught: 400 Function not found: CUMMAX at [18:4]
+
+(job ID: e6461817-545a-4536-bcab-bd4055fc43c2)
+
+                                 -----Query Job SQL Follows-----                                 
+
+    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
+   1:-- data_algebra SQL https://github.com/WinVector/data_algebra
+   2:--  dialect: BigQueryModel
+   3:--       string quote: "
+   4:--   identifier quote: `
+   5:WITH
+   6: `table_reference_0` AS (
+   7:  SELECT
+   8:   `row_id` ,
+   9:   `x` ,
+  10:   `g`
+  11:  FROM
+  12:   `data-algebra-test.test_1.d`
+  13: ) ,
+  14: `extend_1` AS (
+  15:  SELECT  -- .extend({ 'new_column': 'x.cummax()'}, partition_by=['g'], order_by=['row_id'])
+  16:   `g` ,
+  17:   `row_id` ,
+  18:   CUMMAX(`x`) OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`
+  19:  FROM
+  20:   `table_reference_0`
+  21: )
+  22:SELECT  -- .order_rows(['g', 'row_id'])
+  23: *
+  24:FROM
+  25: `extend_1`
+  26:ORDER BY
+  27: `g` ,
+  28: `row_id`
+    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
+
+
+error (n)
+op: cummin, op_class: w, example expression: x.cummin(), db: BigQueryModel
+caught: 400 Function not found: CUMMIN at [18:4]
+
+(job ID: 88d30019-8c01-4ce1-8d16-613f3f036e98)
+
+                                 -----Query Job SQL Follows-----                                 
+
+    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
+   1:-- data_algebra SQL https://github.com/WinVector/data_algebra
+   2:--  dialect: BigQueryModel
+   3:--       string quote: "
+   4:--   identifier quote: `
+   5:WITH
+   6: `table_reference_0` AS (
+   7:  SELECT
+   8:   `row_id` ,
+   9:   `x` ,
+  10:   `g`
+  11:  FROM
+  12:   `data-algebra-test.test_1.d`
+  13: ) ,
+  14: `extend_1` AS (
+  15:  SELECT  -- .extend({ 'new_column': 'x.cummin()'}, partition_by=['g'], order_by=['row_id'])
+  16:   `g` ,
+  17:   `row_id` ,
+  18:   CUMMIN(`x`) OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`
+  19:  FROM
+  20:   `table_reference_0`
+  21: )
+  22:SELECT  -- .order_rows(['g', 'row_id'])
+  23: *
+  24:FROM
+  25: `extend_1`
+  26:ORDER BY
+  27: `g` ,
+  28: `row_id`
+    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
+
+
+error (n)
+op: %, op_class: e, example expression: row_id % q, db: PostgreSQLModel
+caught: dict is not a sequence
+
+
+error (n)
+op: arcsin, op_class: e, example expression: x.arcsin(), db: PostgreSQLModel
+caught: (psycopg2.errors.UndefinedFunction) function arcsin(double precision) does not exist
+LINE 16:    ARCSIN("x") AS "new_column"
+            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "x"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'x.arcsin()'})
+   "row_id" ,
+   ARCSIN("x") AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: arccos, op_class: e, example expression: x.arccos(), db: PostgreSQLModel
+caught: (psycopg2.errors.UndefinedFunction) function arccos(double precision) does not exist
+LINE 16:    ARCCOS("x") AS "new_column"
+            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "x"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'x.arccos()'})
+   "row_id" ,
+   ARCCOS("x") AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: arctan, op_class: e, example expression: x.arctan(), db: PostgreSQLModel
+caught: (psycopg2.errors.UndefinedFunction) function arctan(double precision) does not exist
+LINE 16:    ARCTAN("x") AS "new_column"
+            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "x"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'x.arctan()'})
+   "row_id" ,
+   ARCTAN("x") AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: arctan2, op_class: e, example expression: x.arctan2(y), db: PostgreSQLModel
+caught: (psycopg2.errors.UndefinedFunction) function arctan2(double precision, double precision) does not exist
+LINE 17:    ARCTAN2("x", "y") AS "new_column"
+            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "x" ,
+   "y"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'x.arctan2(y)'})
+   "row_id" ,
+   ARCTAN2("x", "y") AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: arcsinh, op_class: e, example expression: x.arcsinh(), db: PostgreSQLModel
+caught: (psycopg2.errors.UndefinedFunction) function arcsinh(double precision) does not exist
+LINE 16:    ARCSINH("x") AS "new_column"
+            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "x"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'x.arcsinh()'})
+   "row_id" ,
+   ARCSINH("x") AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: arccosh, op_class: e, example expression: x.arccosh(), db: PostgreSQLModel
+caught: (psycopg2.errors.UndefinedFunction) function arccosh(double precision) does not exist
+LINE 16:    ARCCOSH("x") AS "new_column"
+            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "x"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'x.arccosh()'})
+   "row_id" ,
+   ARCCOSH("x") AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: arctanh, op_class: e, example expression: x.arctanh(), db: PostgreSQLModel
+caught: (psycopg2.errors.UndefinedFunction) function arctanh(double precision) does not exist
+LINE 16:    ARCTANH("x") AS "new_column"
+            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "x"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'x.arctanh()'})
+   "row_id" ,
+   ARCTANH("x") AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: expm1, op_class: e, example expression: y.expm1(), db: PostgreSQLModel
+caught: (psycopg2.errors.UndefinedFunction) function expm1(double precision) does not exist
+LINE 16:    EXPM1("y") AS "new_column"
+            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "y"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'y.expm1()'})
+   "row_id" ,
+   EXPM1("y") AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: log1p, op_class: e, example expression: x.log1p(), db: PostgreSQLModel
+caught: (psycopg2.errors.UndefinedFunction) function log1p(double precision) does not exist
+LINE 16:    LOG1P("x") AS "new_column"
+            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "x"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'x.log1p()'})
+   "row_id" ,
+   LOG1P("x") AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: mod, op_class: e, example expression: y.mod(0.5), db: PostgreSQLModel
+caught: (psycopg2.errors.UndefinedFunction) function mod(double precision, numeric) does not exist
+LINE 16:    MOD("y", 0.5) AS "new_column"
+            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "y"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'y.mod(0.5)'})
+   "row_id" ,
+   MOD("y", 0.5) AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: remainder, op_class: e, example expression: y.remainder(0.5), db: PostgreSQLModel
+caught: (psycopg2.errors.UndefinedFunction) function remainder(double precision, numeric) does not exist
+LINE 16:    REMAINDER("y", 0.5) AS "new_column"
+            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "y"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'y.remainder(0.5)'})
+   "row_id" ,
+   REMAINDER("y", 0.5) AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: as_int64, op_class: e, example expression: y.as_int64(), db: PostgreSQLModel
+caught: (psycopg2.errors.UndefinedObject) type "int64" does not exist
+LINE 16:    CAST("y" AS INT64) AS "new_column"
+                        ^
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "y"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'y.as_int64()'})
+   "row_id" ,
+   CAST("y" AS INT64) AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: parse_date, op_class: e, example expression: str_date_col.parse_date(), db: PostgreSQLModel
+caught: dict is not a sequence
+
+
+error (n)
+op: parse_datetime, op_class: e, example expression: str_datetime_col.parse_datetime(), db: PostgreSQLModel
+caught: dict is not a sequence
+
+
+error (n)
+op: format_datetime, op_class: e, example expression: datetime_col_0.format_datetime(), db: PostgreSQLModel
+caught: dict is not a sequence
+
+
+error (n)
+op: format_date, op_class: e, example expression: date_col_0.format_date(), db: PostgreSQLModel
+caught: dict is not a sequence
+
+
+error (n)
+op: dayofweek, op_class: e, example expression: date_col_0.dayofweek(), db: PostgreSQLModel
+caught: (psycopg2.errors.InvalidParameterValue) timestamp units "dayofweek" not recognized
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "date_col_0"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'date_col_0.dayofweek()'})
+   "row_id" ,
+   EXTRACT(DAYOFWEEK FROM "date_col_0") AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/9h9h)
+
+
+error (n)
+op: dayofyear, op_class: e, example expression: date_col_0.dayofyear(), db: PostgreSQLModel
+caught: (psycopg2.errors.InvalidParameterValue) timestamp units "dayofyear" not recognized
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "date_col_0"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'date_col_0.dayofyear()'})
+   "row_id" ,
+   EXTRACT(DAYOFYEAR FROM "date_col_0") AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/9h9h)
+
+
+difference (w)
+op: weekofyear, op_class: e, example expression: date_col_0.weekofyear(), db: PostgreSQLModel
+Pandas result (expectation):
+   row_id  new_column
+0       0           1
+1       1          13
+2       2           1
+3       3          13
+DB result:
+   row_id  new_column
+0       0        52.0
+1       1        14.0
+2       2        52.0
+3       3        14.0
+query
+-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "date_col_0"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'date_col_0.weekofyear()'})
+   "row_id" ,
+   EXTRACT(WEEK FROM "date_col_0") AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+
+
+
+error (n)
+op: timestamp_diff, op_class: e, example expression: datetime_col_0.timestamp_diff(datetime_col_1), db: PostgreSQLModel
+caught: (psycopg2.errors.UndefinedColumn) column "second" does not exist
+LINE 17: ...IMESTAMP_DIFF("datetime_col_0", "datetime_col_1", SECOND) AS...
+                                                              ^
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "datetime_col_0" ,
+   "datetime_col_1"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'datetime_col_0.timestamp_diff(datetime_col_1)'})
+   "row_id" ,
+   TIMESTAMP_DIFF("datetime_col_0", "datetime_col_1", SECOND) AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: date_diff, op_class: e, example expression: date_col_0.date_diff(date_col_1), db: PostgreSQLModel
+caught: (psycopg2.errors.UndefinedColumn) column "day" does not exist
+LINE 17:    TIMESTAMP_DIFF("date_col_0", "date_col_1", DAY) AS "new_c...
+                                                       ^
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "date_col_0" ,
+   "date_col_1"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'date_col_0.date_diff(date_col_1)'})
+   "row_id" ,
+   TIMESTAMP_DIFF("date_col_0", "date_col_1", DAY) AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: base_Sunday, op_class: e, example expression: date_col_1.base_Sunday(), db: PostgreSQLModel
+caught: (psycopg2.errors.SyntaxError) syntax error at or near "EXTRACT"
+LINE 16:    DATE_SUB("date_col_1", INTERVAL (EXTRACT(DAYOFWEEK FROM "...
+                                             ^
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "date_col_1"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'date_col_1.base_Sunday()'})
+   "row_id" ,
+   DATE_SUB("date_col_1", INTERVAL (EXTRACT(DAYOFWEEK FROM "date_col_1") - 1) DAY) AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: _ngroup, op_class: g, example expression: _ngroup(), db: PostgreSQLModel
+caught: (psycopg2.errors.UndefinedFunction) function ngroup() does not exist
+LINE 17:    NGROUP() OVER ( PARTITION BY "g"  )  AS "new_column"
+            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': '_ngroup()'}, partition_by=['g'])
+   "g" ,
+   "row_id" ,
+   NGROUP() OVER ( PARTITION BY "g"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: all, op_class: g, example expression: a.all(), db: PostgreSQLModel
+caught: (psycopg2.errors.UndefinedFunction) function logical_and(boolean) does not exist
+LINE 18:    LOGICAL_AND("a") OVER ( PARTITION BY "g"  )  AS "new_colu...
+            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "a" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'a.all()'}, partition_by=['g'])
+   "g" ,
+   "row_id" ,
+   LOGICAL_AND("a") OVER ( PARTITION BY "g"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: any, op_class: g, example expression: a.any(), db: PostgreSQLModel
+caught: (psycopg2.errors.UndefinedFunction) function logical_or(boolean) does not exist
+LINE 18:    LOGICAL_OR("a") OVER ( PARTITION BY "g"  )  AS "new_colum...
+            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "a" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'a.any()'}, partition_by=['g'])
+   "g" ,
+   "row_id" ,
+   LOGICAL_OR("a") OVER ( PARTITION BY "g"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: median, op_class: g, example expression: x.median(), db: PostgreSQLModel
+caught: (psycopg2.errors.UndefinedFunction) function median(double precision) does not exist
+LINE 18:    MEDIAN("x") OVER ( PARTITION BY "g"  )  AS "new_column"
+            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "x" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'x.median()'}, partition_by=['g'])
+   "g" ,
+   "row_id" ,
+   MEDIAN("x") OVER ( PARTITION BY "g"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: nunique, op_class: g, example expression: x.nunique(), db: PostgreSQLModel
+caught: (psycopg2.errors.FeatureNotSupported) DISTINCT is not implemented for window functions
+LINE 18:    COUNT(DISTINCT ("x")) OVER ( PARTITION BY "g"  )  AS "new...
+            ^
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "x" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'x.nunique()'}, partition_by=['g'])
+   "g" ,
+   "row_id" ,
+   COUNT(DISTINCT ("x")) OVER ( PARTITION BY "g"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/tw8g)
+
+
+difference (w)
+op: _count, op_class: g, example expression: _count(), db: PostgreSQLModel
+Pandas result (expectation):
+     g  row_id  new_column
+0    a       0           1
+1    a       1           2
+2    b       2           1
+3  ccc       3           1
+DB result:
+     g  row_id  new_column
+0    a       0           2
+1    a       1           2
+2    b       2           1
+3  ccc       3           1
+query
+-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': '_count()'}, partition_by=['g'])
+   "g" ,
+   "row_id" ,
+   SUM(1) OVER ( PARTITION BY "g"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+
+
+
+error (n)
+op: all, op_class: p, example expression: a.all(), db: PostgreSQLModel
+caught: (psycopg2.errors.UndefinedFunction) function logical_and(boolean) does not exist
+LINE 15:    LOGICAL_AND("a") AS "new_column" ,
+            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "g" ,
+   "a"
+  FROM
+   "d"
+ ) ,
+ "project_1" AS (
+  SELECT  -- .project({ 'new_column': 'a.all()'}, group_by=['g'])
+   LOGICAL_AND("a") AS "new_column" ,
+   "g"
+  FROM
+   "table_reference_0"
+  GROUP BY
+   "g"
+ )
+SELECT  -- .order_rows(['g'])
+ *
+FROM
+ "project_1"
+ORDER BY
+ "g"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: any, op_class: p, example expression: a.any(), db: PostgreSQLModel
+caught: (psycopg2.errors.UndefinedFunction) function logical_or(boolean) does not exist
+LINE 15:    LOGICAL_OR("a") AS "new_column" ,
+            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "g" ,
+   "a"
+  FROM
+   "d"
+ ) ,
+ "project_1" AS (
+  SELECT  -- .project({ 'new_column': 'a.any()'}, group_by=['g'])
+   LOGICAL_OR("a") AS "new_column" ,
+   "g"
+  FROM
+   "table_reference_0"
+  GROUP BY
+   "g"
+ )
+SELECT  -- .order_rows(['g'])
+ *
+FROM
+ "project_1"
+ORDER BY
+ "g"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: median, op_class: p, example expression: x.median(), db: PostgreSQLModel
+caught: (psycopg2.errors.UndefinedFunction) function median(double precision) does not exist
+LINE 15:    MEDIAN("x") AS "new_column" ,
+            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "x" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "project_1" AS (
+  SELECT  -- .project({ 'new_column': 'x.median()'}, group_by=['g'])
+   MEDIAN("x") AS "new_column" ,
+   "g"
+  FROM
+   "table_reference_0"
+  GROUP BY
+   "g"
+ )
+SELECT  -- .order_rows(['g'])
+ *
+FROM
+ "project_1"
+ORDER BY
+ "g"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: bfill, op_class: w, example expression: z.bfill(), db: PostgreSQLModel
+caught: (psycopg2.errors.UndefinedFunction) function bfill(double precision) does not exist
+LINE 18:    BFILL("z") OVER ( PARTITION BY "g" ORDER BY "row_id"  )  ...
+            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "z" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'z.bfill()'}, partition_by=['g'], order_by=['row_id'])
+   "g" ,
+   "row_id" ,
+   BFILL("z") OVER ( PARTITION BY "g" ORDER BY "row_id"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: ffill, op_class: w, example expression: z.ffill(), db: PostgreSQLModel
+caught: (psycopg2.errors.UndefinedFunction) function ffill(double precision) does not exist
+LINE 18:    FFILL("z") OVER ( PARTITION BY "g" ORDER BY "row_id"  )  ...
+            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "z" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'z.ffill()'}, partition_by=['g'], order_by=['row_id'])
+   "g" ,
+   "row_id" ,
+   FFILL("z") OVER ( PARTITION BY "g" ORDER BY "row_id"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: last, op_class: w, example expression: x.last(), db: PostgreSQLModel
+caught: (psycopg2.errors.UndefinedFunction) function last(double precision) does not exist
+LINE 18:    LAST("x") OVER ( PARTITION BY "g" ORDER BY "row_id"  )  A...
+            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "x" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'x.last()'}, partition_by=['g'], order_by=['row_id'])
+   "g" ,
+   "row_id" ,
+   LAST("x") OVER ( PARTITION BY "g" ORDER BY "row_id"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: rank, op_class: w, example expression: x.rank(), db: PostgreSQLModel
+caught: (psycopg2.errors.WrongObjectType) WITHIN GROUP is required for ordered-set aggregate rank
+LINE 18:    RANK("x") OVER ( PARTITION BY "g" ORDER BY "row_id"  )  A...
+            ^
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "x" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'x.rank()'}, partition_by=['g'], order_by=['row_id'])
+   "g" ,
+   "row_id" ,
+   RANK("x") OVER ( PARTITION BY "g" ORDER BY "row_id"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: cumprod, op_class: w, example expression: x.cumprod(), db: PostgreSQLModel
+caught: (psycopg2.errors.UndefinedFunction) function cumprod(double precision) does not exist
+LINE 18:    CUMPROD("x") OVER ( PARTITION BY "g" ORDER BY "row_id"  )...
+            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "x" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'x.cumprod()'}, partition_by=['g'], order_by=['row_id'])
+   "g" ,
+   "row_id" ,
+   CUMPROD("x") OVER ( PARTITION BY "g" ORDER BY "row_id"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: cumcount, op_class: w, example expression: z.cumcount(), db: PostgreSQLModel
+caught: (psycopg2.errors.UndefinedFunction) function cumcount(double precision) does not exist
+LINE 18:    CUMCOUNT("z") OVER ( PARTITION BY "g" ORDER BY "row_id"  ...
+            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "z" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'z.cumcount()'}, partition_by=['g'], order_by=['row_id'])
+   "g" ,
+   "row_id" ,
+   CUMCOUNT("z") OVER ( PARTITION BY "g" ORDER BY "row_id"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: cummax, op_class: w, example expression: x.cummax(), db: PostgreSQLModel
+caught: (psycopg2.errors.UndefinedFunction) function cummax(double precision) does not exist
+LINE 18:    CUMMAX("x") OVER ( PARTITION BY "g" ORDER BY "row_id"  ) ...
+            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "x" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'x.cummax()'}, partition_by=['g'], order_by=['row_id'])
+   "g" ,
+   "row_id" ,
+   CUMMAX("x") OVER ( PARTITION BY "g" ORDER BY "row_id"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: cummin, op_class: w, example expression: x.cummin(), db: PostgreSQLModel
+caught: (psycopg2.errors.UndefinedFunction) function cummin(double precision) does not exist
+LINE 18:    CUMMIN("x") OVER ( PARTITION BY "g" ORDER BY "row_id"  ) ...
+            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: PostgreSQLModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "x" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'x.cummin()'}, partition_by=['g'], order_by=['row_id'])
+   "g" ,
+   "row_id" ,
+   CUMMIN("x") OVER ( PARTITION BY "g" ORDER BY "row_id"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: arcsin, op_class: e, example expression: x.arcsin(), db: SparkSQLModel
+caught: Undefined function: 'ARCSIN'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 16 pos 3
+
+
+error (n)
+op: arccos, op_class: e, example expression: x.arccos(), db: SparkSQLModel
+caught: Undefined function: 'ARCCOS'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 16 pos 3
+
+
+error (n)
+op: arctan, op_class: e, example expression: x.arctan(), db: SparkSQLModel
+caught: Undefined function: 'ARCTAN'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 16 pos 3
+
+
+error (n)
+op: arctan2, op_class: e, example expression: x.arctan2(y), db: SparkSQLModel
+caught: Undefined function: 'ARCTAN2'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 17 pos 3
+
+
+error (n)
+op: arcsinh, op_class: e, example expression: x.arcsinh(), db: SparkSQLModel
+caught: Undefined function: 'ARCSINH'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 16 pos 3
+
+
+error (n)
+op: arccosh, op_class: e, example expression: x.arccosh(), db: SparkSQLModel
+caught: Undefined function: 'ARCCOSH'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 16 pos 3
+
+
+error (n)
+op: arctanh, op_class: e, example expression: x.arctanh(), db: SparkSQLModel
+caught: Undefined function: 'ARCTANH'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 16 pos 3
+
+
+difference (w)
+op: floor, op_class: e, example expression: z.floor(), db: SparkSQLModel
+Pandas result (expectation):
+   row_id  new_column
+0       0         1.0
+1       1         NaN
+2       2        -3.0
+3       3         NaN
+DB result:
+   row_id  new_column
+0       0           1
+1       1           0
+2       2          -3
+3       3           0
+query
+-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SparkSQLModel
+--       string quote: "
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `z`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'z.floor()'})
+   `row_id` ,
+   FLOOR(`z`) AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `row_id`
+
+
+
+difference (w)
+op: ceil, op_class: e, example expression: z.ceil(), db: SparkSQLModel
+Pandas result (expectation):
+   row_id  new_column
+0       0         2.0
+1       1         NaN
+2       2        -2.0
+3       3         NaN
+DB result:
+   row_id  new_column
+0       0           2
+1       1           0
+2       2          -2
+3       3           0
+query
+-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SparkSQLModel
+--       string quote: "
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `z`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'z.ceil()'})
+   `row_id` ,
+   CEILING(`z`) AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `row_id`
+
+
+
+error (n)
+op: remainder, op_class: e, example expression: y.remainder(0.5), db: SparkSQLModel
+caught: Undefined function: 'REMAINDER'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 16 pos 3
+
+
+difference (w)
+op: is_null, op_class: e, example expression: z.is_null(), db: SparkSQLModel
+Pandas result (expectation):
+   row_id  new_column
+0       0       False
+1       1        True
+2       2       False
+3       3        True
+DB result:
+   row_id  new_column
+0       0       False
+1       1       False
+2       2       False
+3       3       False
+query
+-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SparkSQLModel
+--       string quote: "
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `z`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'z.is_null()'})
+   `row_id` ,
+   (`z` IS NULL) AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `row_id`
+
+
+
+error (n)
+op: as_int64, op_class: e, example expression: y.as_int64(), db: SparkSQLModel
+caught: 
+DataType int64 is not supported.(line 16, pos 15)
+
+== SQL ==
+-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SparkSQLModel
+--       string quote: "
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `y`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'y.as_int64()'})
+   `row_id` ,
+   CAST(`y` AS INT64) AS `new_column`
+---------------^^^
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `row_id`
+
+
+
+error (n)
+op: parse_date, op_class: e, example expression: str_date_col.parse_date(), db: SparkSQLModel
+caught: Undefined function: 'PARSE_DATE'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 16 pos 3
+
+
+error (n)
+op: parse_datetime, op_class: e, example expression: str_datetime_col.parse_datetime(), db: SparkSQLModel
+caught: Undefined function: 'PARSE_DATETIME'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 16 pos 3
+
+
+error (n)
+op: format_datetime, op_class: e, example expression: datetime_col_0.format_datetime(), db: SparkSQLModel
+caught: Undefined function: 'FORMAT_DATETIME'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 16 pos 3
+
+
+error (n)
+op: format_date, op_class: e, example expression: date_col_0.format_date(), db: SparkSQLModel
+caught: Undefined function: 'FORMAT_DATE'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 16 pos 3
+
+
+error (n)
+op: dayofyear, op_class: e, example expression: date_col_0.dayofyear(), db: SparkSQLModel
+caught: Literals of type 'DAYOFYEAR' are currently not supported for the date type.; line 16 pos 3
+
+
+difference (w)
+op: weekofyear, op_class: e, example expression: date_col_0.weekofyear(), db: SparkSQLModel
+Pandas result (expectation):
+   row_id  new_column
+0       0           1
+1       1          13
+2       2           1
+3       3          13
+DB result:
+   row_id  new_column
+0       0          52
+1       1          14
+2       2          52
+3       3          14
+query
+-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SparkSQLModel
+--       string quote: "
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `date_col_0`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'date_col_0.weekofyear()'})
+   `row_id` ,
+   EXTRACT(WEEK FROM `date_col_0`) AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `row_id`
+
+
+
+error (n)
+op: timestamp_diff, op_class: e, example expression: datetime_col_0.timestamp_diff(datetime_col_1), db: SparkSQLModel
+caught: Undefined function: 'TIMESTAMP_DIFF'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 17 pos 3
+
+
+error (n)
+op: date_diff, op_class: e, example expression: date_col_0.date_diff(date_col_1), db: SparkSQLModel
+caught: Undefined function: 'TIMESTAMP_DIFF'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 17 pos 3
+
+
+error (n)
+op: base_Sunday, op_class: e, example expression: date_col_1.base_Sunday(), db: SparkSQLModel
+caught: 
+no viable alternative at input 'WITH\n `table_reference_0` AS (\n  SELECT\n   `row_id` ,\n   `date_col_1`\n  FROM\n   `d`\n ) ,\n `extend_1` AS (\n  SELECT  -- .extend({ 'new_column': 'date_col_1.base_Sunday()'})\n   `row_id` ,\n   DATE_SUB(`date_col_1`, INTERVAL (EXTRACT(DAYOFWEEK FROM `date_col_1`) - 1) DAY'(line 16, pos 78)
+
+== SQL ==
+-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SparkSQLModel
+--       string quote: "
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `date_col_1`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'date_col_1.base_Sunday()'})
+   `row_id` ,
+   DATE_SUB(`date_col_1`, INTERVAL (EXTRACT(DAYOFWEEK FROM `date_col_1`) - 1) DAY) AS `new_column`
+------------------------------------------------------------------------------^^^
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `row_id`
+
+
+
+error (n)
+op: _ngroup, op_class: g, example expression: _ngroup(), db: SparkSQLModel
+caught: Undefined function: 'NGROUP'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 17 pos 3
+
+
+error (n)
+op: all, op_class: g, example expression: a.all(), db: SparkSQLModel
+caught: Undefined function: 'LOGICAL_AND'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 18 pos 3
+
+
+error (n)
+op: any, op_class: g, example expression: a.any(), db: SparkSQLModel
+caught: Undefined function: 'LOGICAL_OR'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 18 pos 3
+
+
+error (n)
+op: median, op_class: g, example expression: x.median(), db: SparkSQLModel
+caught: Undefined function: 'MEDIAN'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 18 pos 3
+
+
+error (n)
+op: nunique, op_class: g, example expression: x.nunique(), db: SparkSQLModel
+caught: Distinct window functions are not supported: count(distinct x#4) windowspecdefinition(g#7, specifiedwindowframe(RowFrame, unboundedpreceding$(), unboundedfollowing$()));
+WithCTE
+:- CTERelationDef 174
+:  +- SubqueryAlias table_reference_0
+:     +- Project [row_id#0L, x#4, g#7]
+:        +- SubqueryAlias d
+:           +- View (`d`, [row_id#0L,a#1,b#2,q#3L,x#4,y#5,z#6,g#7,s2#8,str_datetime_col#9,str_date_col#10,datetime_col_0#11,datetime_col_1#12,date_col_0#13,date_col_1#14])
+:              +- LogicalRDD [row_id#0L, a#1, b#2, q#3L, x#4, y#5, z#6, g#7, s2#8, str_datetime_col#9, str_date_col#10, datetime_col_0#11, datetime_col_1#12, date_col_0#13, date_col_1#14], false
+:- CTERelationDef 175
+:  +- SubqueryAlias extend_1
+:     +- Project [g#7, row_id#0L, new_column#292L]
+:        +- Project [g#7, row_id#0L, x#4, new_column#292L, new_column#292L]
+:           +- Window [count(distinct x#4) windowspecdefinition(g#7, specifiedwindowframe(RowFrame, unboundedpreceding$(), unboundedfollowing$())) AS new_column#292L], [g#7]
+:              +- Project [g#7, row_id#0L, x#4]
+:                 +- SubqueryAlias table_reference_0
+:                    +- CTERelationRef 174, true, [row_id#0L, x#4, g#7]
++- Sort [g#7 ASC NULLS FIRST, row_id#0L ASC NULLS FIRST], true
+   +- Project [g#7, row_id#0L, new_column#292L]
+      +- SubqueryAlias extend_1
+         +- CTERelationRef 175, true, [g#7, row_id#0L, new_column#292L]
+
+
+
+difference (w)
+op: count, op_class: g, example expression: z.count(), db: SparkSQLModel
+Pandas result (expectation):
+     g  row_id  new_column
+0    a       0           1
+1    a       1           1
+2    b       2           1
+3  ccc       3           0
+DB result:
+     g  row_id  new_column
+0    a       0           2
+1    a       1           2
+2    b       2           1
+3  ccc       3           1
+query
+-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SparkSQLModel
+--       string quote: "
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `z` ,
+   `g`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'z.count()'}, partition_by=['g'])
+   `g` ,
+   `row_id` ,
+   SUM(CASE WHEN `z` IS NOT NULL THEN 1 ELSE 0 END) OVER ( PARTITION BY `g`  )  AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `g` ,
+ `row_id`
+
+
+
+difference (w)
+op: _count, op_class: g, example expression: _count(), db: SparkSQLModel
+Pandas result (expectation):
+     g  row_id  new_column
+0    a       0           1
+1    a       1           2
+2    b       2           1
+3  ccc       3           1
+DB result:
+     g  row_id  new_column
+0    a       0           2
+1    a       1           2
+2    b       2           1
+3  ccc       3           1
+query
+-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SparkSQLModel
+--       string quote: "
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `g`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': '_count()'}, partition_by=['g'])
+   `g` ,
+   `row_id` ,
+   SUM(1) OVER ( PARTITION BY `g`  )  AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `g` ,
+ `row_id`
+
+
+
+error (n)
+op: all, op_class: p, example expression: a.all(), db: SparkSQLModel
+caught: Undefined function: 'LOGICAL_AND'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 15 pos 3
+
+
+error (n)
+op: any, op_class: p, example expression: a.any(), db: SparkSQLModel
+caught: Undefined function: 'LOGICAL_OR'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 15 pos 3
+
+
+error (n)
+op: median, op_class: p, example expression: x.median(), db: SparkSQLModel
+caught: Undefined function: 'MEDIAN'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 15 pos 3
+
+
+difference (w)
+op: count, op_class: p, example expression: z.count(), db: SparkSQLModel
+Pandas result (expectation):
+     g  new_column
+0    a           1
+1    b           1
+2  ccc           0
+DB result:
+   new_column    g
+0           2    a
+1           1    b
+2           1  ccc
+query
+-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SparkSQLModel
+--       string quote: "
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `g` ,
+   `z`
+  FROM
+   `d`
+ ) ,
+ `project_1` AS (
+  SELECT  -- .project({ 'new_column': 'z.count()'}, group_by=['g'])
+   SUM(CASE WHEN `z` IS NOT NULL THEN 1 ELSE 0 END) AS `new_column` ,
+   `g`
+  FROM
+   `table_reference_0`
+  GROUP BY
+   `g`
+ )
+SELECT  -- .order_rows(['g'])
+ *
+FROM
+ `project_1`
+ORDER BY
+ `g`
+
+
+
+error (n)
+op: bfill, op_class: w, example expression: z.bfill(), db: SparkSQLModel
+caught: Undefined function: 'BFILL'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 18 pos 3
+
+
+error (n)
+op: ffill, op_class: w, example expression: z.ffill(), db: SparkSQLModel
+caught: Undefined function: 'FFILL'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 18 pos 3
+
+
+difference (w)
+op: last, op_class: w, example expression: x.last(), db: SparkSQLModel
+Pandas result (expectation):
+     g  row_id  new_column
+0    a       0         0.2
+1    a       1         0.2
+2    b       2         0.3
+3  ccc       3         0.4
+DB result:
+     g  row_id  new_column
+0    a       0         0.1
+1    a       1         0.2
+2    b       2         0.3
+3  ccc       3         0.4
+query
+-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SparkSQLModel
+--       string quote: "
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `x` ,
+   `g`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'x.last()'}, partition_by=['g'], order_by=['row_id'])
+   `g` ,
+   `row_id` ,
+   LAST(`x`) OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `g` ,
+ `row_id`
+
+
+
+error (n)
+op: cumprod, op_class: w, example expression: x.cumprod(), db: SparkSQLModel
+caught: Undefined function: 'CUMPROD'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 18 pos 3
+
+
+error (n)
+op: cumcount, op_class: w, example expression: z.cumcount(), db: SparkSQLModel
+caught: Undefined function: 'CUMCOUNT'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 18 pos 3
+
+
+error (n)
+op: cummax, op_class: w, example expression: x.cummax(), db: SparkSQLModel
+caught: Undefined function: 'CUMMAX'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 18 pos 3
+
+
+error (n)
+op: cummin, op_class: w, example expression: x.cummin(), db: SparkSQLModel
+caught: Undefined function: 'CUMMIN'. This function is neither a registered temporary function nor a permanent function registered in the database 'default'.; line 18 pos 3
+
+
+error (n)
+op: %, op_class: e, example expression: row_id % q, db: MySQLModel
+caught: unsupported format character 'q' (0x71) at index 280
+
+
+error (n)
+op: arcsin, op_class: e, example expression: x.arcsin(), db: MySQLModel
+caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.ARCSIN does not exist')
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `x`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'x.arcsin()'})
+   `row_id` ,
+   ARCSIN(`x`) AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+
+
+error (n)
+op: arccos, op_class: e, example expression: x.arccos(), db: MySQLModel
+caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.ARCCOS does not exist')
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `x`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'x.arccos()'})
+   `row_id` ,
+   ARCCOS(`x`) AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+
+
+error (n)
+op: arctan, op_class: e, example expression: x.arctan(), db: MySQLModel
+caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.ARCTAN does not exist')
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `x`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'x.arctan()'})
+   `row_id` ,
+   ARCTAN(`x`) AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+
+
+error (n)
+op: arctan2, op_class: e, example expression: x.arctan2(y), db: MySQLModel
+caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.ARCTAN2 does not exist')
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `x` ,
+   `y`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'x.arctan2(y)'})
+   `row_id` ,
+   ARCTAN2(`x`, `y`) AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+
+
+error (n)
+op: sinh, op_class: e, example expression: x.sinh(), db: MySQLModel
+caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.SINH does not exist')
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `x`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'x.sinh()'})
+   `row_id` ,
+   SINH(`x`) AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+
+
+error (n)
+op: cosh, op_class: e, example expression: x.cosh(), db: MySQLModel
+caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.COSH does not exist')
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `x`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'x.cosh()'})
+   `row_id` ,
+   COSH(`x`) AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+
+
+error (n)
+op: tanh, op_class: e, example expression: x.tanh(), db: MySQLModel
+caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.TANH does not exist')
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `x`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'x.tanh()'})
+   `row_id` ,
+   TANH(`x`) AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+
+
+error (n)
+op: arcsinh, op_class: e, example expression: x.arcsinh(), db: MySQLModel
+caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.ARCSINH does not exist')
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `x`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'x.arcsinh()'})
+   `row_id` ,
+   ARCSINH(`x`) AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+
+
+error (n)
+op: arccosh, op_class: e, example expression: x.arccosh(), db: MySQLModel
+caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.ARCCOSH does not exist')
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `x`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'x.arccosh()'})
+   `row_id` ,
+   ARCCOSH(`x`) AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+
+
+error (n)
+op: arctanh, op_class: e, example expression: x.arctanh(), db: MySQLModel
+caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.ARCTANH does not exist')
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `x`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'x.arctanh()'})
+   `row_id` ,
+   ARCTANH(`x`) AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+
+
+error (n)
+op: expm1, op_class: e, example expression: y.expm1(), db: MySQLModel
+caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.EXPM1 does not exist')
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `y`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'y.expm1()'})
+   `row_id` ,
+   EXPM1(`y`) AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+
+
+error (n)
+op: log1p, op_class: e, example expression: x.log1p(), db: MySQLModel
+caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.LOG1P does not exist')
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `x`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'x.log1p()'})
+   `row_id` ,
+   LOG1P(`x`) AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+
+
+error (n)
+op: remainder, op_class: e, example expression: y.remainder(0.5), db: MySQLModel
+caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.REMAINDER does not exist')
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `y`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'y.remainder(0.5)'})
+   `row_id` ,
+   REMAINDER(`y`, 0.5) AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+
+
+error (n)
+op: as_int64, op_class: e, example expression: y.as_int64(), db: MySQLModel
+caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'INT64) AS `new_column`\n  FROM\n   `table_reference_0`\n )\nSELECT  -- .order_rows([' at line 16")
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `y`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'y.as_int64()'})
+   `row_id` ,
+   CAST(`y` AS INT64) AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: parse_date, op_class: e, example expression: str_date_col.parse_date(), db: MySQLModel
+caught: unsupported format character 'Y' (0x59) at index 308
+
+
+error (n)
+op: parse_datetime, op_class: e, example expression: str_datetime_col.parse_datetime(), db: MySQLModel
+caught: unsupported format character 'Y' (0x59) at index 320
+
+
+error (n)
+op: format_datetime, op_class: e, example expression: datetime_col_0.format_datetime(), db: MySQLModel
+caught: unsupported format character 'Y' (0x59) at index 317
+
+
+error (n)
+op: format_date, op_class: e, example expression: date_col_0.format_date(), db: MySQLModel
+caught: unsupported format character 'Y' (0x59) at index 305
+
+
+error (n)
+op: dayofweek, op_class: e, example expression: date_col_0.dayofweek(), db: MySQLModel
+caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'DAYOFWEEK FROM `date_col_0`) AS `new_column`\n  FROM\n   `table_reference_0`\n )\nSE' at line 16")
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `date_col_0`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'date_col_0.dayofweek()'})
+   `row_id` ,
+   EXTRACT(DAYOFWEEK FROM `date_col_0`) AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: dayofyear, op_class: e, example expression: date_col_0.dayofyear(), db: MySQLModel
+caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'DAYOFYEAR FROM `date_col_0`) AS `new_column`\n  FROM\n   `table_reference_0`\n )\nSE' at line 16")
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `date_col_0`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'date_col_0.dayofyear()'})
+   `row_id` ,
+   EXTRACT(DAYOFYEAR FROM `date_col_0`) AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: timestamp_diff, op_class: e, example expression: datetime_col_0.timestamp_diff(datetime_col_1), db: MySQLModel
+caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.TIMESTAMP_DIFF does not exist')
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `datetime_col_0` ,
+   `datetime_col_1`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'datetime_col_0.timestamp_diff(datetime_col_1)'})
+   `row_id` ,
+   TIMESTAMP_DIFF(`datetime_col_0`, `datetime_col_1`, SECOND) AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+
+
+error (n)
+op: date_diff, op_class: e, example expression: date_col_0.date_diff(date_col_1), db: MySQLModel
+caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.TIMESTAMP_DIFF does not exist')
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `date_col_0` ,
+   `date_col_1`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'date_col_0.date_diff(date_col_1)'})
+   `row_id` ,
+   TIMESTAMP_DIFF(`date_col_0`, `date_col_1`, DAY) AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+
+
+error (n)
+op: base_Sunday, op_class: e, example expression: date_col_1.base_Sunday(), db: MySQLModel
+caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'DAYOFWEEK FROM `date_col_1`) - 1) DAY) AS `new_column`\n  FROM\n   `table_referenc' at line 16")
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `date_col_1`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'date_col_1.base_Sunday()'})
+   `row_id` ,
+   DATE_SUB(`date_col_1`, INTERVAL (EXTRACT(DAYOFWEEK FROM `date_col_1`) - 1) DAY) AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: _ngroup, op_class: g, example expression: _ngroup(), db: MySQLModel
+caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'OVER ( PARTITION BY `g`  )  AS `new_column`\n  FROM\n   `table_reference_0`\n )\nSEL' at line 17")
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `g`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': '_ngroup()'}, partition_by=['g'])
+   `g` ,
+   `row_id` ,
+   NGROUP() OVER ( PARTITION BY `g`  )  AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `g` ,
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: all, op_class: g, example expression: a.all(), db: MySQLModel
+caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'OVER ( PARTITION BY `g`  )  AS `new_column`\n  FROM\n   `table_reference_0`\n )\nSEL' at line 18")
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `a` ,
+   `g`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'a.all()'}, partition_by=['g'])
+   `g` ,
+   `row_id` ,
+   LOGICAL_AND(`a`) OVER ( PARTITION BY `g`  )  AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `g` ,
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: any, op_class: g, example expression: a.any(), db: MySQLModel
+caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'OVER ( PARTITION BY `g`  )  AS `new_column`\n  FROM\n   `table_reference_0`\n )\nSEL' at line 18")
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `a` ,
+   `g`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'a.any()'}, partition_by=['g'])
+   `g` ,
+   `row_id` ,
+   LOGICAL_OR(`a`) OVER ( PARTITION BY `g`  )  AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `g` ,
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: median, op_class: g, example expression: x.median(), db: MySQLModel
+caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'OVER ( PARTITION BY `g`  )  AS `new_column`\n  FROM\n   `table_reference_0`\n )\nSEL' at line 18")
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `x` ,
+   `g`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'x.median()'}, partition_by=['g'])
+   `g` ,
+   `row_id` ,
+   MEDIAN(`x`) OVER ( PARTITION BY `g`  )  AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `g` ,
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: nunique, op_class: g, example expression: x.nunique(), db: MySQLModel
+caught: (pymysql.err.NotSupportedError) (1235, "This version of MySQL doesn't yet support '<window function>(DISTINCT ..)'")
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `x` ,
+   `g`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'x.nunique()'}, partition_by=['g'])
+   `g` ,
+   `row_id` ,
+   COUNT(DISTINCT (`x`)) OVER ( PARTITION BY `g`  )  AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `g` ,
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/tw8g)
+
+
+difference (w)
+op: _count, op_class: g, example expression: _count(), db: MySQLModel
+Pandas result (expectation):
+     g  row_id  new_column
+0    a       0           1
+1    a       1           2
+2    b       2           1
+3  ccc       3           1
+DB result:
+     g  row_id  new_column
+0    a       0         2.0
+1    a       1         2.0
+2    b       2         1.0
+3  ccc       3         1.0
+query
+-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `g`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': '_count()'}, partition_by=['g'])
+   `g` ,
+   `row_id` ,
+   SUM(1) OVER ( PARTITION BY `g`  )  AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `g` ,
+ `row_id`
+
+
+
+error (n)
+op: all, op_class: p, example expression: a.all(), db: MySQLModel
+caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.LOGICAL_AND does not exist')
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `g` ,
+   `a`
+  FROM
+   `d`
+ ) ,
+ `project_1` AS (
+  SELECT  -- .project({ 'new_column': 'a.all()'}, group_by=['g'])
+   LOGICAL_AND(`a`) AS `new_column` ,
+   `g`
+  FROM
+   `table_reference_0`
+  GROUP BY
+   `g`
+ )
+SELECT  -- .order_rows(['g'])
+ *
+FROM
+ `project_1`
+ORDER BY
+ `g`
+]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+
+
+error (n)
+op: any, op_class: p, example expression: a.any(), db: MySQLModel
+caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.LOGICAL_OR does not exist')
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `g` ,
+   `a`
+  FROM
+   `d`
+ ) ,
+ `project_1` AS (
+  SELECT  -- .project({ 'new_column': 'a.any()'}, group_by=['g'])
+   LOGICAL_OR(`a`) AS `new_column` ,
+   `g`
+  FROM
+   `table_reference_0`
+  GROUP BY
+   `g`
+ )
+SELECT  -- .order_rows(['g'])
+ *
+FROM
+ `project_1`
+ORDER BY
+ `g`
+]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+
+
+error (n)
+op: median, op_class: p, example expression: x.median(), db: MySQLModel
+caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.MEDIAN does not exist')
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `x` ,
+   `g`
+  FROM
+   `d`
+ ) ,
+ `project_1` AS (
+  SELECT  -- .project({ 'new_column': 'x.median()'}, group_by=['g'])
+   MEDIAN(`x`) AS `new_column` ,
+   `g`
+  FROM
+   `table_reference_0`
+  GROUP BY
+   `g`
+ )
+SELECT  -- .order_rows(['g'])
+ *
+FROM
+ `project_1`
+ORDER BY
+ `g`
+]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+
+
+error (n)
+op: bfill, op_class: w, example expression: z.bfill(), db: MySQLModel
+caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`\n  FROM\n   `table_r' at line 18")
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `z` ,
+   `g`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'z.bfill()'}, partition_by=['g'], order_by=['row_id'])
+   `g` ,
+   `row_id` ,
+   BFILL(`z`) OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `g` ,
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: ffill, op_class: w, example expression: z.ffill(), db: MySQLModel
+caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`\n  FROM\n   `table_r' at line 18")
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `z` ,
+   `g`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'z.ffill()'}, partition_by=['g'], order_by=['row_id'])
+   `g` ,
+   `row_id` ,
+   FFILL(`z`) OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `g` ,
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: last, op_class: w, example expression: x.last(), db: MySQLModel
+caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '(`x`) OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`\n  FROM\n   `t' at line 18")
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `x` ,
+   `g`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'x.last()'}, partition_by=['g'], order_by=['row_id'])
+   `g` ,
+   `row_id` ,
+   LAST(`x`) OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `g` ,
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: rank, op_class: w, example expression: x.rank(), db: MySQLModel
+caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '`x`) OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`\n  FROM\n   `ta' at line 18")
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `x` ,
+   `g`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'x.rank()'}, partition_by=['g'], order_by=['row_id'])
+   `g` ,
+   `row_id` ,
+   RANK(`x`) OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `g` ,
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: cumprod, op_class: w, example expression: x.cumprod(), db: MySQLModel
+caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`\n  FROM\n   `table_r' at line 18")
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `x` ,
+   `g`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'x.cumprod()'}, partition_by=['g'], order_by=['row_id'])
+   `g` ,
+   `row_id` ,
+   CUMPROD(`x`) OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `g` ,
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: cumcount, op_class: w, example expression: z.cumcount(), db: MySQLModel
+caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`\n  FROM\n   `table_r' at line 18")
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `z` ,
+   `g`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'z.cumcount()'}, partition_by=['g'], order_by=['row_id'])
+   `g` ,
+   `row_id` ,
+   CUMCOUNT(`z`) OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `g` ,
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: cummax, op_class: w, example expression: x.cummax(), db: MySQLModel
+caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`\n  FROM\n   `table_r' at line 18")
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `x` ,
+   `g`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'x.cummax()'}, partition_by=['g'], order_by=['row_id'])
+   `g` ,
+   `row_id` ,
+   CUMMAX(`x`) OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `g` ,
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+
+error (n)
+op: cummin, op_class: w, example expression: x.cummin(), db: MySQLModel
+caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`\n  FROM\n   `table_r' at line 18")
+[SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `x` ,
+   `g`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'x.cummin()'}, partition_by=['g'], order_by=['row_id'])
+   `g` ,
+   `row_id` ,
+   CUMMIN(`x`) OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `g` ,
+ `row_id`
+]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+

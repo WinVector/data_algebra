@@ -606,6 +606,8 @@ db_default_op_replacements = {
     "||": "OR",
     "!": "NOT",
     "~": "NOT",
+    "all": "LOGICAL_AND",
+    "any": "LOGICAL_OR",
     "_count": "COUNT",
     "_ngroup": "NGROUP",
     "_row_number": "ROW_NUMBER",
