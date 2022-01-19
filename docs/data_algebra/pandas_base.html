@@ -55,6 +55,12 @@
                                 <a class="function" href="#PandasModelBase.isnull">isnull</a>
                         </li>
                         <li>
+                                <a class="function" href="#PandasModelBase.isnan">isnan</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#PandasModelBase.isinf">isinf</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#PandasModelBase.bad_column_positions">bad_column_positions</a>
                         </li>
                         <li>
@@ -322,6 +328,8 @@
         <span class="s2">&quot;not&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_not</span><span class="p">,</span>
         <span class="s2">&quot;!&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_not</span><span class="p">,</span>
         <span class="s2">&quot;if_else&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">,</span>
+        <span class="s2">&quot;is_nan&quot;</span><span class="p">:</span> <span class="n">data_model</span><span class="o">.</span><span class="n">isnan</span><span class="p">,</span>
+        <span class="s2">&quot;is_inf&quot;</span><span class="p">:</span> <span class="n">data_model</span><span class="o">.</span><span class="n">isinf</span><span class="p">,</span>
         <span class="s2">&quot;is_null&quot;</span><span class="p">:</span> <span class="n">data_model</span><span class="o">.</span><span class="n">isnull</span><span class="p">,</span>
         <span class="s2">&quot;is_bad&quot;</span><span class="p">:</span> <span class="n">data_model</span><span class="o">.</span><span class="n">bad_column_positions</span><span class="p">,</span>
         <span class="s2">&quot;is_in&quot;</span><span class="p">:</span> <span class="n">_type_safe_is_in</span><span class="p">,</span>
@@ -470,12 +478,26 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">isnull</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">isnan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return vector indicating which entries are nan (vectorized).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">isinf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return vector indicating which entries are nan (vectorized).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">bad_column_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return vector indicating which entries are bad (null or nan) (vectorized).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">can_convert_col_to_numeric</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">isnull</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
             <span class="p">)</span>
@@ -1051,6 +1073,8 @@
         <span class="s2">&quot;not&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_not</span><span class="p">,</span>
         <span class="s2">&quot;!&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_not</span><span class="p">,</span>
         <span class="s2">&quot;if_else&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">,</span>
+        <span class="s2">&quot;is_nan&quot;</span><span class="p">:</span> <span class="n">data_model</span><span class="o">.</span><span class="n">isnan</span><span class="p">,</span>
+        <span class="s2">&quot;is_inf&quot;</span><span class="p">:</span> <span class="n">data_model</span><span class="o">.</span><span class="n">isinf</span><span class="p">,</span>
         <span class="s2">&quot;is_null&quot;</span><span class="p">:</span> <span class="n">data_model</span><span class="o">.</span><span class="n">isnull</span><span class="p">,</span>
         <span class="s2">&quot;is_bad&quot;</span><span class="p">:</span> <span class="n">data_model</span><span class="o">.</span><span class="n">bad_column_positions</span><span class="p">,</span>
         <span class="s2">&quot;is_in&quot;</span><span class="p">:</span> <span class="n">_type_safe_is_in</span><span class="p">,</span>
@@ -1216,12 +1240,26 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">isnull</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">isnan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return vector indicating which entries are nan (vectorized).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">isinf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return vector indicating which entries are nan (vectorized).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">bad_column_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return vector indicating which entries are bad (null or nan) (vectorized).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">can_convert_col_to_numeric</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">isnull</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
             <span class="p">)</span>
@@ -1934,6 +1972,56 @@
 
 
                             </div>
+                            <div id="PandasModelBase.isnan" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#PandasModelBase.isnan">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">isnan</span><span class="signature">(self, x)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">isnan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return vector indicating which entries are nan (vectorized).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Return vector indicating which entries are nan (vectorized).</p>
+</div>
+
+
+                            </div>
+                            <div id="PandasModelBase.isinf" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#PandasModelBase.isinf">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">isinf</span><span class="signature">(self, x)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">isinf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return vector indicating which entries are nan (vectorized).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Return vector indicating which entries are nan (vectorized).</p>
+</div>
+
+
+                            </div>
                             <div id="PandasModelBase.bad_column_positions" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#PandasModelBase.bad_column_positions">#&nbsp;&nbsp</a>
 
@@ -1949,7 +2037,7 @@
 <span class="sd">        Return vector indicating which entries are bad (null or nan) (vectorized).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">can_convert_col_to_numeric</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">isnull</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
             <span class="p">)</span>

@@ -244,6 +244,12 @@
                                 <a class="function" href="#Term.is_null">is_null</a>
                         </li>
                         <li>
+                                <a class="function" href="#Term.is_nan">is_nan</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Term.is_inf">is_inf</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#Term.is_bad">is_bad</a>
                         </li>
                         <li>
@@ -1270,6 +1276,18 @@
 <span class="sd">        Return which items are null (vectorized).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;is_null&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">is_nan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return which items are nan (vectorized).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;is_nan&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">is_inf</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return which items are inf (vectorized).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;is_inf&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">is_bad</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -2954,6 +2972,18 @@ str() method returns only the text for interoperability.</p>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;is_null&quot;</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">is_nan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return which items are nan (vectorized).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;is_nan&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">is_inf</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return which items are inf (vectorized).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;is_inf&quot;</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">is_bad</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return which items are bad (null or nan) (vectorized).</span>
@@ -4535,6 +4565,54 @@ str() method returns only the text for interoperability.</p>
 
 
                             </div>
+                            <div id="Term.is_nan" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Term.is_nan">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">is_nan</span><span class="signature">(self)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">is_nan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return which items are nan (vectorized).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;is_nan&quot;</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Return which items are nan (vectorized).</p>
+</div>
+
+
+                            </div>
+                            <div id="Term.is_inf" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Term.is_inf">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">is_inf</span><span class="signature">(self)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">is_inf</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return which items are inf (vectorized).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;is_inf&quot;</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Return which items are inf (vectorized).</p>
+</div>
+
+
+                            </div>
                             <div id="Term.is_bad" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#Term.is_bad">#&nbsp;&nbsp</a>
 
@@ -5548,6 +5626,8 @@ str() method returns only the text for interoperability.</p>
                 <dd id="Value.var" class="function"><a href="#Term.var">var</a></dd>
                 <dd id="Value.shift" class="function"><a href="#Term.shift">shift</a></dd>
                 <dd id="Value.is_null" class="function"><a href="#Term.is_null">is_null</a></dd>
+                <dd id="Value.is_nan" class="function"><a href="#Term.is_nan">is_nan</a></dd>
+                <dd id="Value.is_inf" class="function"><a href="#Term.is_inf">is_inf</a></dd>
                 <dd id="Value.is_bad" class="function"><a href="#Term.is_bad">is_bad</a></dd>
                 <dd id="Value.if_else" class="function"><a href="#Term.if_else">if_else</a></dd>
                 <dd id="Value.is_in" class="function"><a href="#Term.is_in">is_in</a></dd>
@@ -6520,6 +6600,8 @@ str() method returns only the text for interoperability.</p>
                 <dd id="ColumnReference.var" class="function"><a href="#Term.var">var</a></dd>
                 <dd id="ColumnReference.shift" class="function"><a href="#Term.shift">shift</a></dd>
                 <dd id="ColumnReference.is_null" class="function"><a href="#Term.is_null">is_null</a></dd>
+                <dd id="ColumnReference.is_nan" class="function"><a href="#Term.is_nan">is_nan</a></dd>
+                <dd id="ColumnReference.is_inf" class="function"><a href="#Term.is_inf">is_inf</a></dd>
                 <dd id="ColumnReference.is_bad" class="function"><a href="#Term.is_bad">is_bad</a></dd>
                 <dd id="ColumnReference.if_else" class="function"><a href="#Term.if_else">if_else</a></dd>
                 <dd id="ColumnReference.is_in" class="function"><a href="#Term.is_in">is_in</a></dd>
@@ -7143,6 +7225,8 @@ str() method returns only the text for interoperability.</p>
                 <dd id="Expression.var" class="function"><a href="#Term.var">var</a></dd>
                 <dd id="Expression.shift" class="function"><a href="#Term.shift">shift</a></dd>
                 <dd id="Expression.is_null" class="function"><a href="#Term.is_null">is_null</a></dd>
+                <dd id="Expression.is_nan" class="function"><a href="#Term.is_nan">is_nan</a></dd>
+                <dd id="Expression.is_inf" class="function"><a href="#Term.is_inf">is_inf</a></dd>
                 <dd id="Expression.is_bad" class="function"><a href="#Term.is_bad">is_bad</a></dd>
                 <dd id="Expression.if_else" class="function"><a href="#Term.if_else">if_else</a></dd>
                 <dd id="Expression.is_in" class="function"><a href="#Term.is_in">is_in</a></dd>

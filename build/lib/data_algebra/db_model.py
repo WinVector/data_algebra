@@ -161,6 +161,34 @@ def _db_is_null_expr(dbmodel, expression):
     )
 
 
+def _db_is_inf_expr(dbmodel, expression):
+    subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
+    return (
+        "("
+        + subexpr
+        + " >= "
+        + dbmodel.value_to_sql("+infinity")
+        + " OR "
+        + subexpr
+        + " <= "
+        + dbmodel.value_to_sql("-infinity")
+        + ")"
+    )
+
+
+def _db_is_nan_expr(dbmodel, expression):
+    subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
+    return (
+        "("
+        + subexpr
+        + " != 0 AND "
+        + subexpr
+        + " = -"
+        + subexpr
+        + ")"
+    )
+
+
 def _db_is_bad_expr(dbmodel, expression):
     subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
     return (
@@ -586,6 +614,8 @@ def _base_Sunday(dbmodel, expression):
 
 db_expr_formatters = {
     "shift": _db_lag_expr,
+    "is_inf": _db_is_inf_expr,
+    "is_nan": _db_is_nan_expr,
     "is_null": _db_is_null_expr,
     "is_bad": _db_is_bad_expr,
     "mean": _db_mean_expr,

@@ -774,6 +774,18 @@ class Term(PreTerm, abc.ABC):
         """
         return self.__uop_expr__("is_null")
 
+    def is_nan(self):
+        """
+        Return which items are nan (vectorized).
+        """
+        return self.__uop_expr__("is_nan")
+
+    def is_inf(self):
+        """
+        Return which items are inf (vectorized).
+        """
+        return self.__uop_expr__("is_inf")
+
     def is_bad(self):
         """
         Return which items are bad (null or nan) (vectorized).

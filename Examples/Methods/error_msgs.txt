@@ -31,6 +31,49 @@ ORDER BY
 
 
 difference (w)
+op: is_inf, op_class: e, example expression: y.is_inf(), db: SQLiteModel
+Pandas result (expectation):
+   row_id  new_column
+0       0       False
+1       1       False
+2       2       False
+3       3       False
+DB result:
+   row_id  new_column
+0       0           1
+1       1           1
+2       2           1
+3       3           1
+query
+-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "y"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'y.is_inf()'})
+   "row_id" ,
+   ("y" >= '+infinity' OR "y" <= '-infinity') AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "row_id"
+
+
+
+difference (w)
 op: datetime_to_date, op_class: e, example expression: datetime_col_0.datetime_to_date(), db: SQLiteModel
 Pandas result (expectation):
    row_id  new_column
@@ -939,7 +982,7 @@ error (n)
 op: arcsin, op_class: e, example expression: x.arcsin(), db: BigQueryModel
 caught: 400 Function not found: ARCSIN; Did you mean asin? at [16:4]
 
-(job ID: c22e2b15-a3af-4867-9da5-8ff91f3a5f9a)
+(job ID: 8abdfa6e-8e6d-4217-b7b6-cf90d6826b33)
 
                  -----Query Job SQL Follows-----                  
 
@@ -976,7 +1019,7 @@ error (n)
 op: arccos, op_class: e, example expression: x.arccos(), db: BigQueryModel
 caught: 400 Function not found: ARCCOS; Did you mean acos? at [16:4]
 
-(job ID: 7b7c297a-3067-4273-a8e9-009ccaada697)
+(job ID: b1d03c18-af9e-4e6b-9a08-5cdb26f30f21)
 
                  -----Query Job SQL Follows-----                  
 
@@ -1013,7 +1056,7 @@ error (n)
 op: arctan, op_class: e, example expression: x.arctan(), db: BigQueryModel
 caught: 400 Function not found: ARCTAN; Did you mean atan? at [16:4]
 
-(job ID: 5789eb30-6842-4486-a1ec-97b1c8f5631f)
+(job ID: 53deb16e-79ac-4109-aa0d-0032495bb04d)
 
                  -----Query Job SQL Follows-----                  
 
@@ -1050,7 +1093,7 @@ error (n)
 op: arctan2, op_class: e, example expression: x.arctan2(y), db: BigQueryModel
 caught: 400 Function not found: ARCTAN2; Did you mean atan2? at [17:4]
 
-(job ID: a5cc8374-ad01-4e4c-af73-b032e6499321)
+(job ID: 0520806a-1cd9-4038-ba94-42e4e64a97e1)
 
                  -----Query Job SQL Follows-----                  
 
@@ -1088,7 +1131,7 @@ error (n)
 op: arcsinh, op_class: e, example expression: x.arcsinh(), db: BigQueryModel
 caught: 400 Function not found: ARCSINH; Did you mean asinh? at [16:4]
 
-(job ID: ea29aa55-d2ec-4d8c-b655-36a2c06f85ab)
+(job ID: 38ffb5b6-0138-4d49-b65d-703b61abe887)
 
                  -----Query Job SQL Follows-----                  
 
@@ -1125,7 +1168,7 @@ error (n)
 op: arccosh, op_class: e, example expression: x.arccosh(), db: BigQueryModel
 caught: 400 Function not found: ARCCOSH; Did you mean acosh? at [16:4]
 
-(job ID: 08dd25e4-b6b5-4f11-adca-acfb48ee9628)
+(job ID: c6677384-469a-43d8-b675-cd2a55d29218)
 
                  -----Query Job SQL Follows-----                  
 
@@ -1162,7 +1205,7 @@ error (n)
 op: arctanh, op_class: e, example expression: x.arctanh(), db: BigQueryModel
 caught: 400 Function not found: ARCTANH; Did you mean atanh? at [16:4]
 
-(job ID: 7a4caa43-308a-4bec-aedc-d858956f2c93)
+(job ID: 1e030a35-93ae-4f0f-8402-e6d8765a018f)
 
                  -----Query Job SQL Follows-----                  
 
@@ -1199,7 +1242,7 @@ error (n)
 op: expm1, op_class: e, example expression: y.expm1(), db: BigQueryModel
 caught: 400 Function not found: EXPM1; Did you mean exp? at [16:4]
 
-(job ID: f8f4fff7-46d4-4ed1-9f08-fcb9f59a147f)
+(job ID: 309eb589-d216-443c-8397-517ee643db5b)
 
                  -----Query Job SQL Follows-----                  
 
@@ -1236,7 +1279,7 @@ error (n)
 op: log1p, op_class: e, example expression: x.log1p(), db: BigQueryModel
 caught: 400 Function not found: LOG1P; Did you mean log10? at [16:4]
 
-(job ID: 6b0fd1a3-6574-409b-b1df-9585b1db8769)
+(job ID: baa9402d-cfb0-479f-a091-4611e9fdd366)
 
                  -----Query Job SQL Follows-----                  
 
@@ -1270,10 +1313,47 @@ caught: 400 Function not found: LOG1P; Did you mean log10? at [16:4]
 
 
 error (n)
+op: is_inf, op_class: e, example expression: y.is_inf(), db: BigQueryModel
+caught: 400 No matching signature for operator >= for argument types: FLOAT64, STRING. Supported signature: ANY >= ANY at [16:5]
+
+(job ID: 0cd9ef53-aa0e-448b-907d-435cdfdb15f6)
+
+                 -----Query Job SQL Follows-----                  
+
+    |    .    |    .    |    .    |    .    |    .    |    .    |
+   1:-- data_algebra SQL https://github.com/WinVector/data_algebra
+   2:--  dialect: BigQueryModel
+   3:--       string quote: "
+   4:--   identifier quote: `
+   5:WITH
+   6: `table_reference_0` AS (
+   7:  SELECT
+   8:   `row_id` ,
+   9:   `y`
+  10:  FROM
+  11:   `data-algebra-test.test_1.d`
+  12: ) ,
+  13: `extend_1` AS (
+  14:  SELECT  -- .extend({ 'new_column': 'y.is_inf()'})
+  15:   `row_id` ,
+  16:   (`y` >= "+infinity" OR `y` <= "-infinity") AS `new_column`
+  17:  FROM
+  18:   `table_reference_0`
+  19: )
+  20:SELECT  -- .order_rows(['row_id'])
+  21: *
+  22:FROM
+  23: `extend_1`
+  24:ORDER BY
+  25: `row_id`
+    |    .    |    .    |    .    |    .    |    .    |    .    |
+
+
+error (n)
 op: _ngroup, op_class: g, example expression: _ngroup(), db: BigQueryModel
 caught: 400 Function not found: NGROUP at [17:4]
 
-(job ID: 57015036-2c08-4513-9583-f181f03b5b72)
+(job ID: 4697c113-9350-4efe-a200-7a5a89c30e4a)
 
                       -----Query Job SQL Follows-----                      
 
@@ -1357,7 +1437,7 @@ error (n)
 op: median, op_class: p, example expression: x.median(), db: BigQueryModel
 caught: 400 percentile_cont aggregate function is not supported.
 
-(job ID: 8ae3ebae-beb4-4ec9-bff1-f9a9c01c0058)
+(job ID: bc4bde74-1c25-41b3-b150-4e1b671c1ef1)
 
                      -----Query Job SQL Follows-----                     
 
@@ -1369,8 +1449,8 @@ caught: 400 percentile_cont aggregate function is not supported.
    5:WITH
    6: `table_reference_0` AS (
    7:  SELECT
-   8:   `x` ,
-   9:   `g`
+   8:   `g` ,
+   9:   `x`
   10:  FROM
   11:   `data-algebra-test.test_1.d`
   12: ) ,
@@ -1396,7 +1476,7 @@ error (n)
 op: bfill, op_class: w, example expression: z.bfill(), db: BigQueryModel
 caught: 400 Function not found: BFILL at [18:4]
 
-(job ID: 0b7feaa5-2146-40f4-81f4-f266f90f047e)
+(job ID: 6097850e-0523-40f0-a9bc-e597d9d72116)
 
                                 -----Query Job SQL Follows-----                                 
 
@@ -1436,7 +1516,7 @@ error (n)
 op: ffill, op_class: w, example expression: z.ffill(), db: BigQueryModel
 caught: 400 Function not found: FFILL at [18:4]
 
-(job ID: 925bca79-fd1d-41c6-ba60-4b6333a4068e)
+(job ID: fa4d16dd-b22c-4afc-a01b-7d97cdaa76ba)
 
                                 -----Query Job SQL Follows-----                                 
 
@@ -1476,7 +1556,7 @@ error (n)
 op: first, op_class: w, example expression: x.first(), db: BigQueryModel
 caught: 400 Function not found: FIRST at [18:4]
 
-(job ID: 3e34b693-cbdb-42d1-bb52-a78c7f6b0f19)
+(job ID: 845e6354-91e3-45e8-a5ae-fbff46df37bb)
 
                                 -----Query Job SQL Follows-----                                 
 
@@ -1516,7 +1596,7 @@ error (n)
 op: last, op_class: w, example expression: x.last(), db: BigQueryModel
 caught: 400 Function not found: LAST; Did you mean least? at [18:4]
 
-(job ID: c2d9d40e-3016-49a7-9503-ae84abfd42a8)
+(job ID: a519e7f4-8994-4cdb-84d2-99bcf6bf0033)
 
                                 -----Query Job SQL Follows-----                                
 
@@ -1556,7 +1636,7 @@ error (n)
 op: rank, op_class: w, example expression: x.rank(), db: BigQueryModel
 caught: 400 Number of arguments does not match for analytic function RANK. Supported signature: RANK() at [18:4]
 
-(job ID: b89925d6-5f60-4db3-bad3-c246dfc630b4)
+(job ID: 0c1db5ec-5aa8-4ce2-a068-b1cf250cdce1)
 
                                 -----Query Job SQL Follows-----                                
 
@@ -1596,7 +1676,7 @@ error (n)
 op: cumprod, op_class: w, example expression: x.cumprod(), db: BigQueryModel
 caught: 400 Function not found: CUMPROD at [18:4]
 
-(job ID: 1189455c-e0fc-4df1-b961-65b6a61c460c)
+(job ID: ad0bdd9e-3ce9-4f4d-9e7d-8c5de9e38766)
 
                                  -----Query Job SQL Follows-----                                  
 
@@ -1636,7 +1716,7 @@ error (n)
 op: cumcount, op_class: w, example expression: z.cumcount(), db: BigQueryModel
 caught: 400 Function not found: CUMCOUNT at [18:4]
 
-(job ID: ac9d177a-0950-477f-9e69-544082182f54)
+(job ID: 478df035-1c30-4dd1-8d28-a76bcd0703f0)
 
                                   -----Query Job SQL Follows-----                                  
 
@@ -1676,7 +1756,7 @@ error (n)
 op: cummax, op_class: w, example expression: x.cummax(), db: BigQueryModel
 caught: 400 Function not found: CUMMAX at [18:4]
 
-(job ID: 21491aaa-76b8-4c62-9884-0c179f3eb282)
+(job ID: 43be239a-1534-400e-871f-86a7cacdfaa7)
 
                                  -----Query Job SQL Follows-----                                 
 
@@ -1716,7 +1796,7 @@ error (n)
 op: cummin, op_class: w, example expression: x.cummin(), db: BigQueryModel
 caught: 400 Function not found: CUMMIN at [18:4]
 
-(job ID: 203488e3-a204-46d9-bba2-76c5d807c5f0)
+(job ID: a28d1767-be72-43f0-8f05-d7e21862609f)
 
                                  -----Query Job SQL Follows-----                                 
 
@@ -2487,8 +2567,8 @@ HINT:  No function matches the given name and argument types. You might need to 
 WITH
  "table_reference_0" AS (
   SELECT
-   "x" ,
-   "g"
+   "g" ,
+   "x"
   FROM
    "d"
  ) ,
@@ -3187,24 +3267,24 @@ error (n)
 op: nunique, op_class: g, example expression: x.nunique(), db: SparkSQLModel
 caught: Distinct window functions are not supported: count(distinct x#4) windowspecdefinition(g#7, specifiedwindowframe(RowFrame, unboundedpreceding$(), unboundedfollowing$()));
 WithCTE
-:- CTERelationDef 170
+:- CTERelationDef 174
 :  +- SubqueryAlias table_reference_0
 :     +- Project [row_id#0L, x#4, g#7]
 :        +- SubqueryAlias d
 :           +- View (`d`, [row_id#0L,a#1,b#2,q#3L,x#4,y#5,z#6,g#7,s2#8,str_datetime_col#9,str_date_col#10,datetime_col_0#11,datetime_col_1#12,date_col_0#13,date_col_1#14])
 :              +- LogicalRDD [row_id#0L, a#1, b#2, q#3L, x#4, y#5, z#6, g#7, s2#8, str_datetime_col#9, str_date_col#10, datetime_col_0#11, datetime_col_1#12, date_col_0#13, date_col_1#14], false
-:- CTERelationDef 171
+:- CTERelationDef 175
 :  +- SubqueryAlias extend_1
-:     +- Project [g#7, row_id#0L, new_column#292L]
-:        +- Project [g#7, row_id#0L, x#4, new_column#292L, new_column#292L]
-:           +- Window [count(distinct x#4) windowspecdefinition(g#7, specifiedwindowframe(RowFrame, unboundedpreceding$(), unboundedfollowing$())) AS new_column#292L], [g#7]
+:     +- Project [g#7, row_id#0L, new_column#298L]
+:        +- Project [g#7, row_id#0L, x#4, new_column#298L, new_column#298L]
+:           +- Window [count(distinct x#4) windowspecdefinition(g#7, specifiedwindowframe(RowFrame, unboundedpreceding$(), unboundedfollowing$())) AS new_column#298L], [g#7]
 :              +- Project [g#7, row_id#0L, x#4]
 :                 +- SubqueryAlias table_reference_0
-:                    +- CTERelationRef 170, true, [row_id#0L, x#4, g#7]
+:                    +- CTERelationRef 174, true, [row_id#0L, x#4, g#7]
 +- Sort [g#7 ASC NULLS FIRST, row_id#0L ASC NULLS FIRST], true
-   +- Project [g#7, row_id#0L, new_column#292L]
+   +- Project [g#7, row_id#0L, new_column#298L]
       +- SubqueryAlias extend_1
-         +- CTERelationRef 171, true, [g#7, row_id#0L, new_column#292L]
+         +- CTERelationRef 175, true, [g#7, row_id#0L, new_column#298L]
 
 
 
@@ -3324,8 +3404,8 @@ query
 WITH
  `table_reference_0` AS (
   SELECT
-   `z` ,
-   `g`
+   `g` ,
+   `z`
   FROM
    `d`
  ) ,
@@ -3808,6 +3888,49 @@ ORDER BY
 (Background on this error at: https://sqlalche.me/e/14/e3q8)
 
 
+difference (w)
+op: is_inf, op_class: e, example expression: y.is_inf(), db: MySQLModel
+Pandas result (expectation):
+   row_id  new_column
+0       0       False
+1       1       False
+2       2       False
+3       3       False
+DB result:
+   row_id  new_column
+0       0           1
+1       1           1
+2       2           1
+3       3           1
+query
+-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: MySQLModel
+--       string quote: '
+--   identifier quote: `
+WITH
+ `table_reference_0` AS (
+  SELECT
+   `row_id` ,
+   `y`
+  FROM
+   `d`
+ ) ,
+ `extend_1` AS (
+  SELECT  -- .extend({ 'new_column': 'y.is_inf()'})
+   `row_id` ,
+   (`y` >= '+infinity' OR `y` <= '-infinity') AS `new_column`
+  FROM
+   `table_reference_0`
+ )
+SELECT  -- .order_rows(['row_id'])
+ *
+FROM
+ `extend_1`
+ORDER BY
+ `row_id`
+
+
+
 error (n)
 op: as_int64, op_class: e, example expression: y.as_int64(), db: MySQLModel
 caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'INT64) AS `new_column`\n  FROM\n   `table_reference_0`\n )\nSELECT  -- .order_rows([' at line 16")
@@ -4181,8 +4304,8 @@ caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.MEDIAN does not e
 WITH
  `table_reference_0` AS (
   SELECT
-   `x` ,
-   `g`
+   `g` ,
+   `x`
   FROM
    `d`
  ) ,

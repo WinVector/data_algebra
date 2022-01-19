@@ -194,6 +194,8 @@ def populate_impl_map(data_model) -> Dict[str, Callable]:
         "not": numpy.logical_not,
         "!": numpy.logical_not,
         "if_else": numpy.where,
+        "is_nan": data_model.isnan,
+        "is_inf": data_model.isinf,
         "is_null": data_model.isnull,
         "is_bad": data_model.bad_column_positions,
         "is_in": _type_safe_is_in,
@@ -342,12 +344,26 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         """
         return self.pd.isnull(x)
 
+    def isnan(self, x):
+        """
+        Return vector indicating which entries are nan (vectorized).
+        """
+        x = numpy.asarray(x + 0.0, dtype=float)
+        return numpy.isnan(x)
+
+    def isinf(self, x):
+        """
+        Return vector indicating which entries are nan (vectorized).
+        """
+        x = numpy.asarray(x + 0.0, dtype=float)
+        return numpy.isinf(x)
+
     def bad_column_positions(self, x):
         """
         Return vector indicating which entries are bad (null or nan) (vectorized).
         """
         if self.can_convert_col_to_numeric(x):
-            x = numpy.asarray(x + 0, dtype=float)
+            x = numpy.asarray(x + 0.0, dtype=float)
             return numpy.logical_or(
                 self.pd.isnull(x), numpy.logical_or(numpy.isnan(x), numpy.isinf(x))
             )
