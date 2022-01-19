@@ -216,3 +216,56 @@ def xicor_score_variables_plan(
             .order_rows(['variable_name'])
     )
     return grouped_calc, 'rep_frame', rep_frame
+
+
+def last_observed_carried_forward(
+        d: ViewRepresentation,
+        *,
+        order_by: Iterable[str],
+        partition_by: Optional[Iterable[str]] = None,
+        value_column_name: str,
+        selection_predicate: str = '.is_null()',
+        locf_to_use_column_name: str = 'locf_to_use',
+        locf_non_null_rank_column_name: str = 'locf_non_null_rank',
+):
+    """
+    Copy last observed non-null value in column value_column_name forward using order order_by and
+    optional partition_by partition.
+
+    :param d: ViewRepresentation representation of data to transform.
+    :param order_by: columns to order by
+    :param partition_by: optional partitioning column
+    :param value_column_name: column to alter
+    :param selection_predicate: expression to choose values to skip
+    :param locf_to_use_column_name: name for a temporary values column
+    :param locf_non_null_rank_column_name: name for a temporary values column
+    """
+    assert isinstance(locf_to_use_column_name, str)
+    assert isinstance(locf_non_null_rank_column_name, str)
+    cols = [locf_to_use_column_name, locf_non_null_rank_column_name] + list(d.column_names)
+    assert len(cols) == len(set(cols))
+    assert not isinstance(order_by, str)
+    order_by = list(order_by)
+    if partition_by is None:
+        partition_by = []
+    else:
+        assert not isinstance(partition_by, str)
+        partition_by = list(partition_by)
+    d_marked = (
+        d
+            .extend({locf_to_use_column_name: f'{value_column_name}.{selection_predicate}.if_else(0, 1)'})
+            .extend({locf_non_null_rank_column_name: f'{locf_to_use_column_name}.cumsum()'},
+                    order_by=order_by,
+                    partition_by=partition_by)
+    )
+    ops = (
+        d_marked
+            .natural_join(
+                b=d_marked
+                    .select_rows(f'{locf_to_use_column_name} == 1')
+                    .select_columns(partition_by + [locf_non_null_rank_column_name, value_column_name]),
+                by=partition_by + [locf_non_null_rank_column_name],
+                jointype='left')
+            .drop_columns([locf_to_use_column_name, locf_non_null_rank_column_name])
+    )
+    return ops
