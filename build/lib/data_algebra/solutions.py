@@ -136,7 +136,7 @@ def xicor_query(
                 {"r": "(1).cumsum()"}, order_by=[y_name], partition_by=var_keys)
             .extend(  # compute reverse y ranks, used to normalize for ties in denominator
                 {"l": "(1).cumsum()"}, order_by=[y_name], reverse=[y_name], partition_by=var_keys)
-            .extend(  # go to max rank of group tie breaking
+            .extend(  # go to max rank of group tie breaking, also why we don't need tiebreaker in cumsums
                 {"l": "l.max()", "r": "r.max()"}, partition_by=[y_group] + var_keys)
             .extend(  # get y rank and y rank of next x-item into same row so we can take a difference
                 {"rplus": "r.shift(1)"},
@@ -216,3 +216,107 @@ def xicor_score_variables_plan(
             .order_rows(['variable_name'])
     )
     return grouped_calc, 'rep_frame', rep_frame
+
+
+def last_observed_carried_forward(
+        d: ViewRepresentation,
+        *,
+        order_by: Iterable[str],
+        partition_by: Optional[Iterable[str]] = None,
+        value_column_name: str,
+        selection_predicate: str = '.is_null()',
+        locf_to_use_column_name: str = 'locf_to_use',
+        locf_non_null_rank_column_name: str = 'locf_non_null_rank',
+        locf_tiebreaker_column_name: str = 'locf_tiebreaker',
+):
+    """
+    Copy last observed non-null value in column value_column_name forward using order order_by and
+    optional partition_by partition.
+
+    :param d: ViewRepresentation representation of data to transform.
+    :param order_by: columns to order by
+    :param partition_by: optional partitioning column
+    :param value_column_name: column to alter
+    :param selection_predicate: expression to choose values to skip
+    :param locf_to_use_column_name: name for a temporary values column
+    :param locf_non_null_rank_column_name: name for a temporary values column
+    :param locf_tiebreaker_column_name: name for a temporary values column
+    """
+    assert isinstance(d, ViewRepresentation)
+    assert isinstance(locf_to_use_column_name, str)
+    assert isinstance(locf_non_null_rank_column_name, str)
+    cols = [locf_to_use_column_name, locf_non_null_rank_column_name, locf_tiebreaker_column_name] + list(d.column_names)
+    assert len(cols) == len(set(cols))
+    assert not isinstance(order_by, str)
+    order_by = list(order_by)
+    if partition_by is None:
+        partition_by = []
+    else:
+        assert not isinstance(partition_by, str)
+        partition_by = list(partition_by)
+    d_marked = (
+        d
+            .extend({locf_to_use_column_name: f'{value_column_name}.{selection_predicate}.if_else(0, 1)'})
+            .extend({locf_tiebreaker_column_name: '_row_number()'}, order_by=partition_by + order_by)
+            .extend({locf_non_null_rank_column_name: f'{locf_to_use_column_name}.cumsum()'},
+                    order_by=order_by + [locf_tiebreaker_column_name],
+                    partition_by=partition_by)
+    )
+    ops = (
+        d_marked
+            .natural_join(
+                b=d_marked
+                    .select_rows(f'{locf_to_use_column_name} == 1')
+                    .select_columns(partition_by + [locf_non_null_rank_column_name, value_column_name]),
+                by=partition_by + [locf_non_null_rank_column_name],
+                jointype='left')
+            .drop_columns([locf_to_use_column_name, locf_non_null_rank_column_name, locf_tiebreaker_column_name])
+    )
+    return ops
+
+
+def rank_to_average(
+        d: ViewRepresentation,
+        *,
+        order_by: Iterable[str],
+        partition_by: Optional[Iterable[str]] = None,
+        rank_column_name: str,
+        tie_breaker_column_name: str = 'rank_tie_breaker',
+):
+    """
+    Compute rank where the rank of each item is the average of all items with same order
+    position. That is rank_to_average([1, 1, 2]) = [1.5, 1.5, 3].
+
+    :param d: ViewRepresentation representation of data to transform.
+    :param order_by: columns to order by
+    :param partition_by: optional partitioning column
+    :param rank_column_name: column to land ranks in
+    :param tie_breaker_column_name: temp column
+    """
+    assert isinstance(d, ViewRepresentation)
+    assert not isinstance(order_by, str)
+    order_by = list(order_by)
+    if partition_by is None:
+        partition_by = []
+    else:
+        assert not isinstance(partition_by, str)
+        partition_by = list(partition_by)
+    cols = [rank_column_name, tie_breaker_column_name] + list(d.column_names)
+    assert len(cols) == len(set(cols))
+    ops = (
+        d  # database sum() is constant per group when partitioned, so cumsum fails without tiebreaker
+            .extend({tie_breaker_column_name: '_row_number()'}, order_by=order_by)
+            .extend(
+                {
+                    rank_column_name: '(1.0).cumsum()',
+                },
+                order_by=order_by + [tie_breaker_column_name],
+                partition_by=partition_by)
+            .extend(
+                {
+                    rank_column_name: f'{rank_column_name}.mean()',
+                },
+                partition_by=partition_by + order_by)
+            .drop_columns([tie_breaker_column_name])
+    )
+    return ops

@@ -39,6 +39,12 @@
             <li>
                     <a class="function" href="#xicor_score_variables_plan">xicor_score_variables_plan</a>
             </li>
+            <li>
+                    <a class="function" href="#last_observed_carried_forward">last_observed_carried_forward</a>
+            </li>
+            <li>
+                    <a class="function" href="#rank_to_average">rank_to_average</a>
+            </li>
     </ul>
 
 
@@ -197,7 +203,7 @@
                 <span class="p">{</span><span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="s2">&quot;(1).cumsum()&quot;</span><span class="p">},</span> <span class="n">order_by</span><span class="o">=</span><span class="p">[</span><span class="n">y_name</span><span class="p">],</span> <span class="n">partition_by</span><span class="o">=</span><span class="n">var_keys</span><span class="p">)</span>
             <span class="o">.</span><span class="n">extend</span><span class="p">(</span>  <span class="c1"># compute reverse y ranks, used to normalize for ties in denominator</span>
                 <span class="p">{</span><span class="s2">&quot;l&quot;</span><span class="p">:</span> <span class="s2">&quot;(1).cumsum()&quot;</span><span class="p">},</span> <span class="n">order_by</span><span class="o">=</span><span class="p">[</span><span class="n">y_name</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="p">[</span><span class="n">y_name</span><span class="p">],</span> <span class="n">partition_by</span><span class="o">=</span><span class="n">var_keys</span><span class="p">)</span>
-            <span class="o">.</span><span class="n">extend</span><span class="p">(</span>  <span class="c1"># go to max rank of group tie breaking</span>
+            <span class="o">.</span><span class="n">extend</span><span class="p">(</span>  <span class="c1"># go to max rank of group tie breaking, also why we don&#39;t need tiebreaker in cumsums</span>
                 <span class="p">{</span><span class="s2">&quot;l&quot;</span><span class="p">:</span> <span class="s2">&quot;l.max()&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="s2">&quot;r.max()&quot;</span><span class="p">},</span> <span class="n">partition_by</span><span class="o">=</span><span class="p">[</span><span class="n">y_group</span><span class="p">]</span> <span class="o">+</span> <span class="n">var_keys</span><span class="p">)</span>
             <span class="o">.</span><span class="n">extend</span><span class="p">(</span>  <span class="c1"># get y rank and y rank of next x-item into same row so we can take a difference</span>
                 <span class="p">{</span><span class="s2">&quot;rplus&quot;</span><span class="p">:</span> <span class="s2">&quot;r.shift(1)&quot;</span><span class="p">},</span>
@@ -277,6 +283,110 @@
             <span class="o">.</span><span class="n">order_rows</span><span class="p">([</span><span class="s1">&#39;variable_name&#39;</span><span class="p">])</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">grouped_calc</span><span class="p">,</span> <span class="s1">&#39;rep_frame&#39;</span><span class="p">,</span> <span class="n">rep_frame</span>
+
+
+<span class="k">def</span> <span class="nf">last_observed_carried_forward</span><span class="p">(</span>
+        <span class="n">d</span><span class="p">:</span> <span class="n">ViewRepresentation</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">order_by</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">partition_by</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">value_column_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">selection_predicate</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;.is_null()&#39;</span><span class="p">,</span>
+        <span class="n">locf_to_use_column_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;locf_to_use&#39;</span><span class="p">,</span>
+        <span class="n">locf_non_null_rank_column_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;locf_non_null_rank&#39;</span><span class="p">,</span>
+        <span class="n">locf_tiebreaker_column_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;locf_tiebreaker&#39;</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Copy last observed non-null value in column value_column_name forward using order order_by and</span>
+<span class="sd">    optional partition_by partition.</span>
+
+<span class="sd">    :param d: ViewRepresentation representation of data to transform.</span>
+<span class="sd">    :param order_by: columns to order by</span>
+<span class="sd">    :param partition_by: optional partitioning column</span>
+<span class="sd">    :param value_column_name: column to alter</span>
+<span class="sd">    :param selection_predicate: expression to choose values to skip</span>
+<span class="sd">    :param locf_to_use_column_name: name for a temporary values column</span>
+<span class="sd">    :param locf_non_null_rank_column_name: name for a temporary values column</span>
+<span class="sd">    :param locf_tiebreaker_column_name: name for a temporary values column</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">ViewRepresentation</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">locf_to_use_column_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">locf_non_null_rank_column_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">locf_to_use_column_name</span><span class="p">,</span> <span class="n">locf_non_null_rank_column_name</span><span class="p">,</span> <span class="n">locf_tiebreaker_column_name</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">cols</span><span class="p">))</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">order_by</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="n">order_by</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">order_by</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">partition_by</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">partition_by</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">partition_by</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="n">partition_by</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">partition_by</span><span class="p">)</span>
+    <span class="n">d_marked</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">d</span>
+            <span class="o">.</span><span class="n">extend</span><span class="p">({</span><span class="n">locf_to_use_column_name</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">value_column_name</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">selection_predicate</span><span class="si">}</span><span class="s1">.if_else(0, 1)&#39;</span><span class="p">})</span>
+            <span class="o">.</span><span class="n">extend</span><span class="p">({</span><span class="n">locf_tiebreaker_column_name</span><span class="p">:</span> <span class="s1">&#39;_row_number()&#39;</span><span class="p">},</span> <span class="n">order_by</span><span class="o">=</span><span class="n">partition_by</span> <span class="o">+</span> <span class="n">order_by</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">extend</span><span class="p">({</span><span class="n">locf_non_null_rank_column_name</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">locf_to_use_column_name</span><span class="si">}</span><span class="s1">.cumsum()&#39;</span><span class="p">},</span>
+                    <span class="n">order_by</span><span class="o">=</span><span class="n">order_by</span> <span class="o">+</span> <span class="p">[</span><span class="n">locf_tiebreaker_column_name</span><span class="p">],</span>
+                    <span class="n">partition_by</span><span class="o">=</span><span class="n">partition_by</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">ops</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">d_marked</span>
+            <span class="o">.</span><span class="n">natural_join</span><span class="p">(</span>
+                <span class="n">b</span><span class="o">=</span><span class="n">d_marked</span>
+                    <span class="o">.</span><span class="n">select_rows</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">locf_to_use_column_name</span><span class="si">}</span><span class="s1"> == 1&#39;</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">select_columns</span><span class="p">(</span><span class="n">partition_by</span> <span class="o">+</span> <span class="p">[</span><span class="n">locf_non_null_rank_column_name</span><span class="p">,</span> <span class="n">value_column_name</span><span class="p">]),</span>
+                <span class="n">by</span><span class="o">=</span><span class="n">partition_by</span> <span class="o">+</span> <span class="p">[</span><span class="n">locf_non_null_rank_column_name</span><span class="p">],</span>
+                <span class="n">jointype</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">drop_columns</span><span class="p">([</span><span class="n">locf_to_use_column_name</span><span class="p">,</span> <span class="n">locf_non_null_rank_column_name</span><span class="p">,</span> <span class="n">locf_tiebreaker_column_name</span><span class="p">])</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">ops</span>
+
+
+<span class="k">def</span> <span class="nf">rank_to_average</span><span class="p">(</span>
+        <span class="n">d</span><span class="p">:</span> <span class="n">ViewRepresentation</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">order_by</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">partition_by</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">rank_column_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">tie_breaker_column_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;rank_tie_breaker&#39;</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute rank where the rank of each item is the average of all items with same order</span>
+<span class="sd">    position. That is rank_to_average([1, 1, 2]) = [1.5, 1.5, 3].</span>
+
+<span class="sd">    :param d: ViewRepresentation representation of data to transform.</span>
+<span class="sd">    :param order_by: columns to order by</span>
+<span class="sd">    :param partition_by: optional partitioning column</span>
+<span class="sd">    :param rank_column_name: column to land ranks in</span>
+<span class="sd">    :param tie_breaker_column_name: temp column</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">ViewRepresentation</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">order_by</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="n">order_by</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">order_by</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">partition_by</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">partition_by</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">partition_by</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="n">partition_by</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">partition_by</span><span class="p">)</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">rank_column_name</span><span class="p">,</span> <span class="n">tie_breaker_column_name</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">cols</span><span class="p">))</span>
+    <span class="n">ops</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">d</span>  <span class="c1"># database sum() is constant per group when partitioned, so cumsum fails without tiebreaker</span>
+            <span class="o">.</span><span class="n">extend</span><span class="p">({</span><span class="n">tie_breaker_column_name</span><span class="p">:</span> <span class="s1">&#39;_row_number()&#39;</span><span class="p">},</span> <span class="n">order_by</span><span class="o">=</span><span class="n">order_by</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="n">rank_column_name</span><span class="p">:</span> <span class="s1">&#39;(1.0).cumsum()&#39;</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="n">order_by</span><span class="o">=</span><span class="n">order_by</span> <span class="o">+</span> <span class="p">[</span><span class="n">tie_breaker_column_name</span><span class="p">],</span>
+                <span class="n">partition_by</span><span class="o">=</span><span class="n">partition_by</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="n">rank_column_name</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">rank_column_name</span><span class="si">}</span><span class="s1">.mean()&#39;</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="n">partition_by</span><span class="o">=</span><span class="n">partition_by</span> <span class="o">+</span> <span class="n">order_by</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">drop_columns</span><span class="p">([</span><span class="n">tie_breaker_column_name</span><span class="p">])</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">ops</span>
 </pre></div>
 
         </details>
@@ -463,7 +573,7 @@ d should be uniquely keyed by row_keys, and mapping table should be uniquely key
                 <span class="p">{</span><span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="s2">&quot;(1).cumsum()&quot;</span><span class="p">},</span> <span class="n">order_by</span><span class="o">=</span><span class="p">[</span><span class="n">y_name</span><span class="p">],</span> <span class="n">partition_by</span><span class="o">=</span><span class="n">var_keys</span><span class="p">)</span>
             <span class="o">.</span><span class="n">extend</span><span class="p">(</span>  <span class="c1"># compute reverse y ranks, used to normalize for ties in denominator</span>
                 <span class="p">{</span><span class="s2">&quot;l&quot;</span><span class="p">:</span> <span class="s2">&quot;(1).cumsum()&quot;</span><span class="p">},</span> <span class="n">order_by</span><span class="o">=</span><span class="p">[</span><span class="n">y_name</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="p">[</span><span class="n">y_name</span><span class="p">],</span> <span class="n">partition_by</span><span class="o">=</span><span class="n">var_keys</span><span class="p">)</span>
-            <span class="o">.</span><span class="n">extend</span><span class="p">(</span>  <span class="c1"># go to max rank of group tie breaking</span>
+            <span class="o">.</span><span class="n">extend</span><span class="p">(</span>  <span class="c1"># go to max rank of group tie breaking, also why we don&#39;t need tiebreaker in cumsums</span>
                 <span class="p">{</span><span class="s2">&quot;l&quot;</span><span class="p">:</span> <span class="s2">&quot;l.max()&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="s2">&quot;r.max()&quot;</span><span class="p">},</span> <span class="n">partition_by</span><span class="o">=</span><span class="p">[</span><span class="n">y_group</span><span class="p">]</span> <span class="o">+</span> <span class="n">var_keys</span><span class="p">)</span>
             <span class="o">.</span><span class="n">extend</span><span class="p">(</span>  <span class="c1"># get y rank and y rank of next x-item into same row so we can take a difference</span>
                 <span class="p">{</span><span class="s2">&quot;rplus&quot;</span><span class="p">:</span> <span class="s2">&quot;r.shift(1)&quot;</span><span class="p">},</span>
@@ -588,6 +698,178 @@ the l-th Y item.</p>
 :param y_name: name of dependent variable
 :param n_rep: number of times to repeat calculation
 :return: group_calc_ops, rep_frame_name, rep_frame</p>
+</div>
+
+
+                </section>
+                <section id="last_observed_carried_forward">
+                            <div class="attr function"><a class="headerlink" href="#last_observed_carried_forward">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">last_observed_carried_forward</span><span class="signature">(
+    d: <a href="data_ops.html#ViewRepresentation">data_algebra.data_ops.ViewRepresentation</a>,
+    *,
+    order_by: Iterable[str],
+    partition_by: Optional[Iterable[str]] = None,
+    value_column_name: str,
+    selection_predicate: str = &#39;.is_null()&#39;,
+    locf_to_use_column_name: str = &#39;locf_to_use&#39;,
+    locf_non_null_rank_column_name: str = &#39;locf_non_null_rank&#39;,
+    locf_tiebreaker_column_name: str = &#39;locf_tiebreaker&#39;
+)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">last_observed_carried_forward</span><span class="p">(</span>
+        <span class="n">d</span><span class="p">:</span> <span class="n">ViewRepresentation</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">order_by</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">partition_by</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">value_column_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">selection_predicate</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;.is_null()&#39;</span><span class="p">,</span>
+        <span class="n">locf_to_use_column_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;locf_to_use&#39;</span><span class="p">,</span>
+        <span class="n">locf_non_null_rank_column_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;locf_non_null_rank&#39;</span><span class="p">,</span>
+        <span class="n">locf_tiebreaker_column_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;locf_tiebreaker&#39;</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Copy last observed non-null value in column value_column_name forward using order order_by and</span>
+<span class="sd">    optional partition_by partition.</span>
+
+<span class="sd">    :param d: ViewRepresentation representation of data to transform.</span>
+<span class="sd">    :param order_by: columns to order by</span>
+<span class="sd">    :param partition_by: optional partitioning column</span>
+<span class="sd">    :param value_column_name: column to alter</span>
+<span class="sd">    :param selection_predicate: expression to choose values to skip</span>
+<span class="sd">    :param locf_to_use_column_name: name for a temporary values column</span>
+<span class="sd">    :param locf_non_null_rank_column_name: name for a temporary values column</span>
+<span class="sd">    :param locf_tiebreaker_column_name: name for a temporary values column</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">ViewRepresentation</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">locf_to_use_column_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">locf_non_null_rank_column_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">locf_to_use_column_name</span><span class="p">,</span> <span class="n">locf_non_null_rank_column_name</span><span class="p">,</span> <span class="n">locf_tiebreaker_column_name</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">cols</span><span class="p">))</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">order_by</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="n">order_by</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">order_by</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">partition_by</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">partition_by</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">partition_by</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="n">partition_by</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">partition_by</span><span class="p">)</span>
+    <span class="n">d_marked</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">d</span>
+            <span class="o">.</span><span class="n">extend</span><span class="p">({</span><span class="n">locf_to_use_column_name</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">value_column_name</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">selection_predicate</span><span class="si">}</span><span class="s1">.if_else(0, 1)&#39;</span><span class="p">})</span>
+            <span class="o">.</span><span class="n">extend</span><span class="p">({</span><span class="n">locf_tiebreaker_column_name</span><span class="p">:</span> <span class="s1">&#39;_row_number()&#39;</span><span class="p">},</span> <span class="n">order_by</span><span class="o">=</span><span class="n">partition_by</span> <span class="o">+</span> <span class="n">order_by</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">extend</span><span class="p">({</span><span class="n">locf_non_null_rank_column_name</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">locf_to_use_column_name</span><span class="si">}</span><span class="s1">.cumsum()&#39;</span><span class="p">},</span>
+                    <span class="n">order_by</span><span class="o">=</span><span class="n">order_by</span> <span class="o">+</span> <span class="p">[</span><span class="n">locf_tiebreaker_column_name</span><span class="p">],</span>
+                    <span class="n">partition_by</span><span class="o">=</span><span class="n">partition_by</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">ops</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">d_marked</span>
+            <span class="o">.</span><span class="n">natural_join</span><span class="p">(</span>
+                <span class="n">b</span><span class="o">=</span><span class="n">d_marked</span>
+                    <span class="o">.</span><span class="n">select_rows</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">locf_to_use_column_name</span><span class="si">}</span><span class="s1"> == 1&#39;</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">select_columns</span><span class="p">(</span><span class="n">partition_by</span> <span class="o">+</span> <span class="p">[</span><span class="n">locf_non_null_rank_column_name</span><span class="p">,</span> <span class="n">value_column_name</span><span class="p">]),</span>
+                <span class="n">by</span><span class="o">=</span><span class="n">partition_by</span> <span class="o">+</span> <span class="p">[</span><span class="n">locf_non_null_rank_column_name</span><span class="p">],</span>
+                <span class="n">jointype</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">drop_columns</span><span class="p">([</span><span class="n">locf_to_use_column_name</span><span class="p">,</span> <span class="n">locf_non_null_rank_column_name</span><span class="p">,</span> <span class="n">locf_tiebreaker_column_name</span><span class="p">])</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">ops</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Copy last observed non-null value in column value_column_name forward using order order_by and
+optional partition_by partition.</p>
+
+<p>:param d: ViewRepresentation representation of data to transform.
+:param order_by: columns to order by
+:param partition_by: optional partitioning column
+:param value_column_name: column to alter
+:param selection_predicate: expression to choose values to skip
+:param locf_to_use_column_name: name for a temporary values column
+:param locf_non_null_rank_column_name: name for a temporary values column
+:param locf_tiebreaker_column_name: name for a temporary values column</p>
+</div>
+
+
+                </section>
+                <section id="rank_to_average">
+                            <div class="attr function"><a class="headerlink" href="#rank_to_average">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">rank_to_average</span><span class="signature">(
+    d: <a href="data_ops.html#ViewRepresentation">data_algebra.data_ops.ViewRepresentation</a>,
+    *,
+    order_by: Iterable[str],
+    partition_by: Optional[Iterable[str]] = None,
+    rank_column_name: str,
+    tie_breaker_column_name: str = &#39;rank_tie_breaker&#39;
+)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">rank_to_average</span><span class="p">(</span>
+        <span class="n">d</span><span class="p">:</span> <span class="n">ViewRepresentation</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">order_by</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">partition_by</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">rank_column_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">tie_breaker_column_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;rank_tie_breaker&#39;</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute rank where the rank of each item is the average of all items with same order</span>
+<span class="sd">    position. That is rank_to_average([1, 1, 2]) = [1.5, 1.5, 3].</span>
+
+<span class="sd">    :param d: ViewRepresentation representation of data to transform.</span>
+<span class="sd">    :param order_by: columns to order by</span>
+<span class="sd">    :param partition_by: optional partitioning column</span>
+<span class="sd">    :param rank_column_name: column to land ranks in</span>
+<span class="sd">    :param tie_breaker_column_name: temp column</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">ViewRepresentation</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">order_by</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="n">order_by</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">order_by</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">partition_by</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">partition_by</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">partition_by</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="n">partition_by</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">partition_by</span><span class="p">)</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">rank_column_name</span><span class="p">,</span> <span class="n">tie_breaker_column_name</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">cols</span><span class="p">))</span>
+    <span class="n">ops</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">d</span>  <span class="c1"># database sum() is constant per group when partitioned, so cumsum fails without tiebreaker</span>
+            <span class="o">.</span><span class="n">extend</span><span class="p">({</span><span class="n">tie_breaker_column_name</span><span class="p">:</span> <span class="s1">&#39;_row_number()&#39;</span><span class="p">},</span> <span class="n">order_by</span><span class="o">=</span><span class="n">order_by</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="n">rank_column_name</span><span class="p">:</span> <span class="s1">&#39;(1.0).cumsum()&#39;</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="n">order_by</span><span class="o">=</span><span class="n">order_by</span> <span class="o">+</span> <span class="p">[</span><span class="n">tie_breaker_column_name</span><span class="p">],</span>
+                <span class="n">partition_by</span><span class="o">=</span><span class="n">partition_by</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="n">rank_column_name</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">rank_column_name</span><span class="si">}</span><span class="s1">.mean()&#39;</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="n">partition_by</span><span class="o">=</span><span class="n">partition_by</span> <span class="o">+</span> <span class="n">order_by</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">drop_columns</span><span class="p">([</span><span class="n">tie_breaker_column_name</span><span class="p">])</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">ops</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Compute rank where the rank of each item is the average of all items with same order
+position. That is rank_to_average([1, 1, 2]) = [1.5, 1.5, 3].</p>
+
+<p>:param d: ViewRepresentation representation of data to transform.
+:param order_by: columns to order by
+:param partition_by: optional partitioning column
+:param rank_column_name: column to land ranks in
+:param tie_breaker_column_name: temp column</p>
 </div>
 
 

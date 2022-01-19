@@ -72,6 +72,8 @@ fn_names_that_imply_windowed_situation = {
     "ohlc",
     "pct_change",
     "rank",
+    "_row_number",
+    "row_number",
     "shift",
     "size",
     "std",
@@ -94,6 +96,8 @@ fn_names_that_imply_ordered_windowed_situation = {
     "shift",
     "lag",
     "lead",
+    "_row_number",
+    "row_number",
 }
 
 
@@ -101,7 +105,7 @@ fn_names_that_imply_ordered_windowed_situation = {
 fn_names_not_allowed_in_project = {
     "ngroup",
     "_ngroup",
-}
+}.union(fn_names_that_imply_ordered_windowed_situation)
 
 
 # fns that don't have consistent windowed implementations we want to support
