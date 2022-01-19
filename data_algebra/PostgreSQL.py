@@ -28,8 +28,6 @@ def _postgresql_as_int64(dbmodel, expression):
 PostgreSQL_formatters = {
     "___": lambda dbmodel, expression: str(expression.to_python()),
     "as_int64": _postgresql_as_int64,
-    "mod": data_algebra.db_model._db_remainder_expr,
-    "%": data_algebra.db_model._db_remainder_expr,
 }
 
 
