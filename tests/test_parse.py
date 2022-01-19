@@ -188,13 +188,13 @@ def test_parse_14():
 
 def test_parse_row_number():
     td = TableDescription(table_name="d", column_names=["row_number", "x"])
-
-    ops = td.extend({'ng': '_row_number()'})
+    ops = td.extend({'ng': '_row_number()'}, order_by=['x'])
     ops_str = str(ops)
     assert "_row_number" in ops_str
-
+    with pytest.raises(ValueError):
+        td.extend({'ng': '_row_number()'})  # no window
     with pytest.raises(KeyError):
-        ops = td.extend({'ng': 'row_number()'})
+        td.extend({'ng': 'row_number()'})  # wrong name
 
 
 def test_parse_ngroup():

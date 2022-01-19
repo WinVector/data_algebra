@@ -5,36 +5,34 @@ import pytest
 import data_algebra
 from data_algebra.data_ops import *
 import data_algebra.SparkSQL
+import data_algebra.SQLite
+import data_algebra.PostgreSQL
+import data_algebra.BigQuery
 import data_algebra.test_util
 import data_algebra.solutions
 
 
-def test_locf():
+def test_rank_to_average():
     pd = data_algebra.default_data_model.pd
     d = pd.DataFrame({
-        'v': [1., numpy.nan, 3., numpy.nan, 2., numpy.nan],
+        'v': [1, 1, 2, 2, 3, 3],
         'g': ['a', 'a', 'a', 'b', 'b', 'b'],
-        'o': [1, 2, 3, 4, 5, 6],
     })
-    ops = data_algebra.solutions.last_observed_carried_forward(
+    ops = data_algebra.solutions.rank_to_average(
         descr(d=d),
-        order_by=['o'],
+        order_by=['v'],
         partition_by=['g'],
-        value_column_name='v',
-        selection_predicate='is_bad()',
+        rank_column_name='r',
     )
     res = ops.transform(d)
     expect = pd.DataFrame({
-        'v': [1.0, 1.0, 3.0, None, 2.0, 2.0],
+        'v': [1, 1, 2, 2, 3, 3],
         'g': ['a', 'a', 'a', 'b', 'b', 'b'],
-        'o': [1, 2, 3, 4, 5, 6],
+        'r': [1.5, 1.5, 3.0, 1.0, 2.5, 2.5],
     })
     assert data_algebra.test_util.equivalent_frames(res, expect)
     data_algebra.test_util.check_transform(
         ops=ops,
         data=d,
         expect=expect,
-        models_to_skip={
-            data_algebra.SparkSQL.SparkSQLModel(),
-        }
     )
