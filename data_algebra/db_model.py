@@ -88,6 +88,7 @@ def _clean_annotation(annotation: Optional[str]) -> Optional[str]:
         return annotation
     annotation = annotation.strip()
     annotation = re.sub(r"(\s|\r|\n)+", " ", annotation)
+    annotation = annotation.replace('%', "percent")  # SQL alchemy doesn't like these in comments
     return annotation.strip()
 
 

@@ -51,6 +51,8 @@ MySQL_formatters = {
     "___": lambda dbmodel, expression: str(expression.to_python()),
     "is_bad": _MySQL_is_bad_expr,
     "concat": _MySQL_concat_expr,
+    "mod": data_algebra.db_model._db_remainder_expr,
+    "%": data_algebra.db_model._db_remainder_expr,
 }
 
 

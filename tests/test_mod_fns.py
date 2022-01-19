@@ -79,3 +79,31 @@ def test_mod_fns_one_edited():
             str(data_algebra.SparkSQL.SparkSQLModel()),  # fn not named REMAINDER
         }
     )
+
+
+def test_mod_fns_percent_notation():
+    pd = data_algebra.default_data_model.pd
+    d = pd.DataFrame({
+        'row_id': [0, 1, 2, 3],
+        'a': [False, False, True, True],
+        'b': [False, True, False, True],
+        'q': [1, 1, 2, 2],
+    })
+    ops = (
+        descr(d=d)
+            .extend({'r': 'row_id % q'})
+    )
+    res = ops.transform(d)
+    expect = pd.DataFrame({
+        'row_id': [0, 1, 2, 3],
+        'a': [False, False, True, True],
+        'b': [False, True, False, True],
+        'q': [1, 1, 2, 2],
+        'r': [0, 0, 0, 1],
+    })
+    assert data_algebra.test_util.equivalent_frames(res, expect)
+    data_algebra.test_util.check_transform(
+        ops=ops,
+        data=d,
+        expect=expect,
+    )
