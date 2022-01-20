@@ -162,6 +162,28 @@ def _k_mul(*args):
     return res
 
 
+def _where_expr(*args):
+    """
+    where(cond, a, b) returns a for positions where cond is True, b otherwise (including cond None).
+    """
+    assert len(args) == 3
+    cond = args[0]
+    a = args[1]
+    b = args[2]
+    return numpy.where(cond, a, b)
+
+
+def _if_else_expr(*args):
+    """
+    if_else(cond, a, b) returns a for positions where cond is True, b when cond is False, None otherwise.
+    """
+    assert len(args) == 3
+    cond = args[0]
+    a = args[1]
+    b = args[2]
+    return numpy.where(data_algebra.default_data_model.bad_column_positions(cond), None, numpy.where(cond, a, b))
+
+
 def populate_impl_map(data_model) -> Dict[str, Callable]:
     """
     Map symbols to implementations.
@@ -193,7 +215,8 @@ def populate_impl_map(data_model) -> Dict[str, Callable]:
         "^": numpy.logical_xor,
         "not": numpy.logical_not,
         "!": numpy.logical_not,
-        "if_else": numpy.where,
+        "where": _where_expr,
+        "if_else": _if_else_expr,
         "is_nan": data_model.isnan,
         "is_inf": data_model.isinf,
         "is_null": data_model.isnull,

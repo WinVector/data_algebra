@@ -256,7 +256,7 @@ def last_observed_carried_forward(
         partition_by = list(partition_by)
     d_marked = (
         d
-            .extend({locf_to_use_column_name: f'{value_column_name}.{selection_predicate}.if_else(0, 1)'})
+            .extend({locf_to_use_column_name: f'{value_column_name}.{selection_predicate}.where(0, 1)'})
             .extend({locf_tiebreaker_column_name: '_row_number()'}, order_by=partition_by + order_by)
             .extend({locf_non_null_rank_column_name: f'{locf_to_use_column_name}.cumsum()'},
                     order_by=order_by + [locf_tiebreaker_column_name],

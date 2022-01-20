@@ -1,11 +1,9 @@
-import sqlite3
 
 import numpy
 
 import data_algebra.test_util
 from data_algebra.data_ops import *
 from data_algebra.SQLite import SQLiteModel
-
 
 import data_algebra
 import data_algebra.util
@@ -107,4 +105,34 @@ def test_if_else_complex():
         {"a": [-4.0, 2.0], "b": [1.0, 2.0], "c": [3.0, 4.0], "d": [1.0, 3.0]}
     )
 
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+
+
+def test_if_else_where():
+    d = data_algebra.default_data_model.pd.DataFrame({
+        "a": [True, False, None],
+        "x": ['x0', 'x1', 'x2'],
+    })
+    ops = (
+        descr(d=d)
+            .extend({
+                'r_e': 'a.if_else(x, "y")',
+                'r_w': 'a.where(x, "y")',
+                'r_m': 'a.mapv({True: "x", False: "y"})'
+            })
+    )
+    res_pandas = ops.transform(d)
+    expect = data_algebra.default_data_model.pd.DataFrame({
+        "a": [True, False, None],
+        "x": ['x0', 'x1', 'x2'],
+        'r_e': ['x0', 'y', None],
+        'r_w': ['x0', 'y', 'y'],
+        'r_m': ['x', 'y', None],
+    })
+    assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
+    sqlite_handle = data_algebra.SQLite.example_handle()
+    sqlite_handle.insert_table(d, table_name='d', allow_overwrite=True)
+    res_sqlite = sqlite_handle.read_query(ops)
+    assert data_algebra.test_util.equivalent_frames(res_sqlite, expect)
+    sqlite_handle.close()
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)

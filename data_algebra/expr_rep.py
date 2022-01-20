@@ -320,7 +320,6 @@ class Term(PreTerm, abc.ABC):
             y = enc_value(y)
         assert not _is_none_value(self)
         assert not _is_none_value(x)
-        assert not _is_none_value(y)
         return Expression(op, (self, x, y), inline=inline, method=method)
 
     # try to get at == and other comparison operators
@@ -798,9 +797,20 @@ class Term(PreTerm, abc.ABC):
     def if_else(self, x, y):
         """
         Vectorized selection between two argument vectors.
+        if_else(True, 1, 2) > 1, if_else(False, 1, 2) -> 2.
+        None propagating behavior if_else(None, 1, 2) -> None.
         """
         # could check if x and y are compatible types
         return self.__triop_expr__("if_else", x, y, method=True)
+
+    def where(self, x, y):
+        """
+        Vectorized selection between two argument vectors.
+        if_else(True, 1, 2) > 1, if_else(False, 1, 2) -> 2.
+        numpy.where behavior: where(None, 1, 2) -> 2
+        """
+        # could check if x and y are compatible types
+        return self.__triop_expr__("where", x, y, method=True)
 
     def is_in(self, x):
         """
@@ -832,11 +842,13 @@ class Term(PreTerm, abc.ABC):
         """
         return self.__op_expr__("co_equalizer", x, inline=False, method=True)
 
-    def mapv(self, value_map, default_value):
+    def mapv(self, value_map, default_value=None):
         """
         Map values (vectorized).
         """
         assert isinstance(value_map, DictTerm)
+        if default_value is None:
+            default_value = Value(None)
         assert isinstance(default_value, Value)
         return self.__triop_expr__(
             "mapv", x=value_map, y=default_value, inline=False, method=True
