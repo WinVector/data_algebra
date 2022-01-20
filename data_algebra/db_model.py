@@ -106,7 +106,7 @@ def _db_lag_expr(dbmodel, expression):
         elif periods < 0:
             return f"LEAD({arg_0}, {-periods})"
         else:
-            return f"{arg_0}"
+            raise ValueError("shift by zero not supported")
     else:
         raise ValueError("too many arguments to SQL LAG/LEAD")
 
