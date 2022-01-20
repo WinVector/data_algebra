@@ -245,7 +245,7 @@
 
 <span class="k">def</span> <span class="nf">_check_scalar_bad</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Return 1 if scalar value is none or nan, else 0.</span>
+<span class="sd">    Return True if scalar value is none or nan, else False.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -259,7 +259,7 @@
 
 <span class="k">def</span> <span class="nf">_check_scalar_nan</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Return 1 if scalar value is nan, else 0.</span>
+<span class="sd">    Return True if scalar value is nan, else False.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -273,7 +273,7 @@
 
 <span class="k">def</span> <span class="nf">_check_scalar_inf</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Return 1 if scalar value is inf, else 0.</span>
+<span class="sd">    Return True if scalar value is inf, else False.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -449,7 +449,7 @@
         <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="s2">&quot;is_bad&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">_check_scalar_bad</span><span class="p">)</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="s2">&quot;is_nan&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">_check_scalar_nan</span><span class="p">)</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="s2">&quot;is_inf&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">_check_scalar_inf</span><span class="p">)</span>
-        <span class="n">saw</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">saw</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;is_bad&#39;</span><span class="p">,</span> <span class="s1">&#39;is_nan&#39;</span><span class="p">,</span> <span class="s1">&#39;is_inf&#39;</span><span class="p">}</span>
         <span class="c1"># math fns</span>
         <span class="n">math_fns</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;acos&quot;</span><span class="p">:</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">_wrap_scalar_fn</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">acos</span><span class="p">),</span>
@@ -1098,7 +1098,7 @@ This version keeps the data instead of using the E[(x-E[x])^2] = E[x^2] - E[x]^2
         <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="s2">&quot;is_bad&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">_check_scalar_bad</span><span class="p">)</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="s2">&quot;is_nan&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">_check_scalar_nan</span><span class="p">)</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="s2">&quot;is_inf&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">_check_scalar_inf</span><span class="p">)</span>
-        <span class="n">saw</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">saw</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;is_bad&#39;</span><span class="p">,</span> <span class="s1">&#39;is_nan&#39;</span><span class="p">,</span> <span class="s1">&#39;is_inf&#39;</span><span class="p">}</span>
         <span class="c1"># math fns</span>
         <span class="n">math_fns</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;acos&quot;</span><span class="p">:</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">_wrap_scalar_fn</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">acos</span><span class="p">),</span>
@@ -1338,7 +1338,7 @@ This version keeps the data instead of using the E[(x-E[x])^2] = E[x^2] - E[x]^2
         <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="s2">&quot;is_bad&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">_check_scalar_bad</span><span class="p">)</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="s2">&quot;is_nan&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">_check_scalar_nan</span><span class="p">)</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="s2">&quot;is_inf&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">_check_scalar_inf</span><span class="p">)</span>
-        <span class="n">saw</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">saw</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;is_bad&#39;</span><span class="p">,</span> <span class="s1">&#39;is_nan&#39;</span><span class="p">,</span> <span class="s1">&#39;is_inf&#39;</span><span class="p">}</span>
         <span class="c1"># math fns</span>
         <span class="n">math_fns</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;acos&quot;</span><span class="p">:</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">_wrap_scalar_fn</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">acos</span><span class="p">),</span>

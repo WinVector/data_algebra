@@ -124,7 +124,7 @@ SQLite_formatters = {
 
 def _check_scalar_bad(x):
     """
-    Return 1 if scalar value is none or nan, else 0.
+    Return True if scalar value is none or nan, else False.
     """
 
     if x is None:
@@ -138,7 +138,7 @@ def _check_scalar_bad(x):
 
 def _check_scalar_nan(x):
     """
-    Return 1 if scalar value is nan, else 0.
+    Return True if scalar value is nan, else False.
     """
 
     if x is None:
@@ -152,7 +152,7 @@ def _check_scalar_nan(x):
 
 def _check_scalar_inf(x):
     """
-    Return 1 if scalar value is inf, else 0.
+    Return True if scalar value is inf, else False.
     """
 
     if x is None:
@@ -328,7 +328,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         conn.create_function("is_bad", 1, _check_scalar_bad)
         conn.create_function("is_nan", 1, _check_scalar_nan)
         conn.create_function("is_inf", 1, _check_scalar_inf)
-        saw = set()
+        saw = {'is_bad', 'is_nan', 'is_inf'}
         # math fns
         math_fns = {
             "acos": functools.partial(_wrap_scalar_fn, math.acos),
