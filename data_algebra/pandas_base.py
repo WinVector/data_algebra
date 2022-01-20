@@ -183,7 +183,11 @@ def _if_else_expr(*args):
     cond = args[0]
     a = args[1]
     b = args[2]
-    return numpy.where(data_algebra.default_data_model.bad_column_positions(cond), None, numpy.where(cond, a, b))
+    res = numpy.where(cond, a, b)
+    bad_posns = data_algebra.default_data_model.bad_column_positions(cond)
+    if numpy.any(bad_posns):
+        res[bad_posns] = None
+    return res
 
 
 def populate_impl_map(data_model) -> Dict[str, Callable]:
