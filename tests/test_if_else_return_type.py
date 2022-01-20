@@ -4,6 +4,7 @@ import numpy
 import data_algebra
 from data_algebra.data_ops import descr
 import data_algebra.test_util
+import data_algebra.SQLite
 
 
 def test_if_else_return_type():
@@ -27,3 +28,10 @@ def test_if_else_return_type():
     assert data_algebra.test_util.equivalent_frames(res, expect)
     assert str(res['w'].dtype) == 'float64'
     assert str(res['i'].dtype) == 'float64'
+    sqlite_handle = data_algebra.SQLite.example_handle()
+    sqlite_handle.insert_table(d, table_name='d', allow_overwrite=True)
+    res_sqlite = sqlite_handle.read_query(ops)
+    sqlite_handle.close()
+    assert data_algebra.test_util.equivalent_frames(res_sqlite, expect)
+    assert str(res_sqlite['w'].dtype) == 'float64'
+    assert str(res_sqlite['i'].dtype) == 'float64'
