@@ -107,7 +107,8 @@ def _type_safe_is_in(a, b):
     return numpy.isin(a, b)
 
 
-def _map_v(a, value_map, default_value):
+def _map_v(a, value_map, default_value=None):
+    """Map values to values."""
     if len(value_map) > 0:
         type_a = data_algebra.util.guess_carried_scalar_type(a)
         type_k = {
@@ -124,9 +125,10 @@ def _map_v(a, value_map, default_value):
         if not data_algebra.util.compatible_types(type_v):
             raise TypeError(f"multiple types in dictionary values: {type_v} in mapv()")
         type_v = list(type_v)[0]
-        type_d = data_algebra.util.guess_carried_scalar_type(default_value)
-        if not data_algebra.util.compatible_types([type_d, type_v]):
-            raise TypeError(f"default is {type_d} for {type_v} values in mapv()'s")
+        if default_value is not None:
+            type_d = data_algebra.util.guess_carried_scalar_type(default_value)
+            if not data_algebra.util.compatible_types([type_d, type_v]):
+                raise TypeError(f"default is {type_d} for {type_v} values in mapv()'s")
     # https://pandas.pydata.org/docs/reference/api/pandas.Series.map.html
     a = data_algebra.default_data_model.pd.Series(a)
     a = a.map(value_map, na_action="ignore")

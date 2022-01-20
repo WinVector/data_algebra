@@ -844,7 +844,7 @@ class Term(PreTerm, abc.ABC):
 
     def mapv(self, value_map, default_value=None):
         """
-        Map values (vectorized).
+        Map values to values (vectorized).
         """
         assert isinstance(value_map, DictTerm)
         if default_value is None:
