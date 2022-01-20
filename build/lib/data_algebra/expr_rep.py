@@ -763,7 +763,10 @@ class Term(PreTerm, abc.ABC):
         """
         if periods is None:
             periods = Value(1)
-        assert isinstance(periods, Value)  # digits control
+        assert isinstance(periods, Value)
+        assert isinstance(periods.value, int)
+        if periods.value == 0:
+            raise ValueError("0-period shift not allowed")
         return self.__op_expr__("shift", periods, inline=False, method=True)
 
     # our ad-hoc definitions
