@@ -107,7 +107,8 @@ def _type_safe_is_in(a, b):
     return numpy.isin(a, b)
 
 
-def _map_v(a, value_map, default_value):
+def _map_v(a, value_map, default_value=None):
+    """Map values to values."""
     if len(value_map) > 0:
         type_a = data_algebra.util.guess_carried_scalar_type(a)
         type_k = {
@@ -124,9 +125,10 @@ def _map_v(a, value_map, default_value):
         if not data_algebra.util.compatible_types(type_v):
             raise TypeError(f"multiple types in dictionary values: {type_v} in mapv()")
         type_v = list(type_v)[0]
-        type_d = data_algebra.util.guess_carried_scalar_type(default_value)
-        if not data_algebra.util.compatible_types([type_d, type_v]):
-            raise TypeError(f"default is {type_d} for {type_v} values in mapv()'s")
+        if default_value is not None:
+            type_d = data_algebra.util.guess_carried_scalar_type(default_value)
+            if not data_algebra.util.compatible_types([type_d, type_v]):
+                raise TypeError(f"default is {type_d} for {type_v} values in mapv()'s")
     # https://pandas.pydata.org/docs/reference/api/pandas.Series.map.html
     a = data_algebra.default_data_model.pd.Series(a)
     a = a.map(value_map, na_action="ignore")
@@ -162,6 +164,28 @@ def _k_mul(*args):
     return res
 
 
+def _where_expr(*args):
+    """
+    where(cond, a, b) returns a for positions where cond is True, b otherwise (including cond None).
+    """
+    assert len(args) == 3
+    cond = args[0]
+    a = args[1]
+    b = args[2]
+    return numpy.where(cond, a, b)
+
+
+def _if_else_expr(*args):
+    """
+    if_else(cond, a, b) returns a for positions where cond is True, b when cond is False, None otherwise.
+    """
+    assert len(args) == 3
+    cond = args[0]
+    a = args[1]
+    b = args[2]
+    return numpy.where(data_algebra.default_data_model.bad_column_positions(cond), None, numpy.where(cond, a, b))
+
+
 def populate_impl_map(data_model) -> Dict[str, Callable]:
     """
     Map symbols to implementations.
@@ -193,7 +217,8 @@ def populate_impl_map(data_model) -> Dict[str, Callable]:
         "^": numpy.logical_xor,
         "not": numpy.logical_not,
         "!": numpy.logical_not,
-        "if_else": numpy.where,
+        "where": _where_expr,
+        "if_else": _if_else_expr,
         "is_nan": data_model.isnan,
         "is_inf": data_model.isinf,
         "is_null": data_model.isnull,

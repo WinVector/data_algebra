@@ -348,6 +348,7 @@
         <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
     <span class="p">)</span>
 
+
 <span class="c1"># extend to floating point</span>
 <span class="c1"># import numpy as np</span>
 <span class="c1"># e0 = np.array([5, 5, -5, -5])</span>
@@ -431,6 +432,28 @@
 
 
 <span class="k">def</span> <span class="nf">_db_if_else_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">)</span><span class="o">==</span><span class="mi">3</span>
+    <span class="n">if_expr</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">x_expr</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">y_expr</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span>
+            <span class="s2">&quot;CASE&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot; WHEN &quot;</span>
+            <span class="o">+</span> <span class="n">if_expr</span>
+            <span class="o">+</span> <span class="s2">&quot; THEN &quot;</span>
+            <span class="o">+</span> <span class="n">x_expr</span>
+            <span class="o">+</span> <span class="s2">&quot; WHEN NOT &quot;</span>
+            <span class="o">+</span> <span class="n">if_expr</span>
+            <span class="o">+</span> <span class="s2">&quot; THEN &quot;</span>
+            <span class="o">+</span> <span class="n">y_expr</span>
+            <span class="o">+</span> <span class="s2">&quot; ELSE &quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;NULL&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot; END&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_db_where_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">)</span><span class="o">==</span><span class="mi">3</span>
     <span class="n">if_expr</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">x_expr</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">y_expr</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -444,7 +467,9 @@
         <span class="o">+</span> <span class="n">if_expr</span>
         <span class="o">+</span> <span class="s2">&quot; THEN &quot;</span>
         <span class="o">+</span> <span class="n">y_expr</span>
-        <span class="o">+</span> <span class="s2">&quot; ELSE NULL END&quot;</span>
+        <span class="o">+</span> <span class="s2">&quot; ELSE &quot;</span>
+        <span class="o">+</span> <span class="n">y_expr</span>
+        <span class="o">+</span> <span class="s2">&quot; END&quot;</span>
     <span class="p">)</span>
 
 
@@ -686,12 +711,12 @@
 
 
 <span class="k">def</span> <span class="nf">_any_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
-    <span class="n">derived</span> <span class="o">=</span> <span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">if_else</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">derived</span> <span class="o">=</span> <span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">derived</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_all_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
-    <span class="n">derived</span> <span class="o">=</span> <span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">if_else</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">derived</span> <span class="o">=</span> <span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">derived</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 
@@ -839,6 +864,7 @@
     <span class="s2">&quot;mean&quot;</span><span class="p">:</span> <span class="n">_db_mean_expr</span><span class="p">,</span>
     <span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="n">_db_size_expr</span><span class="p">,</span>
     <span class="s2">&quot;if_else&quot;</span><span class="p">:</span> <span class="n">_db_if_else_expr</span><span class="p">,</span>
+    <span class="s2">&quot;where&quot;</span><span class="p">:</span> <span class="n">_db_where_expr</span><span class="p">,</span>
     <span class="s2">&quot;is_in&quot;</span><span class="p">:</span> <span class="n">_db_is_in_expr</span><span class="p">,</span>
     <span class="s2">&quot;maximum&quot;</span><span class="p">:</span> <span class="n">_db_maximum_expr</span><span class="p">,</span>
     <span class="s2">&quot;fmax&quot;</span><span class="p">:</span> <span class="n">_db_fmax_expr</span><span class="p">,</span>

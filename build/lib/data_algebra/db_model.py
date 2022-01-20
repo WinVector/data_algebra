@@ -130,6 +130,7 @@ def _db_mod_expr(dbmodel, expression):
         + ")"
     )
 
+
 # extend to floating point
 # import numpy as np
 # e0 = np.array([5, 5, -5, -5])
@@ -213,6 +214,28 @@ def _db_is_bad_expr(dbmodel, expression):
 
 
 def _db_if_else_expr(dbmodel, expression):
+    assert len(expression.args)==3
+    if_expr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
+    x_expr = dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
+    y_expr = dbmodel.expr_to_sql(expression.args[2], want_inline_parens=True)
+    return (
+            "CASE"
+            + " WHEN "
+            + if_expr
+            + " THEN "
+            + x_expr
+            + " WHEN NOT "
+            + if_expr
+            + " THEN "
+            + y_expr
+            + " ELSE "
+            + "NULL"
+            + " END"
+    )
+
+
+def _db_where_expr(dbmodel, expression):
+    assert len(expression.args)==3
     if_expr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
     x_expr = dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
     y_expr = dbmodel.expr_to_sql(expression.args[2], want_inline_parens=True)
@@ -226,7 +249,9 @@ def _db_if_else_expr(dbmodel, expression):
         + if_expr
         + " THEN "
         + y_expr
-        + " ELSE NULL END"
+        + " ELSE "
+        + y_expr
+        + " END"
     )
 
 
@@ -468,12 +493,12 @@ def _trimstr(dbmodel, expression):
 
 
 def _any_expr(dbmodel, expression):
-    derived = expression.args[0].if_else(1, 0).max() >= data_algebra.expr_rep.Value(1)
+    derived = expression.args[0].where(1, 0).max() >= data_algebra.expr_rep.Value(1)
     return dbmodel.expr_to_sql(derived, want_inline_parens=True)
 
 
 def _all_expr(dbmodel, expression):
-    derived = expression.args[0].if_else(1, 0).min() >= data_algebra.expr_rep.Value(1)
+    derived = expression.args[0].where(1, 0).min() >= data_algebra.expr_rep.Value(1)
     return dbmodel.expr_to_sql(derived, want_inline_parens=True)
 
 
@@ -621,6 +646,7 @@ db_expr_formatters = {
     "mean": _db_mean_expr,
     "size": _db_size_expr,
     "if_else": _db_if_else_expr,
+    "where": _db_where_expr,
     "is_in": _db_is_in_expr,
     "maximum": _db_maximum_expr,
     "fmax": _db_fmax_expr,

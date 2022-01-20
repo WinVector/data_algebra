@@ -256,6 +256,9 @@
                                 <a class="function" href="#Term.if_else">if_else</a>
                         </li>
                         <li>
+                                <a class="function" href="#Term.where">where</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#Term.is_in">is_in</a>
                         </li>
                         <li>
@@ -823,7 +826,6 @@
             <span class="n">y</span> <span class="o">=</span> <span class="n">enc_value</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
         <span class="k">assert</span> <span class="ow">not</span> <span class="n">_is_none_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">assert</span> <span class="ow">not</span> <span class="n">_is_none_value</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="ow">not</span> <span class="n">_is_none_value</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Expression</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">inline</span><span class="o">=</span><span class="n">inline</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
 
     <span class="c1"># try to get at == and other comparison operators</span>
@@ -1301,9 +1303,20 @@
     <span class="k">def</span> <span class="nf">if_else</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Vectorized selection between two argument vectors.</span>
+<span class="sd">        if_else(True, 1, 2) &gt; 1, if_else(False, 1, 2) -&gt; 2.</span>
+<span class="sd">        None propagating behavior if_else(None, 1, 2) -&gt; None.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># could check if x and y are compatible types</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__triop_expr__</span><span class="p">(</span><span class="s2">&quot;if_else&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">where</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Vectorized selection between two argument vectors.</span>
+<span class="sd">        if_else(True, 1, 2) &gt; 1, if_else(False, 1, 2) -&gt; 2.</span>
+<span class="sd">        numpy.where behavior: where(None, 1, 2) -&gt; 2</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># could check if x and y are compatible types</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__triop_expr__</span><span class="p">(</span><span class="s2">&quot;where&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">is_in</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1335,11 +1348,13 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;co_equalizer&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">mapv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value_map</span><span class="p">,</span> <span class="n">default_value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">mapv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value_map</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Map values (vectorized).</span>
+<span class="sd">        Map values to values (vectorized).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_map</span><span class="p">,</span> <span class="n">DictTerm</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">default_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">default_value</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_value</span><span class="p">,</span> <span class="n">Value</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__triop_expr__</span><span class="p">(</span>
             <span class="s2">&quot;mapv&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">value_map</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">default_value</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span>
@@ -2521,7 +2536,6 @@ str() method returns only the text for interoperability.</p>
             <span class="n">y</span> <span class="o">=</span> <span class="n">enc_value</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
         <span class="k">assert</span> <span class="ow">not</span> <span class="n">_is_none_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">assert</span> <span class="ow">not</span> <span class="n">_is_none_value</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="ow">not</span> <span class="n">_is_none_value</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Expression</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">inline</span><span class="o">=</span><span class="n">inline</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
 
     <span class="c1"># try to get at == and other comparison operators</span>
@@ -2999,9 +3013,20 @@ str() method returns only the text for interoperability.</p>
     <span class="k">def</span> <span class="nf">if_else</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Vectorized selection between two argument vectors.</span>
+<span class="sd">        if_else(True, 1, 2) &gt; 1, if_else(False, 1, 2) -&gt; 2.</span>
+<span class="sd">        None propagating behavior if_else(None, 1, 2) -&gt; None.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># could check if x and y are compatible types</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__triop_expr__</span><span class="p">(</span><span class="s2">&quot;if_else&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">where</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Vectorized selection between two argument vectors.</span>
+<span class="sd">        if_else(True, 1, 2) &gt; 1, if_else(False, 1, 2) -&gt; 2.</span>
+<span class="sd">        numpy.where behavior: where(None, 1, 2) -&gt; 2</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># could check if x and y are compatible types</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__triop_expr__</span><span class="p">(</span><span class="s2">&quot;where&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">is_in</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -3033,11 +3058,13 @@ str() method returns only the text for interoperability.</p>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;co_equalizer&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">mapv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value_map</span><span class="p">,</span> <span class="n">default_value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">mapv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value_map</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Map values (vectorized).</span>
+<span class="sd">        Map values to values (vectorized).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_map</span><span class="p">,</span> <span class="n">DictTerm</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">default_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">default_value</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_value</span><span class="p">,</span> <span class="n">Value</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__triop_expr__</span><span class="p">(</span>
             <span class="s2">&quot;mapv&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">value_map</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">default_value</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span>
@@ -4659,6 +4686,8 @@ str() method returns only the text for interoperability.</p>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">if_else</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Vectorized selection between two argument vectors.</span>
+<span class="sd">        if_else(True, 1, 2) &gt; 1, if_else(False, 1, 2) -&gt; 2.</span>
+<span class="sd">        None propagating behavior if_else(None, 1, 2) -&gt; None.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># could check if x and y are compatible types</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__triop_expr__</span><span class="p">(</span><span class="s2">&quot;if_else&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -4666,7 +4695,38 @@ str() method returns only the text for interoperability.</p>
 
         </details>
 
-            <div class="docstring"><p>Vectorized selection between two argument vectors.</p>
+            <div class="docstring"><p>Vectorized selection between two argument vectors.
+if_else(True, 1, 2) &gt; 1, if_else(False, 1, 2) -> 2.
+None propagating behavior if_else(None, 1, 2) -> None.</p>
+</div>
+
+
+                            </div>
+                            <div id="Term.where" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Term.where">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">where</span><span class="signature">(self, x, y)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">where</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Vectorized selection between two argument vectors.</span>
+<span class="sd">        if_else(True, 1, 2) &gt; 1, if_else(False, 1, 2) -&gt; 2.</span>
+<span class="sd">        numpy.where behavior: where(None, 1, 2) -&gt; 2</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># could check if x and y are compatible types</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__triop_expr__</span><span class="p">(</span><span class="s2">&quot;where&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Vectorized selection between two argument vectors.
+if_else(True, 1, 2) &gt; 1, if_else(False, 1, 2) -> 2.
+numpy.where behavior: where(None, 1, 2) -> 2</p>
 </div>
 
 
@@ -4778,16 +4838,18 @@ str() method returns only the text for interoperability.</p>
 
         
             <span class="def">def</span>
-            <span class="name">mapv</span><span class="signature">(self, value_map, default_value)</span>:
+            <span class="name">mapv</span><span class="signature">(self, value_map, default_value=None)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">mapv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value_map</span><span class="p">,</span> <span class="n">default_value</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">mapv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value_map</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Map values (vectorized).</span>
+<span class="sd">        Map values to values (vectorized).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_map</span><span class="p">,</span> <span class="n">DictTerm</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">default_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">default_value</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_value</span><span class="p">,</span> <span class="n">Value</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__triop_expr__</span><span class="p">(</span>
             <span class="s2">&quot;mapv&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">value_map</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">default_value</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span>
@@ -4796,7 +4858,7 @@ str() method returns only the text for interoperability.</p>
 
         </details>
 
-            <div class="docstring"><p>Map values (vectorized).</p>
+            <div class="docstring"><p>Map values to values (vectorized).</p>
 </div>
 
 
@@ -5639,6 +5701,7 @@ str() method returns only the text for interoperability.</p>
                 <dd id="Value.is_inf" class="function"><a href="#Term.is_inf">is_inf</a></dd>
                 <dd id="Value.is_bad" class="function"><a href="#Term.is_bad">is_bad</a></dd>
                 <dd id="Value.if_else" class="function"><a href="#Term.if_else">if_else</a></dd>
+                <dd id="Value.where" class="function"><a href="#Term.where">where</a></dd>
                 <dd id="Value.is_in" class="function"><a href="#Term.is_in">is_in</a></dd>
                 <dd id="Value.concat" class="function"><a href="#Term.concat">concat</a></dd>
                 <dd id="Value.coalesce" class="function"><a href="#Term.coalesce">coalesce</a></dd>
@@ -6613,6 +6676,7 @@ str() method returns only the text for interoperability.</p>
                 <dd id="ColumnReference.is_inf" class="function"><a href="#Term.is_inf">is_inf</a></dd>
                 <dd id="ColumnReference.is_bad" class="function"><a href="#Term.is_bad">is_bad</a></dd>
                 <dd id="ColumnReference.if_else" class="function"><a href="#Term.if_else">if_else</a></dd>
+                <dd id="ColumnReference.where" class="function"><a href="#Term.where">where</a></dd>
                 <dd id="ColumnReference.is_in" class="function"><a href="#Term.is_in">is_in</a></dd>
                 <dd id="ColumnReference.concat" class="function"><a href="#Term.concat">concat</a></dd>
                 <dd id="ColumnReference.coalesce" class="function"><a href="#Term.coalesce">coalesce</a></dd>
@@ -7238,6 +7302,7 @@ str() method returns only the text for interoperability.</p>
                 <dd id="Expression.is_inf" class="function"><a href="#Term.is_inf">is_inf</a></dd>
                 <dd id="Expression.is_bad" class="function"><a href="#Term.is_bad">is_bad</a></dd>
                 <dd id="Expression.if_else" class="function"><a href="#Term.if_else">if_else</a></dd>
+                <dd id="Expression.where" class="function"><a href="#Term.where">where</a></dd>
                 <dd id="Expression.is_in" class="function"><a href="#Term.is_in">is_in</a></dd>
                 <dd id="Expression.concat" class="function"><a href="#Term.concat">concat</a></dd>
                 <dd id="Expression.coalesce" class="function"><a href="#Term.coalesce">coalesce</a></dd>

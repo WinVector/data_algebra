@@ -241,7 +241,8 @@
     <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_map_v</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">value_map</span><span class="p">,</span> <span class="n">default_value</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_map_v</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">value_map</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Map values to values.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value_map</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">type_a</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">guess_carried_scalar_type</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
         <span class="n">type_k</span> <span class="o">=</span> <span class="p">{</span>
@@ -258,9 +259,10 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">compatible_types</span><span class="p">(</span><span class="n">type_v</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;multiple types in dictionary values: </span><span class="si">{</span><span class="n">type_v</span><span class="si">}</span><span class="s2"> in mapv()&quot;</span><span class="p">)</span>
         <span class="n">type_v</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">type_v</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">type_d</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">guess_carried_scalar_type</span><span class="p">(</span><span class="n">default_value</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">compatible_types</span><span class="p">([</span><span class="n">type_d</span><span class="p">,</span> <span class="n">type_v</span><span class="p">]):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;default is </span><span class="si">{</span><span class="n">type_d</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">type_v</span><span class="si">}</span><span class="s2"> values in mapv()&#39;s&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">default_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">type_d</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">guess_carried_scalar_type</span><span class="p">(</span><span class="n">default_value</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">compatible_types</span><span class="p">([</span><span class="n">type_d</span><span class="p">,</span> <span class="n">type_v</span><span class="p">]):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;default is </span><span class="si">{</span><span class="n">type_d</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">type_v</span><span class="si">}</span><span class="s2"> values in mapv()&#39;s&quot;</span><span class="p">)</span>
     <span class="c1"># https://pandas.pydata.org/docs/reference/api/pandas.Series.map.html</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">value_map</span><span class="p">,</span> <span class="n">na_action</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
@@ -296,6 +298,28 @@
     <span class="k">return</span> <span class="n">res</span>
 
 
+<span class="k">def</span> <span class="nf">_where_expr</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    where(cond, a, b) returns a for positions where cond is True, b otherwise (including cond None).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span>
+    <span class="n">cond</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_if_else_expr</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    if_else(cond, a, b) returns a for positions where cond is True, b when cond is False, None otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span>
+    <span class="n">cond</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">bad_column_positions</span><span class="p">(</span><span class="n">cond</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>
+
+
 <span class="k">def</span> <span class="nf">populate_impl_map</span><span class="p">(</span><span class="n">data_model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Map symbols to implementations.</span>
@@ -327,7 +351,8 @@
         <span class="s2">&quot;^&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_xor</span><span class="p">,</span>
         <span class="s2">&quot;not&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_not</span><span class="p">,</span>
         <span class="s2">&quot;!&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_not</span><span class="p">,</span>
-        <span class="s2">&quot;if_else&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">,</span>
+        <span class="s2">&quot;where&quot;</span><span class="p">:</span> <span class="n">_where_expr</span><span class="p">,</span>
+        <span class="s2">&quot;if_else&quot;</span><span class="p">:</span> <span class="n">_if_else_expr</span><span class="p">,</span>
         <span class="s2">&quot;is_nan&quot;</span><span class="p">:</span> <span class="n">data_model</span><span class="o">.</span><span class="n">isnan</span><span class="p">,</span>
         <span class="s2">&quot;is_inf&quot;</span><span class="p">:</span> <span class="n">data_model</span><span class="o">.</span><span class="n">isinf</span><span class="p">,</span>
         <span class="s2">&quot;is_null&quot;</span><span class="p">:</span> <span class="n">data_model</span><span class="o">.</span><span class="n">isnull</span><span class="p">,</span>
@@ -1072,7 +1097,8 @@
         <span class="s2">&quot;^&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_xor</span><span class="p">,</span>
         <span class="s2">&quot;not&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_not</span><span class="p">,</span>
         <span class="s2">&quot;!&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_not</span><span class="p">,</span>
-        <span class="s2">&quot;if_else&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">,</span>
+        <span class="s2">&quot;where&quot;</span><span class="p">:</span> <span class="n">_where_expr</span><span class="p">,</span>
+        <span class="s2">&quot;if_else&quot;</span><span class="p">:</span> <span class="n">_if_else_expr</span><span class="p">,</span>
         <span class="s2">&quot;is_nan&quot;</span><span class="p">:</span> <span class="n">data_model</span><span class="o">.</span><span class="n">isnan</span><span class="p">,</span>
         <span class="s2">&quot;is_inf&quot;</span><span class="p">:</span> <span class="n">data_model</span><span class="o">.</span><span class="n">isinf</span><span class="p">,</span>
         <span class="s2">&quot;is_null&quot;</span><span class="p">:</span> <span class="n">data_model</span><span class="o">.</span><span class="n">isnull</span><span class="p">,</span>
