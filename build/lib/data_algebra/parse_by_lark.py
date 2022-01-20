@@ -50,6 +50,7 @@ op_remap = {
     "||": "__or__",
     "%+%": "concat",
     "%?%": "coalesce",
+    '%/%': 'float_divide',
 }
 
 

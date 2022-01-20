@@ -89,10 +89,18 @@
     <span class="p">)</span>
 
 
+<span class="k">def</span> <span class="nf">_postgresql_null_divide_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+    <span class="n">e0</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">e1</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">e0</span><span class="si">}</span><span class="s1"> / NULLIF(</span><span class="si">{</span><span class="n">e1</span><span class="si">}</span><span class="s1">, 0)&#39;</span>
+
+
 <span class="c1"># map from op-name to special SQL formatting code</span>
 <span class="n">PostgreSQL_formatters</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;___&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">to_python</span><span class="p">()),</span>
     <span class="s2">&quot;as_int64&quot;</span><span class="p">:</span> <span class="n">_postgresql_as_int64</span><span class="p">,</span>
+    <span class="s2">&quot;%/%&quot;</span><span class="p">:</span> <span class="n">_postgresql_null_divide_expr</span><span class="p">,</span>
 <span class="p">}</span>
 
 
@@ -113,6 +121,7 @@
             <span class="n">string_quote</span><span class="o">=</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span>
             <span class="n">sql_formatters</span><span class="o">=</span><span class="n">PostgreSQL_formatters</span><span class="p">,</span>
             <span class="n">op_replacements</span><span class="o">=</span><span class="n">op_replacements</span><span class="p">,</span>
+            <span class="n">float_type</span><span class="o">=</span><span class="s1">&#39;DOUBLE PRECISION&#39;</span><span class="p">,</span>
         <span class="p">)</span>
 
 
@@ -160,6 +169,7 @@
             <span class="n">string_quote</span><span class="o">=</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span>
             <span class="n">sql_formatters</span><span class="o">=</span><span class="n">PostgreSQL_formatters</span><span class="p">,</span>
             <span class="n">op_replacements</span><span class="o">=</span><span class="n">op_replacements</span><span class="p">,</span>
+            <span class="n">float_type</span><span class="o">=</span><span class="s1">&#39;DOUBLE PRECISION&#39;</span><span class="p">,</span>
         <span class="p">)</span>
 </pre></div>
 
@@ -191,6 +201,7 @@ Assuming we are using a sqlalchemy engine as our connection</p>
             <span class="n">string_quote</span><span class="o">=</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span>
             <span class="n">sql_formatters</span><span class="o">=</span><span class="n">PostgreSQL_formatters</span><span class="p">,</span>
             <span class="n">op_replacements</span><span class="o">=</span><span class="n">op_replacements</span><span class="p">,</span>
+            <span class="n">float_type</span><span class="o">=</span><span class="s1">&#39;DOUBLE PRECISION&#39;</span><span class="p">,</span>
         <span class="p">)</span>
 </pre></div>
 

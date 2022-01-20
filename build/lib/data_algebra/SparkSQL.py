@@ -18,6 +18,11 @@ except ImportError:
     pass
 
 
+def _sparksql_is_nan_expr(dbmodel, expression):
+    subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+    return f'isNaN({subexpr})'
+
+
 def _sparksql_is_bad_expr(dbmodel, expression):
     subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
     assert isinstance(subexpr, str)
@@ -109,6 +114,7 @@ def _spark_std_expr(dbmodel, expression):
 # map from op-name to special SQL formatting code
 SparkSQL_formatters = {
     "___": lambda dbmodel, expression: str(expression.to_python()),
+    "is_nan": _sparksql_is_nan_expr,
     "is_bad": _sparksql_is_bad_expr,
     "coalesce": _sparksql_coalesce_expr,
     "mapv": _sparksql_db_mapv,
@@ -151,6 +157,7 @@ class SparkSQLModel(data_algebra.db_model.DBModel):
             identifier_quote="`",
             string_quote='"',
             string_type="STRING",
+            float_type="DOUBLE",
             sql_formatters=SparkSQL_formatters,
         )
 

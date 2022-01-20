@@ -382,52 +382,43 @@
 
 <span class="k">def</span> <span class="nf">_db_is_inf_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
     <span class="n">subexpr</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">plus_inf</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;CAST(</span><span class="si">{</span><span class="n">dbmodel</span><span class="o">.</span><span class="n">value_to_sql</span><span class="p">(</span><span class="s1">&#39;+infinity&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> AS </span><span class="si">{</span><span class="n">dbmodel</span><span class="o">.</span><span class="n">float_type</span><span class="si">}</span><span class="s2">)&quot;</span>
+    <span class="n">minus_inf</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;CAST(</span><span class="si">{</span><span class="n">dbmodel</span><span class="o">.</span><span class="n">value_to_sql</span><span class="p">(</span><span class="s1">&#39;-infinity&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> AS </span><span class="si">{</span><span class="n">dbmodel</span><span class="o">.</span><span class="n">float_type</span><span class="si">}</span><span class="s2">)&quot;</span>
     <span class="k">return</span> <span class="p">(</span>
-        <span class="s2">&quot;(&quot;</span>
-        <span class="o">+</span> <span class="n">subexpr</span>
-        <span class="o">+</span> <span class="s2">&quot; &gt;= &quot;</span>
-        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">value_to_sql</span><span class="p">(</span><span class="s2">&quot;+infinity&quot;</span><span class="p">)</span>
-        <span class="o">+</span> <span class="s2">&quot; OR &quot;</span>
-        <span class="o">+</span> <span class="n">subexpr</span>
-        <span class="o">+</span> <span class="s2">&quot; &lt;= &quot;</span>
-        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">value_to_sql</span><span class="p">(</span><span class="s2">&quot;-infinity&quot;</span><span class="p">)</span>
-        <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+            <span class="s2">&quot;(CASE&quot;</span>
+            <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39; WHEN </span><span class="si">{</span><span class="n">subexpr</span><span class="si">}</span><span class="s1"> IS NULL THEN FALSE&#39;</span>
+            <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39; WHEN NOT ((</span><span class="si">{</span><span class="n">subexpr</span><span class="si">}</span><span class="s1"> &gt; </span><span class="si">{</span><span class="n">minus_inf</span><span class="si">}</span><span class="s1">) AND (</span><span class="si">{</span><span class="n">subexpr</span><span class="si">}</span><span class="s1"> &lt; </span><span class="si">{</span><span class="n">plus_inf</span><span class="si">}</span><span class="s1">)) THEN TRUE&#39;</span>
+            <span class="o">+</span> <span class="s1">&#39; ELSE FALSE&#39;</span>
+            <span class="o">+</span> <span class="s1">&#39; END)&#39;</span>
     <span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_db_is_nan_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
     <span class="n">subexpr</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span>
-        <span class="s2">&quot;(&quot;</span>
-        <span class="o">+</span> <span class="n">subexpr</span>
-        <span class="o">+</span> <span class="s2">&quot; != 0 AND &quot;</span>
-        <span class="o">+</span> <span class="n">subexpr</span>
-        <span class="o">+</span> <span class="s2">&quot; = -&quot;</span>
-        <span class="o">+</span> <span class="n">subexpr</span>
-        <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+        <span class="s2">&quot;(CASE&quot;</span>
+        <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39; WHEN </span><span class="si">{</span><span class="n">subexpr</span><span class="si">}</span><span class="s1"> IS NULL THEN TRUE&#39;</span>
+        <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39; WHEN (</span><span class="si">{</span><span class="n">subexpr</span><span class="si">}</span><span class="s1"> &gt; 0) AND (-</span><span class="si">{</span><span class="n">subexpr</span><span class="si">}</span><span class="s1"> &gt; 0) THEN TRUE&#39;</span>
+        <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39; WHEN (</span><span class="si">{</span><span class="n">subexpr</span><span class="si">}</span><span class="s1"> != </span><span class="si">{</span><span class="n">subexpr</span><span class="si">}</span><span class="s1">) THEN TRUE&#39;</span>
+        <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39; WHEN (</span><span class="si">{</span><span class="n">subexpr</span><span class="si">}</span><span class="s1"> != 0) AND (</span><span class="si">{</span><span class="n">subexpr</span><span class="si">}</span><span class="s1"> = -</span><span class="si">{</span><span class="n">subexpr</span><span class="si">}</span><span class="s1">) THEN TRUE&#39;</span>
+        <span class="o">+</span> <span class="s1">&#39; ELSE FALSE&#39;</span>
+        <span class="o">+</span> <span class="s1">&#39; END)&#39;</span>
     <span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_db_is_bad_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
     <span class="n">subexpr</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">plus_inf</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;CAST(</span><span class="si">{</span><span class="n">dbmodel</span><span class="o">.</span><span class="n">value_to_sql</span><span class="p">(</span><span class="s1">&#39;+infinity&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> AS </span><span class="si">{</span><span class="n">dbmodel</span><span class="o">.</span><span class="n">float_type</span><span class="si">}</span><span class="s2">)&quot;</span>
+    <span class="n">minus_inf</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;CAST(</span><span class="si">{</span><span class="n">dbmodel</span><span class="o">.</span><span class="n">value_to_sql</span><span class="p">(</span><span class="s1">&#39;-infinity&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> AS </span><span class="si">{</span><span class="n">dbmodel</span><span class="o">.</span><span class="n">float_type</span><span class="si">}</span><span class="s2">)&quot;</span>
     <span class="k">return</span> <span class="p">(</span>
-        <span class="s2">&quot;(&quot;</span>
-        <span class="o">+</span> <span class="n">subexpr</span>
-        <span class="o">+</span> <span class="s2">&quot; IS NULL OR &quot;</span>
-        <span class="o">+</span> <span class="n">subexpr</span>
-        <span class="o">+</span> <span class="s2">&quot; &gt;= &quot;</span>
-        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">value_to_sql</span><span class="p">(</span><span class="s2">&quot;+infinity&quot;</span><span class="p">)</span>
-        <span class="o">+</span> <span class="s2">&quot; OR &quot;</span>
-        <span class="o">+</span> <span class="n">subexpr</span>
-        <span class="o">+</span> <span class="s2">&quot; &lt;= &quot;</span>
-        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">value_to_sql</span><span class="p">(</span><span class="s2">&quot;-infinity&quot;</span><span class="p">)</span>
-        <span class="o">+</span> <span class="s2">&quot; OR (&quot;</span>
-        <span class="o">+</span> <span class="n">subexpr</span>
-        <span class="o">+</span> <span class="s2">&quot; != 0 AND &quot;</span>
-        <span class="o">+</span> <span class="n">subexpr</span>
-        <span class="o">+</span> <span class="s2">&quot; = -&quot;</span>
-        <span class="o">+</span> <span class="n">subexpr</span>
-        <span class="o">+</span> <span class="s2">&quot;))&quot;</span>
+        <span class="s2">&quot;(CASE&quot;</span>
+        <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39; WHEN </span><span class="si">{</span><span class="n">subexpr</span><span class="si">}</span><span class="s1"> IS NULL THEN TRUE&#39;</span>
+        <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39; WHEN (</span><span class="si">{</span><span class="n">subexpr</span><span class="si">}</span><span class="s1"> &gt; 0) AND (-</span><span class="si">{</span><span class="n">subexpr</span><span class="si">}</span><span class="s1"> &gt; 0) THEN TRUE&#39;</span>
+        <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39; WHEN (</span><span class="si">{</span><span class="n">subexpr</span><span class="si">}</span><span class="s1"> != </span><span class="si">{</span><span class="n">subexpr</span><span class="si">}</span><span class="s1">) THEN TRUE&#39;</span>
+        <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39; WHEN (</span><span class="si">{</span><span class="n">subexpr</span><span class="si">}</span><span class="s1"> != 0) AND (</span><span class="si">{</span><span class="n">subexpr</span><span class="si">}</span><span class="s1"> = -</span><span class="si">{</span><span class="n">subexpr</span><span class="si">}</span><span class="s1">) THEN TRUE&#39;</span>
+        <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39; WHEN NOT ((</span><span class="si">{</span><span class="n">subexpr</span><span class="si">}</span><span class="s1"> &gt; </span><span class="si">{</span><span class="n">minus_inf</span><span class="si">}</span><span class="s1">) AND (</span><span class="si">{</span><span class="n">subexpr</span><span class="si">}</span><span class="s1"> &lt; </span><span class="si">{</span><span class="n">plus_inf</span><span class="si">}</span><span class="s1">)) THEN TRUE&#39;</span>
+        <span class="o">+</span> <span class="s1">&#39; ELSE FALSE&#39;</span>
+        <span class="o">+</span> <span class="s1">&#39; END)&#39;</span>
     <span class="p">)</span>
 
 
@@ -662,6 +653,15 @@
     <span class="k">return</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">ratio</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 
+<span class="k">def</span> <span class="nf">_db_float_divide_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="c1"># don&#39;t issue an error</span>
+    <span class="c1"># https://cloud.google.com/bigquery/docs/reference/standard-sql/mathematical_functions#ieee_divide</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+    <span class="n">e0</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">e1</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;(</span><span class="si">{</span><span class="n">e0</span><span class="si">}</span><span class="s1">) / (1.0 * (</span><span class="si">{</span><span class="n">e1</span><span class="si">}</span><span class="s1">))&#39;</span>
+
+
 <span class="k">def</span> <span class="nf">_db_nunique_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="s2">&quot;COUNT(DISTINCT (&quot;</span>
@@ -878,6 +878,7 @@
     <span class="s2">&quot;floor&quot;</span><span class="p">:</span> <span class="n">_db_floor_expr</span><span class="p">,</span>
     <span class="s2">&quot;ceil&quot;</span><span class="p">:</span> <span class="n">_db_ceil_expr</span><span class="p">,</span>
     <span class="s2">&quot;//&quot;</span><span class="p">:</span> <span class="n">_db_int_divide_expr</span><span class="p">,</span>
+    <span class="s1">&#39;%/%&#39;</span><span class="p">:</span> <span class="n">_db_float_divide_expr</span><span class="p">,</span>
     <span class="s2">&quot;**&quot;</span><span class="p">:</span> <span class="n">_db_pow_expr</span><span class="p">,</span>
     <span class="s2">&quot;nunique&quot;</span><span class="p">:</span> <span class="n">_db_nunique_expr</span><span class="p">,</span>
     <span class="s2">&quot;mapv&quot;</span><span class="p">:</span> <span class="n">_db_mapv</span><span class="p">,</span>
@@ -1016,6 +1017,7 @@
         <span class="n">on_joiner</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;AND&quot;</span><span class="p">,</span>
         <span class="n">drop_text</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;DROP TABLE&quot;</span><span class="p">,</span>
         <span class="n">string_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;VARCHAR&quot;</span><span class="p">,</span>
+        <span class="n">float_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;FLOAT64&#39;</span><span class="p">,</span>
         <span class="n">supports_with</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">allow_extend_merges</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">default_SQL_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1042,6 +1044,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">on_joiner</span> <span class="o">=</span> <span class="n">on_joiner</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">drop_text</span> <span class="o">=</span> <span class="n">drop_text</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">string_type</span> <span class="o">=</span> <span class="n">string_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">float_type</span> <span class="o">=</span> <span class="n">float_type</span>
         <span class="k">if</span> <span class="n">default_SQL_format_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">default_SQL_format_options</span> <span class="o">=</span> <span class="n">SQLFormatOptions</span><span class="p">()</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_SQL_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
@@ -2767,6 +2770,7 @@
         <span class="n">on_joiner</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;AND&quot;</span><span class="p">,</span>
         <span class="n">drop_text</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;DROP TABLE&quot;</span><span class="p">,</span>
         <span class="n">string_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;VARCHAR&quot;</span><span class="p">,</span>
+        <span class="n">float_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;FLOAT64&#39;</span><span class="p">,</span>
         <span class="n">supports_with</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">allow_extend_merges</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">default_SQL_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -2793,6 +2797,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">on_joiner</span> <span class="o">=</span> <span class="n">on_joiner</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">drop_text</span> <span class="o">=</span> <span class="n">drop_text</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">string_type</span> <span class="o">=</span> <span class="n">string_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">float_type</span> <span class="o">=</span> <span class="n">float_type</span>
         <span class="k">if</span> <span class="n">default_SQL_format_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">default_SQL_format_options</span> <span class="o">=</span> <span class="n">SQLFormatOptions</span><span class="p">()</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_SQL_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
@@ -4257,6 +4262,7 @@
     on_joiner: str = &#39;AND&#39;,
     drop_text: str = &#39;DROP TABLE&#39;,
     string_type: str = &#39;VARCHAR&#39;,
+    float_type: str = &#39;FLOAT64&#39;,
     supports_with: bool = True,
     allow_extend_merges: bool = True,
     default_SQL_format_options=None,
@@ -4280,6 +4286,7 @@
         <span class="n">on_joiner</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;AND&quot;</span><span class="p">,</span>
         <span class="n">drop_text</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;DROP TABLE&quot;</span><span class="p">,</span>
         <span class="n">string_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;VARCHAR&quot;</span><span class="p">,</span>
+        <span class="n">float_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;FLOAT64&#39;</span><span class="p">,</span>
         <span class="n">supports_with</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">allow_extend_merges</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">default_SQL_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -4306,6 +4313,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">on_joiner</span> <span class="o">=</span> <span class="n">on_joiner</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">drop_text</span> <span class="o">=</span> <span class="n">drop_text</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">string_type</span> <span class="o">=</span> <span class="n">string_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">float_type</span> <span class="o">=</span> <span class="n">float_type</span>
         <span class="k">if</span> <span class="n">default_SQL_format_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">default_SQL_format_options</span> <span class="o">=</span> <span class="n">SQLFormatOptions</span><span class="p">()</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_SQL_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>

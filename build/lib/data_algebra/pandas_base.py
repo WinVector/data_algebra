@@ -205,6 +205,7 @@ def populate_impl_map(data_model) -> Dict[str, Callable]:
         "*": _k_mul,
         "/": numpy.divide,
         "//": numpy.floor_divide,
+        "%/%": numpy.divide,
         "%": numpy.mod,
         "**": numpy.power,
         "and": _k_and,

@@ -319,7 +319,6 @@ class Term(PreTerm, abc.ABC):
         if not isinstance(y, Term):
             y = enc_value(y)
         assert not _is_none_value(self)
-        assert not _is_none_value(x)
         return Expression(op, (self, x, y), inline=inline, method=method)
 
     # try to get at == and other comparison operators
@@ -367,6 +366,9 @@ class Term(PreTerm, abc.ABC):
 
     def __rtruediv__(self, other):
         return self.__rop_expr__("/", other)
+
+    def float_divide(self, other):
+        return self.__op_expr__("%/%", other)
 
     def __floordiv__(self, other):
         return self.__op_expr__("//", other)

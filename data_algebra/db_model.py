@@ -164,52 +164,43 @@ def _db_is_null_expr(dbmodel, expression):
 
 def _db_is_inf_expr(dbmodel, expression):
     subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
+    plus_inf = f"CAST({dbmodel.value_to_sql('+infinity')} AS {dbmodel.float_type})"
+    minus_inf = f"CAST({dbmodel.value_to_sql('-infinity')} AS {dbmodel.float_type})"
     return (
-        "("
-        + subexpr
-        + " >= "
-        + dbmodel.value_to_sql("+infinity")
-        + " OR "
-        + subexpr
-        + " <= "
-        + dbmodel.value_to_sql("-infinity")
-        + ")"
+            "(CASE"
+            + f' WHEN {subexpr} IS NULL THEN FALSE'
+            + f' WHEN NOT (({subexpr} > {minus_inf}) AND ({subexpr} < {plus_inf})) THEN TRUE'
+            + ' ELSE FALSE'
+            + ' END)'
     )
 
 
 def _db_is_nan_expr(dbmodel, expression):
     subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
     return (
-        "("
-        + subexpr
-        + " != 0 AND "
-        + subexpr
-        + " = -"
-        + subexpr
-        + ")"
+        "(CASE"
+        + f' WHEN {subexpr} IS NULL THEN TRUE'
+        + f' WHEN ({subexpr} > 0) AND (-{subexpr} > 0) THEN TRUE'
+        + f' WHEN ({subexpr} != {subexpr}) THEN TRUE'
+        + f' WHEN ({subexpr} != 0) AND ({subexpr} = -{subexpr}) THEN TRUE'
+        + ' ELSE FALSE'
+        + ' END)'
     )
 
 
 def _db_is_bad_expr(dbmodel, expression):
     subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
+    plus_inf = f"CAST({dbmodel.value_to_sql('+infinity')} AS {dbmodel.float_type})"
+    minus_inf = f"CAST({dbmodel.value_to_sql('-infinity')} AS {dbmodel.float_type})"
     return (
-        "("
-        + subexpr
-        + " IS NULL OR "
-        + subexpr
-        + " >= "
-        + dbmodel.value_to_sql("+infinity")
-        + " OR "
-        + subexpr
-        + " <= "
-        + dbmodel.value_to_sql("-infinity")
-        + " OR ("
-        + subexpr
-        + " != 0 AND "
-        + subexpr
-        + " = -"
-        + subexpr
-        + "))"
+        "(CASE"
+        + f' WHEN {subexpr} IS NULL THEN TRUE'
+        + f' WHEN ({subexpr} > 0) AND (-{subexpr} > 0) THEN TRUE'
+        + f' WHEN ({subexpr} != {subexpr}) THEN TRUE'
+        + f' WHEN ({subexpr} != 0) AND ({subexpr} = -{subexpr}) THEN TRUE'
+        + f' WHEN NOT (({subexpr} > {minus_inf}) AND ({subexpr} < {plus_inf})) THEN TRUE'
+        + ' ELSE FALSE'
+        + ' END)'
     )
 
 
@@ -444,6 +435,15 @@ def _db_int_divide_expr(dbmodel, expression):
     return dbmodel.expr_to_sql(ratio, want_inline_parens=False)
 
 
+def _db_float_divide_expr(dbmodel, expression):
+    # don't issue an error
+    # https://cloud.google.com/bigquery/docs/reference/standard-sql/mathematical_functions#ieee_divide
+    assert len(expression.args) == 2
+    e0 = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+    e1 = dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
+    return f'({e0}) / (1.0 * ({e1}))'
+
+
 def _db_nunique_expr(dbmodel, expression):
     return (
         "COUNT(DISTINCT ("
@@ -660,6 +660,7 @@ db_expr_formatters = {
     "floor": _db_floor_expr,
     "ceil": _db_ceil_expr,
     "//": _db_int_divide_expr,
+    '%/%': _db_float_divide_expr,
     "**": _db_pow_expr,
     "nunique": _db_nunique_expr,
     "mapv": _db_mapv,
@@ -798,6 +799,7 @@ class DBModel:
         on_joiner: str = "AND",
         drop_text: str = "DROP TABLE",
         string_type: str = "VARCHAR",
+        float_type: str = 'FLOAT64',
         supports_with: bool = True,
         allow_extend_merges: bool = True,
         default_SQL_format_options=None,
@@ -824,6 +826,7 @@ class DBModel:
         self.on_joiner = on_joiner
         self.drop_text = drop_text
         self.string_type = string_type
+        self.float_type = float_type
         if default_SQL_format_options is None:
             default_SQL_format_options = SQLFormatOptions()
         assert isinstance(default_SQL_format_options, SQLFormatOptions)

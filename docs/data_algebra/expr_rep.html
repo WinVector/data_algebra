@@ -73,6 +73,9 @@
                     <a class="class" href="#Term">Term</a>
                             <ul class="memberlist">
                         <li>
+                                <a class="function" href="#Term.float_divide">float_divide</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#Term.sign">sign</a>
                         </li>
                         <li>
@@ -825,7 +828,6 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">Term</span><span class="p">):</span>
             <span class="n">y</span> <span class="o">=</span> <span class="n">enc_value</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
         <span class="k">assert</span> <span class="ow">not</span> <span class="n">_is_none_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="ow">not</span> <span class="n">_is_none_value</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Expression</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">inline</span><span class="o">=</span><span class="n">inline</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
 
     <span class="c1"># try to get at == and other comparison operators</span>
@@ -873,6 +875,9 @@
 
     <span class="k">def</span> <span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rop_expr__</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">float_divide</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;%/%&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__floordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;//&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
@@ -2535,7 +2540,6 @@ str() method returns only the text for interoperability.</p>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">Term</span><span class="p">):</span>
             <span class="n">y</span> <span class="o">=</span> <span class="n">enc_value</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
         <span class="k">assert</span> <span class="ow">not</span> <span class="n">_is_none_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="ow">not</span> <span class="n">_is_none_value</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Expression</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">inline</span><span class="o">=</span><span class="n">inline</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
 
     <span class="c1"># try to get at == and other comparison operators</span>
@@ -2583,6 +2587,9 @@ str() method returns only the text for interoperability.</p>
 
     <span class="k">def</span> <span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rop_expr__</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">float_divide</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;%/%&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__floordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;//&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
@@ -3226,6 +3233,25 @@ str() method returns only the text for interoperability.</p>
 </div>
 
 
+                            <div id="Term.float_divide" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Term.float_divide">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">float_divide</span><span class="signature">(self, other)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">float_divide</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;%/%&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
                             <div id="Term.sign" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#Term.sign">#&nbsp;&nbsp</a>
 
@@ -5640,7 +5666,8 @@ numpy.where behavior: where(None, 1, 2) -> 2</p>
                                 <h5>Inherited Members</h5>
                                 <dl>
                                     <div><dt><a href="#Term">Term</a></dt>
-                                <dd id="Value.sign" class="function"><a href="#Term.sign">sign</a></dd>
+                                <dd id="Value.float_divide" class="function"><a href="#Term.float_divide">float_divide</a></dd>
+                <dd id="Value.sign" class="function"><a href="#Term.sign">sign</a></dd>
                 <dd id="Value.sin" class="function"><a href="#Term.sin">sin</a></dd>
                 <dd id="Value.cos" class="function"><a href="#Term.cos">cos</a></dd>
                 <dd id="Value.arcsin" class="function"><a href="#Term.arcsin">arcsin</a></dd>
@@ -6615,7 +6642,8 @@ numpy.where behavior: where(None, 1, 2) -> 2</p>
                                 <h5>Inherited Members</h5>
                                 <dl>
                                     <div><dt><a href="#Term">Term</a></dt>
-                                <dd id="ColumnReference.sign" class="function"><a href="#Term.sign">sign</a></dd>
+                                <dd id="ColumnReference.float_divide" class="function"><a href="#Term.float_divide">float_divide</a></dd>
+                <dd id="ColumnReference.sign" class="function"><a href="#Term.sign">sign</a></dd>
                 <dd id="ColumnReference.sin" class="function"><a href="#Term.sin">sin</a></dd>
                 <dd id="ColumnReference.cos" class="function"><a href="#Term.cos">cos</a></dd>
                 <dd id="ColumnReference.arcsin" class="function"><a href="#Term.arcsin">arcsin</a></dd>
@@ -7241,7 +7269,8 @@ numpy.where behavior: where(None, 1, 2) -> 2</p>
                                 <h5>Inherited Members</h5>
                                 <dl>
                                     <div><dt><a href="#Term">Term</a></dt>
-                                <dd id="Expression.sign" class="function"><a href="#Term.sign">sign</a></dd>
+                                <dd id="Expression.float_divide" class="function"><a href="#Term.float_divide">float_divide</a></dd>
+                <dd id="Expression.sign" class="function"><a href="#Term.sign">sign</a></dd>
                 <dd id="Expression.sin" class="function"><a href="#Term.sin">sin</a></dd>
                 <dd id="Expression.cos" class="function"><a href="#Term.cos">cos</a></dd>
                 <dd id="Expression.arcsin" class="function"><a href="#Term.arcsin">arcsin</a></dd>

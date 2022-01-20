@@ -73,6 +73,15 @@ def _bigquery_any_value_expr(dbmodel, expression):
     return 'ANY_VALUE(' + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + ')'
 
 
+def _bigquery_ieee_divide_expr(dbmodel, expression):
+    # don't issue an error
+    # https://cloud.google.com/bigquery/docs/reference/standard-sql/mathematical_functions#ieee_divide
+    assert len(expression.args) == 2
+    e0 = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+    e1 = dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
+    return f'IEEE_DIVIDE({e0}, 1.0 * ({e1}))'
+
+
 BigQuery_formatters = {
     "median": _bigquery_median_expr,
     "is_bad": _bigquery_is_bad_expr,
@@ -81,6 +90,7 @@ BigQuery_formatters = {
     "any": _bigquery_any_expr,
     "all": _bigquery_all_expr,
     "any_value": _bigquery_any_value_expr,
+    "%/%": _bigquery_ieee_divide_expr,
 }
 
 

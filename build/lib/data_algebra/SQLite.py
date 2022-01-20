@@ -38,6 +38,30 @@ def _sqlite_is_bad_expr(dbmodel, expression):
     )
 
 
+def _sqlite_is_nan_expr(dbmodel, expression):
+    """
+    Return SQL to check for nan values.
+    """
+
+    return (
+        "is_nan("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ")"
+    )
+
+
+def _sqlite_is_inf_expr(dbmodel, expression):
+    """
+    Return SQL to check for nan values.
+    """
+
+    return (
+        "is_inf("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ")"
+    )
+
+
 def _sqlite_RAND_expr(dbmodel, expression):
     """
     Return independent uniform numbers in the range [0, 1]
@@ -89,6 +113,8 @@ def _sqlite_logical_and_expr(dbmodel, expression):
 
 SQLite_formatters = {
     "is_bad": _sqlite_is_bad_expr,
+    "is_nan": _sqlite_is_nan_expr,
+    "is_inf": _sqlite_is_inf_expr,
     "rand": _sqlite_RAND_expr,
     "remainder": _sqlite_remainder_expr,
     'logical_or': _sqlite_logical_or_expr,
@@ -102,12 +128,40 @@ def _check_scalar_bad(x):
     """
 
     if x is None:
-        return 1
+        return True
     if not isinstance(x, numbers.Number):
-        return 0
+        return False
     if numpy.isinf(x) or numpy.isnan(x):
-        return 1
-    return 0
+        return True
+    return False
+
+
+def _check_scalar_nan(x):
+    """
+    Return 1 if scalar value is nan, else 0.
+    """
+
+    if x is None:
+        return True  # sqlite can't tell this from nan
+    if not isinstance(x, numbers.Number):
+        return False
+    if numpy.isnan(x):
+        return True
+    return False
+
+
+def _check_scalar_inf(x):
+    """
+    Return 1 if scalar value is inf, else 0.
+    """
+
+    if x is None:
+        return False
+    if not isinstance(x, numbers.Number):
+        return False
+    if numpy.isinf(x):
+        return True
+    return False
 
 
 def _sign_fn(x):
@@ -272,6 +326,8 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         """
         # https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.create_function
         conn.create_function("is_bad", 1, _check_scalar_bad)
+        conn.create_function("is_nan", 1, _check_scalar_nan)
+        conn.create_function("is_inf", 1, _check_scalar_inf)
         saw = set()
         # math fns
         math_fns = {
@@ -296,8 +352,6 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             "frexp": functools.partial(_wrap_scalar_fn, math.frexp),
             "gamma": functools.partial(_wrap_scalar_fn, math.gamma),
             "isfinite": functools.partial(_wrap_scalar_fn, math.isfinite),
-            "isinf": functools.partial(_wrap_scalar_fn, math.isinf),
-            "isnan": functools.partial(_wrap_scalar_fn, math.isnan),
             "lgamma": functools.partial(_wrap_scalar_fn, math.lgamma),
             "log": functools.partial(_wrap_scalar_fn, math.log),
             "log10": functools.partial(_wrap_scalar_fn, math.log10),

@@ -70,7 +70,7 @@ Licence: https://github.com/lark-parser/lark/blob/master/LICENSE (MIT)</p>
 <span class="c1"># changes:</span>
 <span class="c1"># !_mul_op: &quot;*&quot;|&quot;@&quot;|&quot;/&quot;|&quot;%&quot;|&quot;//&quot;</span>
 <span class="c1"># redefined as</span>
-<span class="c1"># !_mul_op: &quot;*&quot;|&quot;@&quot;|&quot;/&quot;|&quot;%+%&quot;|&quot;%?%&quot;|&quot;%&quot;|&quot;//&quot;</span>
+<span class="c1"># !_mul_op: &quot;*&quot;|&quot;/&quot;|&quot;%+%&quot;|&quot;%?%&quot;|&quot;%&quot;|&quot;//&quot;|&quot;%/%&quot;</span>
 <span class="c1"># added in or_test_sym and and_test_sym</span>
 <span class="c1"># removed expression &amp; and |</span>
 
@@ -182,7 +182,7 @@ Licence: https://github.com/lark-parser/lark/blob/master/LICENSE (MIT)</p>
 <span class="s2">!_add_op: &quot;+&quot;|&quot;-&quot;</span>
 <span class="s2">!_shift_op: &quot;&lt;&lt;&quot;|&quot;&gt;&gt;&quot;</span>
 <span class="s2">// !_mul_op: &quot;*&quot;|&quot;@&quot;|&quot;/&quot;|&quot;%&quot;|&quot;//&quot;</span>
-<span class="s2">!_mul_op: &quot;*&quot;|&quot;@&quot;|&quot;/&quot;|&quot;</span><span class="si">%+%</span><span class="s2">&quot;|&quot;%?%&quot;|&quot;%&quot;|&quot;//&quot;</span>
+<span class="s2">!_mul_op: &quot;*&quot;|&quot;/&quot;|&quot;</span><span class="si">%+%</span><span class="s2">&quot;|&quot;%?%&quot;|&quot;%&quot;|&quot;//&quot;|&quot;%/%&quot;</span>
 <span class="s2">// &lt;&gt; isn&#39;t actually a valid comparison operator in Python. It&#39;s here for the</span>
 <span class="s2">// sake of a __future__ import described in PEP 401 (which really works :-)</span>
 <span class="s2">!_comp_op: &quot;&lt;&quot;|&quot;&gt;&quot;|&quot;==&quot;|&quot;&gt;=&quot;|&quot;&lt;=&quot;|&quot;&lt;&gt;&quot;|&quot;!=&quot;|&quot;in&quot;|&quot;not&quot; &quot;in&quot;|&quot;is&quot;|&quot;is&quot; &quot;not&quot;</span>

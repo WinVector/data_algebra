@@ -24,10 +24,18 @@ def _postgresql_as_int64(dbmodel, expression):
     )
 
 
+def _postgresql_null_divide_expr(dbmodel, expression):
+    assert len(expression.args) == 2
+    e0 = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
+    e1 = dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
+    return f'{e0} / NULLIF({e1}, 0)'
+
+
 # map from op-name to special SQL formatting code
 PostgreSQL_formatters = {
     "___": lambda dbmodel, expression: str(expression.to_python()),
     "as_int64": _postgresql_as_int64,
+    "%/%": _postgresql_null_divide_expr,
 }
 
 
@@ -48,6 +56,7 @@ class PostgreSQLModel(data_algebra.db_model.DBModel):
             string_quote="'",
             sql_formatters=PostgreSQL_formatters,
             op_replacements=op_replacements,
+            float_type='DOUBLE PRECISION',
         )
 
 
