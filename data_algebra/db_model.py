@@ -1839,7 +1839,7 @@ class DBModel:
             model_descr = re.sub(r"\s+", " ", str(self))
             sql_str_list = [
                 f"-- data_algebra SQL https://github.com/WinVector/data_algebra",
-                f"--  dialect: {model_descr}",
+                f"--  dialect: {model_descr} {data_algebra.__version__}",
                 f"--       string quote: {self.string_quote}",
                 f"--   identifier quote: {self.identifier_quote}",
             ] + sql_str_list
