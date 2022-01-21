@@ -47,7 +47,7 @@ tests/test_get_methods_used.py .                                         [ 30%]
 tests/test_ghost_col_issue.py .                                          [ 31%]
 tests/test_idioms.py .................                                   [ 37%]
 tests/test_if_else.py .....                                              [ 39%]
-tests/test_if_else_return_type.py F                                      [ 39%]
+tests/test_if_else_return_type.py .                                      [ 39%]
 tests/test_incomplete_agg.py .                                           [ 39%]
 tests/test_join_check.py .                                               [ 40%]
 tests/test_join_effects.py .                                             [ 40%]
@@ -117,58 +117,6 @@ tests/test_window_fns.py .....                                           [ 98%]
 tests/test_with.py ..                                                    [ 99%]
 tests/test_xicor.py ..                                                   [100%]
 
-=================================== FAILURES ===================================
-___________________________ test_if_else_return_type ___________________________
-
-    def test_if_else_return_type():
-        pd = data_algebra.default_data_model.pd
-        d = pd.DataFrame({
-            'x': [True, False, None],
-        })
-        ops = (
-            descr(d=d)
-                .extend({
-                    'w': 'x.where(1.0, 2.0)',
-                    'i': 'x.if_else(1.0, 2.0)',
-                })
-        )
-        res = ops.transform(d)
-        expect = pd.DataFrame({
-            'x': [True, False, None],
-            'w': [1.0, 2.0, 2.0],
-            'i': [1.0, 2.0, numpy.nan],
-        })
-        assert data_algebra.test_util.equivalent_frames(res, expect)
-        assert str(res['w'].dtype) == 'float64'
-        assert str(res['i'].dtype) == 'float64'
->       numpy.isnan(res)  # when column types are wrong this threw in pyvteat test_KDD2009.py
-
-tests/test_if_else_return_type.py:31: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-../../../opt/anaconda3/envs/ai_academy_3_9/lib/python3.9/site-packages/pandas/core/generic.py:2032: in __array_ufunc__
-    return arraylike.array_ufunc(self, ufunc, method, *inputs, **kwargs)
-../../../opt/anaconda3/envs/ai_academy_3_9/lib/python3.9/site-packages/pandas/core/arraylike.py:372: in array_ufunc
-    result = mgr.apply(getattr(ufunc, method))
-../../../opt/anaconda3/envs/ai_academy_3_9/lib/python3.9/site-packages/pandas/core/internals/managers.py:325: in apply
-    applied = b.apply(f, **kwargs)
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-self = ObjectBlock: slice(0, 1, 1), 1 x 3, dtype: object
-func = <method-wrapper '__call__' of numpy.ufunc object at 0x7fb3f81ee7c0>
-kwargs = {}
-
-    @final
-    def apply(self, func, **kwargs) -> list[Block]:
-        """
-        apply the function to my values; return a block if we are not
-        one
-        """
-        with np.errstate(all="ignore"):
->           result = func(self.values, **kwargs)
-E           TypeError: ufunc 'isnan' not supported for the input types, and the inputs could not be safely coerced to any supported types according to the casting rule ''safe''
-
-../../../opt/anaconda3/envs/ai_academy_3_9/lib/python3.9/site-packages/pandas/core/internals/blocks.py:382: TypeError
-
 ---------- coverage: platform darwin, python 3.9.7-final-0 -----------
 Name                                   Stmts   Miss  Cover   Missing
 --------------------------------------------------------------------
@@ -204,6 +152,5 @@ data_algebra/util.py                     140     29    79%   26, 51, 56, 61, 84-
 --------------------------------------------------------------------
 TOTAL                                   5669    712    87%
 
-=========================== short test summary info ============================
-FAILED tests/test_if_else_return_type.py::test_if_else_return_type - TypeErro...
-================== 1 failed, 281 passed in 406.07s (0:06:46) ===================
+
+======================= 282 passed in 485.89s (0:08:05) ========================
