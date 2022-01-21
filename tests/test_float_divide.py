@@ -72,8 +72,8 @@ def test_is_inf():
 def test_float_divide_works():
     pd = data_algebra.default_data_model.pd
     d = pd.DataFrame({
-        'a': [1, 1, 1, 0, numpy.inf],
-        'b': [1, 2, 0, 0, numpy.inf],
+        'a': [1, 1, 1, 0],
+        'b': [1, 2, 0, 0],
     })
     ops = (
         descr(d=d)
@@ -86,9 +86,9 @@ def test_float_divide_works():
     )
     res_pandas = ops.transform(d)
     expect = pd.DataFrame({
-        'a': [1, 1, 1, 0, numpy.inf],
-        'b': [1, 2, 0, 0, numpy.inf],
-        'r': [1.0, 0.5, None, None, None],
+        'a': [1, 1, 1, 0],
+        'b': [1, 2, 0, 0],
+        'r': [1.0, 0.5, None, None],
         })
     assert data_algebra.test_util.equivalent_frames(expect, res_pandas)
     sqlite_handle = data_algebra.SQLite.example_handle()
