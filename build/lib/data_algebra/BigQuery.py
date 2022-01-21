@@ -78,8 +78,8 @@ def _bigquery_ieee_divide_expr(dbmodel, expression):
     # https://cloud.google.com/bigquery/docs/reference/standard-sql/mathematical_functions#ieee_divide
     assert len(expression.args) == 2
     e0 = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-    e1 = dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
-    return f'IEEE_DIVIDE({e0}, 1.0 * ({e1}))'
+    e1 = dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
+    return f'IEEE_DIVIDE({e0}, 1.0 * {e1})'
 
 
 BigQuery_formatters = {
