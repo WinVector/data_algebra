@@ -23,6 +23,7 @@ def user_pytest_start(request):
         with gzip.open(global_test_result_cache_fname, "rb") as in_f:
             res = data_algebra.test_util.global_test_result_cache = pickle.load(in_f)
         assert isinstance(res, data_algebra.eval_cache.ResultCache)
+        res.dirty = False
         data_algebra.test_util.global_test_result_cache = res
     except FileNotFoundError:
         pass
@@ -31,6 +32,7 @@ def user_pytest_start(request):
         """write dirty cache on test system teardown"""
         if ((data_algebra.test_util.global_test_result_cache is not None)
                 and data_algebra.test_util.global_test_result_cache.dirty):
+            data_algebra.test_util.global_test_result_cache.dirty = False
             with gzip.open(global_test_result_cache_fname, "wb") as out_f:
                 pickle.dump(
                     data_algebra.test_util.global_test_result_cache, out_f
