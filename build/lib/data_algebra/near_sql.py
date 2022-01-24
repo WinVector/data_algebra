@@ -83,9 +83,9 @@ class NearSQL(abc.ABC):
         self.is_table = is_table
         self.annotation = annotation
 
-    def to_bound_near_sql(self, *, columns=None, force_sql=False, constants=None):
+    def to_bound_near_sql(self, *, columns=None, force_sql=False):
         return NearSQLContainer(
-            near_sql=self, columns=columns, force_sql=force_sql, constants=constants
+            near_sql=self, columns=columns, force_sql=force_sql
         )
 
     @abc.abstractmethod
@@ -94,7 +94,6 @@ class NearSQL(abc.ABC):
         *,
         columns=None,
         force_sql=False,
-        constants=None,
         db_model,
         sql_format_options=None,
     ) -> List[str]:
@@ -107,35 +106,29 @@ class NearSQL(abc.ABC):
 
 class NearSQLContainer:
     """
-    NearSQL with bound in columns, force_sql, and constants decisions
+    NearSQL with bound in columns, force_sql
     """
 
     near_sql: NearSQL
     force_sql: bool
-    constants: Optional[Dict]
 
-    def __init__(self, *, near_sql: NearSQL, columns=None, force_sql: bool = False, constants=None):
+    def __init__(self, *, near_sql: NearSQL, columns=None, force_sql: bool = False):
         assert isinstance(near_sql, NearSQL)
         assert isinstance(
             columns, (set, data_algebra.OrderedSet.OrderedSet, list, type(None))
         )
         assert isinstance(force_sql, bool)
-        assert isinstance(constants, (dict, type(None)))
         self.near_sql = near_sql
         self.columns = None
         if columns is not None:
             self.columns = columns.copy()
         self.columns = columns
         self.force_sql = force_sql
-        self.constants = None
-        if constants is not None:
-            self.constants = constants.copy()
 
     def to_sql_str_list(self, db_model, sql_format_options=None) -> List[str]:
         return self.near_sql.to_sql_str_list(
             columns=self.columns,
             force_sql=self.force_sql,
-            constants=self.constants,
             db_model=db_model,
             sql_format_options=sql_format_options,
         )
@@ -210,7 +203,6 @@ class NearSQLNamedEntity(NearSQL):
         *,
         columns=None,
         force_sql=False,
-        constants=None,
         db_model,
         sql_format_options=None,
     ) -> List[str]:
@@ -228,7 +220,6 @@ class NearSQLCommonTableExpression(NearSQLNamedEntity):
         *,
         columns=None,
         force_sql=False,
-        constants=None,
         db_model,
         sql_format_options=None,
     ) -> List[str]:
@@ -236,7 +227,6 @@ class NearSQLCommonTableExpression(NearSQLNamedEntity):
             near_sql=self,
             columns=columns,
             force_sql=force_sql,
-            constants=constants,
             sql_format_options=sql_format_options,
         )
 
@@ -257,7 +247,6 @@ class NearSQLTable(NearSQLNamedEntity):
         *,
         columns=None,
         force_sql=False,
-        constants=None,
         db_model,
         sql_format_options=None,
     ) -> List[str]:
@@ -265,7 +254,6 @@ class NearSQLTable(NearSQLNamedEntity):
             near_sql=self,
             columns=columns,
             force_sql=force_sql,
-            constants=constants,
             sql_format_options=sql_format_options,
         )
 
@@ -316,14 +304,12 @@ class NearSQLUnaryStep(NearSQL):
         *,
         columns=None,
         force_sql=False,
-        constants=None,
         db_model,
         sql_format_options=None,
     ) -> List[str]:
         return db_model.nearsqlunary_to_sql_str_list_(
             near_sql=self,
             columns=columns,
-            constants=constants,
             sql_format_options=sql_format_options,
         )
 
@@ -386,7 +372,6 @@ class NearSQLBinaryStep(NearSQL):
         *,
         columns=None,
         force_sql=False,
-        constants=None,
         db_model,
         sql_format_options=None,
     ) -> List[str]:
@@ -394,7 +379,6 @@ class NearSQLBinaryStep(NearSQL):
             near_sql=self,
             columns=columns,
             force_sql=force_sql,
-            constants=constants,
             sql_format_options=sql_format_options,
             quoted_query_name=self.quoted_query_name,
         )
@@ -477,7 +461,6 @@ class NearSQLRawQStep(NearSQL):
         *,
         columns=None,
         force_sql=False,
-        constants=None,
         db_model,
         sql_format_options=None,
     ) -> List[str]:
