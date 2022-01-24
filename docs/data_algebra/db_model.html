@@ -1835,6 +1835,10 @@
         <span class="n">sql_right</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation_</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using_right</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
+        <span class="k">if</span> <span class="n">sql_left</span><span class="o">.</span><span class="n">quoted_query_name</span> <span class="o">==</span> <span class="n">sql_right</span><span class="o">.</span><span class="n">quoted_query_name</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;In join steps left and right subquery must not be identical, </span>
+<span class="s2">                one can work around this by using an extend() to add a new column on one side of join</span>
+<span class="s2">                (though one must make sure query optimization does not eliminate such a column).&quot;&quot;&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">using_left</span><span class="p">,</span> <span class="n">sql_left</span><span class="p">,</span> <span class="n">using_right</span><span class="p">,</span> <span class="n">sql_right</span>
 
     <span class="k">def</span> <span class="nf">natural_join_to_near_sql</span><span class="p">(</span>
@@ -1891,7 +1895,6 @@
             <span class="p">)</span>
             <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_end</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
                 <span class="n">on_terms</span> <span class="o">=</span> <span class="n">on_terms</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">on_end</span><span class="p">]</span>
-        <span class="c1"># TODO: if names match, wrap sub_sql2 (and do it prior to term construction)</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLBinaryStep</span><span class="p">(</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">query_name</span><span class="o">=</span><span class="n">view_name</span><span class="p">,</span>
@@ -3573,6 +3576,10 @@
         <span class="n">sql_right</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation_</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using_right</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
+        <span class="k">if</span> <span class="n">sql_left</span><span class="o">.</span><span class="n">quoted_query_name</span> <span class="o">==</span> <span class="n">sql_right</span><span class="o">.</span><span class="n">quoted_query_name</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;In join steps left and right subquery must not be identical, </span>
+<span class="s2">                one can work around this by using an extend() to add a new column on one side of join</span>
+<span class="s2">                (though one must make sure query optimization does not eliminate such a column).&quot;&quot;&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">using_left</span><span class="p">,</span> <span class="n">sql_left</span><span class="p">,</span> <span class="n">using_right</span><span class="p">,</span> <span class="n">sql_right</span>
 
     <span class="k">def</span> <span class="nf">natural_join_to_near_sql</span><span class="p">(</span>
@@ -3629,7 +3636,6 @@
             <span class="p">)</span>
             <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_end</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
                 <span class="n">on_terms</span> <span class="o">=</span> <span class="n">on_terms</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">on_end</span><span class="p">]</span>
-        <span class="c1"># TODO: if names match, wrap sub_sql2 (and do it prior to term construction)</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLBinaryStep</span><span class="p">(</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">query_name</span><span class="o">=</span><span class="n">view_name</span><span class="p">,</span>
@@ -5566,7 +5572,6 @@
             <span class="p">)</span>
             <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_end</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
                 <span class="n">on_terms</span> <span class="o">=</span> <span class="n">on_terms</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">on_end</span><span class="p">]</span>
-        <span class="c1"># TODO: if names match, wrap sub_sql2 (and do it prior to term construction)</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLBinaryStep</span><span class="p">(</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">query_name</span><span class="o">=</span><span class="n">view_name</span><span class="p">,</span>

@@ -1617,6 +1617,10 @@ class DBModel:
         sql_right = join_node.sources[1].to_near_sql_implementation_(
             db_model=self, using=using_right, temp_id_source=temp_id_source
         )
+        if sql_left.quoted_query_name == sql_right.quoted_query_name:
+            raise ValueError("""In join steps left and right subquery must not be identical, 
+                one can work around this by using an extend() to add a new column on one side of join
+                (though one must make sure query optimization does not eliminate such a column).""")
         return using_left, sql_left, using_right, sql_right
 
     def natural_join_to_near_sql(
@@ -1673,7 +1677,6 @@ class DBModel:
             )
             if (self.on_end is not None) and (len(self.on_end) > 0):
                 on_terms = on_terms + [self.on_end]
-        # TODO: if names match, wrap sub_sql2 (and do it prior to term construction)
         near_sql = data_algebra.near_sql.NearSQLBinaryStep(
             terms=terms,
             query_name=view_name,
