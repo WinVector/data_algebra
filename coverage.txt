@@ -248,12 +248,12 @@ data = {'d':    x
     
         if caught is not None:
 >           raise ValueError("testing caught " + str(caught))
-E           ValueError: testing caught DBHandle(db_model=SQLiteModel, conn=<sqlite3.Connection object at 0x7fee091708a0>) error in test Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+E           ValueError: testing caught DBHandle(db_model=SQLiteModel, conn=<sqlite3.Connection object at 0x7f856ba538a0>) error in test Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
 E           --  dialect: SQLiteModel 1.3.2
 E           --       string quote: '
 E           --   identifier quote: "
 E           SELECT  -- _0..natural_join(b= _1, by=['x'], jointype='LEFT')
-E              COALESCE("d"."x", "d"."x") AS "x"
+E            COALESCE("d"."x", "d"."x") AS "x"
 E           FROM
 E           (
 E            "d"
@@ -291,7 +291,7 @@ pandas.io.sql.DatabaseError: Execution failed on sql '-- data_algebra SQL https:
 --       string quote: '
 --   identifier quote: "
 SELECT  -- _0..natural_join(b= _1, by=['x'], jointype='LEFT')
-   COALESCE("d"."x", "d"."x") AS "x"
+ COALESCE("d"."x", "d"."x") AS "x"
 FROM
 (
  "d"
@@ -308,12 +308,12 @@ Traceback (most recent call last):
     _run_handle_experiments(
   File "/Users/johnmount/Documents/work/data_algebra/data_algebra/test_util.py", line 247, in _run_handle_experiments
     raise ValueError(f"{db_handle} error in test " + str(caught))
-ValueError: DBHandle(db_model=SQLiteModel, conn=<sqlite3.Connection object at 0x7fee091708a0>) error in test Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+ValueError: DBHandle(db_model=SQLiteModel, conn=<sqlite3.Connection object at 0x7f856ba538a0>) error in test Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
 --  dialect: SQLiteModel 1.3.2
 --       string quote: '
 --   identifier quote: "
 SELECT  -- _0..natural_join(b= _1, by=['x'], jointype='LEFT')
-   COALESCE("d"."x", "d"."x") AS "x"
+ COALESCE("d"."x", "d"."x") AS "x"
 FROM
 (
  "d"
@@ -361,4 +361,4 @@ TOTAL                                   5694    704    88%
 
 =========================== short test summary info ============================
 FAILED tests/test_dag_elim.py::test_dag_elim_btt - ValueError: testing caught...
-================== 1 failed, 287 passed in 436.19s (0:07:16) ===================
+================== 1 failed, 287 passed in 416.56s (0:06:56) ===================
