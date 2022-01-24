@@ -122,13 +122,30 @@ def test_dag_elim_btt():
                 jointype='left',
             )
     )
-    db_model = data_algebra.SQLite.SQLiteModel()
-    sql = db_model.to_sql(
-        ops,
-        sql_format_options=data_algebra.db_model.SQLFormatOptions(use_with=True, annotate=False)
+    expect = pd.DataFrame({
+        'x': [1, 2, 3],
+    })
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+
+
+def test_dag_elim_bttf():
+    # test work around or fix
+    pd = data_algebra.default_data_model.pd
+    d = pd.DataFrame({
+        'x': [1, 2, 3],
+    })
+    ops = (
+        descr(d=d)
+            .natural_join(
+                b=descr(d=d).extend({'waste_column': 1}),
+                by=['x'],
+                jointype='left',
+                )
+            # can't drop or optimizer gets rid of waste extend
     )
     expect = pd.DataFrame({
         'x': [1, 2, 3],
+        'waste_column': 1
     })
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
 

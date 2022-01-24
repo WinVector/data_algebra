@@ -2,7 +2,7 @@
 platform darwin -- Python 3.9.7, pytest-6.2.4, py-1.10.0, pluggy-0.13.1
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: cov-2.12.1, anyio-2.2.0, typeguard-2.13.0
-collected 292 items
+collected 293 items
 
 tests/test_OrderedSet.py ....                                            [  1%]
 tests/test_agg.py .                                                      [  1%]
@@ -21,13 +21,13 @@ tests/test_cols_used.py .                                                [  9%]
 tests/test_compare_data_frames.py .                                      [  9%]
 tests/test_complex_expr.py ....                                          [ 11%]
 tests/test_compound_where.py ..                                          [ 11%]
-tests/test_concat_rows.py ...                                            [ 13%]
+tests/test_concat_rows.py ...                                            [ 12%]
 tests/test_container.py ..                                               [ 13%]
-tests/test_cross_product_join.py .                                       [ 14%]
-tests/test_dag_elim.py ....F.....                                        [ 17%]
-tests/test_data_model_isolation.py .                                     [ 17%]
+tests/test_cross_product_join.py .                                       [ 13%]
+tests/test_dag_elim.py ....F......                                       [ 17%]
+tests/test_data_model_isolation.py .                                     [ 18%]
 tests/test_db_handle.py ..                                               [ 18%]
-tests/test_db_model.py .                                                 [ 18%]
+tests/test_db_model.py .                                                 [ 19%]
 tests/test_degenerate_project.py .                                       [ 19%]
 tests/test_drop_columns.py .                                             [ 19%]
 tests/test_eval_cache.py ...                                             [ 20%]
@@ -37,13 +37,13 @@ tests/test_exp.py .                                                      [ 26%]
 tests/test_exp_parens.py .                                               [ 26%]
 tests/test_expr_parse.py .                                               [ 27%]
 tests/test_expression_expectations.py ..                                 [ 27%]
-tests/test_extend.py ......                                              [ 29%]
+tests/test_extend.py ......                                              [ 30%]
 tests/test_extend_order.py .                                             [ 30%]
 tests/test_first_last.py .                                               [ 30%]
 tests/test_float_divide.py ...                                           [ 31%]
-tests/test_flow_text.py .                                                [ 31%]
+tests/test_flow_text.py .                                                [ 32%]
 tests/test_forbidden_calculation.py ..                                   [ 32%]
-tests/test_free_fn.py .                                                  [ 32%]
+tests/test_free_fn.py .                                                  [ 33%]
 tests/test_get_methods_used.py .                                         [ 33%]
 tests/test_ghost_col_issue.py .                                          [ 33%]
 tests/test_idioms.py .................                                   [ 39%]
@@ -52,17 +52,17 @@ tests/test_if_else_return_type.py .                                      [ 41%]
 tests/test_incomplete_agg.py .                                           [ 41%]
 tests/test_join_check.py .                                               [ 42%]
 tests/test_join_effects.py .                                             [ 42%]
-tests/test_join_multi_key.py .                                           [ 42%]
+tests/test_join_multi_key.py .                                           [ 43%]
 tests/test_join_opt.py .                                                 [ 43%]
 tests/test_join_variations.py .                                          [ 43%]
 tests/test_lark_parser.py .....                                          [ 45%]
 tests/test_locf.py .                                                     [ 45%]
-tests/test_logistic_example.py .                                         [ 45%]
+tests/test_logistic_example.py .                                         [ 46%]
 tests/test_mapv.py ..                                                    [ 46%]
-tests/test_math.py .                                                     [ 46%]
+tests/test_math.py .                                                     [ 47%]
 tests/test_method_catalog_issues.py ..                                   [ 47%]
-tests/test_minimum.py .                                                  [ 47%]
-tests/test_mod_fns.py ...                                                [ 48%]
+tests/test_minimum.py .                                                  [ 48%]
+tests/test_mod_fns.py ...                                                [ 49%]
 tests/test_multi_map.py .                                                [ 49%]
 tests/test_narrow.py .                                                   [ 49%]
 tests/test_natural_join.py .                                             [ 50%]
@@ -100,9 +100,9 @@ tests/test_spark_sql.py ...                                              [ 78%]
 tests/test_sql_extend_shortening.py ..                                   [ 79%]
 tests/test_sqlite.py .............                                       [ 83%]
 tests/test_sqlite_joins.py ...                                           [ 84%]
-tests/test_std_var.py ...                                                [ 85%]
+tests/test_std_var.py ...                                                [ 86%]
 tests/test_strat_example.py ..                                           [ 86%]
-tests/test_sum_cumsum.py .                                               [ 86%]
+tests/test_sum_cumsum.py .                                               [ 87%]
 tests/test_sum_one.py .                                                  [ 87%]
 tests/test_t_test_example.py ..                                          [ 88%]
 tests/test_table_is_key_by_columns.py .                                  [ 88%]
@@ -134,17 +134,12 @@ ______________________________ test_dag_elim_btt _______________________________
                     jointype='left',
                 )
         )
-        db_model = data_algebra.SQLite.SQLiteModel()
-        sql = db_model.to_sql(
-            ops,
-            sql_format_options=data_algebra.db_model.SQLFormatOptions(use_with=True, annotate=False)
-        )
         expect = pd.DataFrame({
             'x': [1, 2, 3],
         })
 >       data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
 
-tests/test_dag_elim.py:133: 
+tests/test_dag_elim.py:128: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
 ops = (
@@ -248,12 +243,8 @@ data = {'d':    x
     
         if caught is not None:
 >           raise ValueError("testing caught " + str(caught))
-E           ValueError: testing caught DBHandle(db_model=SQLiteModel, conn=<sqlite3.Connection object at 0x7f9dea5a8990>) error in test Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
-E           --  dialect: SQLiteModel 1.3.2
-E           --       string quote: '
-E           --   identifier quote: "
-E           SELECT  -- _0..natural_join(b= _1, by=['x'], jointype='LEFT')
-E              COALESCE("d"."x", "d"."x") AS "x"
+E           ValueError: testing caught DBHandle(db_model=SQLiteModel, conn=<sqlite3.Connection object at 0x7ff5f8b46990>) error in test Execution failed on sql 'SELECT
+E            COALESCE("d"."x", "d"."x") AS "x"
 E           FROM
 E           (
 E            "d"
@@ -286,12 +277,8 @@ Traceback (most recent call last):
     cursor = self.execute(*args)
   File "/Users/johnmount/opt/anaconda3/envs/ai_academy_3_9/lib/python3.9/site-packages/pandas/io/sql.py", line 2068, in execute
     raise ex from exc
-pandas.io.sql.DatabaseError: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel 1.3.2
---       string quote: '
---   identifier quote: "
-SELECT  -- _0..natural_join(b= _1, by=['x'], jointype='LEFT')
-   COALESCE("d"."x", "d"."x") AS "x"
+pandas.io.sql.DatabaseError: Execution failed on sql 'SELECT
+ COALESCE("d"."x", "d"."x") AS "x"
 FROM
 (
  "d"
@@ -308,12 +295,8 @@ Traceback (most recent call last):
     _run_handle_experiments(
   File "/Users/johnmount/Documents/work/data_algebra/data_algebra/test_util.py", line 247, in _run_handle_experiments
     raise ValueError(f"{db_handle} error in test " + str(caught))
-ValueError: DBHandle(db_model=SQLiteModel, conn=<sqlite3.Connection object at 0x7f9dea5a8990>) error in test Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel 1.3.2
---       string quote: '
---   identifier quote: "
-SELECT  -- _0..natural_join(b= _1, by=['x'], jointype='LEFT')
-   COALESCE("d"."x", "d"."x") AS "x"
+ValueError: DBHandle(db_model=SQLiteModel, conn=<sqlite3.Connection object at 0x7ff5f8b46990>) error in test Execution failed on sql 'SELECT
+ COALESCE("d"."x", "d"."x") AS "x"
 FROM
 (
  "d"
@@ -361,4 +344,4 @@ TOTAL                                   5684    702    88%
 
 =========================== short test summary info ============================
 FAILED tests/test_dag_elim.py::test_dag_elim_btt - ValueError: testing caught...
-================== 1 failed, 291 passed in 380.11s (0:06:20) ===================
+================== 1 failed, 292 passed in 455.32s (0:07:35) ===================
