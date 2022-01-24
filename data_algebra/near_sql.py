@@ -158,6 +158,13 @@ class NearSQLContainer:
         in_with_form = self.near_sql.to_with_form()
         sequence = in_with_form.previous_steps
         stub = in_with_form.last_step
+        assert isinstance(stub, NearSQL)
+        assert isinstance(sequence, List)
+        for v in sequence:
+            assert isinstance(v, tuple)
+            assert len(v) == 2
+            assert isinstance(v[0], str)
+            assert isinstance(v[1], NearSQLContainer)
         if not stub.is_table:
             # replace step with a reference
             if stub.quoted_query_name not in {k for k, v in sequence}:
@@ -167,17 +174,24 @@ class NearSQLContainer:
                         NearSQLContainer(near_sql=stub, force_sql=self.force_sql,),
                     )
                 )
-            stub = NearSQLContainer(
+            new_stub = NearSQLContainer(
                 near_sql=NearSQLCommonTableExpression(
                     query_name=stub.query_name,
                     quoted_query_name=stub.quoted_query_name,
                 ),
                 force_sql=self.force_sql,
             )
-        return stub, sequence
+        else:
+            assert len(sequence) == 0
+            new_stub = NearSQLContainer(
+                near_sql=stub,
+                force_sql=True,
+            )
+        return new_stub, sequence
 
 
 class NearSQLNamedEntity(NearSQL):
+    """Model for tables and common table expressions"""
     def __init__(self, *, terms, query_name, quoted_query_name):
         NearSQL.__init__(
             self,
