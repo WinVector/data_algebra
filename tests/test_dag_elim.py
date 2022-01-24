@@ -155,3 +155,102 @@ def test_dag_elim_bttb():
         'x': [1, 2, 3],
     })
     data_algebra.test_util.check_transform(ops=ops, data={'d': d, 'd2': d}, expect=expect)
+
+
+def test_dag_elim_uee():
+    pd = data_algebra.default_data_model.pd
+    d = pd.DataFrame({
+        'x': [1, 2, 3],
+        'y': [1, 2, 3],
+    })
+    ops = (
+        descr(d=d)
+            .extend({'y': 'x'})
+            .concat_rows(
+                b=(
+                    descr(d=d)
+                        .extend({'y': 'x'})
+                ),
+            )
+    )
+    db_model = data_algebra.SQLite.SQLiteModel()
+    sql = db_model.to_sql(
+        ops,
+        sql_format_options=data_algebra.db_model.SQLFormatOptions(use_with=True, annotate=False)
+    )
+    expect = pd.DataFrame({
+        'x': [1, 2, 3, 1, 2, 3],
+        'y': [1, 2, 3, 1, 2, 3],
+        'source_name': ['a', 'a', 'a', 'b', 'b', 'b'],
+    })
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+
+
+def test_dag_elim_uet():
+    pd = data_algebra.default_data_model.pd
+    d = pd.DataFrame({
+        'x': [1, 2, 3],
+        'y': [1, 2, 3],
+    })
+    ops = (
+        descr(d=d)
+            .extend({'y': 'x'})
+            .concat_rows(
+                b=descr(d=d),
+            )
+    )
+    expect = pd.DataFrame({
+        'x': [1, 2, 3, 1, 2, 3],
+        'y': [1, 2, 3, 1, 2, 3],
+        'source_name': ['a', 'a', 'a', 'b', 'b', 'b'],
+    })
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+
+
+def test_dag_elim_ute():
+    pd = data_algebra.default_data_model.pd
+    d = pd.DataFrame({
+        'x': [1, 2, 3],
+        'y': [1, 2, 3],
+    })
+    ops = (
+        descr(d=d)
+            .concat_rows(
+                b=(
+                    descr(d=d)
+                        .extend({'y': 'x'})
+                ),
+            )
+    )
+    expect = pd.DataFrame({
+        'x': [1, 2, 3, 1, 2, 3],
+        'y': [1, 2, 3, 1, 2, 3],
+        'source_name': ['a', 'a', 'a', 'b', 'b', 'b'],
+    })
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+
+
+def test_dag_elim_utt():
+    pd = data_algebra.default_data_model.pd
+    d = pd.DataFrame({
+        'x': [1, 2, 3],
+        'y': [1, 2, 3],
+    })
+    ops = (
+        descr(d=d)
+            .concat_rows(
+                b=descr(d=d),
+            )
+    )
+    db_model = data_algebra.SQLite.SQLiteModel()
+    sql = db_model.to_sql(
+        ops,
+        sql_format_options=data_algebra.db_model.SQLFormatOptions(use_with=True, annotate=False)
+    )
+    expect = pd.DataFrame({
+        'x': [1, 2, 3, 1, 2, 3],
+        'y': [1, 2, 3, 1, 2, 3],
+        'source_name': ['a', 'a', 'a', 'b', 'b', 'b'],
+    })
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+

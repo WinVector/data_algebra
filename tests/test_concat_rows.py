@@ -31,7 +31,7 @@ def test_concat_rows():
 
 
 def test_if_concat_is_stoopid_1():
-    # look if concat is concating by position intead of name
+    # look if concat is concating by position instead of name
     d1 = data_algebra.default_data_model.pd.DataFrame({"x": ["a"], "y": ["b"]})
 
     d2 = data_algebra.default_data_model.pd.DataFrame({"y": ["c"], "x": ["d"]})

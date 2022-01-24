@@ -1673,13 +1673,14 @@ class DBModel:
             )
             if (self.on_end is not None) and (len(self.on_end) > 0):
                 on_terms = on_terms + [self.on_end]
+        # TODO: if names match, wrap sub_sql2 (and do it prior to term construction)
         near_sql = data_algebra.near_sql.NearSQLBinaryStep(
             terms=terms,
             query_name=view_name,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql1=sql_left.to_bound_near_sql(columns=using_left, force_sql=False),
             joiner=join_node.jointype + " JOIN",
-            sub_sql2=sql_right.to_bound_near_sql(columns=using_right, force_sql=False),  #  TODO: force_sql and pivot this up and get subquery name to fix self-join
+            sub_sql2=sql_right.to_bound_near_sql(columns=using_right, force_sql=False),
             suffix=on_terms,
             annotation=str(
                 join_node.to_python_src_(print_sources=False, indent=-1)
@@ -1711,36 +1712,32 @@ class DBModel:
         using_right = subusing[1]
         if set(using_left) != set(using_right):
             raise ValueError("left/right usings did not match")
-        sql_left = concat_node.sources[0].to_near_sql_implementation_(
-            db_model=self, using=using_left, temp_id_source=temp_id_source
+        using_joint = using_left.copy()
+        terms = {ci: None for ci in using_joint}
+        expr_left = concat_node.sources[0]
+        expr_right = concat_node.sources[1]
+        if concat_node.id_column is not None:
+            expr_left = expr_left.extend({concat_node.id_column: f'"{concat_node.a_name}"'})
+            expr_right = expr_right.extend({concat_node.id_column: f'"{concat_node.b_name}"'})
+            using_joint.add(concat_node.id_column)
+            terms.update({concat_node.id_column: None})
+        sql_left = expr_left.to_near_sql_implementation_(
+            db_model=self, using=using_joint, temp_id_source=temp_id_source
         )
-        sql_right = concat_node.sources[1].to_near_sql_implementation_(
-            db_model=self, using=using_left, temp_id_source=temp_id_source
+        sql_right = expr_right.to_near_sql_implementation_(
+            db_model=self, using=using_joint, temp_id_source=temp_id_source
         )
         view_name = "concat_rows_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
-        terms = {ci: None for ci in using_left}
-        constants_left = None
-        constants_right = None
-        if concat_node.id_column is not None:
-            constants_left = {
-                concat_node.id_column: self.quote_string(concat_node.a_name)
-            }
-            constants_right = {
-                concat_node.id_column: self.quote_string(concat_node.b_name)
-            }
-            terms.update({concat_node.id_column: None})
         near_sql = data_algebra.near_sql.NearSQLBinaryStep(
             terms=terms,
             query_name=view_name,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql1=sql_left.to_bound_near_sql(
-                columns=using_left, force_sql=True, constants=constants_left,
-            ),
+                columns=using_joint.copy(), force_sql=True),
             joiner="UNION ALL",
             sub_sql2=sql_right.to_bound_near_sql(
-                columns=using_left, force_sql=True, constants=constants_right,
-            ),
+                columns=using_joint.copy(), force_sql=True),
             annotation=str(
                 concat_node.to_python_src_(print_sources=False, indent=-1)
             ),
@@ -2046,7 +2043,6 @@ class DBModel:
         *,
         columns=None,
         force_sql=False,
-        constants=None,
         sql_format_options=None,
     ) -> List[str]:
         """
@@ -2071,7 +2067,6 @@ class DBModel:
         *,
         columns=None,
         force_sql=False,
-        constants=None,
         sql_format_options=None,
     ) -> List[str]:
         """
@@ -2088,14 +2083,8 @@ class DBModel:
                 columns = []
         if len(columns) <= 0:
             columns = []
-        have_constants = (constants is not None) and (len(constants) > 0)
-        if force_sql or have_constants:
+        if force_sql:
             terms_strs = [self.quote_identifier(k) for k in columns]
-            if have_constants:
-                terms_strs = terms_strs + [
-                    v + " AS " + self.quote_identifier(k)
-                    for (k, v) in constants.items()
-                ]
             if len(terms_strs) < 1:
                 terms_strs = ["*"]
             return (
@@ -2114,7 +2103,6 @@ class DBModel:
         *,
         columns=None,
         force_sql=False,
-        constants=None,
         sql_format_options=None,
     ) -> List[str]:
         """
@@ -2130,11 +2118,6 @@ class DBModel:
             if columns is None:
                 columns = [k for k in terms.keys()]
             terms_strs = [self.enc_term_(k, terms=terms) for k in columns]
-            if (constants is not None) and (len(constants) > 0):
-                terms_strs = terms_strs + [
-                    v + " AS " + self.quote_identifier(k)
-                    for (k, v) in constants.items()
-                ]
             if len(terms_strs) < 1:
                 terms_strs = ["*"]
         sql_start = "SELECT"
@@ -2198,7 +2181,6 @@ class DBModel:
         *,
         columns=None,
         force_sql=False,
-        constants=None,
         sql_format_options=None,
         quoted_query_name=None,
     ) -> List[str]:
@@ -2215,8 +2197,6 @@ class DBModel:
             terms = near_sql.terms
         if columns is None:
             columns = [k for k in terms.keys()]
-        if (constants is not None) and (len(constants) > 0):
-            terms.update(constants)
         terms_strs = [self.enc_term_(k, terms=terms) for k in columns]
         if len(terms_strs) < 1:
             terms_strs = ["*"]
