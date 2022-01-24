@@ -400,7 +400,7 @@ class NearSQLBinaryStep(NearSQL):
         )
 
     def to_with_form(self) -> SQLWithList:
-        if self.sub_sql1.near_sql.is_table and self.sub_sql2.near_sql.is_table:
+        if self.sub_sql1.near_sql.is_table and self.sub_sql2.near_sql.is_table:  # TODO: remove this?
             # tables references don't need to be re-encoded
             return SQLWithList(last_step=self, previous_steps=[])
         # non-trivial sequence
@@ -491,7 +491,7 @@ class NearSQLRawQStep(NearSQL):
         if self.sub_sql is None:
             # no sub-steps
             return SQLWithList(last_step=self, previous_steps=[])
-        if self.sub_sql.near_sql.is_table:
+        if self.sub_sql.near_sql.is_table:  # TODO: do we want this?
             # table references don't need to be re-encoded
             return SQLWithList(last_step=self, previous_steps=[])
         # non-trivial sequence

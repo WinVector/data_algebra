@@ -125,7 +125,7 @@ def test_dag_elim_btt():
     db_model = data_algebra.SQLite.SQLiteModel()
     sql = db_model.to_sql(
         ops,
-        sql_format_options=data_algebra.db_model.SQLFormatOptions(use_with=False, annotate=False)
+        sql_format_options=data_algebra.db_model.SQLFormatOptions(use_with=True, annotate=False)
     )
     expect = pd.DataFrame({
         'x': [1, 2, 3],
