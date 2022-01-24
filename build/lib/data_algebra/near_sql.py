@@ -5,14 +5,10 @@ Representation for operations that are nearly translated into SQL.
 import abc
 from typing import Dict, Iterable, List, Optional, Tuple
 
-import numpy
-
 import data_algebra.OrderedSet
 
 
 # classes for holding object for SQL generation
-
-# TODO: build a term object that carries the column use information
 
 
 class SQLWithList:
@@ -114,7 +110,11 @@ class NearSQLContainer:
     NearSQL with bound in columns, force_sql, and constants decisions
     """
 
-    def __init__(self, *, near_sql, columns=None, force_sql=False, constants=None):
+    near_sql: NearSQL
+    force_sql: bool
+    constants: Optional[Dict]
+
+    def __init__(self, *, near_sql: NearSQL, columns=None, force_sql: bool = False, constants=None):
         assert isinstance(near_sql, NearSQL)
         assert isinstance(
             columns, (set, data_algebra.OrderedSet.OrderedSet, list, type(None))
@@ -257,6 +257,12 @@ class NearSQLTable(NearSQLNamedEntity):
 
 
 class NearSQLUnaryStep(NearSQL):
+
+    sub_sql: NearSQLContainer
+    mergeable: bool
+    suffix: Optional[List]
+    declared_term_dependencies: Optional[Dict]
+
     def __init__(
         self,
         *,
@@ -325,6 +331,12 @@ class NearSQLUnaryStep(NearSQL):
 
 
 class NearSQLBinaryStep(NearSQL):
+
+    sub_sql1: NearSQLContainer
+    sub_sql2: NearSQLContainer
+    suffix: Optional[List]
+    joiner: str
+
     def __init__(
         self,
         *,
@@ -406,6 +418,12 @@ class NearSQLBinaryStep(NearSQL):
 
 
 class NearSQLRawQStep(NearSQL):
+
+    prefix: List
+    sub_sql: Optional[NearSQLContainer]
+    suffix: Optional[List]
+    add_select: bool
+
     def __init__(
         self,
         *,

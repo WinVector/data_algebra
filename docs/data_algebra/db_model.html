@@ -1994,6 +1994,10 @@
             <span class="n">sql_format_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SQLFormatOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert ViewRepresentation into SQL string.</span>
+
+<span class="sd">        :param ops: ViewRepresentation to convert</span>
+<span class="sd">        :param sql_format_options: sql formatting options</span>
+<span class="sd">        :return: sql string</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">DBModel</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">)</span>
@@ -2009,6 +2013,7 @@
             <span class="n">non_rec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_recommended_methods</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_rec</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2"> translation doesn&#39;t fully support method context: </span><span class="si">{</span><span class="n">non_rec</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+        <span class="c1"># TODO: put common sub-expression control object here and pass into converters</span>
         <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">to_near_sql_implementation_</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
@@ -3747,6 +3752,10 @@
             <span class="n">sql_format_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SQLFormatOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert ViewRepresentation into SQL string.</span>
+
+<span class="sd">        :param ops: ViewRepresentation to convert</span>
+<span class="sd">        :param sql_format_options: sql formatting options</span>
+<span class="sd">        :return: sql string</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">DBModel</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">)</span>
@@ -3762,6 +3771,7 @@
             <span class="n">non_rec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_recommended_methods</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_rec</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2"> translation doesn&#39;t fully support method context: </span><span class="si">{</span><span class="n">non_rec</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+        <span class="c1"># TODO: put common sub-expression control object here and pass into converters</span>
         <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">to_near_sql_implementation_</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
@@ -5789,6 +5799,10 @@
             <span class="n">sql_format_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SQLFormatOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert ViewRepresentation into SQL string.</span>
+
+<span class="sd">        :param ops: ViewRepresentation to convert</span>
+<span class="sd">        :param sql_format_options: sql formatting options</span>
+<span class="sd">        :return: sql string</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">DBModel</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">)</span>
@@ -5804,6 +5818,7 @@
             <span class="n">non_rec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_recommended_methods</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_rec</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2"> translation doesn&#39;t fully support method context: </span><span class="si">{</span><span class="n">non_rec</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+        <span class="c1"># TODO: put common sub-expression control object here and pass into converters</span>
         <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">to_near_sql_implementation_</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
@@ -5864,6 +5879,10 @@
         </details>
 
             <div class="docstring"><p>Convert ViewRepresentation into SQL string.</p>
+
+<p>:param ops: ViewRepresentation to convert
+:param sql_format_options: sql formatting options
+:return: sql string</p>
 </div>
 
 

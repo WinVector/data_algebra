@@ -1776,6 +1776,10 @@ class DBModel:
             sql_format_options: Optional[SQLFormatOptions] = None) -> str:
         """
         Convert ViewRepresentation into SQL string.
+
+        :param ops: ViewRepresentation to convert
+        :param sql_format_options: sql formatting options
+        :return: sql string
         """
         assert isinstance(self, DBModel)
         assert isinstance(ops, data_algebra.data_ops.ViewRepresentation)
@@ -1791,6 +1795,7 @@ class DBModel:
             non_rec = self.non_recommended_methods(ops)
             if len(non_rec) > 0:
                 warnings.warn(f"{self} translation doesn't fully support method context: {non_rec}", UserWarning)
+        # TODO: put common sub-expression control object here and pass into converters
         temp_id_source = [0]
         near_sql = ops.to_near_sql_implementation_(
             db_model=self, using=None, temp_id_source=temp_id_source

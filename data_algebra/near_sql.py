@@ -110,7 +110,11 @@ class NearSQLContainer:
     NearSQL with bound in columns, force_sql, and constants decisions
     """
 
-    def __init__(self, *, near_sql, columns=None, force_sql=False, constants=None):
+    near_sql: NearSQL
+    force_sql: bool
+    constants: Optional[Dict]
+
+    def __init__(self, *, near_sql: NearSQL, columns=None, force_sql: bool = False, constants=None):
         assert isinstance(near_sql, NearSQL)
         assert isinstance(
             columns, (set, data_algebra.OrderedSet.OrderedSet, list, type(None))
