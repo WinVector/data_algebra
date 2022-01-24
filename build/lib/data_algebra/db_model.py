@@ -1679,7 +1679,7 @@ class DBModel:
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql1=sql_left.to_bound_near_sql(columns=using_left, force_sql=False),
             joiner=join_node.jointype + " JOIN",
-            sub_sql2=sql_right.to_bound_near_sql(columns=using_right, force_sql=False),
+            sub_sql2=sql_right.to_bound_near_sql(columns=using_right, force_sql=False),  #  TODO: force_sql and pivot this up and get subquery name to fix self-join
             suffix=on_terms,
             annotation=str(
                 join_node.to_python_src_(print_sources=False, indent=-1)

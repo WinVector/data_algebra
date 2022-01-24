@@ -158,6 +158,13 @@ class NearSQLContainer:
         in_with_form = self.near_sql.to_with_form()
         sequence = in_with_form.previous_steps
         stub = in_with_form.last_step
+        assert isinstance(stub, NearSQL)
+        assert isinstance(sequence, List)
+        for v in sequence:
+            assert isinstance(v, tuple)
+            assert len(v) == 2
+            assert isinstance(v[0], str)
+            assert isinstance(v[1], NearSQLContainer)
         if not stub.is_table:
             # replace step with a reference
             if stub.quoted_query_name not in {k for k, v in sequence}:
@@ -167,17 +174,24 @@ class NearSQLContainer:
                         NearSQLContainer(near_sql=stub, force_sql=self.force_sql,),
                     )
                 )
-            stub = NearSQLContainer(
+            new_stub = NearSQLContainer(
                 near_sql=NearSQLCommonTableExpression(
                     query_name=stub.query_name,
                     quoted_query_name=stub.quoted_query_name,
                 ),
                 force_sql=self.force_sql,
             )
-        return stub, sequence
+        else:
+            assert len(sequence) == 0
+            new_stub = NearSQLContainer(
+                near_sql=stub,
+                force_sql=True,
+            )
+        return new_stub, sequence
 
 
 class NearSQLNamedEntity(NearSQL):
+    """Model for tables and common table expressions"""
     def __init__(self, *, terms, query_name, quoted_query_name):
         NearSQL.__init__(
             self,
@@ -386,7 +400,7 @@ class NearSQLBinaryStep(NearSQL):
         )
 
     def to_with_form(self) -> SQLWithList:
-        if self.sub_sql1.near_sql.is_table and self.sub_sql2.near_sql.is_table:
+        if self.sub_sql1.near_sql.is_table and self.sub_sql2.near_sql.is_table:  # TODO: remove this?
             # tables references don't need to be re-encoded
             return SQLWithList(last_step=self, previous_steps=[])
         # non-trivial sequence
@@ -477,7 +491,7 @@ class NearSQLRawQStep(NearSQL):
         if self.sub_sql is None:
             # no sub-steps
             return SQLWithList(last_step=self, previous_steps=[])
-        if self.sub_sql.near_sql.is_table:
+        if self.sub_sql.near_sql.is_table:  # TODO: do we want this?
             # table references don't need to be re-encoded
             return SQLWithList(last_step=self, previous_steps=[])
         # non-trivial sequence

@@ -340,6 +340,13 @@
         <span class="n">in_with_form</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">to_with_form</span><span class="p">()</span>
         <span class="n">sequence</span> <span class="o">=</span> <span class="n">in_with_form</span><span class="o">.</span><span class="n">previous_steps</span>
         <span class="n">stub</span> <span class="o">=</span> <span class="n">in_with_form</span><span class="o">.</span><span class="n">last_step</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stub</span><span class="p">,</span> <span class="n">NearSQL</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">List</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">NearSQLContainer</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">stub</span><span class="o">.</span><span class="n">is_table</span><span class="p">:</span>
             <span class="c1"># replace step with a reference</span>
             <span class="k">if</span> <span class="n">stub</span><span class="o">.</span><span class="n">quoted_query_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">}:</span>
@@ -349,17 +356,24 @@
                         <span class="n">NearSQLContainer</span><span class="p">(</span><span class="n">near_sql</span><span class="o">=</span><span class="n">stub</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_sql</span><span class="p">,),</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
-            <span class="n">stub</span> <span class="o">=</span> <span class="n">NearSQLContainer</span><span class="p">(</span>
+            <span class="n">new_stub</span> <span class="o">=</span> <span class="n">NearSQLContainer</span><span class="p">(</span>
                 <span class="n">near_sql</span><span class="o">=</span><span class="n">NearSQLCommonTableExpression</span><span class="p">(</span>
                     <span class="n">query_name</span><span class="o">=</span><span class="n">stub</span><span class="o">.</span><span class="n">query_name</span><span class="p">,</span>
                     <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">stub</span><span class="o">.</span><span class="n">quoted_query_name</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">force_sql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_sql</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">return</span> <span class="n">stub</span><span class="p">,</span> <span class="n">sequence</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+            <span class="n">new_stub</span> <span class="o">=</span> <span class="n">NearSQLContainer</span><span class="p">(</span>
+                <span class="n">near_sql</span><span class="o">=</span><span class="n">stub</span><span class="p">,</span>
+                <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_stub</span><span class="p">,</span> <span class="n">sequence</span>
 
 
 <span class="k">class</span> <span class="nc">NearSQLNamedEntity</span><span class="p">(</span><span class="n">NearSQL</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Model for tables and common table expressions&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">terms</span><span class="p">,</span> <span class="n">query_name</span><span class="p">,</span> <span class="n">quoted_query_name</span><span class="p">):</span>
         <span class="n">NearSQL</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
@@ -568,7 +582,7 @@
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">to_with_form</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SQLWithList</span><span class="p">:</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql1</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">is_table</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql2</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">is_table</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql1</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">is_table</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql2</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">is_table</span><span class="p">:</span>  <span class="c1"># TODO: remove this?</span>
             <span class="c1"># tables references don&#39;t need to be re-encoded</span>
             <span class="k">return</span> <span class="n">SQLWithList</span><span class="p">(</span><span class="n">last_step</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">previous_steps</span><span class="o">=</span><span class="p">[])</span>
         <span class="c1"># non-trivial sequence</span>
@@ -659,7 +673,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># no sub-steps</span>
             <span class="k">return</span> <span class="n">SQLWithList</span><span class="p">(</span><span class="n">last_step</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">previous_steps</span><span class="o">=</span><span class="p">[])</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">is_table</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">is_table</span><span class="p">:</span>  <span class="c1"># TODO: do we want this?</span>
             <span class="c1"># table references don&#39;t need to be re-encoded</span>
             <span class="k">return</span> <span class="n">SQLWithList</span><span class="p">(</span><span class="n">last_step</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">previous_steps</span><span class="o">=</span><span class="p">[])</span>
         <span class="c1"># non-trivial sequence</span>
@@ -1022,6 +1036,13 @@
         <span class="n">in_with_form</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">to_with_form</span><span class="p">()</span>
         <span class="n">sequence</span> <span class="o">=</span> <span class="n">in_with_form</span><span class="o">.</span><span class="n">previous_steps</span>
         <span class="n">stub</span> <span class="o">=</span> <span class="n">in_with_form</span><span class="o">.</span><span class="n">last_step</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stub</span><span class="p">,</span> <span class="n">NearSQL</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">List</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">NearSQLContainer</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">stub</span><span class="o">.</span><span class="n">is_table</span><span class="p">:</span>
             <span class="c1"># replace step with a reference</span>
             <span class="k">if</span> <span class="n">stub</span><span class="o">.</span><span class="n">quoted_query_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">}:</span>
@@ -1031,14 +1052,20 @@
                         <span class="n">NearSQLContainer</span><span class="p">(</span><span class="n">near_sql</span><span class="o">=</span><span class="n">stub</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_sql</span><span class="p">,),</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
-            <span class="n">stub</span> <span class="o">=</span> <span class="n">NearSQLContainer</span><span class="p">(</span>
+            <span class="n">new_stub</span> <span class="o">=</span> <span class="n">NearSQLContainer</span><span class="p">(</span>
                 <span class="n">near_sql</span><span class="o">=</span><span class="n">NearSQLCommonTableExpression</span><span class="p">(</span>
                     <span class="n">query_name</span><span class="o">=</span><span class="n">stub</span><span class="o">.</span><span class="n">query_name</span><span class="p">,</span>
                     <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">stub</span><span class="o">.</span><span class="n">quoted_query_name</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">force_sql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_sql</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">return</span> <span class="n">stub</span><span class="p">,</span> <span class="n">sequence</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+            <span class="n">new_stub</span> <span class="o">=</span> <span class="n">NearSQLContainer</span><span class="p">(</span>
+                <span class="n">near_sql</span><span class="o">=</span><span class="n">stub</span><span class="p">,</span>
+                <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_stub</span><span class="p">,</span> <span class="n">sequence</span>
 </pre></div>
 
         </details>
@@ -1153,6 +1180,13 @@
         <span class="n">in_with_form</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">to_with_form</span><span class="p">()</span>
         <span class="n">sequence</span> <span class="o">=</span> <span class="n">in_with_form</span><span class="o">.</span><span class="n">previous_steps</span>
         <span class="n">stub</span> <span class="o">=</span> <span class="n">in_with_form</span><span class="o">.</span><span class="n">last_step</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stub</span><span class="p">,</span> <span class="n">NearSQL</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">List</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">NearSQLContainer</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">stub</span><span class="o">.</span><span class="n">is_table</span><span class="p">:</span>
             <span class="c1"># replace step with a reference</span>
             <span class="k">if</span> <span class="n">stub</span><span class="o">.</span><span class="n">quoted_query_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">}:</span>
@@ -1162,14 +1196,20 @@
                         <span class="n">NearSQLContainer</span><span class="p">(</span><span class="n">near_sql</span><span class="o">=</span><span class="n">stub</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_sql</span><span class="p">,),</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
-            <span class="n">stub</span> <span class="o">=</span> <span class="n">NearSQLContainer</span><span class="p">(</span>
+            <span class="n">new_stub</span> <span class="o">=</span> <span class="n">NearSQLContainer</span><span class="p">(</span>
                 <span class="n">near_sql</span><span class="o">=</span><span class="n">NearSQLCommonTableExpression</span><span class="p">(</span>
                     <span class="n">query_name</span><span class="o">=</span><span class="n">stub</span><span class="o">.</span><span class="n">query_name</span><span class="p">,</span>
                     <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">stub</span><span class="o">.</span><span class="n">quoted_query_name</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">force_sql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_sql</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">return</span> <span class="n">stub</span><span class="p">,</span> <span class="n">sequence</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+            <span class="n">new_stub</span> <span class="o">=</span> <span class="n">NearSQLContainer</span><span class="p">(</span>
+                <span class="n">near_sql</span><span class="o">=</span><span class="n">stub</span><span class="p">,</span>
+                <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_stub</span><span class="p">,</span> <span class="n">sequence</span>
 </pre></div>
 
         </details>
@@ -1190,6 +1230,7 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">NearSQLNamedEntity</span><span class="p">(</span><span class="n">NearSQL</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Model for tables and common table expressions&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">terms</span><span class="p">,</span> <span class="n">query_name</span><span class="p">,</span> <span class="n">quoted_query_name</span><span class="p">):</span>
         <span class="n">NearSQL</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
@@ -1217,7 +1258,7 @@
 
         </details>
 
-            <div class="docstring"><p>Represent SQL queries in a mostly string-form</p>
+            <div class="docstring"><p>Model for tables and common table expressions</p>
 </div>
 
 
@@ -1330,7 +1371,7 @@
 
         </details>
 
-            <div class="docstring"><p>Represent SQL queries in a mostly string-form</p>
+            <div class="docstring"><p>Model for tables and common table expressions</p>
 </div>
 
 
@@ -1455,7 +1496,7 @@
 
         </details>
 
-            <div class="docstring"><p>Represent SQL queries in a mostly string-form</p>
+            <div class="docstring"><p>Model for tables and common table expressions</p>
 </div>
 
 
@@ -1848,7 +1889,7 @@
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">to_with_form</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SQLWithList</span><span class="p">:</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql1</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">is_table</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql2</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">is_table</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql1</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">is_table</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql2</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">is_table</span><span class="p">:</span>  <span class="c1"># TODO: remove this?</span>
             <span class="c1"># tables references don&#39;t need to be re-encoded</span>
             <span class="k">return</span> <span class="n">SQLWithList</span><span class="p">(</span><span class="n">last_step</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">previous_steps</span><span class="o">=</span><span class="p">[])</span>
         <span class="c1"># non-trivial sequence</span>
@@ -1995,7 +2036,7 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_with_form</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SQLWithList</span><span class="p">:</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql1</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">is_table</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql2</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">is_table</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql1</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">is_table</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql2</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">is_table</span><span class="p">:</span>  <span class="c1"># TODO: remove this?</span>
             <span class="c1"># tables references don&#39;t need to be re-encoded</span>
             <span class="k">return</span> <span class="n">SQLWithList</span><span class="p">(</span><span class="n">last_step</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">previous_steps</span><span class="o">=</span><span class="p">[])</span>
         <span class="c1"># non-trivial sequence</span>
@@ -2116,7 +2157,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># no sub-steps</span>
             <span class="k">return</span> <span class="n">SQLWithList</span><span class="p">(</span><span class="n">last_step</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">previous_steps</span><span class="o">=</span><span class="p">[])</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">is_table</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">is_table</span><span class="p">:</span>  <span class="c1"># TODO: do we want this?</span>
             <span class="c1"># table references don&#39;t need to be re-encoded</span>
             <span class="k">return</span> <span class="n">SQLWithList</span><span class="p">(</span><span class="n">last_step</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">previous_steps</span><span class="o">=</span><span class="p">[])</span>
         <span class="c1"># non-trivial sequence</span>
@@ -2253,7 +2294,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># no sub-steps</span>
             <span class="k">return</span> <span class="n">SQLWithList</span><span class="p">(</span><span class="n">last_step</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">previous_steps</span><span class="o">=</span><span class="p">[])</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">is_table</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">is_table</span><span class="p">:</span>  <span class="c1"># TODO: do we want this?</span>
             <span class="c1"># table references don&#39;t need to be re-encoded</span>
             <span class="k">return</span> <span class="n">SQLWithList</span><span class="p">(</span><span class="n">last_step</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">previous_steps</span><span class="o">=</span><span class="p">[])</span>
         <span class="c1"># non-trivial sequence</span>

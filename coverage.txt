@@ -2,7 +2,7 @@
 platform darwin -- Python 3.9.7, pytest-6.2.4, py-1.10.0, pluggy-0.13.1
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: cov-2.12.1, anyio-2.2.0, typeguard-2.13.0
-collected 283 items
+collected 288 items
 
 tests/test_OrderedSet.py ....                                            [  1%]
 tests/test_agg.py .                                                      [  1%]
@@ -11,7 +11,7 @@ tests/test_arith.py .                                                    [  2%]
 tests/test_arrow1.py ...                                                 [  3%]
 tests/test_bigquery_user_fns.py .                                        [  4%]
 tests/test_calc_warnings_errors.py .                                     [  4%]
-tests/test_cc.py ....                                                    [  6%]
+tests/test_cc.py ....                                                    [  5%]
 tests/test_cdata1.py ....                                                [  7%]
 tests/test_cdata_convenience.py .                                        [  7%]
 tests/test_cdata_example.py ...                                          [  8%]
@@ -22,101 +22,307 @@ tests/test_compare_data_frames.py .                                      [ 10%]
 tests/test_complex_expr.py ....                                          [ 11%]
 tests/test_compound_where.py ..                                          [ 12%]
 tests/test_concat_rows.py ...                                            [ 13%]
-tests/test_container.py ..                                               [ 14%]
+tests/test_container.py ..                                               [ 13%]
 tests/test_cross_product_join.py .                                       [ 14%]
-tests/test_dag_elim.py .                                                 [ 14%]
-tests/test_data_model_isolation.py .                                     [ 15%]
-tests/test_db_handle.py ..                                               [ 15%]
-tests/test_db_model.py .                                                 [ 16%]
-tests/test_degenerate_project.py .                                       [ 16%]
-tests/test_drop_columns.py .                                             [ 16%]
-tests/test_eval_cache.py ...                                             [ 18%]
-tests/test_ex_examples.py ............                                   [ 22%]
-tests/test_example1.py ....                                              [ 23%]
-tests/test_exp.py .                                                      [ 24%]
-tests/test_exp_parens.py .                                               [ 24%]
-tests/test_expr_parse.py .                                               [ 24%]
-tests/test_expression_expectations.py ..                                 [ 25%]
-tests/test_extend.py ......                                              [ 27%]
-tests/test_extend_order.py .                                             [ 27%]
-tests/test_first_last.py .                                               [ 28%]
-tests/test_float_divide.py ...                                           [ 29%]
-tests/test_flow_text.py .                                                [ 29%]
-tests/test_forbidden_calculation.py ..                                   [ 30%]
-tests/test_free_fn.py .                                                  [ 30%]
-tests/test_get_methods_used.py .                                         [ 31%]
-tests/test_ghost_col_issue.py .                                          [ 31%]
-tests/test_idioms.py .................                                   [ 37%]
-tests/test_if_else.py .....                                              [ 39%]
-tests/test_if_else_return_type.py .                                      [ 39%]
-tests/test_incomplete_agg.py .                                           [ 39%]
-tests/test_join_check.py .                                               [ 40%]
-tests/test_join_effects.py .                                             [ 40%]
-tests/test_join_multi_key.py .                                           [ 40%]
-tests/test_join_opt.py .                                                 [ 41%]
-tests/test_join_variations.py .                                          [ 41%]
-tests/test_lark_parser.py .....                                          [ 43%]
-tests/test_locf.py .                                                     [ 43%]
-tests/test_logistic_example.py .                                         [ 44%]
-tests/test_mapv.py ..                                                    [ 44%]
-tests/test_math.py .                                                     [ 45%]
-tests/test_method_catalog_issues.py ..                                   [ 45%]
-tests/test_minimum.py .                                                  [ 46%]
-tests/test_mod_fns.py ...                                                [ 47%]
-tests/test_multi_map.py .                                                [ 47%]
+tests/test_dag_elim.py ....F.                                            [ 16%]
+tests/test_data_model_isolation.py .                                     [ 16%]
+tests/test_db_handle.py ..                                               [ 17%]
+tests/test_db_model.py .                                                 [ 17%]
+tests/test_degenerate_project.py .                                       [ 18%]
+tests/test_drop_columns.py .                                             [ 18%]
+tests/test_eval_cache.py ...                                             [ 19%]
+tests/test_ex_examples.py ............                                   [ 23%]
+tests/test_example1.py ....                                              [ 25%]
+tests/test_exp.py .                                                      [ 25%]
+tests/test_exp_parens.py .                                               [ 25%]
+tests/test_expr_parse.py .                                               [ 26%]
+tests/test_expression_expectations.py ..                                 [ 26%]
+tests/test_extend.py ......                                              [ 28%]
+tests/test_extend_order.py .                                             [ 29%]
+tests/test_first_last.py .                                               [ 29%]
+tests/test_float_divide.py ...                                           [ 30%]
+tests/test_flow_text.py .                                                [ 30%]
+tests/test_forbidden_calculation.py ..                                   [ 31%]
+tests/test_free_fn.py .                                                  [ 31%]
+tests/test_get_methods_used.py .                                         [ 32%]
+tests/test_ghost_col_issue.py .                                          [ 32%]
+tests/test_idioms.py .................                                   [ 38%]
+tests/test_if_else.py .....                                              [ 40%]
+tests/test_if_else_return_type.py .                                      [ 40%]
+tests/test_incomplete_agg.py .                                           [ 40%]
+tests/test_join_check.py .                                               [ 41%]
+tests/test_join_effects.py .                                             [ 41%]
+tests/test_join_multi_key.py .                                           [ 42%]
+tests/test_join_opt.py .                                                 [ 42%]
+tests/test_join_variations.py .                                          [ 42%]
+tests/test_lark_parser.py .....                                          [ 44%]
+tests/test_locf.py .                                                     [ 44%]
+tests/test_logistic_example.py .                                         [ 45%]
+tests/test_mapv.py ..                                                    [ 45%]
+tests/test_math.py .                                                     [ 46%]
+tests/test_method_catalog_issues.py ..                                   [ 46%]
+tests/test_minimum.py .                                                  [ 47%]
+tests/test_mod_fns.py ...                                                [ 48%]
+tests/test_multi_map.py .                                                [ 48%]
 tests/test_narrow.py .                                                   [ 48%]
-tests/test_natural_join.py .                                             [ 48%]
-tests/test_neg.py .                                                      [ 48%]
-tests/test_null_bad.py ..                                                [ 49%]
-tests/test_one_row_cdata_convert.py .                                    [ 49%]
-tests/test_ops.py .                                                      [ 50%]
-tests/test_ops_eq.py .                                                   [ 50%]
-tests/test_or.py .....                                                   [ 52%]
-tests/test_order_limit.py .                                              [ 52%]
+tests/test_natural_join.py .                                             [ 49%]
+tests/test_neg.py .                                                      [ 49%]
+tests/test_null_bad.py ..                                                [ 50%]
+tests/test_one_row_cdata_convert.py .                                    [ 50%]
+tests/test_ops.py .                                                      [ 51%]
+tests/test_ops_eq.py .                                                   [ 51%]
+tests/test_or.py .....                                                   [ 53%]
+tests/test_order_limit.py .                                              [ 53%]
 tests/test_ordered_agg_group.py .                                        [ 53%]
 tests/test_parse.py ..........................                           [ 62%]
-tests/test_project.py .....                                              [ 63%]
+tests/test_project.py .....                                              [ 64%]
 tests/test_rank.py .                                                     [ 64%]
-tests/test_rank_to_average.py .                                          [ 64%]
+tests/test_rank_to_average.py .                                          [ 65%]
 tests/test_ranked_example.py .                                           [ 65%]
 tests/test_readme_example.py .                                           [ 65%]
 tests/test_ref_detect.py ..                                              [ 66%]
-tests/test_rename.py .                                                   [ 66%]
-tests/test_round.py ...                                                  [ 67%]
-tests/test_scalar_columns.py .                                           [ 67%]
+tests/test_rename.py .                                                   [ 67%]
+tests/test_round.py ...                                                  [ 68%]
+tests/test_scalar_columns.py .                                           [ 68%]
 tests/test_scatter_example.py .                                          [ 68%]
-tests/test_scoring_example.py .                                          [ 68%]
-tests/test_select.py ...                                                 [ 69%]
-tests/test_select_stacking.py .                                          [ 69%]
-tests/test_select_values.py ..                                           [ 70%]
-tests/test_set_quoting.py ......                                         [ 72%]
+tests/test_scoring_example.py .                                          [ 69%]
+tests/test_select.py ...                                                 [ 70%]
+tests/test_select_stacking.py .                                          [ 70%]
+tests/test_select_values.py ..                                           [ 71%]
+tests/test_set_quoting.py ......                                         [ 73%]
 tests/test_shift.py ..                                                   [ 73%]
-tests/test_shorten.py .                                                  [ 73%]
-tests/test_sign_parse.py ..                                              [ 74%]
-tests/test_simple.py ....                                                [ 75%]
+tests/test_shorten.py .                                                  [ 74%]
+tests/test_sign_parse.py ..                                              [ 75%]
+tests/test_simple.py ....                                                [ 76%]
 tests/test_simple_expr.py .                                              [ 76%]
 tests/test_simplification.py ..                                          [ 77%]
 tests/test_spark_sql.py ...                                              [ 78%]
-tests/test_sql_extend_shortening.py ..                                   [ 78%]
+tests/test_sql_extend_shortening.py ..                                   [ 79%]
 tests/test_sqlite.py .............                                       [ 83%]
 tests/test_sqlite_joins.py ...                                           [ 84%]
 tests/test_std_var.py ...                                                [ 85%]
 tests/test_strat_example.py ..                                           [ 86%]
 tests/test_sum_cumsum.py .                                               [ 86%]
-tests/test_sum_one.py .                                                  [ 86%]
+tests/test_sum_one.py .                                                  [ 87%]
 tests/test_t_test_example.py ..                                          [ 87%]
-tests/test_table_is_key_by_columns.py .                                  [ 87%]
+tests/test_table_is_key_by_columns.py .                                  [ 88%]
 tests/test_table_q.py .                                                  [ 88%]
 tests/test_transform_examples.py ...........                             [ 92%]
 tests/test_types.py .                                                    [ 92%]
 tests/test_uniform.py ..                                                 [ 93%]
-tests/test_use.py ..                                                     [ 93%]
+tests/test_use.py ..                                                     [ 94%]
 tests/test_user_sql.py .                                                 [ 94%]
 tests/test_value_behaves_like_column.py ....                             [ 95%]
 tests/test_window2.py ...                                                [ 96%]
 tests/test_window_fns.py .....                                           [ 98%]
 tests/test_with.py ..                                                    [ 99%]
 tests/test_xicor.py ..                                                   [100%]
+
+=================================== FAILURES ===================================
+______________________________ test_dag_elim_btt _______________________________
+
+    def test_dag_elim_btt():
+        pd = data_algebra.default_data_model.pd
+        d = pd.DataFrame({
+            'x': [1, 2, 3],
+        })
+        ops = (
+            descr(d=d)
+                .natural_join(
+                    b=descr(d=d),
+                    by=['x'],
+                    jointype='left',
+                )
+        )
+        db_model = data_algebra.SQLite.SQLiteModel()
+        sql = db_model.to_sql(
+            ops,
+            sql_format_options=data_algebra.db_model.SQLFormatOptions(use_with=True, annotate=False)
+        )
+        expect = pd.DataFrame({
+            'x': [1, 2, 3],
+        })
+>       data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+
+tests/test_dag_elim.py:133: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ops = (
+    TableDescription(table_name="d", column_names=["x"]).natural_join(
+        b=TableDescription(table_name="d", column_names=["x"]),
+        by=["x"],
+        jointype="LEFT",
+    )
+)
+
+data = {'d':    x
+0  1
+1  2
+2  3}, expect =    x
+0  1
+1  2
+2  3
+
+    def check_transform(
+        ops,
+        data,
+        expect,
+        *,
+        float_tol: float = 1e-8,
+        check_column_order: bool = False,
+        cols_case_sensitive: bool = False,
+        check_row_order: bool = False,
+        check_parse: bool = True,
+        models_to_skip: Optional[Iterable] = None,
+        valid_for_empty: bool = True,
+        empty_produces_empty: bool = True,
+    ) -> None:
+        """
+        Test an operator dag produces the expected result, and parses correctly.
+        Assert if there are issues.
+    
+        :param ops: data_algebra.data_ops.ViewRepresentation
+        :param data: pd.DataFrame or map of strings to pd.DataFrame
+        :param expect: pd.DataFrame
+        :param float_tol: passed to equivalent_frames()
+        :param check_column_order: passed to equivalent_frames()
+        :param cols_case_sensitive: passed to equivalent_frames()
+        :param check_row_order: passed to equivalent_frames()
+        :param check_parse: if True check expression parses/formats to self
+        :param models_to_skip: None or set of model names or models to skip testing
+        :param valid_for_empty: logical, if True perform tests on empty inputs
+        :param empty_produces_empty: logical, if True assume emtpy inputs should produce empty output
+        :return: nothing
+        """
+    
+        # convert single table to dictionary
+        if not isinstance(data, dict):
+            cols_used = ops.columns_used()
+            table_name = [k for k in cols_used.keys()][0]
+            data = {table_name: data}
+    
+        db_handles = [
+            # non-connected handles, lets us test some of the SQL generation path
+            data_algebra.SQLite.SQLiteModel().db_handle(None),
+            data_algebra.BigQuery.BigQueryModel().db_handle(None),
+            data_algebra.PostgreSQL.PostgreSQLModel().db_handle(None),
+            data_algebra.SparkSQL.SparkSQLModel().db_handle(None),
+            data_algebra.MySQL.MySQLModel().db_handle(None),
+        ]
+    
+        test_dbs = get_test_dbs()
+        db_handles = db_handles + test_dbs
+    
+        if models_to_skip is not None:
+            models_to_skip = {str(m) for m in models_to_skip}
+            db_handles = [h for h in db_handles if str(h.db_model) not in models_to_skip]
+    
+        caught: Optional[Any] = None
+        try:
+            check_transform_on_handles(
+                ops=ops,
+                data=data,
+                expect=expect,
+                float_tol=float_tol,
+                check_column_order=check_column_order,
+                cols_case_sensitive=cols_case_sensitive,
+                check_row_order=check_row_order,
+                check_parse=check_parse,
+                db_handles=db_handles,
+                valid_for_empty=valid_for_empty,
+                empty_produces_empty=empty_produces_empty,
+            )
+        except AssertionError as ase:
+            traceback.print_exc()
+            caught = ase
+        except Exception as exc:
+            traceback.print_exc()
+            caught = exc
+    
+        for handle in db_handles:
+            # noinspection PyBroadException
+            try:
+                handle.close()
+            except Exception:
+                pass
+    
+        if caught is not None:
+>           raise ValueError("testing caught " + str(caught))
+E           ValueError: testing caught DBHandle(db_model=SQLiteModel, conn=<sqlite3.Connection object at 0x7fee091708a0>) error in test Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+E           --  dialect: SQLiteModel 1.3.2
+E           --       string quote: '
+E           --   identifier quote: "
+E           SELECT  -- _0..natural_join(b= _1, by=['x'], jointype='LEFT')
+E              COALESCE("d"."x", "d"."x") AS "x"
+E           FROM
+E           (
+E            "d"
+E           LEFT JOIN
+E            "d"
+E           ON
+E            "d"."x" = "d"."x"
+E           )
+E           ': ambiguous column name: d.x
+
+data_algebra/test_util.py:558: ValueError
+----------------------------- Captured stderr call -----------------------------
+Traceback (most recent call last):
+  File "/Users/johnmount/opt/anaconda3/envs/ai_academy_3_9/lib/python3.9/site-packages/pandas/io/sql.py", line 2056, in execute
+    cur.execute(*args, **kwargs)
+sqlite3.OperationalError: ambiguous column name: d.x
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/johnmount/Documents/work/data_algebra/data_algebra/test_util.py", line 225, in _run_handle_experiments
+    res_db_sql_i = db_handle.read_query(sql_statements[i])
+  File "/Users/johnmount/Documents/work/data_algebra/data_algebra/db_model.py", line 2304, in read_query
+    return self.db_model.read_query(conn=self.conn, q=q)
+  File "/Users/johnmount/Documents/work/data_algebra/data_algebra/db_model.py", line 889, in read_query
+    r = pandas.io.sql.read_sql(q, conn)
+  File "/Users/johnmount/opt/anaconda3/envs/ai_academy_3_9/lib/python3.9/site-packages/pandas/io/sql.py", line 602, in read_sql
+    return pandas_sql.read_query(
+  File "/Users/johnmount/opt/anaconda3/envs/ai_academy_3_9/lib/python3.9/site-packages/pandas/io/sql.py", line 2116, in read_query
+    cursor = self.execute(*args)
+  File "/Users/johnmount/opt/anaconda3/envs/ai_academy_3_9/lib/python3.9/site-packages/pandas/io/sql.py", line 2068, in execute
+    raise ex from exc
+pandas.io.sql.DatabaseError: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel 1.3.2
+--       string quote: '
+--   identifier quote: "
+SELECT  -- _0..natural_join(b= _1, by=['x'], jointype='LEFT')
+   COALESCE("d"."x", "d"."x") AS "x"
+FROM
+(
+ "d"
+LEFT JOIN
+ "d"
+ON
+ "d"."x" = "d"."x"
+)
+': ambiguous column name: d.x
+Traceback (most recent call last):
+  File "/Users/johnmount/Documents/work/data_algebra/data_algebra/test_util.py", line 530, in check_transform
+    check_transform_on_handles(
+  File "/Users/johnmount/Documents/work/data_algebra/data_algebra/test_util.py", line 424, in check_transform_on_handles
+    _run_handle_experiments(
+  File "/Users/johnmount/Documents/work/data_algebra/data_algebra/test_util.py", line 247, in _run_handle_experiments
+    raise ValueError(f"{db_handle} error in test " + str(caught))
+ValueError: DBHandle(db_model=SQLiteModel, conn=<sqlite3.Connection object at 0x7fee091708a0>) error in test Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel 1.3.2
+--       string quote: '
+--   identifier quote: "
+SELECT  -- _0..natural_join(b= _1, by=['x'], jointype='LEFT')
+   COALESCE("d"."x", "d"."x") AS "x"
+FROM
+(
+ "d"
+LEFT JOIN
+ "d"
+ON
+ "d"."x" = "d"."x"
+)
+': ambiguous column name: d.x
 
 ---------- coverage: platform darwin, python 3.9.7-final-0 -----------
 Name                                   Stmts   Miss  Cover   Missing
@@ -140,7 +346,7 @@ data_algebra/eval_cache.py                52      0   100%
 data_algebra/expr_parse.py                35      0   100%
 data_algebra/expr_rep.py                 642     88    86%   208-211, 216, 224, 240, 247, 258, 282, 291-306, 350, 356, 362, 368, 377, 383, 389, 398, 401, 404, 407, 410, 413, 464, 524, 602, 608, 643, 655, 661, 667, 679, 685, 733, 900, 915, 925, 940, 1027, 1042, 1094, 1101-1108, 1114-1115, 1140-1141, 1173, 1180-1181, 1187, 1222, 1224, 1260, 1346, 1360, 1362, 1364, 1367-1373, 1375, 1447, 1461-1463, 1479, 1518
 data_algebra/flow_text.py                 17      0   100%
-data_algebra/near_sql.py                 202      1    99%   41
+data_algebra/near_sql.py                 211      3    99%   41, 185-186
 data_algebra/op_catalog.py                 3      0   100%
 data_algebra/op_container.py             124     48    61%   47-48, 65-74, 78-79, 87-88, 91-92, 95-96, 99-100, 103, 106, 110-111, 116, 121, 130-138, 149-150, 153-154, 157-165, 168-171, 174-175, 182-183, 194-195, 198-199, 202-205, 211-212, 216, 219
 data_algebra/pandas_base.py              494     43    91%   29, 69, 71, 84, 94, 103, 118, 121, 126, 131, 344, 410, 416-423, 456, 479, 493, 502, 504, 539, 584, 625, 637, 657, 673, 683, 698, 748, 756, 771, 782, 794, 814, 842, 854, 857, 889, 906, 909, 920
@@ -148,10 +354,11 @@ data_algebra/pandas_model.py               5      0   100%
 data_algebra/parse_by_lark.py            159     24    85%   73, 95, 110, 131-132, 139, 146, 156, 170-171, 173, 185, 191, 198-202, 230, 238, 248-251
 data_algebra/python3_lark.py               1      0   100%
 data_algebra/solutions.py                 91      3    97%   59, 253, 300
-data_algebra/test_util.py                286     39    86%   87, 107, 117, 120, 124, 147, 150, 154, 157, 166, 221-222, 238-243, 247, 259, 261-269, 315, 318, 326, 337, 344, 348, 359, 370, 543-548, 554-555, 558
+data_algebra/test_util.py                286     29    90%   87, 107, 117, 120, 124, 147, 150, 154, 157, 166, 221-222, 239-240, 259, 261-269, 315, 318, 326, 337, 344, 348, 359, 370, 544-545, 554-555
 data_algebra/util.py                     140     29    79%   26, 51, 56, 61, 84-85, 88-89, 92-93, 96-97, 100-101, 104-105, 108-109, 112-113, 116-117, 120-121, 192, 207, 248, 252, 254
 --------------------------------------------------------------------
-TOTAL                                   5685    712    87%
+TOTAL                                   5694    704    88%
 
-
-======================= 283 passed in 581.21s (0:09:41) ========================
+=========================== short test summary info ============================
+FAILED tests/test_dag_elim.py::test_dag_elim_btt - ValueError: testing caught...
+================== 1 failed, 287 passed in 436.19s (0:07:16) ===================
