@@ -96,6 +96,7 @@ def _type_safe_not_equal(a, b):
 
 
 def _type_safe_is_in(a, b):
+    b = list(b)
     if len(b) > 0:
         type_a = data_algebra.util.guess_carried_scalar_type(a)
         type_b = {data_algebra.util.map_type_to_canonical(type(v)) for v in b}

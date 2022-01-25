@@ -275,6 +275,9 @@ def last_observed_carried_forward(
     return ops
 
 
+# TODO: add aligning events to state at event example (UNION ALL and then locf)
+
+
 def rank_to_average(
         d: ViewRepresentation,
         *,
