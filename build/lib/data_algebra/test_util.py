@@ -85,8 +85,10 @@ def equivalent_frames(
         return False
     if a.shape[1] < 1:
         return True
-    a = a.reset_index(drop=True, inplace=False)
+    a = a.reset_index(drop=True, inplace=False)  # get rid of indices
     b = b.reset_index(drop=True, inplace=False)
+    if a.equals(b):
+        return True
     if not cols_case_sensitive:
         a.columns = [c.lower() for c in a.columns]
         a = a.reset_index(drop=True)
