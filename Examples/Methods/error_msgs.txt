@@ -2,7 +2,7 @@
 error (n)
 op: arctan2, op_class: e, example expression: x.arctan2(y), db: SQLiteModel
 caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -46,7 +46,7 @@ DB result:
 3       3  2030-04-05
 query
 -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -76,7 +76,7 @@ ORDER BY
 error (n)
 op: parse_date, op_class: e, example expression: str_date_col.parse_date(), db: SQLiteModel
 caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -106,7 +106,7 @@ ORDER BY
 error (n)
 op: parse_datetime, op_class: e, example expression: str_datetime_col.parse_datetime(), db: SQLiteModel
 caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -136,7 +136,7 @@ ORDER BY
 error (n)
 op: format_datetime, op_class: e, example expression: datetime_col_0.format_datetime(), db: SQLiteModel
 caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -166,7 +166,7 @@ ORDER BY
 error (n)
 op: format_date, op_class: e, example expression: date_col_0.format_date(), db: SQLiteModel
 caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -196,7 +196,7 @@ ORDER BY
 error (n)
 op: dayofweek, op_class: e, example expression: date_col_0.dayofweek(), db: SQLiteModel
 caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -226,7 +226,7 @@ ORDER BY
 error (n)
 op: dayofyear, op_class: e, example expression: date_col_0.dayofyear(), db: SQLiteModel
 caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -256,7 +256,7 @@ ORDER BY
 error (n)
 op: dayofmonth, op_class: e, example expression: date_col_0.dayofmonth(), db: SQLiteModel
 caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -286,7 +286,7 @@ ORDER BY
 error (n)
 op: weekofyear, op_class: e, example expression: date_col_0.weekofyear(), db: SQLiteModel
 caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -316,7 +316,7 @@ ORDER BY
 error (n)
 op: month, op_class: e, example expression: date_col_0.month(), db: SQLiteModel
 caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -346,7 +346,7 @@ ORDER BY
 error (n)
 op: quarter, op_class: e, example expression: date_col_0.quarter(), db: SQLiteModel
 caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -376,7 +376,7 @@ ORDER BY
 error (n)
 op: year, op_class: e, example expression: date_col_0.year(), db: SQLiteModel
 caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -406,7 +406,7 @@ ORDER BY
 error (n)
 op: timestamp_diff, op_class: e, example expression: datetime_col_0.timestamp_diff(datetime_col_1), db: SQLiteModel
 caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -437,7 +437,7 @@ ORDER BY
 error (n)
 op: date_diff, op_class: e, example expression: date_col_0.date_diff(date_col_1), db: SQLiteModel
 caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -468,7 +468,7 @@ ORDER BY
 error (n)
 op: base_Sunday, op_class: e, example expression: date_col_1.base_Sunday(), db: SQLiteModel
 caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -498,7 +498,7 @@ ORDER BY
 error (n)
 op: _ngroup, op_class: g, example expression: _ngroup(), db: SQLiteModel
 caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -530,7 +530,7 @@ ORDER BY
 error (n)
 op: median, op_class: g, example expression: x.median(), db: SQLiteModel
 caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -563,7 +563,7 @@ ORDER BY
 error (n)
 op: nunique, op_class: g, example expression: x.nunique(), db: SQLiteModel
 caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -609,7 +609,7 @@ DB result:
 3  ccc       3           1
 query
 -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -641,7 +641,7 @@ ORDER BY
 error (n)
 op: bfill, op_class: w, example expression: z.bfill(), db: SQLiteModel
 caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -674,7 +674,7 @@ ORDER BY
 error (n)
 op: ffill, op_class: w, example expression: z.ffill(), db: SQLiteModel
 caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -707,7 +707,7 @@ ORDER BY
 error (n)
 op: first, op_class: w, example expression: x.first(), db: SQLiteModel
 caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -740,7 +740,7 @@ ORDER BY
 error (n)
 op: last, op_class: w, example expression: x.last(), db: SQLiteModel
 caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -773,7 +773,7 @@ ORDER BY
 error (n)
 op: rank, op_class: w, example expression: x.rank(), db: SQLiteModel
 caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -806,7 +806,7 @@ ORDER BY
 error (n)
 op: cumprod, op_class: w, example expression: x.cumprod(), db: SQLiteModel
 caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -839,7 +839,7 @@ ORDER BY
 error (n)
 op: cumcount, op_class: w, example expression: z.cumcount(), db: SQLiteModel
 caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -872,7 +872,7 @@ ORDER BY
 error (n)
 op: cummax, op_class: w, example expression: x.cummax(), db: SQLiteModel
 caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -905,7 +905,7 @@ ORDER BY
 error (n)
 op: cummin, op_class: w, example expression: x.cummin(), db: SQLiteModel
 caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SQLiteModel
+--  dialect: SQLiteModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -939,13 +939,13 @@ error (n)
 op: arcsin, op_class: e, example expression: x.arcsin(), db: BigQueryModel
 caught: 400 Function not found: ARCSIN; Did you mean asin? at [16:4]
 
-(job ID: bf4a8348-0e30-4cd6-97de-9a0a2ecde744)
+(job ID: 65e82d00-1482-4312-a07c-afd122121aae)
 
                  -----Query Job SQL Follows-----                  
 
     |    .    |    .    |    .    |    .    |    .    |    .    |
    1:-- data_algebra SQL https://github.com/WinVector/data_algebra
-   2:--  dialect: BigQueryModel
+   2:--  dialect: BigQueryModel 1.3.3
    3:--       string quote: "
    4:--   identifier quote: `
    5:WITH
@@ -976,13 +976,13 @@ error (n)
 op: arccos, op_class: e, example expression: x.arccos(), db: BigQueryModel
 caught: 400 Function not found: ARCCOS; Did you mean acos? at [16:4]
 
-(job ID: 269261a3-c320-40f9-9493-deedd14eefe9)
+(job ID: 101f0e5e-267f-442e-b225-3f079734fd1b)
 
                  -----Query Job SQL Follows-----                  
 
     |    .    |    .    |    .    |    .    |    .    |    .    |
    1:-- data_algebra SQL https://github.com/WinVector/data_algebra
-   2:--  dialect: BigQueryModel
+   2:--  dialect: BigQueryModel 1.3.3
    3:--       string quote: "
    4:--   identifier quote: `
    5:WITH
@@ -1013,13 +1013,13 @@ error (n)
 op: arctan, op_class: e, example expression: x.arctan(), db: BigQueryModel
 caught: 400 Function not found: ARCTAN; Did you mean atan? at [16:4]
 
-(job ID: 1ee017f1-c49d-4e1d-8bc7-f053cd98e294)
+(job ID: ec7ceae0-3992-454d-9496-affe5f8abbbe)
 
                  -----Query Job SQL Follows-----                  
 
     |    .    |    .    |    .    |    .    |    .    |    .    |
    1:-- data_algebra SQL https://github.com/WinVector/data_algebra
-   2:--  dialect: BigQueryModel
+   2:--  dialect: BigQueryModel 1.3.3
    3:--       string quote: "
    4:--   identifier quote: `
    5:WITH
@@ -1050,13 +1050,13 @@ error (n)
 op: arctan2, op_class: e, example expression: x.arctan2(y), db: BigQueryModel
 caught: 400 Function not found: ARCTAN2; Did you mean atan2? at [17:4]
 
-(job ID: 5eb6403d-01a1-4123-8e81-6f6022b0351c)
+(job ID: 1642f4be-a4c2-4677-8c3a-b64cb4c15244)
 
                  -----Query Job SQL Follows-----                  
 
     |    .    |    .    |    .    |    .    |    .    |    .    |
    1:-- data_algebra SQL https://github.com/WinVector/data_algebra
-   2:--  dialect: BigQueryModel
+   2:--  dialect: BigQueryModel 1.3.3
    3:--       string quote: "
    4:--   identifier quote: `
    5:WITH
@@ -1088,13 +1088,13 @@ error (n)
 op: arcsinh, op_class: e, example expression: x.arcsinh(), db: BigQueryModel
 caught: 400 Function not found: ARCSINH; Did you mean asinh? at [16:4]
 
-(job ID: d03985c2-1527-479a-88d0-7a0e04be7b64)
+(job ID: 145d21d2-fc8f-4738-9811-d7a89b6646b4)
 
                  -----Query Job SQL Follows-----                  
 
     |    .    |    .    |    .    |    .    |    .    |    .    |
    1:-- data_algebra SQL https://github.com/WinVector/data_algebra
-   2:--  dialect: BigQueryModel
+   2:--  dialect: BigQueryModel 1.3.3
    3:--       string quote: "
    4:--   identifier quote: `
    5:WITH
@@ -1125,13 +1125,13 @@ error (n)
 op: arccosh, op_class: e, example expression: x.arccosh(), db: BigQueryModel
 caught: 400 Function not found: ARCCOSH; Did you mean acosh? at [16:4]
 
-(job ID: b3993102-3dd4-4341-9692-11d38f93f05f)
+(job ID: b4b3422f-8ae9-48a6-8a4f-418efa522161)
 
                  -----Query Job SQL Follows-----                  
 
     |    .    |    .    |    .    |    .    |    .    |    .    |
    1:-- data_algebra SQL https://github.com/WinVector/data_algebra
-   2:--  dialect: BigQueryModel
+   2:--  dialect: BigQueryModel 1.3.3
    3:--       string quote: "
    4:--   identifier quote: `
    5:WITH
@@ -1162,13 +1162,13 @@ error (n)
 op: arctanh, op_class: e, example expression: x.arctanh(), db: BigQueryModel
 caught: 400 Function not found: ARCTANH; Did you mean atanh? at [16:4]
 
-(job ID: 0177a8f6-6e67-409a-9fe8-d2780e241d6d)
+(job ID: 7fb1839b-3400-4520-a98e-c49f514add63)
 
                  -----Query Job SQL Follows-----                  
 
     |    .    |    .    |    .    |    .    |    .    |    .    |
    1:-- data_algebra SQL https://github.com/WinVector/data_algebra
-   2:--  dialect: BigQueryModel
+   2:--  dialect: BigQueryModel 1.3.3
    3:--       string quote: "
    4:--   identifier quote: `
    5:WITH
@@ -1199,13 +1199,13 @@ error (n)
 op: expm1, op_class: e, example expression: y.expm1(), db: BigQueryModel
 caught: 400 Function not found: EXPM1; Did you mean exp? at [16:4]
 
-(job ID: 884ab60c-0ec3-4713-8915-6f24d81a3b09)
+(job ID: bac2d606-2c87-48f6-89dc-8dd73c2fc9f9)
 
                  -----Query Job SQL Follows-----                  
 
     |    .    |    .    |    .    |    .    |    .    |    .    |
    1:-- data_algebra SQL https://github.com/WinVector/data_algebra
-   2:--  dialect: BigQueryModel
+   2:--  dialect: BigQueryModel 1.3.3
    3:--       string quote: "
    4:--   identifier quote: `
    5:WITH
@@ -1236,13 +1236,13 @@ error (n)
 op: log1p, op_class: e, example expression: x.log1p(), db: BigQueryModel
 caught: 400 Function not found: LOG1P; Did you mean log10? at [16:4]
 
-(job ID: f08a985b-499b-4128-bbad-9c573f9d080c)
+(job ID: db25d484-221c-4dc8-9262-4c605e9d696b)
 
                  -----Query Job SQL Follows-----                  
 
     |    .    |    .    |    .    |    .    |    .    |    .    |
    1:-- data_algebra SQL https://github.com/WinVector/data_algebra
-   2:--  dialect: BigQueryModel
+   2:--  dialect: BigQueryModel 1.3.3
    3:--       string quote: "
    4:--   identifier quote: `
    5:WITH
@@ -1273,13 +1273,13 @@ error (n)
 op: _ngroup, op_class: g, example expression: _ngroup(), db: BigQueryModel
 caught: 400 Function not found: NGROUP at [17:4]
 
-(job ID: 76206f15-2495-45df-85e5-849069c91ffc)
+(job ID: fcfed674-c6d3-477e-854b-0753ccabee6f)
 
                       -----Query Job SQL Follows-----                      
 
     |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
    1:-- data_algebra SQL https://github.com/WinVector/data_algebra
-   2:--  dialect: BigQueryModel
+   2:--  dialect: BigQueryModel 1.3.3
    3:--       string quote: "
    4:--   identifier quote: `
    5:WITH
@@ -1324,7 +1324,7 @@ DB result:
 3  ccc       3           1
 query
 -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: BigQueryModel
+--  dialect: BigQueryModel 1.3.3
 --       string quote: "
 --   identifier quote: `
 WITH
@@ -1357,20 +1357,20 @@ error (n)
 op: median, op_class: p, example expression: x.median(), db: BigQueryModel
 caught: 400 percentile_cont aggregate function is not supported.
 
-(job ID: 5b3b1a49-cd40-404d-9d35-597d6fec109a)
+(job ID: d6145ab4-e01a-4741-9422-7ceae03cd797)
 
                      -----Query Job SQL Follows-----                     
 
     |    .    |    .    |    .    |    .    |    .    |    .    |
    1:-- data_algebra SQL https://github.com/WinVector/data_algebra
-   2:--  dialect: BigQueryModel
+   2:--  dialect: BigQueryModel 1.3.3
    3:--       string quote: "
    4:--   identifier quote: `
    5:WITH
    6: `table_reference_0` AS (
    7:  SELECT
-   8:   `x` ,
-   9:   `g`
+   8:   `g` ,
+   9:   `x`
   10:  FROM
   11:   `data-algebra-test.test_1.d`
   12: ) ,
@@ -1396,13 +1396,13 @@ error (n)
 op: bfill, op_class: w, example expression: z.bfill(), db: BigQueryModel
 caught: 400 Function not found: BFILL at [18:4]
 
-(job ID: 1f47df5a-9e69-4eca-9787-b67791a56412)
+(job ID: 3b46d9d0-c028-4387-8349-1085ad12a930)
 
                                 -----Query Job SQL Follows-----                                 
 
     |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
    1:-- data_algebra SQL https://github.com/WinVector/data_algebra
-   2:--  dialect: BigQueryModel
+   2:--  dialect: BigQueryModel 1.3.3
    3:--       string quote: "
    4:--   identifier quote: `
    5:WITH
@@ -1436,13 +1436,13 @@ error (n)
 op: ffill, op_class: w, example expression: z.ffill(), db: BigQueryModel
 caught: 400 Function not found: FFILL at [18:4]
 
-(job ID: aa6e4bf9-34c9-403c-a684-9e75719d746d)
+(job ID: 28b70a02-1d9d-4534-af16-392cbe9bcfa2)
 
                                 -----Query Job SQL Follows-----                                 
 
     |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
    1:-- data_algebra SQL https://github.com/WinVector/data_algebra
-   2:--  dialect: BigQueryModel
+   2:--  dialect: BigQueryModel 1.3.3
    3:--       string quote: "
    4:--   identifier quote: `
    5:WITH
@@ -1476,13 +1476,13 @@ error (n)
 op: first, op_class: w, example expression: x.first(), db: BigQueryModel
 caught: 400 Function not found: FIRST at [18:4]
 
-(job ID: 2fdc8a92-dba7-41e1-986c-3bec625e97bd)
+(job ID: e1aff175-ae4f-4300-a213-0bda3bf64f1d)
 
                                 -----Query Job SQL Follows-----                                 
 
     |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
    1:-- data_algebra SQL https://github.com/WinVector/data_algebra
-   2:--  dialect: BigQueryModel
+   2:--  dialect: BigQueryModel 1.3.3
    3:--       string quote: "
    4:--   identifier quote: `
    5:WITH
@@ -1516,13 +1516,13 @@ error (n)
 op: last, op_class: w, example expression: x.last(), db: BigQueryModel
 caught: 400 Function not found: LAST; Did you mean least? at [18:4]
 
-(job ID: 81a50e64-a049-46dc-a66a-a6df26c333c0)
+(job ID: 8f3caa8f-e235-4a71-b25d-754b5e36bea6)
 
                                 -----Query Job SQL Follows-----                                
 
     |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
    1:-- data_algebra SQL https://github.com/WinVector/data_algebra
-   2:--  dialect: BigQueryModel
+   2:--  dialect: BigQueryModel 1.3.3
    3:--       string quote: "
    4:--   identifier quote: `
    5:WITH
@@ -1556,13 +1556,13 @@ error (n)
 op: rank, op_class: w, example expression: x.rank(), db: BigQueryModel
 caught: 400 Number of arguments does not match for analytic function RANK. Supported signature: RANK() at [18:4]
 
-(job ID: f8879033-90ba-42ca-9110-57119ae62411)
+(job ID: 2e94f143-455c-4e69-b01c-23c417561262)
 
                                 -----Query Job SQL Follows-----                                
 
     |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
    1:-- data_algebra SQL https://github.com/WinVector/data_algebra
-   2:--  dialect: BigQueryModel
+   2:--  dialect: BigQueryModel 1.3.3
    3:--       string quote: "
    4:--   identifier quote: `
    5:WITH
@@ -1596,13 +1596,13 @@ error (n)
 op: cumprod, op_class: w, example expression: x.cumprod(), db: BigQueryModel
 caught: 400 Function not found: CUMPROD at [18:4]
 
-(job ID: 729d5de4-1086-4bb8-a61c-4d750d7c3448)
+(job ID: d812ae22-6fe6-41ec-9506-33ed0af5f96f)
 
                                  -----Query Job SQL Follows-----                                  
 
     |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
    1:-- data_algebra SQL https://github.com/WinVector/data_algebra
-   2:--  dialect: BigQueryModel
+   2:--  dialect: BigQueryModel 1.3.3
    3:--       string quote: "
    4:--   identifier quote: `
    5:WITH
@@ -1636,13 +1636,13 @@ error (n)
 op: cumcount, op_class: w, example expression: z.cumcount(), db: BigQueryModel
 caught: 400 Function not found: CUMCOUNT at [18:4]
 
-(job ID: 39dd53d4-be2d-4b92-9359-ef1448cf4cfa)
+(job ID: 27354776-d99b-444c-b8a9-586cb19f56fc)
 
                                   -----Query Job SQL Follows-----                                  
 
     |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
    1:-- data_algebra SQL https://github.com/WinVector/data_algebra
-   2:--  dialect: BigQueryModel
+   2:--  dialect: BigQueryModel 1.3.3
    3:--       string quote: "
    4:--   identifier quote: `
    5:WITH
@@ -1676,13 +1676,13 @@ error (n)
 op: cummax, op_class: w, example expression: x.cummax(), db: BigQueryModel
 caught: 400 Function not found: CUMMAX at [18:4]
 
-(job ID: 9dd0d846-b953-4dea-9713-0932a664c03e)
+(job ID: cd7ac422-0c44-4ae9-bd0e-7369296ccdc9)
 
                                  -----Query Job SQL Follows-----                                 
 
     |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
    1:-- data_algebra SQL https://github.com/WinVector/data_algebra
-   2:--  dialect: BigQueryModel
+   2:--  dialect: BigQueryModel 1.3.3
    3:--       string quote: "
    4:--   identifier quote: `
    5:WITH
@@ -1716,13 +1716,13 @@ error (n)
 op: cummin, op_class: w, example expression: x.cummin(), db: BigQueryModel
 caught: 400 Function not found: CUMMIN at [18:4]
 
-(job ID: fc4e7351-4635-4bf9-88f6-bd4f2d80bdc3)
+(job ID: 6d6a999d-219e-4f83-b221-d83b6d70e3c0)
 
                                  -----Query Job SQL Follows-----                                 
 
     |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |    .    |
    1:-- data_algebra SQL https://github.com/WinVector/data_algebra
-   2:--  dialect: BigQueryModel
+   2:--  dialect: BigQueryModel 1.3.3
    3:--       string quote: "
    4:--   identifier quote: `
    5:WITH
@@ -1760,7 +1760,7 @@ LINE 16:    ARCSIN("x") AS "new_column"
 HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -1796,7 +1796,7 @@ LINE 16:    ARCCOS("x") AS "new_column"
 HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -1832,7 +1832,7 @@ LINE 16:    ARCTAN("x") AS "new_column"
 HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -1868,7 +1868,7 @@ LINE 17:    ARCTAN2("x", "y") AS "new_column"
 HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -1905,7 +1905,7 @@ LINE 16:    ARCSINH("x") AS "new_column"
 HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -1941,7 +1941,7 @@ LINE 16:    ARCCOSH("x") AS "new_column"
 HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -1977,7 +1977,7 @@ LINE 16:    ARCTANH("x") AS "new_column"
 HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -2013,7 +2013,7 @@ LINE 16:    EXPM1("y") AS "new_column"
 HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -2049,7 +2049,7 @@ LINE 16:    LOG1P("x") AS "new_column"
 HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -2102,7 +2102,7 @@ op: dayofweek, op_class: e, example expression: date_col_0.dayofweek(), db: Post
 caught: (psycopg2.errors.InvalidParameterValue) timestamp units "dayofweek" not recognized
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -2135,7 +2135,7 @@ op: dayofyear, op_class: e, example expression: date_col_0.dayofyear(), db: Post
 caught: (psycopg2.errors.InvalidParameterValue) timestamp units "dayofyear" not recognized
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -2179,7 +2179,7 @@ DB result:
 3       3        14.0
 query
 -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -2213,7 +2213,7 @@ LINE 17: ...IMESTAMP_DIFF("datetime_col_0", "datetime_col_1", SECOND) AS...
                                                               ^
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -2249,7 +2249,7 @@ LINE 17:    TIMESTAMP_DIFF("date_col_0", "date_col_1", DAY) AS "new_c...
                                                        ^
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -2285,7 +2285,7 @@ LINE 16:    DATE_SUB("date_col_1", INTERVAL (EXTRACT(DAYOFWEEK FROM "...
                                              ^
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -2321,7 +2321,7 @@ LINE 17:    NGROUP() OVER ( PARTITION BY "g"  )  AS "new_column"
 HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -2359,7 +2359,7 @@ LINE 18:    MEDIAN("x") OVER ( PARTITION BY "g"  )  AS "new_column"
 HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -2397,7 +2397,7 @@ LINE 18:    COUNT(DISTINCT ("x")) OVER ( PARTITION BY "g"  )  AS "new...
             ^
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -2444,7 +2444,7 @@ DB result:
 3  ccc       3           1
 query
 -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -2481,14 +2481,14 @@ LINE 15:    MEDIAN("x") AS "new_column" ,
 HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
  "table_reference_0" AS (
   SELECT
-   "x" ,
-   "g"
+   "g" ,
+   "x"
   FROM
    "d"
  ) ,
@@ -2519,7 +2519,7 @@ LINE 18:    BFILL("z") OVER ( PARTITION BY "g" ORDER BY "row_id"  )  ...
 HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -2558,7 +2558,7 @@ LINE 18:    FFILL("z") OVER ( PARTITION BY "g" ORDER BY "row_id"  )  ...
 HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -2597,7 +2597,7 @@ LINE 18:    FIRST("x") OVER ( PARTITION BY "g" ORDER BY "row_id"  )  ...
 HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -2636,7 +2636,7 @@ LINE 18:    LAST("x") OVER ( PARTITION BY "g" ORDER BY "row_id"  )  A...
 HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -2674,7 +2674,7 @@ LINE 18:    RANK("x") OVER ( PARTITION BY "g" ORDER BY "row_id"  )  A...
             ^
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -2713,7 +2713,7 @@ LINE 18:    CUMPROD("x") OVER ( PARTITION BY "g" ORDER BY "row_id"  )...
 HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -2752,7 +2752,7 @@ LINE 18:    CUMCOUNT("z") OVER ( PARTITION BY "g" ORDER BY "row_id"  ...
 HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -2791,7 +2791,7 @@ LINE 18:    CUMMAX("x") OVER ( PARTITION BY "g" ORDER BY "row_id"  ) ...
 HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -2830,7 +2830,7 @@ LINE 18:    CUMMIN("x") OVER ( PARTITION BY "g" ORDER BY "row_id"  ) ...
 HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: PostgreSQLModel
+--  dialect: PostgreSQLModel 1.3.3
 --       string quote: '
 --   identifier quote: "
 WITH
@@ -2912,7 +2912,7 @@ DB result:
 3       3           0
 query
 -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SparkSQLModel
+--  dialect: SparkSQLModel 1.3.3
 --       string quote: "
 --   identifier quote: `
 WITH
@@ -2955,7 +2955,7 @@ DB result:
 3       3           0
 query
 -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SparkSQLModel
+--  dialect: SparkSQLModel 1.3.3
 --       string quote: "
 --   identifier quote: `
 WITH
@@ -2998,7 +2998,7 @@ DB result:
 3       3       False
 query
 -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SparkSQLModel
+--  dialect: SparkSQLModel 1.3.3
 --       string quote: "
 --   identifier quote: `
 WITH
@@ -3032,7 +3032,7 @@ DataType int64 is not supported.(line 16, pos 15)
 
 == SQL ==
 -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SparkSQLModel
+--  dialect: SparkSQLModel 1.3.3
 --       string quote: "
 --   identifier quote: `
 WITH
@@ -3101,7 +3101,7 @@ DB result:
 3       3          14
 query
 -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SparkSQLModel
+--  dialect: SparkSQLModel 1.3.3
 --       string quote: "
 --   identifier quote: `
 WITH
@@ -3145,7 +3145,7 @@ no viable alternative at input 'WITH\n `table_reference_0` AS (\n  SELECT\n   `r
 
 == SQL ==
 -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SparkSQLModel
+--  dialect: SparkSQLModel 1.3.3
 --       string quote: "
 --   identifier quote: `
 WITH
@@ -3224,7 +3224,7 @@ DB result:
 3  ccc       3           1
 query
 -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SparkSQLModel
+--  dialect: SparkSQLModel 1.3.3
 --       string quote: "
 --   identifier quote: `
 WITH
@@ -3270,7 +3270,7 @@ DB result:
 3  ccc       3           1
 query
 -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SparkSQLModel
+--  dialect: SparkSQLModel 1.3.3
 --       string quote: "
 --   identifier quote: `
 WITH
@@ -3318,7 +3318,7 @@ DB result:
 2           1  ccc
 query
 -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SparkSQLModel
+--  dialect: SparkSQLModel 1.3.3
 --       string quote: "
 --   identifier quote: `
 WITH
@@ -3373,7 +3373,7 @@ DB result:
 3  ccc       3         0.4
 query
 -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: SparkSQLModel
+--  dialect: SparkSQLModel 1.3.3
 --       string quote: "
 --   identifier quote: `
 WITH
@@ -3427,7 +3427,7 @@ error (n)
 op: arcsin, op_class: e, example expression: x.arcsin(), db: MySQLModel
 caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.ARCSIN does not exist')
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -3459,7 +3459,7 @@ error (n)
 op: arccos, op_class: e, example expression: x.arccos(), db: MySQLModel
 caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.ARCCOS does not exist')
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -3491,7 +3491,7 @@ error (n)
 op: arctan, op_class: e, example expression: x.arctan(), db: MySQLModel
 caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.ARCTAN does not exist')
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -3523,7 +3523,7 @@ error (n)
 op: arctan2, op_class: e, example expression: x.arctan2(y), db: MySQLModel
 caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.ARCTAN2 does not exist')
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -3556,7 +3556,7 @@ error (n)
 op: sinh, op_class: e, example expression: x.sinh(), db: MySQLModel
 caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.SINH does not exist')
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -3588,7 +3588,7 @@ error (n)
 op: cosh, op_class: e, example expression: x.cosh(), db: MySQLModel
 caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.COSH does not exist')
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -3620,7 +3620,7 @@ error (n)
 op: tanh, op_class: e, example expression: x.tanh(), db: MySQLModel
 caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.TANH does not exist')
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -3652,7 +3652,7 @@ error (n)
 op: arcsinh, op_class: e, example expression: x.arcsinh(), db: MySQLModel
 caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.ARCSINH does not exist')
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -3684,7 +3684,7 @@ error (n)
 op: arccosh, op_class: e, example expression: x.arccosh(), db: MySQLModel
 caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.ARCCOSH does not exist')
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -3716,7 +3716,7 @@ error (n)
 op: arctanh, op_class: e, example expression: x.arctanh(), db: MySQLModel
 caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.ARCTANH does not exist')
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -3748,7 +3748,7 @@ error (n)
 op: expm1, op_class: e, example expression: y.expm1(), db: MySQLModel
 caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.EXPM1 does not exist')
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -3780,7 +3780,7 @@ error (n)
 op: log1p, op_class: e, example expression: x.log1p(), db: MySQLModel
 caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.LOG1P does not exist')
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -3812,7 +3812,7 @@ error (n)
 op: is_inf, op_class: e, example expression: y.is_inf(), db: MySQLModel
 caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'FLOAT64)) AND (`y` < CAST('+infinity' AS FLOAT64))) THEN TRUE ELSE FALSE END) AS' at line 16")
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -3844,7 +3844,7 @@ error (n)
 op: as_int64, op_class: e, example expression: y.as_int64(), db: MySQLModel
 caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'INT64) AS `new_column`\n  FROM\n   `table_reference_0`\n )\nSELECT  -- .order_rows([' at line 16")
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -3874,29 +3874,29 @@ ORDER BY
 
 error (n)
 op: parse_date, op_class: e, example expression: str_date_col.parse_date(), db: MySQLModel
-caught: unsupported format character 'Y' (0x59) at index 369
+caught: unsupported format character 'Y' (0x59) at index 375
 
 
 error (n)
 op: parse_datetime, op_class: e, example expression: str_datetime_col.parse_datetime(), db: MySQLModel
-caught: unsupported format character 'Y' (0x59) at index 412
+caught: unsupported format character 'Y' (0x59) at index 418
 
 
 error (n)
 op: format_datetime, op_class: e, example expression: datetime_col_0.format_datetime(), db: MySQLModel
-caught: unsupported format character 'Y' (0x59) at index 410
+caught: unsupported format character 'Y' (0x59) at index 416
 
 
 error (n)
 op: format_date, op_class: e, example expression: date_col_0.format_date(), db: MySQLModel
-caught: unsupported format character 'Y' (0x59) at index 367
+caught: unsupported format character 'Y' (0x59) at index 373
 
 
 error (n)
 op: dayofweek, op_class: e, example expression: date_col_0.dayofweek(), db: MySQLModel
 caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'DAYOFWEEK FROM `date_col_0`) AS `new_column`\n  FROM\n   `table_reference_0`\n )\nSE' at line 16")
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -3928,7 +3928,7 @@ error (n)
 op: dayofyear, op_class: e, example expression: date_col_0.dayofyear(), db: MySQLModel
 caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'DAYOFYEAR FROM `date_col_0`) AS `new_column`\n  FROM\n   `table_reference_0`\n )\nSE' at line 16")
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -3960,7 +3960,7 @@ error (n)
 op: timestamp_diff, op_class: e, example expression: datetime_col_0.timestamp_diff(datetime_col_1), db: MySQLModel
 caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.TIMESTAMP_DIFF does not exist')
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -3993,7 +3993,7 @@ error (n)
 op: date_diff, op_class: e, example expression: date_col_0.date_diff(date_col_1), db: MySQLModel
 caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.TIMESTAMP_DIFF does not exist')
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -4026,7 +4026,7 @@ error (n)
 op: base_Sunday, op_class: e, example expression: date_col_1.base_Sunday(), db: MySQLModel
 caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'DAYOFWEEK FROM `date_col_1`) - 1) DAY) AS `new_column`\n  FROM\n   `table_referenc' at line 16")
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -4058,7 +4058,7 @@ error (n)
 op: _ngroup, op_class: g, example expression: _ngroup(), db: MySQLModel
 caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'OVER ( PARTITION BY `g`  )  AS `new_column`\n  FROM\n   `table_reference_0`\n )\nSEL' at line 17")
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -4092,7 +4092,7 @@ error (n)
 op: median, op_class: g, example expression: x.median(), db: MySQLModel
 caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'OVER ( PARTITION BY `g`  )  AS `new_column`\n  FROM\n   `table_reference_0`\n )\nSEL' at line 18")
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -4127,7 +4127,7 @@ error (n)
 op: nunique, op_class: g, example expression: x.nunique(), db: MySQLModel
 caught: (pymysql.err.NotSupportedError) (1235, "This version of MySQL doesn't yet support '<window function>(DISTINCT ..)'")
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -4174,7 +4174,7 @@ DB result:
 3  ccc       3         1.0
 query
 -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -4207,14 +4207,14 @@ error (n)
 op: median, op_class: p, example expression: x.median(), db: MySQLModel
 caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.MEDIAN does not exist')
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
  `table_reference_0` AS (
   SELECT
-   `x` ,
-   `g`
+   `g` ,
+   `x`
   FROM
    `d`
  ) ,
@@ -4241,7 +4241,7 @@ error (n)
 op: bfill, op_class: w, example expression: z.bfill(), db: MySQLModel
 caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`\n  FROM\n   `table_r' at line 18")
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -4276,7 +4276,7 @@ error (n)
 op: ffill, op_class: w, example expression: z.ffill(), db: MySQLModel
 caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`\n  FROM\n   `table_r' at line 18")
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -4311,7 +4311,7 @@ error (n)
 op: first, op_class: w, example expression: x.first(), db: MySQLModel
 caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '(`x`) OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`\n  FROM\n   `t' at line 18")
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -4346,7 +4346,7 @@ error (n)
 op: last, op_class: w, example expression: x.last(), db: MySQLModel
 caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '(`x`) OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`\n  FROM\n   `t' at line 18")
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -4381,7 +4381,7 @@ error (n)
 op: rank, op_class: w, example expression: x.rank(), db: MySQLModel
 caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '`x`) OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`\n  FROM\n   `ta' at line 18")
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -4416,7 +4416,7 @@ error (n)
 op: cumprod, op_class: w, example expression: x.cumprod(), db: MySQLModel
 caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`\n  FROM\n   `table_r' at line 18")
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -4451,7 +4451,7 @@ error (n)
 op: cumcount, op_class: w, example expression: z.cumcount(), db: MySQLModel
 caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`\n  FROM\n   `table_r' at line 18")
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -4486,7 +4486,7 @@ error (n)
 op: cummax, op_class: w, example expression: x.cummax(), db: MySQLModel
 caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`\n  FROM\n   `table_r' at line 18")
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
@@ -4521,7 +4521,7 @@ error (n)
 op: cummin, op_class: w, example expression: x.cummin(), db: MySQLModel
 caught: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'OVER ( PARTITION BY `g` ORDER BY `row_id`  )  AS `new_column`\n  FROM\n   `table_r' at line 18")
 [SQL: -- data_algebra SQL https://github.com/WinVector/data_algebra
---  dialect: MySQLModel
+--  dialect: MySQLModel 1.3.3
 --       string quote: '
 --   identifier quote: `
 WITH
