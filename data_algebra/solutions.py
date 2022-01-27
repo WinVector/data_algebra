@@ -309,6 +309,7 @@ def braid_data(
     :param state_row_mark: source annotation of state rows.
     :param event_row_mark: source annotation of event rows.
     :param stand_in_values: dictionary stand in values to use for state_value_column_name and event_value_column_names
+            needed to get column types correct, replaced by None and not passed further.
     :param locf_to_use_column_name: name for a temporary values column
     :param locf_non_null_rank_column_name: name for a temporary values column
     :param locf_tiebreaker_column_name: name for a temporary values column

@@ -461,8 +461,14 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             except TypeError:
                 target_rows = max(target_rows, 1)  # scalar
         if target_rows < 1:
-            return self.pd.DataFrame(cols)
-            #return self.pd.DataFrame({k: [] for k in cols.keys()})
+            # noinspection PyBroadException
+            try:
+                res = self.pd.DataFrame(cols)
+                if res.shape[0] > 0:
+                    res = res.loc[[False] * res.shape[0], :].reset_index(drop=True, inplace=False)
+            except Exception:
+                res = self.pd.DataFrame({k: [] for k in cols.keys()})
+            return res
 
         # agg can return scalars, which then can't be made into a self.pd.DataFrame
         def promote_scalar(vi, *, target_len):
