@@ -43,6 +43,9 @@
                     <a class="function" href="#last_observed_carried_forward">last_observed_carried_forward</a>
             </li>
             <li>
+                    <a class="function" href="#braid_data">braid_data</a>
+            </li>
+            <li>
                     <a class="function" href="#rank_to_average">rank_to_average</a>
             </li>
     </ul>
@@ -70,7 +73,7 @@
 <span class="sd">data algebra solutions to common data processing problems</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">data_algebra</span>
@@ -291,7 +294,7 @@
         <span class="n">order_by</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">partition_by</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">value_column_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">selection_predicate</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;.is_null()&#39;</span><span class="p">,</span>
+        <span class="n">selection_predicate</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;is_null()&#39;</span><span class="p">,</span>
         <span class="n">locf_to_use_column_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;locf_to_use&#39;</span><span class="p">,</span>
         <span class="n">locf_non_null_rank_column_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;locf_non_null_rank&#39;</span><span class="p">,</span>
         <span class="n">locf_tiebreaker_column_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;locf_tiebreaker&#39;</span><span class="p">,</span>
@@ -304,7 +307,7 @@
 <span class="sd">    :param order_by: columns to order by</span>
 <span class="sd">    :param partition_by: optional partitioning column</span>
 <span class="sd">    :param value_column_name: column to alter</span>
-<span class="sd">    :param selection_predicate: expression to choose values to skip</span>
+<span class="sd">    :param selection_predicate: expression to choose values to replace</span>
 <span class="sd">    :param locf_to_use_column_name: name for a temporary values column</span>
 <span class="sd">    :param locf_non_null_rank_column_name: name for a temporary values column</span>
 <span class="sd">    :param locf_tiebreaker_column_name: name for a temporary values column</span>
@@ -315,6 +318,10 @@
     <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">locf_to_use_column_name</span><span class="p">,</span> <span class="n">locf_non_null_rank_column_name</span><span class="p">,</span> <span class="n">locf_tiebreaker_column_name</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">cols</span><span class="p">))</span>
     <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">order_by</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selection_predicate</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">locf_to_use_column_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">locf_non_null_rank_column_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">locf_tiebreaker_column_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
     <span class="n">order_by</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">order_by</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">partition_by</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">partition_by</span> <span class="o">=</span> <span class="p">[]</span>
@@ -342,7 +349,96 @@
     <span class="k">return</span> <span class="n">ops</span>
 
 
-<span class="c1"># TODO: add aligning events to state at event example (UNION ALL and then locf)</span>
+<span class="k">def</span> <span class="nf">braid_data</span><span class="p">(</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">d_state</span><span class="p">:</span> <span class="n">ViewRepresentation</span><span class="p">,</span>
+        <span class="n">d_event</span><span class="p">:</span> <span class="n">ViewRepresentation</span><span class="p">,</span>
+        <span class="n">order_by</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">partition_by</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">state_value_column_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">event_value_column_names</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">source_id_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;record_type&#39;</span><span class="p">,</span>
+        <span class="n">state_row_mark</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;state_row&#39;</span><span class="p">,</span>
+        <span class="n">event_row_mark</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;event_row&#39;</span><span class="p">,</span>
+        <span class="n">stand_in_values</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
+        <span class="n">locf_to_use_column_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;locf_to_use&#39;</span><span class="p">,</span>
+        <span class="n">locf_non_null_rank_column_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;locf_non_null_rank&#39;</span><span class="p">,</span>
+        <span class="n">locf_tiebreaker_column_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;locf_tiebreaker&#39;</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mix data from two sources, ordering by order_by columns and carrying forward observations</span>
+<span class="sd">    on d_state value column.</span>
+
+<span class="sd">    :param d_state: ViewRepresentation representation of state by order_by.</span>
+<span class="sd">    :param d_event: ViewRepresentation representation of events by order_by.</span>
+<span class="sd">    :param order_by: columns to order by (non empty list of column names)</span>
+<span class="sd">    :param partition_by: optional partitioning column names</span>
+<span class="sd">    :param state_value_column_name: column to copy from d_state and propagate forward</span>
+<span class="sd">    :param event_value_column_names: columns to copy from d_event</span>
+<span class="sd">    :param source_id_column: name for source identification column.</span>
+<span class="sd">    :param state_row_mark: source annotation of state rows.</span>
+<span class="sd">    :param event_row_mark: source annotation of event rows.</span>
+<span class="sd">    :param stand_in_values: dictionary stand in values to use for state_value_column_name and event_value_column_names</span>
+<span class="sd">            needed to get column types correct, replaced by None and not passed further.</span>
+<span class="sd">    :param locf_to_use_column_name: name for a temporary values column</span>
+<span class="sd">    :param locf_non_null_rank_column_name: name for a temporary values column</span>
+<span class="sd">    :param locf_tiebreaker_column_name: name for a temporary values column</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d_state</span><span class="p">,</span> <span class="n">ViewRepresentation</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d_event</span><span class="p">,</span> <span class="n">ViewRepresentation</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">order_by</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="n">order_by</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">order_by</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">order_by</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">partition_by</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">partition_by</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="n">partition_by</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">partition_by</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">partition_by</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">state_value_column_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event_value_column_names</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="n">event_value_column_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">event_value_column_names</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source_id_column</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">state_row_mark</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event_row_mark</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">locf_to_use_column_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">locf_non_null_rank_column_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">locf_tiebreaker_column_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stand_in_values</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+    <span class="n">together</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">d_state</span>
+            <span class="o">.</span><span class="n">extend</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">stand_in_values</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">event_value_column_names</span><span class="p">})</span>
+            <span class="o">.</span><span class="n">select_columns</span><span class="p">(</span><span class="n">partition_by</span> <span class="o">+</span> <span class="n">order_by</span> <span class="o">+</span> <span class="p">[</span><span class="n">state_value_column_name</span><span class="p">]</span> <span class="o">+</span> <span class="n">event_value_column_names</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">concat_rows</span><span class="p">(</span>
+                <span class="n">b</span><span class="o">=</span><span class="p">(</span>
+                    <span class="n">d_event</span>
+                        <span class="o">.</span><span class="n">extend</span><span class="p">({</span><span class="n">state_value_column_name</span><span class="p">:</span> <span class="n">stand_in_values</span><span class="p">[</span><span class="n">state_value_column_name</span><span class="p">]})</span>
+                        <span class="o">.</span><span class="n">select_columns</span><span class="p">(</span><span class="n">partition_by</span> <span class="o">+</span> <span class="n">order_by</span> <span class="o">+</span> <span class="p">[</span><span class="n">state_value_column_name</span><span class="p">]</span> <span class="o">+</span> <span class="n">event_value_column_names</span><span class="p">)</span>
+                    <span class="p">),</span>
+                <span class="n">id_column</span><span class="o">=</span><span class="n">source_id_column</span><span class="p">,</span>
+                <span class="n">a_name</span><span class="o">=</span><span class="n">state_row_mark</span><span class="p">,</span>
+                <span class="n">b_name</span><span class="o">=</span><span class="n">event_row_mark</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="c1"># clear out stand-in values</span>
+            <span class="o">.</span><span class="n">extend</span><span class="p">({</span>
+                <span class="n">state_value_column_name</span><span class="p">:</span>
+                    <span class="sa">f</span><span class="s1">&#39;(</span><span class="si">{</span><span class="n">source_id_column</span><span class="si">}</span><span class="s1"> == &quot;</span><span class="si">{</span><span class="n">event_row_mark</span><span class="si">}</span><span class="s1">&quot;).if_else(None, </span><span class="si">{</span><span class="n">state_value_column_name</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">})</span>
+            <span class="o">.</span><span class="n">extend</span><span class="p">({</span>
+                <span class="n">k</span><span class="p">:</span>
+                    <span class="sa">f</span><span class="s1">&#39;(</span><span class="si">{</span><span class="n">source_id_column</span><span class="si">}</span><span class="s1"> == &quot;</span><span class="si">{</span><span class="n">state_row_mark</span><span class="si">}</span><span class="s1">&quot;).if_else(None, </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">)&#39;</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">event_value_column_names</span><span class="p">})</span>
+        <span class="p">)</span>
+    <span class="n">ops</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">last_observed_carried_forward</span><span class="p">(</span>
+            <span class="n">together</span><span class="p">,</span>
+            <span class="n">order_by</span><span class="o">=</span><span class="n">order_by</span><span class="p">,</span>
+            <span class="n">partition_by</span><span class="o">=</span><span class="n">partition_by</span><span class="p">,</span>
+            <span class="n">value_column_name</span><span class="o">=</span><span class="n">state_value_column_name</span><span class="p">,</span>
+            <span class="n">selection_predicate</span><span class="o">=</span><span class="s1">&#39;is_null()&#39;</span><span class="p">,</span>
+            <span class="n">locf_to_use_column_name</span><span class="o">=</span><span class="n">locf_to_use_column_name</span><span class="p">,</span>
+            <span class="n">locf_non_null_rank_column_name</span><span class="o">=</span><span class="n">locf_non_null_rank_column_name</span><span class="p">,</span>
+            <span class="n">locf_tiebreaker_column_name</span><span class="o">=</span><span class="n">locf_tiebreaker_column_name</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">ops</span>
 
 
 <span class="k">def</span> <span class="nf">rank_to_average</span><span class="p">(</span>
@@ -716,7 +812,7 @@ the l-th Y item.</p>
     order_by: Iterable[str],
     partition_by: Optional[Iterable[str]] = None,
     value_column_name: str,
-    selection_predicate: str = &#39;.is_null()&#39;,
+    selection_predicate: str = &#39;is_null()&#39;,
     locf_to_use_column_name: str = &#39;locf_to_use&#39;,
     locf_non_null_rank_column_name: str = &#39;locf_non_null_rank&#39;,
     locf_tiebreaker_column_name: str = &#39;locf_tiebreaker&#39;
@@ -731,7 +827,7 @@ the l-th Y item.</p>
         <span class="n">order_by</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">partition_by</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">value_column_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">selection_predicate</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;.is_null()&#39;</span><span class="p">,</span>
+        <span class="n">selection_predicate</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;is_null()&#39;</span><span class="p">,</span>
         <span class="n">locf_to_use_column_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;locf_to_use&#39;</span><span class="p">,</span>
         <span class="n">locf_non_null_rank_column_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;locf_non_null_rank&#39;</span><span class="p">,</span>
         <span class="n">locf_tiebreaker_column_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;locf_tiebreaker&#39;</span><span class="p">,</span>
@@ -744,7 +840,7 @@ the l-th Y item.</p>
 <span class="sd">    :param order_by: columns to order by</span>
 <span class="sd">    :param partition_by: optional partitioning column</span>
 <span class="sd">    :param value_column_name: column to alter</span>
-<span class="sd">    :param selection_predicate: expression to choose values to skip</span>
+<span class="sd">    :param selection_predicate: expression to choose values to replace</span>
 <span class="sd">    :param locf_to_use_column_name: name for a temporary values column</span>
 <span class="sd">    :param locf_non_null_rank_column_name: name for a temporary values column</span>
 <span class="sd">    :param locf_tiebreaker_column_name: name for a temporary values column</span>
@@ -755,6 +851,10 @@ the l-th Y item.</p>
     <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">locf_to_use_column_name</span><span class="p">,</span> <span class="n">locf_non_null_rank_column_name</span><span class="p">,</span> <span class="n">locf_tiebreaker_column_name</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">cols</span><span class="p">))</span>
     <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">order_by</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selection_predicate</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">locf_to_use_column_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">locf_non_null_rank_column_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">locf_tiebreaker_column_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
     <span class="n">order_by</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">order_by</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">partition_by</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">partition_by</span> <span class="o">=</span> <span class="p">[]</span>
@@ -791,7 +891,147 @@ optional partition_by partition.</p>
 :param order_by: columns to order by
 :param partition_by: optional partitioning column
 :param value_column_name: column to alter
-:param selection_predicate: expression to choose values to skip
+:param selection_predicate: expression to choose values to replace
+:param locf_to_use_column_name: name for a temporary values column
+:param locf_non_null_rank_column_name: name for a temporary values column
+:param locf_tiebreaker_column_name: name for a temporary values column</p>
+</div>
+
+
+                </section>
+                <section id="braid_data">
+                            <div class="attr function"><a class="headerlink" href="#braid_data">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">braid_data</span><span class="signature">(
+    *,
+    d_state: <a href="data_ops.html#ViewRepresentation">data_algebra.data_ops.ViewRepresentation</a>,
+    d_event: <a href="data_ops.html#ViewRepresentation">data_algebra.data_ops.ViewRepresentation</a>,
+    order_by: Iterable[str],
+    partition_by: Optional[Iterable[str]] = None,
+    state_value_column_name: str,
+    event_value_column_names: Iterable[str],
+    source_id_column: str = &#39;record_type&#39;,
+    state_row_mark: str = &#39;state_row&#39;,
+    event_row_mark: str = &#39;event_row&#39;,
+    stand_in_values: Dict,
+    locf_to_use_column_name: str = &#39;locf_to_use&#39;,
+    locf_non_null_rank_column_name: str = &#39;locf_non_null_rank&#39;,
+    locf_tiebreaker_column_name: str = &#39;locf_tiebreaker&#39;
+)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">braid_data</span><span class="p">(</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">d_state</span><span class="p">:</span> <span class="n">ViewRepresentation</span><span class="p">,</span>
+        <span class="n">d_event</span><span class="p">:</span> <span class="n">ViewRepresentation</span><span class="p">,</span>
+        <span class="n">order_by</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">partition_by</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">state_value_column_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">event_value_column_names</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">source_id_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;record_type&#39;</span><span class="p">,</span>
+        <span class="n">state_row_mark</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;state_row&#39;</span><span class="p">,</span>
+        <span class="n">event_row_mark</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;event_row&#39;</span><span class="p">,</span>
+        <span class="n">stand_in_values</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
+        <span class="n">locf_to_use_column_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;locf_to_use&#39;</span><span class="p">,</span>
+        <span class="n">locf_non_null_rank_column_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;locf_non_null_rank&#39;</span><span class="p">,</span>
+        <span class="n">locf_tiebreaker_column_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;locf_tiebreaker&#39;</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mix data from two sources, ordering by order_by columns and carrying forward observations</span>
+<span class="sd">    on d_state value column.</span>
+
+<span class="sd">    :param d_state: ViewRepresentation representation of state by order_by.</span>
+<span class="sd">    :param d_event: ViewRepresentation representation of events by order_by.</span>
+<span class="sd">    :param order_by: columns to order by (non empty list of column names)</span>
+<span class="sd">    :param partition_by: optional partitioning column names</span>
+<span class="sd">    :param state_value_column_name: column to copy from d_state and propagate forward</span>
+<span class="sd">    :param event_value_column_names: columns to copy from d_event</span>
+<span class="sd">    :param source_id_column: name for source identification column.</span>
+<span class="sd">    :param state_row_mark: source annotation of state rows.</span>
+<span class="sd">    :param event_row_mark: source annotation of event rows.</span>
+<span class="sd">    :param stand_in_values: dictionary stand in values to use for state_value_column_name and event_value_column_names</span>
+<span class="sd">            needed to get column types correct, replaced by None and not passed further.</span>
+<span class="sd">    :param locf_to_use_column_name: name for a temporary values column</span>
+<span class="sd">    :param locf_non_null_rank_column_name: name for a temporary values column</span>
+<span class="sd">    :param locf_tiebreaker_column_name: name for a temporary values column</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d_state</span><span class="p">,</span> <span class="n">ViewRepresentation</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d_event</span><span class="p">,</span> <span class="n">ViewRepresentation</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">order_by</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="n">order_by</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">order_by</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">order_by</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">partition_by</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">partition_by</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="n">partition_by</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">partition_by</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">partition_by</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">state_value_column_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event_value_column_names</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="n">event_value_column_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">event_value_column_names</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source_id_column</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">state_row_mark</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event_row_mark</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">locf_to_use_column_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">locf_non_null_rank_column_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">locf_tiebreaker_column_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stand_in_values</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+    <span class="n">together</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">d_state</span>
+            <span class="o">.</span><span class="n">extend</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">stand_in_values</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">event_value_column_names</span><span class="p">})</span>
+            <span class="o">.</span><span class="n">select_columns</span><span class="p">(</span><span class="n">partition_by</span> <span class="o">+</span> <span class="n">order_by</span> <span class="o">+</span> <span class="p">[</span><span class="n">state_value_column_name</span><span class="p">]</span> <span class="o">+</span> <span class="n">event_value_column_names</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">concat_rows</span><span class="p">(</span>
+                <span class="n">b</span><span class="o">=</span><span class="p">(</span>
+                    <span class="n">d_event</span>
+                        <span class="o">.</span><span class="n">extend</span><span class="p">({</span><span class="n">state_value_column_name</span><span class="p">:</span> <span class="n">stand_in_values</span><span class="p">[</span><span class="n">state_value_column_name</span><span class="p">]})</span>
+                        <span class="o">.</span><span class="n">select_columns</span><span class="p">(</span><span class="n">partition_by</span> <span class="o">+</span> <span class="n">order_by</span> <span class="o">+</span> <span class="p">[</span><span class="n">state_value_column_name</span><span class="p">]</span> <span class="o">+</span> <span class="n">event_value_column_names</span><span class="p">)</span>
+                    <span class="p">),</span>
+                <span class="n">id_column</span><span class="o">=</span><span class="n">source_id_column</span><span class="p">,</span>
+                <span class="n">a_name</span><span class="o">=</span><span class="n">state_row_mark</span><span class="p">,</span>
+                <span class="n">b_name</span><span class="o">=</span><span class="n">event_row_mark</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="c1"># clear out stand-in values</span>
+            <span class="o">.</span><span class="n">extend</span><span class="p">({</span>
+                <span class="n">state_value_column_name</span><span class="p">:</span>
+                    <span class="sa">f</span><span class="s1">&#39;(</span><span class="si">{</span><span class="n">source_id_column</span><span class="si">}</span><span class="s1"> == &quot;</span><span class="si">{</span><span class="n">event_row_mark</span><span class="si">}</span><span class="s1">&quot;).if_else(None, </span><span class="si">{</span><span class="n">state_value_column_name</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">})</span>
+            <span class="o">.</span><span class="n">extend</span><span class="p">({</span>
+                <span class="n">k</span><span class="p">:</span>
+                    <span class="sa">f</span><span class="s1">&#39;(</span><span class="si">{</span><span class="n">source_id_column</span><span class="si">}</span><span class="s1"> == &quot;</span><span class="si">{</span><span class="n">state_row_mark</span><span class="si">}</span><span class="s1">&quot;).if_else(None, </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">)&#39;</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">event_value_column_names</span><span class="p">})</span>
+        <span class="p">)</span>
+    <span class="n">ops</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">last_observed_carried_forward</span><span class="p">(</span>
+            <span class="n">together</span><span class="p">,</span>
+            <span class="n">order_by</span><span class="o">=</span><span class="n">order_by</span><span class="p">,</span>
+            <span class="n">partition_by</span><span class="o">=</span><span class="n">partition_by</span><span class="p">,</span>
+            <span class="n">value_column_name</span><span class="o">=</span><span class="n">state_value_column_name</span><span class="p">,</span>
+            <span class="n">selection_predicate</span><span class="o">=</span><span class="s1">&#39;is_null()&#39;</span><span class="p">,</span>
+            <span class="n">locf_to_use_column_name</span><span class="o">=</span><span class="n">locf_to_use_column_name</span><span class="p">,</span>
+            <span class="n">locf_non_null_rank_column_name</span><span class="o">=</span><span class="n">locf_non_null_rank_column_name</span><span class="p">,</span>
+            <span class="n">locf_tiebreaker_column_name</span><span class="o">=</span><span class="n">locf_tiebreaker_column_name</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">ops</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Mix data from two sources, ordering by order_by columns and carrying forward observations
+on d_state value column.</p>
+
+<p>:param d_state: ViewRepresentation representation of state by order_by.
+:param d_event: ViewRepresentation representation of events by order_by.
+:param order_by: columns to order by (non empty list of column names)
+:param partition_by: optional partitioning column names
+:param state_value_column_name: column to copy from d_state and propagate forward
+:param event_value_column_names: columns to copy from d_event
+:param source_id_column: name for source identification column.
+:param state_row_mark: source annotation of state rows.
+:param event_row_mark: source annotation of event rows.
+:param stand_in_values: dictionary stand in values to use for state_value_column_name and event_value_column_names
+        needed to get column types correct, replaced by None and not passed further.
 :param locf_to_use_column_name: name for a temporary values column
 :param locf_non_null_rank_column_name: name for a temporary values column
 :param locf_tiebreaker_column_name: name for a temporary values column</p>

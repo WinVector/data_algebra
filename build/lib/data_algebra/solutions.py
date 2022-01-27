@@ -3,7 +3,7 @@
 data algebra solutions to common data processing problems
 """
 
-from typing import Iterable, Optional
+from typing import Dict, Iterable, Optional
 
 import numpy
 import data_algebra
@@ -224,7 +224,7 @@ def last_observed_carried_forward(
         order_by: Iterable[str],
         partition_by: Optional[Iterable[str]] = None,
         value_column_name: str,
-        selection_predicate: str = '.is_null()',
+        selection_predicate: str = 'is_null()',
         locf_to_use_column_name: str = 'locf_to_use',
         locf_non_null_rank_column_name: str = 'locf_non_null_rank',
         locf_tiebreaker_column_name: str = 'locf_tiebreaker',
@@ -237,7 +237,7 @@ def last_observed_carried_forward(
     :param order_by: columns to order by
     :param partition_by: optional partitioning column
     :param value_column_name: column to alter
-    :param selection_predicate: expression to choose values to skip
+    :param selection_predicate: expression to choose values to replace
     :param locf_to_use_column_name: name for a temporary values column
     :param locf_non_null_rank_column_name: name for a temporary values column
     :param locf_tiebreaker_column_name: name for a temporary values column
@@ -248,6 +248,10 @@ def last_observed_carried_forward(
     cols = [locf_to_use_column_name, locf_non_null_rank_column_name, locf_tiebreaker_column_name] + list(d.column_names)
     assert len(cols) == len(set(cols))
     assert not isinstance(order_by, str)
+    assert isinstance(selection_predicate, str)
+    assert isinstance(locf_to_use_column_name, str)
+    assert isinstance(locf_non_null_rank_column_name, str)
+    assert isinstance(locf_tiebreaker_column_name, str)
     order_by = list(order_by)
     if partition_by is None:
         partition_by = []
@@ -275,7 +279,96 @@ def last_observed_carried_forward(
     return ops
 
 
-# TODO: add aligning events to state at event example (UNION ALL and then locf)
+def braid_data(
+        *,
+        d_state: ViewRepresentation,
+        d_event: ViewRepresentation,
+        order_by: Iterable[str],
+        partition_by: Optional[Iterable[str]] = None,
+        state_value_column_name: str,
+        event_value_column_names: Iterable[str],
+        source_id_column: str = 'record_type',
+        state_row_mark: str = 'state_row',
+        event_row_mark: str = 'event_row',
+        stand_in_values: Dict,
+        locf_to_use_column_name: str = 'locf_to_use',
+        locf_non_null_rank_column_name: str = 'locf_non_null_rank',
+        locf_tiebreaker_column_name: str = 'locf_tiebreaker',
+):
+    """
+    Mix data from two sources, ordering by order_by columns and carrying forward observations
+    on d_state value column.
+
+    :param d_state: ViewRepresentation representation of state by order_by.
+    :param d_event: ViewRepresentation representation of events by order_by.
+    :param order_by: columns to order by (non empty list of column names)
+    :param partition_by: optional partitioning column names
+    :param state_value_column_name: column to copy from d_state and propagate forward
+    :param event_value_column_names: columns to copy from d_event
+    :param source_id_column: name for source identification column.
+    :param state_row_mark: source annotation of state rows.
+    :param event_row_mark: source annotation of event rows.
+    :param stand_in_values: dictionary stand in values to use for state_value_column_name and event_value_column_names
+            needed to get column types correct, replaced by None and not passed further.
+    :param locf_to_use_column_name: name for a temporary values column
+    :param locf_non_null_rank_column_name: name for a temporary values column
+    :param locf_tiebreaker_column_name: name for a temporary values column
+    """
+    assert isinstance(d_state, ViewRepresentation)
+    assert isinstance(d_event, ViewRepresentation)
+    assert not isinstance(order_by, str)
+    order_by = list(order_by)
+    assert len(order_by) > 0
+    if partition_by is not None:
+        assert not isinstance(partition_by, str)
+        partition_by = list(partition_by)
+    else:
+        partition_by = []
+    assert isinstance(state_value_column_name, str)
+    assert not isinstance(event_value_column_names, str)
+    event_value_column_names = list(event_value_column_names)
+    assert isinstance(source_id_column, str)
+    assert isinstance(state_row_mark, str)
+    assert isinstance(event_row_mark, str)
+    assert isinstance(locf_to_use_column_name, str)
+    assert isinstance(locf_non_null_rank_column_name, str)
+    assert isinstance(locf_tiebreaker_column_name, str)
+    assert isinstance(stand_in_values, dict)
+    together = (
+        d_state
+            .extend({k: stand_in_values[k] for k in event_value_column_names})
+            .select_columns(partition_by + order_by + [state_value_column_name] + event_value_column_names)
+            .concat_rows(
+                b=(
+                    d_event
+                        .extend({state_value_column_name: stand_in_values[state_value_column_name]})
+                        .select_columns(partition_by + order_by + [state_value_column_name] + event_value_column_names)
+                    ),
+                id_column=source_id_column,
+                a_name=state_row_mark,
+                b_name=event_row_mark,
+                )
+            # clear out stand-in values
+            .extend({
+                state_value_column_name:
+                    f'({source_id_column} == "{event_row_mark}").if_else(None, {state_value_column_name})'})
+            .extend({
+                k:
+                    f'({source_id_column} == "{state_row_mark}").if_else(None, {k})' for k in event_value_column_names})
+        )
+    ops = (
+        last_observed_carried_forward(
+            together,
+            order_by=order_by,
+            partition_by=partition_by,
+            value_column_name=state_value_column_name,
+            selection_predicate='is_null()',
+            locf_to_use_column_name=locf_to_use_column_name,
+            locf_non_null_rank_column_name=locf_non_null_rank_column_name,
+            locf_tiebreaker_column_name=locf_tiebreaker_column_name,
+            )
+        )
+    return ops
 
 
 def rank_to_average(
