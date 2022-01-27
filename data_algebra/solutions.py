@@ -3,7 +3,7 @@
 data algebra solutions to common data processing problems
 """
 
-from typing import Iterable, Optional
+from typing import Dict, Iterable, Optional
 
 import numpy
 import data_algebra
@@ -290,13 +290,14 @@ def braid_data(
         source_id_column: str = 'record_type',
         state_row_mark: str = 'state_row',
         event_row_mark: str = 'event_row',
+        stand_in_values: Dict,
         locf_to_use_column_name: str = 'locf_to_use',
         locf_non_null_rank_column_name: str = 'locf_non_null_rank',
         locf_tiebreaker_column_name: str = 'locf_tiebreaker',
 ):
     """
     Mix data from two sources, ordering by order_by columns and carrying forward observations
-    on d_state value column.  TODO: work on default types!
+    on d_state value column.
 
     :param d_state: ViewRepresentation representation of state by order_by.
     :param d_event: ViewRepresentation representation of events by order_by.
@@ -307,6 +308,7 @@ def braid_data(
     :param source_id_column: name for source identification column.
     :param state_row_mark: source annotation of state rows.
     :param event_row_mark: source annotation of event rows.
+    :param stand_in_values: dictionary stand in values to use for state_value_column_name and event_value_column_names
     :param locf_to_use_column_name: name for a temporary values column
     :param locf_non_null_rank_column_name: name for a temporary values column
     :param locf_tiebreaker_column_name: name for a temporary values column
@@ -330,21 +332,28 @@ def braid_data(
     assert isinstance(locf_to_use_column_name, str)
     assert isinstance(locf_non_null_rank_column_name, str)
     assert isinstance(locf_tiebreaker_column_name, str)
+    assert isinstance(stand_in_values, dict)
     together = (
         d_state
-            .extend({k: 0.0 for k in event_value_column_names})
+            .extend({k: stand_in_values[k] for k in event_value_column_names})
             .select_columns(partition_by + order_by + [state_value_column_name] + event_value_column_names)
             .concat_rows(
                 b=(
                     d_event
-                        .extend({state_value_column_name: '""'})
+                        .extend({state_value_column_name: stand_in_values[state_value_column_name]})
                         .select_columns(partition_by + order_by + [state_value_column_name] + event_value_column_names)
                     ),
                 id_column=source_id_column,
                 a_name=state_row_mark,
                 b_name=event_row_mark,
                 )
-            .extend({state_value_column_name: f'({source_id_column} == "{event_row_mark}").if_else(None, {state_value_column_name})'})
+            # clear out stand-in values
+            .extend({
+                state_value_column_name:
+                    f'({source_id_column} == "{event_row_mark}").if_else(None, {state_value_column_name})'})
+            .extend({
+                k:
+                    f'({source_id_column} == "{state_row_mark}").if_else(None, {k})' for k in event_value_column_names})
         )
     ops = (
         last_observed_carried_forward(
