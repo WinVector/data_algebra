@@ -3,6 +3,10 @@ import data_algebra
 from data_algebra.data_ops import descr
 import data_algebra.solutions
 import data_algebra.test_util
+import data_algebra.SparkSQL
+import data_algebra.MySQL
+import data_algebra.PostgreSQL
+import data_algebra.BigQuery
 
 
 def test_braid():
@@ -36,7 +40,10 @@ def test_braid():
         ops=ops,
         data={'d_state': d_state, 'd_event': d_event},
         expect=expect,
-        models_to_skip={
+        models_to_skip={  # TODO: vet on more dbs
             data_algebra.SparkSQL.SparkSQLModel(),
+            data_algebra.MySQL.MySQLModel(),
+            data_algebra.PostgreSQL.PostgreSQLModel(),
+            data_algebra.BigQuery.BigQueryModel(),
         }
     )

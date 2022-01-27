@@ -279,7 +279,6 @@ def last_observed_carried_forward(
     return ops
 
 
-# TODO: test
 def braid_data(
         *,
         d_state: ViewRepresentation,
@@ -288,7 +287,7 @@ def braid_data(
         partition_by: Optional[Iterable[str]] = None,
         state_value_column_name: str,
         event_value_column_names: Iterable[str],
-        source_id_column: Optional[str] = 'record_type',
+        source_id_column: str = 'record_type',
         state_row_mark: str = 'state_row',
         event_row_mark: str = 'event_row',
         locf_to_use_column_name: str = 'locf_to_use',
@@ -297,7 +296,7 @@ def braid_data(
 ):
     """
     Mix data from two sources, ordering by order_by columns and carrying forward observations
-    on d_state value column.
+    on d_state value column.  TODO: work on default types!
 
     :param d_state: ViewRepresentation representation of state by order_by.
     :param d_event: ViewRepresentation representation of events by order_by.
@@ -305,7 +304,7 @@ def braid_data(
     :param partition_by: optional partitioning column names
     :param state_value_column_name: column to copy from d_state and propagate forward
     :param event_value_column_names: columns to copy from d_event
-    :param source_id_column: optional name for source identification column.
+    :param source_id_column: name for source identification column.
     :param state_row_mark: source annotation of state rows.
     :param event_row_mark: source annotation of event rows.
     :param locf_to_use_column_name: name for a temporary values column
@@ -325,8 +324,7 @@ def braid_data(
     assert isinstance(state_value_column_name, str)
     assert not isinstance(event_value_column_names, str)
     event_value_column_names = list(event_value_column_names)
-    if source_id_column is not None:
-        assert isinstance(source_id_column, str)
+    assert isinstance(source_id_column, str)
     assert isinstance(state_row_mark, str)
     assert isinstance(event_row_mark, str)
     assert isinstance(locf_to_use_column_name, str)
