@@ -130,37 +130,27 @@ class NearSQLContainer:
             sql_format_options=None,
             quoted_query_name_annotation: Optional[str] = None) -> List[str]:
         """Convert subsql, possibly adding query name"""
-        if isinstance(self.near_sql, data_algebra.near_sql.NearSQLNamedEntity):
-            declared_quoted_name = self.near_sql.quoted_query_name
-            implicit_annotation = (
-                    (not self.force_sql)
-                    and (quoted_query_name_annotation == declared_quoted_name))
-            if implicit_annotation:
-                quoted_query_name_annotation = None  # don't add annotation
-                sql = [declared_quoted_name]  # don't call to SQL method
+        non_trivial_annotation = ((quoted_query_name_annotation is not None)
+                                  and (quoted_query_name_annotation != self.near_sql.quoted_query_name))
+        if (isinstance(self.near_sql, data_algebra.near_sql.NearSQLNamedEntity)
+            and (not self.force_sql)):
+            # short circuit table and cte path
+            assert quoted_query_name_annotation is not None  # type hint
+            assert isinstance(quoted_query_name_annotation, str)    # type hint
+            if non_trivial_annotation:
+                sql = [self.near_sql.quoted_query_name + ' ' + quoted_query_name_annotation]  # table name and alias
             else:
-                forced_annotation = (
-                    self.force_sql  # as table name is buried in this case
-                    or ((quoted_query_name_annotation is not None)
-                        and (quoted_query_name_annotation != declared_quoted_name))
-                )
-                sql = self.near_sql.to_sql_str_list(
-                    columns=self.columns,
-                    force_sql=self.force_sql or forced_annotation,
-                    db_model=db_model,
-                    sql_format_options=sql_format_options,
-                )
+                sql = [self.near_sql.quoted_query_name]
         else:
+            # main path
             sql = self.near_sql.to_sql_str_list(
                 columns=self.columns,
-                force_sql=self.force_sql,
+                force_sql=self.force_sql or non_trivial_annotation,
                 db_model=db_model,
                 sql_format_options=sql_format_options,
             )
-        if quoted_query_name_annotation is not None:
-            sql = (
-                    ["("] + sql + [") " + quoted_query_name_annotation]
-            )
+            if quoted_query_name_annotation is not None:
+                sql = ["("] + sql + [") " + quoted_query_name_annotation]
         return sql
 
     # sequence: a list where last element is a NearSQLContainer previous elements are (name, NearSQLContainer) pairs
