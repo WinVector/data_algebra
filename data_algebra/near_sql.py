@@ -54,7 +54,7 @@ class NearSQL(abc.ABC):
     """
 
     terms: Optional[Dict[str, Optional[str]]]
-    query_name: Optional[str]
+    query_name: str
     quoted_query_name: str
     is_table: bool = False
     annotation: Optional[str] = None
@@ -63,13 +63,13 @@ class NearSQL(abc.ABC):
         self,
         *,
         terms: Optional[Dict[str, Optional[str]]],
-        query_name: Optional[str] = None,
+        query_name: str,
         quoted_query_name: str,
         is_table: bool = False,
         annotation: Optional[str] = None,
     ):
         assert isinstance(terms, (dict, type(None)))
-        assert isinstance(query_name, (str, type(None)))
+        assert isinstance(query_name, str)
         assert isinstance(quoted_query_name, str)
         assert isinstance(is_table, bool)
         assert isinstance(annotation, (str, type(None)))
@@ -207,7 +207,7 @@ class NearSQLContainer:
 
 class NearSQLNamedEntity(NearSQL):
     """Model for tables and common table expressions"""
-    def __init__(self, *, terms, query_name, quoted_query_name):
+    def __init__(self, *, terms, query_name: str, quoted_query_name: str):
         NearSQL.__init__(
             self,
             terms=terms,
@@ -232,7 +232,7 @@ class NearSQLNamedEntity(NearSQL):
 
 
 class NearSQLCommonTableExpression(NearSQLNamedEntity):
-    def __init__(self, *, query_name, quoted_query_name):
+    def __init__(self, *, query_name: str, quoted_query_name: str):
         NearSQLNamedEntity.__init__(
             self, terms=None, query_name=query_name, quoted_query_name=quoted_query_name
         )
@@ -291,8 +291,8 @@ class NearSQLUnaryStep(NearSQL):
         self,
         *,
         terms,
-        query_name,
-        quoted_query_name,
+        query_name: str,
+        quoted_query_name: str,
         sub_sql,
         suffix=None,
         annotation=None,
@@ -363,11 +363,11 @@ class NearSQLBinaryStep(NearSQL):
         self,
         *,
         terms,
-        query_name,
-        quoted_query_name,
-        sub_sql1,
-        joiner,
-        sub_sql2,
+        query_name: str,
+        quoted_query_name: str,
+        sub_sql1: NearSQLContainer,
+        joiner: str,
+        sub_sql2: NearSQLContainer,
         suffix=None,
         annotation=None,
     ):
