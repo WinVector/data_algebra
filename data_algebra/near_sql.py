@@ -123,8 +123,13 @@ class NearSQLContainer:
             self.columns = data_algebra.OrderedSet.OrderedSet(columns)
         self.force_sql = force_sql
 
-    # TODO: implement more of add query name and take external name
-    def convert_subsql(self, *, db_model, sql_format_options=None, add_query_name: bool = False) -> List[str]:
+    # TODO: implement more of add query name
+    def convert_subsql(
+            self,
+            *,
+            db_model,
+            sql_format_options=None,
+            quoted_query_name_annotation: Optional[str] = None) -> List[str]:
         """Convert subsql, possibly adding query name"""
         sub_sql = self.near_sql.to_sql_str_list(
             columns=self.columns,
@@ -134,7 +139,8 @@ class NearSQLContainer:
         )
         assert isinstance(sub_sql, list)
         sql = sub_sql
-        if add_query_name:
+        if quoted_query_name_annotation is not None:
+            assert isinstance(quoted_query_name_annotation, str)
             if isinstance(self.near_sql, data_algebra.near_sql.NearSQLTable):
                 pass
             elif isinstance(
@@ -144,7 +150,7 @@ class NearSQLContainer:
                 pass
             else:
                 sql = (
-                        ["("] + sub_sql + [") " + self.near_sql.quoted_query_name]
+                        ["("] + sub_sql + [") " + quoted_query_name_annotation]
                 )
         return sql
 
