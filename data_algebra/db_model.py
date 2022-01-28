@@ -2023,11 +2023,6 @@ class DBModel:
         assert isinstance(sub_sql, list)
         if isinstance(nearsql_container.near_sql, data_algebra.near_sql.NearSQLTable):
             sql = sub_sql
-            if (
-                nearsql_container.near_sql.quoted_query_name
-                != nearsql_container.near_sql.quoted_table_name
-            ):
-                sql = sql + [nearsql_container.near_sql.quoted_query_name]
         elif isinstance(
             nearsql_container.near_sql,
             data_algebra.near_sql.NearSQLCommonTableExpression,
