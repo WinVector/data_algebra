@@ -79,16 +79,16 @@ def equivalent_frames(
     # leave in extra checks as this is usually used by test code
     if local_data_model is None:
         local_data_model = data_algebra.default_data_model
-    assert isinstance(a, local_data_model.pd.DataFrame)
-    assert isinstance(b, local_data_model.pd.DataFrame)
+    assert local_data_model.is_appropriate_data_instance(a)
+    assert local_data_model.is_appropriate_data_instance(b)
     if a.shape != b.shape:
         return False
     if a.shape[1] < 1:
         return True
-    a = a.reset_index(drop=True, inplace=False)  # get rid of indices
-    b = b.reset_index(drop=True, inplace=False)
     if a.equals(b):
         return True
+    a = a.reset_index(drop=True, inplace=False)  # get rid of indices
+    b = b.reset_index(drop=True, inplace=False)
     if not cols_case_sensitive:
         a.columns = [c.lower() for c in a.columns]
         a = a.reset_index(drop=True)

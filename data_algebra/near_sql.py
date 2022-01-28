@@ -123,19 +123,30 @@ class NearSQLContainer:
             self.columns = data_algebra.OrderedSet.OrderedSet(columns)
         self.force_sql = force_sql
 
-    def to_sql_str_list(self, db_model, sql_format_options=None) -> List[str]:
-        return self.near_sql.to_sql_str_list(
+    # TODO: implement more of add query name and take external name
+    def convert_subsql(self, *, db_model, sql_format_options=None, add_query_name: bool = False) -> List[str]:
+        """Convert subsql, possibly adding query name"""
+        sub_sql = self.near_sql.to_sql_str_list(
             columns=self.columns,
             force_sql=self.force_sql,
             db_model=db_model,
             sql_format_options=sql_format_options,
         )
-
-    # assemble sub-sql
-    def convert_subsql(self, *, db_model, sql_format_options=None):
-        return db_model.convert_nearsql_container_subsql_(
-            nearsql_container=self, sql_format_options=sql_format_options
-        )
+        assert isinstance(sub_sql, list)
+        sql = sub_sql
+        if add_query_name:
+            if isinstance(self.near_sql, data_algebra.near_sql.NearSQLTable):
+                pass
+            elif isinstance(
+                    self.near_sql,
+                    data_algebra.near_sql.NearSQLCommonTableExpression,
+            ):
+                pass
+            else:
+                sql = (
+                        ["("] + sub_sql + [") " + self.near_sql.quoted_query_name]
+                )
+        return sql
 
     # sequence: a list where last element is a NearSQLContainer previous elements are (name, NearSQLContainer) pairs
     # stub the replacement common table expression in a NearSQLContainer

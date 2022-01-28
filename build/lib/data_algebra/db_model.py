@@ -1156,7 +1156,6 @@ class DBModel:
         if len(missing) > 0:
             raise KeyError("referred to unknown columns: " + str(missing))
         cols_using = [c for c in table_def.column_names if c in using]
-
         subsql = data_algebra.near_sql.NearSQLTable(
             terms={k: self.quote_identifier(k) for k in cols_using},
             table_name=self.quote_table_name(table_def),
@@ -1810,8 +1809,8 @@ class DBModel:
                 sql_sequence: List[str] = []
                 for i in range(len_sequence):
                     nmi = sequence.previous_steps[i][0]  # already quoted
-                    sqli = sequence.previous_steps[i][1].to_sql_str_list(
-                        db_model=self, sql_format_options=sql_format_options
+                    sqli = sequence.previous_steps[i][1].convert_subsql(
+                        db_model=self, sql_format_options=sql_format_options, add_query_name=False
                     )
                     sql_sequence = (
                         sql_sequence
@@ -2008,38 +2007,6 @@ class DBModel:
             return self.quote_identifier(k)
         return v + " AS " + self.quote_identifier(k)
 
-    def convert_nearsql_container_subsql_(
-        self, nearsql_container, *, sql_format_options=None
-    ) -> List[str]:
-        """
-        Convert sub-SQL into list of SQL string lines.
-        """
-        assert isinstance(nearsql_container, data_algebra.near_sql.NearSQLContainer)
-        if sql_format_options is None:
-            sql_format_options = self.default_SQL_format_options
-        assert isinstance(sql_format_options, SQLFormatOptions)
-        sub_sql = nearsql_container.to_sql_str_list(
-            self, sql_format_options=sql_format_options
-        )
-        assert isinstance(sub_sql, list)
-        if isinstance(nearsql_container.near_sql, data_algebra.near_sql.NearSQLTable):
-            sql = sub_sql
-            if (
-                nearsql_container.near_sql.quoted_query_name
-                != nearsql_container.near_sql.quoted_table_name
-            ):
-                sql = sql + [nearsql_container.near_sql.quoted_query_name]
-        elif isinstance(
-            nearsql_container.near_sql,
-            data_algebra.near_sql.NearSQLCommonTableExpression,
-        ):
-            sql = sub_sql
-        else:
-            sql = (
-                ["("] + sub_sql + [") " + nearsql_container.near_sql.quoted_query_name]
-            )
-        return sql
-
     def nearsqlcte_to_sql_str_list_(
         self,
         near_sql,
@@ -2141,7 +2108,7 @@ class DBModel:
             + [
                 sql_format_options.sql_indent + si
                 for si in near_sql.sub_sql.convert_subsql(
-                    db_model=self, sql_format_options=sql_format_options
+                    db_model=self, sql_format_options=sql_format_options, add_query_name=True
                 )
             ]
         )
@@ -2171,7 +2138,7 @@ class DBModel:
             sql = sql + [
                 sql_format_options.sql_indent + si
                 for si in near_sql.sub_sql.convert_subsql(
-                    db_model=self, sql_format_options=sql_format_options
+                    db_model=self, sql_format_options=sql_format_options, add_query_name=True
                 )
             ]
         if (near_sql.suffix is not None) and (len(near_sql.suffix) > 0):
@@ -2213,20 +2180,13 @@ class DBModel:
             clean_anno = _clean_annotation(near_sql.annotation)
             if clean_anno is not None:
                 sql_start = "SELECT  -- " + clean_anno
-        if is_union:
-            substr_1 = near_sql.sub_sql1.to_sql_str_list(
-                db_model=self, sql_format_options=sql_format_options
-            )
-            substr_2 = near_sql.sub_sql2.to_sql_str_list(
-                db_model=self, sql_format_options=sql_format_options
-            )
-        else:
-            substr_1 = near_sql.sub_sql1.convert_subsql(
-                db_model=self, sql_format_options=sql_format_options
-            )
-            substr_2 = near_sql.sub_sql2.convert_subsql(
-                db_model=self, sql_format_options=sql_format_options
-            )
+        subsql_add_query_name = not is_union
+        substr_1 = near_sql.sub_sql1.convert_subsql(
+            db_model=self, sql_format_options=sql_format_options, add_query_name=subsql_add_query_name
+        )
+        substr_2 = near_sql.sub_sql2.convert_subsql(
+            db_model=self, sql_format_options=sql_format_options, add_query_name=subsql_add_query_name
+        )
         sql = (
             [sql_start]
             + self._indent_and_sep_terms(
