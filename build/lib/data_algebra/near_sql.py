@@ -123,29 +123,44 @@ class NearSQLContainer:
             self.columns = data_algebra.OrderedSet.OrderedSet(columns)
         self.force_sql = force_sql
 
-    # TODO: implement more of add query name and take external name
-    def convert_subsql(self, *, db_model, sql_format_options=None, add_query_name: bool = False) -> List[str]:
+    def convert_subsql(
+            self,
+            *,
+            db_model,
+            sql_format_options=None,
+            quoted_query_name_annotation: Optional[str] = None) -> List[str]:
         """Convert subsql, possibly adding query name"""
-        sub_sql = self.near_sql.to_sql_str_list(
-            columns=self.columns,
-            force_sql=self.force_sql,
-            db_model=db_model,
-            sql_format_options=sql_format_options,
-        )
-        assert isinstance(sub_sql, list)
-        sql = sub_sql
-        if add_query_name:
-            if isinstance(self.near_sql, data_algebra.near_sql.NearSQLTable):
-                pass
-            elif isinstance(
-                    self.near_sql,
-                    data_algebra.near_sql.NearSQLCommonTableExpression,
-            ):
-                pass
+        if isinstance(self.near_sql, data_algebra.near_sql.NearSQLNamedEntity):
+            declared_quoted_name = self.near_sql.quoted_query_name
+            implicit_annotation = (
+                    (not self.force_sql)
+                    and (quoted_query_name_annotation == declared_quoted_name))
+            if implicit_annotation:
+                quoted_query_name_annotation = None  # don't add annotation
+                sql = [declared_quoted_name]  # don't call to SQL method
             else:
-                sql = (
-                        ["("] + sub_sql + [") " + self.near_sql.quoted_query_name]
+                forced_annotation = (
+                    self.force_sql  # as table name is buried in this case
+                    or ((quoted_query_name_annotation is not None)
+                        and (quoted_query_name_annotation != declared_quoted_name))
                 )
+                sql = self.near_sql.to_sql_str_list(
+                    columns=self.columns,
+                    force_sql=self.force_sql or forced_annotation,
+                    db_model=db_model,
+                    sql_format_options=sql_format_options,
+                )
+        else:
+            sql = self.near_sql.to_sql_str_list(
+                columns=self.columns,
+                force_sql=self.force_sql,
+                db_model=db_model,
+                sql_format_options=sql_format_options,
+            )
+        if quoted_query_name_annotation is not None:
+            sql = (
+                    ["("] + sql + [") " + quoted_query_name_annotation]
+            )
         return sql
 
     # sequence: a list where last element is a NearSQLContainer previous elements are (name, NearSQLContainer) pairs

@@ -1810,7 +1810,7 @@ class DBModel:
                 for i in range(len_sequence):
                     nmi = sequence.previous_steps[i][0]  # already quoted
                     sqli = sequence.previous_steps[i][1].convert_subsql(
-                        db_model=self, sql_format_options=sql_format_options, add_query_name=False
+                        db_model=self, sql_format_options=sql_format_options
                     )
                     sql_sequence = (
                         sql_sequence
@@ -2108,7 +2108,9 @@ class DBModel:
             + [
                 sql_format_options.sql_indent + si
                 for si in near_sql.sub_sql.convert_subsql(
-                    db_model=self, sql_format_options=sql_format_options, add_query_name=True
+                    db_model=self,
+                    sql_format_options=sql_format_options,
+                    quoted_query_name_annotation=near_sql.sub_sql.near_sql.quoted_query_name
                 )
             ]
         )
@@ -2138,7 +2140,9 @@ class DBModel:
             sql = sql + [
                 sql_format_options.sql_indent + si
                 for si in near_sql.sub_sql.convert_subsql(
-                    db_model=self, sql_format_options=sql_format_options, add_query_name=True
+                    db_model=self,
+                    sql_format_options=sql_format_options,
+                    quoted_query_name_annotation=near_sql.sub_sql.near_sql.quoted_query_name
                 )
             ]
         if (near_sql.suffix is not None) and (len(near_sql.suffix) > 0):
@@ -2182,10 +2186,14 @@ class DBModel:
                 sql_start = "SELECT  -- " + clean_anno
         subsql_add_query_name = not is_union
         substr_1 = near_sql.sub_sql1.convert_subsql(
-            db_model=self, sql_format_options=sql_format_options, add_query_name=subsql_add_query_name
+            db_model=self,
+            sql_format_options=sql_format_options,
+            quoted_query_name_annotation=near_sql.sub_sql1.near_sql.quoted_query_name if subsql_add_query_name else None
         )
         substr_2 = near_sql.sub_sql2.convert_subsql(
-            db_model=self, sql_format_options=sql_format_options, add_query_name=subsql_add_query_name
+            db_model=self,
+            sql_format_options=sql_format_options,
+            quoted_query_name_annotation=near_sql.sub_sql2.near_sql.quoted_query_name if subsql_add_query_name else None
         )
         sql = (
             [sql_start]
@@ -2205,7 +2213,7 @@ class DBModel:
             and (quoted_query_name is not None)
             and (len(quoted_query_name) > 0)
         ):
-            sql = sql + [") " + quoted_query_name]
+            sql = sql + [") " + quoted_query_name]  # duplicate name, but not of whole query
         else:
             sql = sql + [")"]
         return sql
