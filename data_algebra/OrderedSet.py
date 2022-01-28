@@ -23,6 +23,7 @@ class OrderedSet(collections.abc.MutableSet):
     def __init__(self, v: Optional[Iterable] = None):
         self.impl = collections.OrderedDict()
         if v is not None:
+            assert not isinstance(v, str)  # treat string as atomic value, not iterable
             for val in v:
                 self.add(val)
 
@@ -32,6 +33,7 @@ class OrderedSet(collections.abc.MutableSet):
             raise TypeError("update() takes no keyword arguments")
 
         for s in args:
+            assert not isinstance(s, str)  # treat string as atomic value, not iterable
             for e in s:
                 self.add(e)
 
@@ -53,13 +55,13 @@ class OrderedSet(collections.abc.MutableSet):
         return all(e in other for e in self)
 
     def __lt__(self, other):
-        return self <= other and self != other
+        return (self <= other) and (self != other)
 
     def __ge__(self, other):
         return all(e in self for e in other)
 
     def __gt__(self, other):
-        return self >= other and self != other
+        return (self >= other) and (self != other)
 
     def __repr__(self):
         return "OrderedSet([%s])" % (", ".join(map(repr, self.impl.keys())))
@@ -91,6 +93,7 @@ class OrderedSet(collections.abc.MutableSet):
         for k in self.impl.keys():
             res.add(k)
         for other in args:
+            assert not isinstance(other, str)  # treat string as atomic, not iterable
             for k in other:
                 if k not in res:
                     res.add(k)
@@ -101,6 +104,8 @@ def ordered_intersect(a: Iterable, b: Iterable) -> OrderedSet:
     """
     Intersection of two iterables, ordered by a.
     """
+    assert not isinstance(a, str)  # treat string as atomic, not iterable
+    assert not isinstance(b, str)  # treat string as atomic, not iterable
     b = set(b)
     return OrderedSet([v for v in a if v in b])
 
@@ -109,6 +114,8 @@ def ordered_union(a: Iterable, b: Iterable) -> OrderedSet:
     """
     Union of two iterables, ordered by a first, then b.
     """
+    assert not isinstance(a, str)  # treat string as atomic, not iterable
+    assert not isinstance(b, str)  # treat string as atomic, not iterable
     a = OrderedSet(a)
     for v in b:
         if v not in a:
@@ -120,6 +127,8 @@ def ordered_diff(a: Iterable, b: Iterable) -> OrderedSet:
     """
     a with b removed, a order preserved.
     """
+    assert not isinstance(a, str)  # treat string as atomic, not iterable
+    assert not isinstance(b, str)  # treat string as atomic, not iterable
     b = set(b)
     a = OrderedSet([v for v in a if v not in b])
     return a

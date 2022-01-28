@@ -1,3 +1,5 @@
+import pytest
+
 import data_algebra.OrderedSet
 
 
@@ -34,3 +36,16 @@ def test_OrderedSet_ordered_diff():
     res = list(data_algebra.OrderedSet.ordered_diff(["a", "b", "c"], ["c", "z"]))
     expect = ["a", "b"]
     assert res == expect
+
+
+def test_OrderedSet_rejects_str():
+    with pytest.raises(Exception):
+        data_algebra.OrderedSet.OrderedSet('ab')
+
+
+def test_OrderedSet_formats_to_self():
+    a = data_algebra.OrderedSet.OrderedSet(['ab'])
+    repr_str = a.__repr__()
+    assert repr_str == "OrderedSet(['ab'])"
+    str_str = str(a)
+    assert str_str == "{'ab'}"

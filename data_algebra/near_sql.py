@@ -111,18 +111,16 @@ class NearSQLContainer:
 
     near_sql: NearSQL
     force_sql: bool
+    columns: Optional[data_algebra.OrderedSet.OrderedSet]
 
-    def __init__(self, *, near_sql: NearSQL, columns=None, force_sql: bool = False):
+    def __init__(self, *, near_sql: NearSQL, columns: Optional[Iterable[str]] = None, force_sql: bool = False):
         assert isinstance(near_sql, NearSQL)
-        assert isinstance(
-            columns, (set, data_algebra.OrderedSet.OrderedSet, list, type(None))
-        )
         assert isinstance(force_sql, bool)
         self.near_sql = near_sql
         self.columns = None
         if columns is not None:
-            self.columns = columns.copy()
-        self.columns = columns
+            assert not isinstance(columns, str)
+            self.columns = data_algebra.OrderedSet.OrderedSet(columns)
         self.force_sql = force_sql
 
     def to_sql_str_list(self, db_model, sql_format_options=None) -> List[str]:
@@ -135,8 +133,6 @@ class NearSQLContainer:
 
     # assemble sub-sql
     def convert_subsql(self, *, db_model, sql_format_options=None):
-        assert isinstance(self, NearSQLContainer)
-        assert isinstance(self.near_sql, NearSQL)
         return db_model.convert_nearsql_container_subsql_(
             nearsql_container=self, sql_format_options=sql_format_options
         )

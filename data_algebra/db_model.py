@@ -2207,6 +2207,7 @@ class DBModel:
             clean_anno = _clean_annotation(near_sql.annotation)
             if clean_anno is not None:
                 sql_start = "SELECT  -- " + clean_anno
+        # TODO: document distinction in if here
         if is_union:
             substr_1 = near_sql.sub_sql1.to_sql_str_list(
                 db_model=self, sql_format_options=sql_format_options
