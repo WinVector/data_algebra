@@ -1,12 +1,9 @@
-import sqlite3
 
 import data_algebra
 from data_algebra.data_ops import *
 
 import data_algebra.SQLite
 import data_algebra.test_util
-
-import pytest
 
 
 def test_cross_project_join_1():

@@ -232,7 +232,7 @@ class NearSQLCommonTableExpression(NearSQLNamedEntity):
 
 
 class NearSQLTable(NearSQLNamedEntity):
-    def __init__(self, *, terms, table_name, quoted_table_name):
+    def __init__(self, *, terms, table_name: str, quoted_table_name: str):
         NearSQLNamedEntity.__init__(
             self,
             terms=terms,

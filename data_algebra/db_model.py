@@ -1156,7 +1156,6 @@ class DBModel:
         if len(missing) > 0:
             raise KeyError("referred to unknown columns: " + str(missing))
         cols_using = [c for c in table_def.column_names if c in using]
-
         subsql = data_algebra.near_sql.NearSQLTable(
             terms={k: self.quote_identifier(k) for k in cols_using},
             table_name=self.quote_table_name(table_def),
@@ -2009,7 +2008,7 @@ class DBModel:
         return v + " AS " + self.quote_identifier(k)
 
     def convert_nearsql_container_subsql_(
-        self, nearsql_container, *, sql_format_options=None
+        self, nearsql_container: data_algebra.near_sql.NearSQLContainer, *, sql_format_options: SQLFormatOptions = None
     ) -> List[str]:
         """
         Convert sub-SQL into list of SQL string lines.
