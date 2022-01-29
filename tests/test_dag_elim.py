@@ -27,7 +27,10 @@ def test_dag_elim():
     db_model = data_algebra.SQLite.SQLiteModel()
     sql = db_model.to_sql(
         ops,
-        sql_format_options=data_algebra.db_model.SQLFormatOptions(use_with=True, annotate=False)
+        sql_format_options=data_algebra.db_model.SQLFormatOptions(
+            use_with=True,
+            annotate=False,
+            use_cte_elim=True)
     )
     n_d = sql.count('"d"')
     assert n_d > 0

@@ -2590,6 +2590,7 @@ class ConvertRecordsNode(ViewRepresentation):
                 sub_sql=data_algebra.near_sql.NearSQLContainer(near_sql=near_sql),
                 suffix=si,
                 annotation="convert records blocks in",
+                ops_key=None,
             )
             assert isinstance(near_sql, data_algebra.near_sql.NearSQL)
         if self.record_map.blocks_out is not None:
@@ -2605,6 +2606,7 @@ class ConvertRecordsNode(ViewRepresentation):
                 sub_sql=data_algebra.near_sql.NearSQLContainer(near_sql=near_sql),
                 suffix=si,
                 annotation="convert records blocks out",
+                ops_key=None,
             )
             assert isinstance(near_sql, data_algebra.near_sql.NearSQL)
         return near_sql
@@ -2705,6 +2707,7 @@ class SQLNode(ViewRepresentation):
             suffix=None,
             annotation="user supplied SQL",
             add_select=False,
+            ops_key=None,
         )
         return near_sql
 
