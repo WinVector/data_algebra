@@ -1570,7 +1570,7 @@ class DBModel:
         )
         return near_sql
 
-    def _coalesce_terms(self, *, sub_view_name_first, sub_view_name_second, cols):
+    def _coalesce_terms(self, *, sub_view_name_first, sub_view_name_second, cols) -> OrderedDict:
         coalesce_formatter = self.sql_formatters["coalesce"]
 
         class PseudoExpression:
@@ -1580,8 +1580,9 @@ class DBModel:
             def __init__(self, args):
                 self.args = args.copy()
 
-        terms = {
-            ci: coalesce_formatter(
+        terms = OrderedDict()
+        for ci in cols:
+            terms[ci] = coalesce_formatter(
                 self,
                 PseudoExpression(
                     [
@@ -1590,18 +1591,23 @@ class DBModel:
                     ]
                 ),
             )
-            for ci in cols
-        }
         return terms
 
-    def _natural_join_sub_queries(self, *, join_node, using, temp_id_source):
+    def _natural_join_sub_queries(
+            self, 
+            *, 
+            join_node, 
+            using,
+            temp_id_source: List
+    ) -> Tuple[OrderedSet, data_algebra.near_sql.NearSQL,
+               OrderedSet, data_algebra.near_sql.NearSQL]:
         if join_node.node_name != "NaturalJoinNode":
             raise TypeError(
                 "Expected join_node to be a data_algebra.data_ops.NaturalJoinNode)"
             )
         if using is None:
             using = OrderedSet(join_node.column_names)
-        by_set = set(join_node.by)
+        by_set = OrderedSet(join_node.by)
         if len(using) < 1:
             raise ValueError("join must use or select at least one column")
         missing = using - set(join_node.column_names)
@@ -1616,10 +1622,6 @@ class DBModel:
         sql_right = join_node.sources[1].to_near_sql_implementation_(
             db_model=self, using=using_right, temp_id_source=temp_id_source
         )
-        if sql_left.quoted_query_name == sql_right.quoted_query_name:
-            raise ValueError("""In join steps left and right subquery must not be identical, 
-                one can work around this by using an extend() to add a new column on one side of join
-                (though one must make sure query optimization does not eliminate such a column).""")
         return using_left, sql_left, using_right, sql_right
 
     def natural_join_to_near_sql(
@@ -1638,35 +1640,43 @@ class DBModel:
             temp_id_source = [0]
         if using is None:
             using = OrderedSet(join_node.column_names)
+        view_name = f"natural_join_{temp_id_source[0]}"
+        left_q = f"join_source_left_{temp_id_source[0]}"
+        right_q = f"join_source_right_{temp_id_source[0]}"
+        temp_id_source[0] = temp_id_source[0] + 1
         using_left, sql_left, using_right, sql_right = self._natural_join_sub_queries(
             join_node=join_node, using=using, temp_id_source=temp_id_source
         )
-        view_name = "natural_join_" + str(temp_id_source[0])
-        temp_id_source[0] = temp_id_source[0] + 1
+        left_qqn = self.quote_identifier(left_q)
+        right_qqn = self.quote_identifier(right_q)
         common = using_left.intersection(using_right)
         if left_is_first:
             terms = self._coalesce_terms(
-                sub_view_name_first=sql_left.quoted_query_name,
-                sub_view_name_second=sql_right.quoted_query_name,
+                sub_view_name_first=left_qqn,
+                sub_view_name_second=right_qqn,
                 cols=[ci for ci in common if ci in using],
             )
         else:
             terms = self._coalesce_terms(
-                sub_view_name_first=sql_right.quoted_query_name,
-                sub_view_name_second=sql_left.quoted_query_name,
+                sub_view_name_first=right_qqn,
+                sub_view_name_second=left_qqn,
                 cols=[ci for ci in common if ci in using],
             )
-        terms.update({ci: None for ci in using_left - common})
-        terms.update({ci: None for ci in using_right - common})
+        for ci in using_left:
+            if ci not in common:
+                terms[ci] = None
+        for ci in using_right:
+            if ci not in common:
+                terms[ci] = None
         on_terms = []
         if len(join_node.by) > 0:
             on_terms = ["ON " + self.on_start] + self._indent_and_sep_terms(
                 [
-                    sql_left.quoted_query_name
+                    left_qqn
                     + "."
                     + self.quote_identifier(c)
                     + " = "
-                    + sql_right.quoted_query_name
+                    + right_qqn
                     + "."
                     + self.quote_identifier(c)
                     for c in join_node.by
@@ -1680,9 +1690,17 @@ class DBModel:
             terms=terms,
             query_name=view_name,
             quoted_query_name=self.quote_identifier(view_name),
-            sub_sql1=sql_left.to_bound_near_sql(columns=using_left, force_sql=False),
+            sub_sql1=sql_left.to_bound_near_sql(
+                columns=using_left,
+                force_sql=False,
+                public_name=left_q,
+                public_name_quoted=left_qqn),
             joiner=join_node.jointype + " JOIN",
-            sub_sql2=sql_right.to_bound_near_sql(columns=using_right, force_sql=False),
+            sub_sql2=sql_right.to_bound_near_sql(
+                columns=using_right,
+                force_sql=False,
+                public_name=right_q,
+                public_name_quoted=right_qqn),
             suffix=on_terms,
             annotation=str(
                 join_node.to_python_src_(print_sources=False, indent=-1)
@@ -2188,12 +2206,12 @@ class DBModel:
         substr_1 = near_sql.sub_sql1.convert_subsql(
             db_model=self,
             sql_format_options=sql_format_options,
-            quoted_query_name_annotation=near_sql.sub_sql1.near_sql.quoted_query_name if subsql_add_query_name else None
+            quoted_query_name_annotation=near_sql.sub_sql1.public_name_quoted if subsql_add_query_name else None
         )
         substr_2 = near_sql.sub_sql2.convert_subsql(
             db_model=self,
             sql_format_options=sql_format_options,
-            quoted_query_name_annotation=near_sql.sub_sql2.near_sql.quoted_query_name if subsql_add_query_name else None
+            quoted_query_name_annotation=near_sql.sub_sql2.public_name_quoted if subsql_add_query_name else None
         )
         sql = (
             [sql_start]

@@ -83,9 +83,20 @@ class NearSQL(abc.ABC):
         self.is_table = is_table
         self.annotation = annotation
 
-    def to_bound_near_sql(self, *, columns=None, force_sql=False):
+    def to_bound_near_sql(
+            self,
+            *,
+            columns=None,
+            force_sql: bool = False,
+            public_name: Optional[str] = None,
+            public_name_quoted: Optional[str] = None,
+    ) -> 'NearSQLContainer':
         return NearSQLContainer(
-            near_sql=self, columns=columns, force_sql=force_sql
+            near_sql=self,
+            columns=columns,
+            force_sql=force_sql,
+            public_name=public_name,
+            public_name_quoted=public_name_quoted,
         )
 
     @abc.abstractmethod
@@ -112,8 +123,18 @@ class NearSQLContainer:
     near_sql: NearSQL
     force_sql: bool
     columns: Optional[data_algebra.OrderedSet.OrderedSet]
+    public_name: Optional[str]
+    public_name_quoted: Optional[str]
 
-    def __init__(self, *, near_sql: NearSQL, columns: Optional[Iterable[str]] = None, force_sql: bool = False):
+    def __init__(
+            self,
+            *,
+            near_sql: NearSQL,
+            columns: Optional[Iterable[str]] = None,
+            force_sql: bool = False,
+            public_name: Optional[str] = None,
+            public_name_quoted: Optional[str] = None,
+    ):
         assert isinstance(near_sql, NearSQL)
         assert isinstance(force_sql, bool)
         self.near_sql = near_sql
@@ -122,6 +143,8 @@ class NearSQLContainer:
             assert not isinstance(columns, str)
             self.columns = data_algebra.OrderedSet.OrderedSet(columns)
         self.force_sql = force_sql
+        self.public_name = public_name
+        self.public_name_quoted = public_name_quoted
 
     def convert_subsql(
             self,
@@ -135,9 +158,9 @@ class NearSQLContainer:
         if (isinstance(self.near_sql, data_algebra.near_sql.NearSQLNamedEntity)
             and (not self.force_sql)):
             # short circuit table and cte path
-            assert quoted_query_name_annotation is not None  # type hint
-            assert isinstance(quoted_query_name_annotation, str)    # type hint
             if non_trivial_annotation:
+                assert quoted_query_name_annotation is not None  # type hint
+                assert isinstance(quoted_query_name_annotation, str)  # type hint
                 sql = [self.near_sql.quoted_query_name + ' ' + quoted_query_name_annotation]  # table name and alias
             else:
                 sql = [self.near_sql.quoted_query_name]
@@ -176,7 +199,10 @@ class NearSQLContainer:
                 sequence.append(
                     (
                         stub.quoted_query_name,
-                        NearSQLContainer(near_sql=stub, force_sql=self.force_sql,),
+                        NearSQLContainer(
+                            near_sql=stub,
+                            force_sql=self.force_sql,
+                        ),
                     )
                 )
             new_stub = NearSQLContainer(
@@ -185,12 +211,16 @@ class NearSQLContainer:
                     quoted_query_name=stub.quoted_query_name,
                 ),
                 force_sql=self.force_sql,
+                public_name=self.public_name,
+                public_name_quoted=self.public_name_quoted,
             )
         else:
             assert len(sequence) == 0
             new_stub = NearSQLContainer(
                 near_sql=stub,
                 force_sql=True,
+                public_name=self.public_name,
+                public_name_quoted=self.public_name_quoted,
             )
         return new_stub, sequence
 
