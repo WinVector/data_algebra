@@ -1594,14 +1594,16 @@ class DBModel:
         }
         return terms
 
-    def _natural_join_sub_queries(self, *, join_node, using, temp_id_source):
+    def _natural_join_sub_queries(self, *, join_node, using, temp_id_source: List
+                                  ) -> Tuple[OrderedSet, data_algebra.near_sql.NearSQL,
+                                             OrderedSet, data_algebra.near_sql.NearSQL]:
         if join_node.node_name != "NaturalJoinNode":
             raise TypeError(
                 "Expected join_node to be a data_algebra.data_ops.NaturalJoinNode)"
             )
         if using is None:
             using = OrderedSet(join_node.column_names)
-        by_set = set(join_node.by)
+        by_set = OrderedSet(join_node.by)
         if len(using) < 1:
             raise ValueError("join must use or select at least one column")
         missing = using - set(join_node.column_names)
