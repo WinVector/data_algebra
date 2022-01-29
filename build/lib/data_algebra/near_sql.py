@@ -56,8 +56,9 @@ class NearSQL(abc.ABC):
     terms: Optional[Dict[str, Optional[str]]]
     query_name: str
     quoted_query_name: str
-    is_table: bool = False
-    annotation: Optional[str] = None
+    is_table: bool
+    ops_key: Optional[str]
+    annotation: Optional[str]
 
     def __init__(
         self,
@@ -67,12 +68,15 @@ class NearSQL(abc.ABC):
         quoted_query_name: str,
         is_table: bool = False,
         annotation: Optional[str] = None,
+        ops_key: Optional[str],  # key for sub-ops, used to eliminate repeated sub-trees
     ):
         assert isinstance(terms, (dict, type(None)))
         assert isinstance(query_name, str)
         assert isinstance(quoted_query_name, str)
         assert isinstance(is_table, bool)
         assert isinstance(annotation, (str, type(None)))
+        if ops_key is not None:
+            assert isinstance(ops_key, str)
         self.terms = None
         if terms is not None:
             assert isinstance(terms, dict)
@@ -82,6 +86,7 @@ class NearSQL(abc.ABC):
         self.quoted_query_name = quoted_query_name
         self.is_table = is_table
         self.annotation = annotation
+        self.ops_key = ops_key
 
     def to_bound_near_sql(
             self,
@@ -111,7 +116,7 @@ class NearSQL(abc.ABC):
         """export"""
 
     @abc.abstractmethod
-    def to_with_form(self) -> SQLWithList:
+    def to_with_form(self, *, cte_cache: Optional[Dict]) -> SQLWithList:
         """convert ot with form"""
 
 
@@ -179,11 +184,11 @@ class NearSQLContainer:
     # sequence: a list where last element is a NearSQLContainer previous elements are (name, NearSQLContainer) pairs
     # stub the replacement common table expression in a NearSQLContainer
     def to_with_form_stub(
-        self,
+        self, *, cte_cache: Optional[Dict]
     ) -> Tuple["NearSQLContainer", List[Tuple[str, "NearSQLContainer"]]]:
-        if self.near_sql.is_table:
+        if self.near_sql.is_table:  # table or common table expression
             return self, []
-        in_with_form = self.near_sql.to_with_form()
+        in_with_form = self.near_sql.to_with_form(cte_cache=cte_cache)
         sequence = in_with_form.previous_steps
         stub = in_with_form.last_step
         assert isinstance(stub, NearSQL)
@@ -194,6 +199,13 @@ class NearSQLContainer:
             assert isinstance(v[0], str)
             assert isinstance(v[1], NearSQLContainer)
         if not stub.is_table:
+            # first check cache
+            ops_key = self.near_sql.ops_key
+            if (cte_cache is not None) and (ops_key is not None):
+                try:
+                    return cte_cache[ops_key]
+                except KeyError:
+                    pass
             # replace step with a reference
             if stub.quoted_query_name not in {k for k, v in sequence}:
                 sequence.append(
@@ -209,11 +221,14 @@ class NearSQLContainer:
                 near_sql=NearSQLCommonTableExpression(
                     query_name=stub.query_name,
                     quoted_query_name=stub.quoted_query_name,
+                    ops_key=ops_key,
                 ),
                 force_sql=self.force_sql,
                 public_name=self.public_name,
                 public_name_quoted=self.public_name_quoted,
             )
+            if (cte_cache is not None) and (ops_key is not None):
+                cte_cache[ops_key] = (new_stub, [])
         else:
             assert len(sequence) == 0
             new_stub = NearSQLContainer(
@@ -225,18 +240,19 @@ class NearSQLContainer:
         return new_stub, sequence
 
 
-class NearSQLNamedEntity(NearSQL):
+class NearSQLNamedEntity(NearSQL, abc.ABC):
     """Model for tables and common table expressions"""
-    def __init__(self, *, terms, query_name: str, quoted_query_name: str):
+    def __init__(self, *, terms, query_name: str, quoted_query_name: str, ops_key: Optional[str]):
         NearSQL.__init__(
             self,
             terms=terms,
             query_name=query_name,
             quoted_query_name=quoted_query_name,
             is_table=True,
+            ops_key=ops_key,
         )
 
-    def to_with_form(self) -> SQLWithList:
+    def to_with_form(self, *, cte_cache: Optional[Dict]) -> SQLWithList:
         return SQLWithList(last_step=self, previous_steps=[])
 
     @abc.abstractmethod
@@ -252,9 +268,9 @@ class NearSQLNamedEntity(NearSQL):
 
 
 class NearSQLCommonTableExpression(NearSQLNamedEntity):
-    def __init__(self, *, query_name: str, quoted_query_name: str):
+    def __init__(self, *, query_name: str, quoted_query_name: str, ops_key: Optional[str]):
         NearSQLNamedEntity.__init__(
-            self, terms=None, query_name=query_name, quoted_query_name=quoted_query_name
+            self, terms=None, query_name=query_name, quoted_query_name=quoted_query_name, ops_key=ops_key
         )
 
     def to_sql_str_list(
@@ -280,6 +296,7 @@ class NearSQLTable(NearSQLNamedEntity):
             terms=terms,
             query_name=table_name,
             quoted_query_name=quoted_table_name,
+            ops_key=table_name,
         )
         self.table_name = table_name
         self.quoted_table_name = quoted_table_name
@@ -316,6 +333,7 @@ class NearSQLUnaryStep(NearSQL):
         sub_sql,
         suffix=None,
         annotation=None,
+        ops_key: Optional[str],
         mergeable=False,
         declared_term_dependencies=None,
     ):
@@ -330,6 +348,7 @@ class NearSQLUnaryStep(NearSQL):
             query_name=query_name,
             quoted_query_name=quoted_query_name,
             annotation=annotation,
+            ops_key=ops_key,
         )
         self.sub_sql = sub_sql
         self.suffix = suffix
@@ -355,12 +374,12 @@ class NearSQLUnaryStep(NearSQL):
             sql_format_options=sql_format_options,
         )
 
-    def to_with_form(self) -> SQLWithList:
+    def to_with_form(self, *, cte_cache: Optional[Dict]) -> SQLWithList:
         if self.sub_sql.near_sql.is_table:
-            # table references don't need to be re-encoded
+            # table references and common table expressions don't need to be re-encoded
             return SQLWithList(last_step=self, previous_steps=[])
         # non-trivial sequence
-        stub, sequence = self.sub_sql.to_with_form_stub()
+        stub, sequence = self.sub_sql.to_with_form_stub(cte_cache=cte_cache)
         stubbed_step = NearSQLUnaryStep(
             terms=self.terms,
             query_name=self.query_name,
@@ -368,6 +387,7 @@ class NearSQLUnaryStep(NearSQL):
             sub_sql=stub,
             suffix=self.suffix,
             annotation=self.annotation,
+            ops_key=self.ops_key,
         )
         return SQLWithList(last_step=stubbed_step, previous_steps=sequence)
 
@@ -390,6 +410,7 @@ class NearSQLBinaryStep(NearSQL):
         sub_sql2: NearSQLContainer,
         suffix=None,
         annotation=None,
+        ops_key: Optional[str],
     ):
         assert isinstance(sub_sql1, NearSQLContainer)
         assert isinstance(sub_sql2, NearSQLContainer)
@@ -403,6 +424,7 @@ class NearSQLBinaryStep(NearSQL):
             query_name=query_name,
             quoted_query_name=quoted_query_name,
             annotation=annotation,
+            ops_key=ops_key,
         )
         self.sub_sql1 = sub_sql1
         self.joiner = joiner
@@ -425,13 +447,13 @@ class NearSQLBinaryStep(NearSQL):
             quoted_query_name=self.quoted_query_name,
         )
 
-    def to_with_form(self) -> SQLWithList:
+    def to_with_form(self, *, cte_cache: Optional[Dict]) -> SQLWithList:
         if self.sub_sql1.near_sql.is_table and self.sub_sql2.near_sql.is_table:  # TODO: remove this?
             # tables references don't need to be re-encoded
             return SQLWithList(last_step=self, previous_steps=[])
         # non-trivial sequence
-        stub1, sequence1 = self.sub_sql1.to_with_form_stub()
-        stub2, sequence2 = self.sub_sql2.to_with_form_stub()
+        stub1, sequence1 = self.sub_sql1.to_with_form_stub(cte_cache=cte_cache)
+        stub2, sequence2 = self.sub_sql2.to_with_form_stub(cte_cache=cte_cache)
         sequence = list()
         seen = set()
         for stepi in sequence1:
@@ -453,6 +475,7 @@ class NearSQLBinaryStep(NearSQL):
             sub_sql2=stub2,
             suffix=self.suffix,
             annotation=self.annotation,
+            ops_key=self.ops_key,
         )
         return SQLWithList(last_step=stubbed_step, previous_steps=sequence)
 
@@ -473,6 +496,7 @@ class NearSQLRawQStep(NearSQL):
         sub_sql: Optional[NearSQLContainer],
         suffix: Optional[List[str]] = None,
         annotation: Optional[str] = None,
+        ops_key: Optional[str],
         add_select: bool = True,
     ):
         assert isinstance(add_select, bool)
@@ -492,6 +516,7 @@ class NearSQLRawQStep(NearSQL):
             query_name=query_name,
             quoted_query_name=quoted_query_name,
             annotation=annotation,
+            ops_key=ops_key,
         )
         self.prefix = prefix
         self.sub_sql = sub_sql
@@ -512,7 +537,7 @@ class NearSQLRawQStep(NearSQL):
             add_select=self.add_select,
         )
 
-    def to_with_form(self) -> SQLWithList:
+    def to_with_form(self, *, cte_cache: Optional[Dict]) -> SQLWithList:
         if self.sub_sql is None:
             # no sub-steps
             return SQLWithList(last_step=self, previous_steps=[])
@@ -520,7 +545,7 @@ class NearSQLRawQStep(NearSQL):
             # table references don't need to be re-encoded
             return SQLWithList(last_step=self, previous_steps=[])
         # non-trivial sequence
-        stub, sequence = self.sub_sql.to_with_form_stub()
+        stub, sequence = self.sub_sql.to_with_form_stub(cte_cache=cte_cache)
         assert isinstance(self.query_name, str)  # type hint
         stubbed_step = NearSQLRawQStep(
             prefix=self.prefix,
@@ -530,5 +555,6 @@ class NearSQLRawQStep(NearSQL):
             suffix=self.suffix,
             annotation=self.annotation,
             add_select=self.add_select,
+            ops_key=self.ops_key,
         )
         return SQLWithList(last_step=stubbed_step, previous_steps=sequence)

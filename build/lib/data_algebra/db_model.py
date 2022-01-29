@@ -7,7 +7,6 @@ import re
 import warnings
 from collections import OrderedDict
 from typing import List, Optional
-from types import SimpleNamespace
 from typing import Dict, Set, Tuple
 
 import pandas.io.sql
@@ -22,6 +21,7 @@ import data_algebra.data_ops
 from data_algebra.OrderedSet import OrderedSet
 import data_algebra.op_catalog
 
+from data_algebra.sql_format_options import SQLFormatOptions
 
 # The db_model can be a bit tricky as SQL is represented a few ways depending
 # on how close to a final result we are.
@@ -30,48 +30,6 @@ import data_algebra.op_catalog
 # The primary computational representation is a NearSQL structure, as it is a dag of objects.
 # Note: near sql has a bound/unbound variation treating the top layer differently than
 # subordinate nodes.
-
-
-class SQLFormatOptions(SimpleNamespace):
-    """
-    Simple class for holding SQL formatting options
-    """
-
-    def __init__(
-        self,
-        use_with: bool = True,
-        annotate: bool = True,
-        sql_indent: str = " ",
-        initial_commas: bool = False,
-        warn_on_method_support: bool = True,
-        warn_on_novel_methods: bool = True,
-    ):
-        assert isinstance(use_with, bool)
-        assert isinstance(annotate, bool)
-        assert isinstance(sql_indent, str)
-        assert len(sql_indent) > 0
-        assert len(sql_indent.strip()) == 0
-        assert isinstance(initial_commas, bool)
-        SimpleNamespace.__init__(
-            self,
-            use_with=use_with,
-            annotate=annotate,
-            sql_indent=sql_indent,
-            initial_commas=initial_commas,
-            warn_on_method_support=warn_on_method_support,
-            warn_on_novel_methods=warn_on_novel_methods,
-        )
-
-    def __str__(self):
-        return self.__repr__()
-
-    # noinspection PyUnusedLocal
-    def _repr_pretty_(self, p, cycle):
-        """
-        IPython pretty print, used at implicit print time
-        https://ipython.readthedocs.io/en/stable/config/integrating.html
-        """
-        p.text(str(self))
 
 
 def _list_join_expecting_list(joiner: str, str_list: List[str]) -> List[str]:
@@ -1176,6 +1134,7 @@ class DBModel:
                 query_name=view_name,
                 quoted_query_name=self.quote_identifier(view_name),
                 sub_sql=subsql.to_bound_near_sql(columns=using),
+                ops_key=f"table({table_def.node_name}, {terms.keys()})",
             )
         return near_sql
 
@@ -1319,6 +1278,7 @@ class DBModel:
             annotation=annotation,
             mergeable=True,
             declared_term_dependencies=declared_term_dependencies,
+            ops_key=str(extend_node),
         )
         return near_sql
 
@@ -1360,6 +1320,7 @@ class DBModel:
             annotation=str(
                 project_node.to_python_src_(print_sources=False, indent=-1)
             ),
+            ops_key=str(project_node),
         )
         return near_sql
 
@@ -1406,6 +1367,7 @@ class DBModel:
                     print_sources=False, indent=-1
                 )
             ),
+            ops_key=str(select_rows_node),
         )
         return near_sql
 
@@ -1528,6 +1490,7 @@ class DBModel:
             annotation=str(
                 order_node.to_python_src_(print_sources=False, indent=-1)
             ),
+            ops_key=str(order_node),
         )
         return near_sql
 
@@ -1567,6 +1530,7 @@ class DBModel:
             annotation=str(
                 rename_node.to_python_src_(print_sources=False, indent=-1)
             ),
+            ops_key=str(rename_node),
         )
         return near_sql
 
@@ -1705,6 +1669,7 @@ class DBModel:
             annotation=str(
                 join_node.to_python_src_(print_sources=False, indent=-1)
             ),
+            ops_key=str(join_node),
         )
         return near_sql
 
@@ -1761,6 +1726,7 @@ class DBModel:
             annotation=str(
                 concat_node.to_python_src_(print_sources=False, indent=-1)
             ),
+            ops_key=str(concat_node),
         )
         return near_sql
 
@@ -1820,7 +1786,10 @@ class DBModel:
         assert isinstance(near_sql, data_algebra.near_sql.NearSQL)
         sql_str_list = None
         if sql_format_options.use_with and self.supports_with:
-            sequence = near_sql.to_with_form()
+            cte_cache: Optional[Dict] = None
+            if sql_format_options.use_cte_elim:
+                cte_cache = dict()
+            sequence = near_sql.to_with_form(cte_cache=cte_cache)
             len_sequence = len(sequence.previous_steps)
             # can fall back to the non-with path
             if len(sequence.previous_steps) >= 1:

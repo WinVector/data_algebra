@@ -1,6 +1,7 @@
 import numpy
 
 import data_algebra.db_model
+import data_algebra.sql_format_options
 import data_algebra.test_util
 from data_algebra.data_ops import *
 
@@ -47,5 +48,5 @@ def test_free_fn():
         sql = handle.to_sql(ops)
     assert isinstance(sql, str)
     assert 'FUNCTION_WE_DONT_KNOW_ABOUT("b")' in sql
-    sql_2 = handle.to_sql(ops, sql_format_options=data_algebra.db_model.SQLFormatOptions(warn_on_novel_methods=False))
+    sql_2 = handle.to_sql(ops, sql_format_options=data_algebra.sql_format_options.SQLFormatOptions(warn_on_novel_methods=False))
     assert sql == sql_2

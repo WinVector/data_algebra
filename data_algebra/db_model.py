@@ -7,7 +7,6 @@ import re
 import warnings
 from collections import OrderedDict
 from typing import List, Optional
-from types import SimpleNamespace
 from typing import Dict, Set, Tuple
 
 import pandas.io.sql
@@ -22,6 +21,7 @@ import data_algebra.data_ops
 from data_algebra.OrderedSet import OrderedSet
 import data_algebra.op_catalog
 
+from data_algebra.sql_format_options import SQLFormatOptions
 
 # The db_model can be a bit tricky as SQL is represented a few ways depending
 # on how close to a final result we are.
@@ -30,51 +30,6 @@ import data_algebra.op_catalog
 # The primary computational representation is a NearSQL structure, as it is a dag of objects.
 # Note: near sql has a bound/unbound variation treating the top layer differently than
 # subordinate nodes.
-
-
-class SQLFormatOptions(SimpleNamespace):
-    """
-    Simple class for holding SQL formatting options
-    """
-
-    def __init__(
-        self,
-        use_with: bool = True,
-        annotate: bool = True,
-        sql_indent: str = " ",
-        initial_commas: bool = False,
-        warn_on_method_support: bool = True,
-        warn_on_novel_methods: bool = True,
-        use_cte_elim: bool = False,
-    ):
-        assert isinstance(use_with, bool)
-        assert isinstance(annotate, bool)
-        assert isinstance(sql_indent, str)
-        assert len(sql_indent) > 0
-        assert len(sql_indent.strip()) == 0
-        assert isinstance(initial_commas, bool)
-        assert isinstance(use_cte_elim, bool)
-        SimpleNamespace.__init__(
-            self,
-            use_with=use_with,
-            annotate=annotate,
-            sql_indent=sql_indent,
-            initial_commas=initial_commas,
-            warn_on_method_support=warn_on_method_support,
-            warn_on_novel_methods=warn_on_novel_methods,
-            use_cte_elim=use_cte_elim,
-        )
-
-    def __str__(self):
-        return self.__repr__()
-
-    # noinspection PyUnusedLocal
-    def _repr_pretty_(self, p, cycle):
-        """
-        IPython pretty print, used at implicit print time
-        https://ipython.readthedocs.io/en/stable/config/integrating.html
-        """
-        p.text(str(self))
 
 
 def _list_join_expecting_list(joiner: str, str_list: List[str]) -> List[str]:

@@ -4,7 +4,7 @@ import data_algebra
 from data_algebra.data_ops import descr
 import data_algebra.test_util
 import data_algebra.util
-from data_algebra.db_model import SQLFormatOptions
+from data_algebra.sql_format_options import SQLFormatOptions
 import data_algebra.SQLite
 
 

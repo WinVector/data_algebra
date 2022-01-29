@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="pdoc 8.0.0" />
-    <title>data_algebra API documentation</title>
+    <title>data_algebra.sql_format_options API documentation</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2264%22%20height%3D%2264%22%20viewBox%3D%2244.5%202.5%2015%2015%22%3E%3Cpath%20d%3D%22M49.351%2021.041c-.233-.721-.546-2.408-.772-4.076-.042-.09-.067-.187-.046-.288-.166-1.347-.277-2.625-.241-3.351-1.378-1.008-2.271-2.586-2.271-4.362%200-.976.272-1.935.788-2.774.057-.094.122-.18.184-.268-.033-.167-.052-.339-.052-.516%200-1.477%201.202-2.679%202.679-2.679.791%200%201.496.352%201.987.9a6.3%206.3%200%200%201%201.001.029c.492-.564%201.207-.929%202.012-.929%201.477%200%202.679%201.202%202.679%202.679a2.65%202.65%200%200%201-.269%201.148c.383.747.595%201.572.595%202.41%200%202.311-1.507%204.29-3.635%205.107.037.699.147%202.27.423%203.294l.137.461c.156%202.136-4.612%205.166-5.199%203.215zm.127-4.919a4.78%204.78%200%200%200%20.775-.584c-.172-.115-.505-.254-.88-.378zm.331%202.302l.828-.502c-.202-.143-.576-.328-.984-.49zm.45%202.157l.701-.403c-.214-.115-.536-.249-.891-.376l.19.779zM49.13%204.141c0%20.152.123.276.276.276s.275-.124.275-.276-.123-.276-.276-.276-.275.124-.275.276zm.735-.389a1.15%201.15%200%200%201%20.314.783%201.16%201.16%200%200%201-1.162%201.162c-.457%200-.842-.27-1.032-.653-.026.117-.042.238-.042.362a1.68%201.68%200%200%200%201.679%201.679%201.68%201.68%200%200%200%201.679-1.679c0-.843-.626-1.535-1.436-1.654zm3.076%201.654a1.68%201.68%200%200%200%201.679%201.679%201.68%201.68%200%200%200%201.679-1.679c0-.037-.009-.072-.011-.109-.21.3-.541.508-.935.508a1.16%201.16%200%200%201-1.162-1.162%201.14%201.14%200%200%201%20.474-.912c-.015%200-.03-.005-.045-.005-.926.001-1.679.754-1.679%201.68zm1.861-1.265c0%20.152.123.276.276.276s.275-.124.275-.276-.123-.276-.276-.276-.275.124-.275.276zm1.823%204.823c0-.52-.103-1.035-.288-1.52-.466.394-1.06.64-1.717.64-1.144%200-2.116-.725-2.499-1.738-.383%201.012-1.355%201.738-2.499%201.738-.867%200-1.631-.421-2.121-1.062-.307.605-.478%201.267-.478%201.942%200%202.486%202.153%204.51%204.801%204.51s4.801-2.023%204.801-4.51zm-3.032%209.156l-.146-.492c-.276-1.02-.395-2.457-.444-3.268a6.11%206.11%200%200%201-1.18.115%206.01%206.01%200%200%201-2.536-.562l.006.175c.802.215%201.848.612%202.021%201.25.079.295-.021.601-.274.837l-.598.501c.667.304%201.243.698%201.311%201.179.02.144.022.507-.393.787l-.564.365c1.285.521%201.361.96%201.381%201.126.018.142.011.496-.427.746l-.854.489c.064-1.19%201.985-2.585%202.697-3.248zM49.34%209.925c0-.667%201-.667%201%200%200%20.653.818%201.205%201.787%201.205s1.787-.552%201.787-1.205c0-.667%201-.667%201%200%200%201.216-1.25%202.205-2.787%202.205s-2.787-.989-2.787-2.205zm-.887-7.633c-.093.077-.205.114-.317.114a.5.5%200%200%201-.318-.886L49.183.397a.5.5%200%200%201%20.703.068.5.5%200%200%201-.069.703zm7.661-.065c-.086%200-.173-.022-.253-.068l-1.523-.893c-.575-.337-.069-1.2.506-.863l1.523.892a.5.5%200%200%201%20.179.685c-.094.158-.261.247-.432.247z%22%20fill%3D%22%233bb300%22/%3E%3C/svg%3E"/>
 
 
@@ -16,56 +16,28 @@
             <label id="navtoggle" for="togglestate" class="pdoc-button"><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke-linecap='round' stroke="currentColor" stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg></label>
             <input id="togglestate" type="checkbox">
             <div>
-                        <a class="pdoc-button module-list-button" href="index.html">
+                        <a class="pdoc-button module-list-button" href="../data_algebra.html">
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-in-left" viewBox="0 0 16 16">
   <path fill-rule="evenodd" d="M10 3.5a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 1 1 0v2A1.5 1.5 0 0 1 9.5 14h-8A1.5 1.5 0 0 1 0 12.5v-9A1.5 1.5 0 0 1 1.5 2h8A1.5 1.5 0 0 1 11 3.5v2a.5.5 0 0 1-1 0v-2z"/>
   <path fill-rule="evenodd" d="M4.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H14.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3z"/>
-</svg>                            &nbsp;
-                            Module Index
-                        </a>
+</svg>                            &nbsp;data_algebra</a>
 
 
                         <input type="search" placeholder="Search..." role="searchbox" aria-label="search"
                                pattern=".+" required>
 
 
-                    <h2>Submodules</h2>
-                    <ul>
-                            <li><a href="data_algebra/BigQuery.html">data_algebra.BigQuery</a></li>
-                            <li><a href="data_algebra/MySQL.html">data_algebra.MySQL</a></li>
-                            <li><a href="data_algebra/OrderedSet.html">data_algebra.OrderedSet</a></li>
-                            <li><a href="data_algebra/PostgreSQL.html">data_algebra.PostgreSQL</a></li>
-                            <li><a href="data_algebra/SQLite.html">data_algebra.SQLite</a></li>
-                            <li><a href="data_algebra/SparkSQL.html">data_algebra.SparkSQL</a></li>
-                            <li><a href="data_algebra/arrow.html">data_algebra.arrow</a></li>
-                            <li><a href="data_algebra/cdata.html">data_algebra.cdata</a></li>
-                            <li><a href="data_algebra/connected_components.html">data_algebra.connected_components</a></li>
-                            <li><a href="data_algebra/data_model.html">data_algebra.data_model</a></li>
-                            <li><a href="data_algebra/data_ops.html">data_algebra.data_ops</a></li>
-                            <li><a href="data_algebra/data_ops_types.html">data_algebra.data_ops_types</a></li>
-                            <li><a href="data_algebra/data_ops_utils.html">data_algebra.data_ops_utils</a></li>
-                            <li><a href="data_algebra/db_model.html">data_algebra.db_model</a></li>
-                            <li><a href="data_algebra/eval_cache.html">data_algebra.eval_cache</a></li>
-                            <li><a href="data_algebra/expr_parse.html">data_algebra.expr_parse</a></li>
-                            <li><a href="data_algebra/expr_rep.html">data_algebra.expr_rep</a></li>
-                            <li><a href="data_algebra/flow_text.html">data_algebra.flow_text</a></li>
-                            <li><a href="data_algebra/near_sql.html">data_algebra.near_sql</a></li>
-                            <li><a href="data_algebra/op_catalog.html">data_algebra.op_catalog</a></li>
-                            <li><a href="data_algebra/op_container.html">data_algebra.op_container</a></li>
-                            <li><a href="data_algebra/pandas_base.html">data_algebra.pandas_base</a></li>
-                            <li><a href="data_algebra/pandas_model.html">data_algebra.pandas_model</a></li>
-                            <li><a href="data_algebra/parse_by_lark.html">data_algebra.parse_by_lark</a></li>
-                            <li><a href="data_algebra/python3_lark.html">data_algebra.python3_lark</a></li>
-                            <li><a href="data_algebra/solutions.html">data_algebra.solutions</a></li>
-                            <li><a href="data_algebra/sql_format_options.html">data_algebra.sql_format_options</a></li>
-                            <li><a href="data_algebra/test_util.html">data_algebra.test_util</a></li>
-                            <li><a href="data_algebra/util.html">data_algebra.util</a></li>
-                    </ul>
 
                     <h2>API Documentation</h2>
                         <ul class="memberlist">
             <li>
-                    <a class="module" href="#data_algebra">data_algebra</a>
+                    <a class="class" href="#SQLFormatOptions">SQLFormatOptions</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#SQLFormatOptions.__init__">SQLFormatOptions</a>
+                        </li>
+                </ul>
+
             </li>
     </ul>
 
@@ -81,104 +53,248 @@
     <main class="pdoc">
             <section>
                     <h1 class="modulename">
-data_algebra    </h1>
+<a href="./../data_algebra.html">data_algebra</a><wbr>.sql_format_options    </h1>
 
-                        <div class="docstring"><p><code><a href="#data_algebra">data_algebra</a></code><a href="https://github.com/WinVector/data_algebra">https://github.com/WinVector/data_algebra</a> is a piped data wrangling system
-based on Codd's relational algebra and experience working with dplyr at scale.  The primary 
-purpose of the package is to support an easy to compose and maintain grammar of data processing
-steps that in turn can be used to generate database specific SQL.  The package also implements
-the same transforms for Pandas DataFrames. </p>
-
-<p>This package is still under initial development, so some parts are not yet implemented or tested, and APIs
-are subject to change.</p>
-
-<p>Mature, production ready <code>R</code><a href="https://www.r-project.org">https://www.r-project.org</a> versions of the system are available as 
-the <code>rquery</code><a href="https://github.com/WinVector/rquery">https://github.com/WinVector/rquery</a> and <code>rqdatatable</code><a href="https://github.com/WinVector/rqdatatable">https://github.com/WinVector/rqdatatable</a> packages.</p>
+                        <div class="docstring"><p>Simple class for holding SQL formatting options</p>
 </div>
 
                         <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Package for data processing in Python: https://github.com/WinVector/data_algebra</span>
+<span class="sd">Simple class for holding SQL formatting options</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="n">__docformat__</span> <span class="o">=</span> <span class="s2">&quot;restructuredtext&quot;</span>
-<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;1.3.3&quot;</span>
-
-<span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">`data_algebra`&lt;https://github.com/WinVector/data_algebra&gt; is a piped data wrangling system</span>
-<span class="s2">based on Codd&#39;s relational algebra and experience working with dplyr at scale.  The primary </span>
-<span class="s2">purpose of the package is to support an easy to compose and maintain grammar of data processing</span>
-<span class="s2">steps that in turn can be used to generate database specific SQL.  The package also implements</span>
-<span class="s2">the same transforms for Pandas DataFrames. </span>
-
-<span class="s2">This package is still under initial development, so some parts are not yet implemented or tested, and APIs</span>
-<span class="s2">are subject to change.</span>
-
-<span class="s2">Mature, production ready `R`&lt;https://www.r-project.org&gt; versions of the system are available as </span>
-<span class="s2">the `rquery`&lt;https://github.com/WinVector/rquery&gt; and `rqdatatable`&lt;https://github.com/WinVector/rqdatatable&gt; packages.</span>
-<span class="s2">&quot;&quot;&quot;</span>
-
-<span class="kn">import</span> <span class="nn">data_algebra.pandas_model</span>
+<span class="kn">from</span> <span class="nn">types</span> <span class="kn">import</span> <span class="n">SimpleNamespace</span>
 
 
-<span class="c1"># set up what pandas supplier we are using</span>
-<span class="n">default_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">pandas_model</span><span class="o">.</span><span class="n">PandasModel</span><span class="p">()</span>
+<span class="k">class</span> <span class="nc">SQLFormatOptions</span><span class="p">(</span><span class="n">SimpleNamespace</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Simple class for holding SQL formatting options</span>
+
+<span class="sd">    :param use_with: bool, if True use with to introduce common table expressions</span>
+<span class="sd">    :param annotate: bool, if True add annotations from original pipeline as SQL comments</span>
+<span class="sd">    :param sql_indent: str = &quot; &quot;, indent string (must be non-empty and all whitespace)</span>
+<span class="sd">    :param initial_commas: bool = False, if True write initial commas instead of after commas</span>
+<span class="sd">    :param warn_on_method_support: bool = True, if True warn on translation to untrusted methods</span>
+<span class="sd">    :param warn_on_novel_methods: bool = True, if True warn on translation to unrecognized methods</span>
+<span class="sd">    :param use_cte_elim: bool = False, if True optimzie SQL by re-using common table expressions (experimental!)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">use_with</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">annotate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">sql_indent</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="p">,</span>
+        <span class="n">initial_commas</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">warn_on_method_support</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">warn_on_novel_methods</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">use_cte_elim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        SQL formatting options.</span>
+
+<span class="sd">        :param use_with: bool, if True use with to introduce common table expressions</span>
+<span class="sd">        :param annotate: bool, if True add annotations from original pipeline as SQL comments</span>
+<span class="sd">        :param sql_indent: str = &quot; &quot;, indent string (must be non-empty and all whitespace)</span>
+<span class="sd">        :param initial_commas: bool = False, if True write initial commas instead of after commas</span>
+<span class="sd">        :param warn_on_method_support: bool = True, if True warn on translation to untrusted methods</span>
+<span class="sd">        :param warn_on_novel_methods: bool = True, if True warn on translation to unrecognized methods</span>
+<span class="sd">        :param use_cte_elim: bool = False, if True optimize SQL by re-using common table expressions (experimental!)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">use_with</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annotate</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_indent</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">sql_indent</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">sql_indent</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">initial_commas</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">use_cte_elim</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+        <span class="n">SimpleNamespace</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">use_with</span><span class="o">=</span><span class="n">use_with</span><span class="p">,</span>
+            <span class="n">annotate</span><span class="o">=</span><span class="n">annotate</span><span class="p">,</span>
+            <span class="n">sql_indent</span><span class="o">=</span><span class="n">sql_indent</span><span class="p">,</span>
+            <span class="n">initial_commas</span><span class="o">=</span><span class="n">initial_commas</span><span class="p">,</span>
+            <span class="n">warn_on_method_support</span><span class="o">=</span><span class="n">warn_on_method_support</span><span class="p">,</span>
+            <span class="n">warn_on_novel_methods</span><span class="o">=</span><span class="n">warn_on_novel_methods</span><span class="p">,</span>
+            <span class="n">use_cte_elim</span><span class="o">=</span><span class="n">use_cte_elim</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
+
+    <span class="c1"># noinspection PyUnusedLocal</span>
+    <span class="k">def</span> <span class="nf">_repr_pretty_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">cycle</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        IPython pretty print, used at implicit print time</span>
+<span class="sd">        https://ipython.readthedocs.io/en/stable/config/integrating.html</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
 </pre></div>
 
         </details>
 
             </section>
-                <section id="data_algebra">
-                                <div class="attr module"><a class="headerlink" href="#data_algebra">#&nbsp;&nbsp</a>
-<span class="name"><a href=""></a></span></div>
+                <section id="SQLFormatOptions">
+                                <div class="attr class">
+        <a class="headerlink" href="#SQLFormatOptions">#&nbsp;&nbsp</a>
+
+        
+        <span class="def">class</span>
+        <span class="name">SQLFormatOptions</span><wbr>(<span class="base">types.SimpleNamespace</span>):
+    </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Package for data processing in Python: https://github.com/WinVector/data_algebra</span>
-<span class="sd">&quot;&quot;&quot;</span>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">SQLFormatOptions</span><span class="p">(</span><span class="n">SimpleNamespace</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Simple class for holding SQL formatting options</span>
 
-<span class="n">__docformat__</span> <span class="o">=</span> <span class="s2">&quot;restructuredtext&quot;</span>
-<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;1.3.3&quot;</span>
+<span class="sd">    :param use_with: bool, if True use with to introduce common table expressions</span>
+<span class="sd">    :param annotate: bool, if True add annotations from original pipeline as SQL comments</span>
+<span class="sd">    :param sql_indent: str = &quot; &quot;, indent string (must be non-empty and all whitespace)</span>
+<span class="sd">    :param initial_commas: bool = False, if True write initial commas instead of after commas</span>
+<span class="sd">    :param warn_on_method_support: bool = True, if True warn on translation to untrusted methods</span>
+<span class="sd">    :param warn_on_novel_methods: bool = True, if True warn on translation to unrecognized methods</span>
+<span class="sd">    :param use_cte_elim: bool = False, if True optimzie SQL by re-using common table expressions (experimental!)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-<span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">`data_algebra`&lt;https://github.com/WinVector/data_algebra&gt; is a piped data wrangling system</span>
-<span class="s2">based on Codd&#39;s relational algebra and experience working with dplyr at scale.  The primary </span>
-<span class="s2">purpose of the package is to support an easy to compose and maintain grammar of data processing</span>
-<span class="s2">steps that in turn can be used to generate database specific SQL.  The package also implements</span>
-<span class="s2">the same transforms for Pandas DataFrames. </span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">use_with</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">annotate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">sql_indent</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="p">,</span>
+        <span class="n">initial_commas</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">warn_on_method_support</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">warn_on_novel_methods</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">use_cte_elim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        SQL formatting options.</span>
 
-<span class="s2">This package is still under initial development, so some parts are not yet implemented or tested, and APIs</span>
-<span class="s2">are subject to change.</span>
+<span class="sd">        :param use_with: bool, if True use with to introduce common table expressions</span>
+<span class="sd">        :param annotate: bool, if True add annotations from original pipeline as SQL comments</span>
+<span class="sd">        :param sql_indent: str = &quot; &quot;, indent string (must be non-empty and all whitespace)</span>
+<span class="sd">        :param initial_commas: bool = False, if True write initial commas instead of after commas</span>
+<span class="sd">        :param warn_on_method_support: bool = True, if True warn on translation to untrusted methods</span>
+<span class="sd">        :param warn_on_novel_methods: bool = True, if True warn on translation to unrecognized methods</span>
+<span class="sd">        :param use_cte_elim: bool = False, if True optimize SQL by re-using common table expressions (experimental!)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">use_with</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annotate</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_indent</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">sql_indent</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">sql_indent</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">initial_commas</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">use_cte_elim</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+        <span class="n">SimpleNamespace</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">use_with</span><span class="o">=</span><span class="n">use_with</span><span class="p">,</span>
+            <span class="n">annotate</span><span class="o">=</span><span class="n">annotate</span><span class="p">,</span>
+            <span class="n">sql_indent</span><span class="o">=</span><span class="n">sql_indent</span><span class="p">,</span>
+            <span class="n">initial_commas</span><span class="o">=</span><span class="n">initial_commas</span><span class="p">,</span>
+            <span class="n">warn_on_method_support</span><span class="o">=</span><span class="n">warn_on_method_support</span><span class="p">,</span>
+            <span class="n">warn_on_novel_methods</span><span class="o">=</span><span class="n">warn_on_novel_methods</span><span class="p">,</span>
+            <span class="n">use_cte_elim</span><span class="o">=</span><span class="n">use_cte_elim</span><span class="p">,</span>
+        <span class="p">)</span>
 
-<span class="s2">Mature, production ready `R`&lt;https://www.r-project.org&gt; versions of the system are available as </span>
-<span class="s2">the `rquery`&lt;https://github.com/WinVector/rquery&gt; and `rqdatatable`&lt;https://github.com/WinVector/rqdatatable&gt; packages.</span>
-<span class="s2">&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
 
-<span class="kn">import</span> <span class="nn">data_algebra.pandas_model</span>
-
-
-<span class="c1"># set up what pandas supplier we are using</span>
-<span class="n">default_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">pandas_model</span><span class="o">.</span><span class="n">PandasModel</span><span class="p">()</span>
+    <span class="c1"># noinspection PyUnusedLocal</span>
+    <span class="k">def</span> <span class="nf">_repr_pretty_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">cycle</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        IPython pretty print, used at implicit print time</span>
+<span class="sd">        https://ipython.readthedocs.io/en/stable/config/integrating.html</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p><code><a href="#data_algebra">data_algebra</a></code><a href="https://github.com/WinVector/data_algebra">https://github.com/WinVector/data_algebra</a> is a piped data wrangling system
-based on Codd's relational algebra and experience working with dplyr at scale.  The primary 
-purpose of the package is to support an easy to compose and maintain grammar of data processing
-steps that in turn can be used to generate database specific SQL.  The package also implements
-the same transforms for Pandas DataFrames. </p>
+            <div class="docstring"><p>Simple class for holding SQL formatting options</p>
 
-<p>This package is still under initial development, so some parts are not yet implemented or tested, and APIs
-are subject to change.</p>
-
-<p>Mature, production ready <code>R</code><a href="https://www.r-project.org">https://www.r-project.org</a> versions of the system are available as 
-the <code>rquery</code><a href="https://github.com/WinVector/rquery">https://github.com/WinVector/rquery</a> and <code>rqdatatable</code><a href="https://github.com/WinVector/rqdatatable">https://github.com/WinVector/rqdatatable</a> packages.</p>
+<p>:param use_with: bool, if True use with to introduce common table expressions
+:param annotate: bool, if True add annotations from original pipeline as SQL comments
+:param sql_indent: str = " ", indent string (must be non-empty and all whitespace)
+:param initial_commas: bool = False, if True write initial commas instead of after commas
+:param warn_on_method_support: bool = True, if True warn on translation to untrusted methods
+:param warn_on_novel_methods: bool = True, if True warn on translation to unrecognized methods
+:param use_cte_elim: bool = False, if True optimzie SQL by re-using common table expressions (experimental!)</p>
 </div>
 
 
+                            <div id="SQLFormatOptions.__init__" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#SQLFormatOptions.__init__">#&nbsp;&nbsp</a>
+
+        
+            <span class="name">SQLFormatOptions</span><span class="signature">(
+    use_with: bool = True,
+    annotate: bool = True,
+    sql_indent: str = &#39; &#39;,
+    initial_commas: bool = False,
+    warn_on_method_support: bool = True,
+    warn_on_novel_methods: bool = True,
+    use_cte_elim: bool = False
+)</span>
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">use_with</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">annotate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">sql_indent</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="p">,</span>
+        <span class="n">initial_commas</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">warn_on_method_support</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">warn_on_novel_methods</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">use_cte_elim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        SQL formatting options.</span>
+
+<span class="sd">        :param use_with: bool, if True use with to introduce common table expressions</span>
+<span class="sd">        :param annotate: bool, if True add annotations from original pipeline as SQL comments</span>
+<span class="sd">        :param sql_indent: str = &quot; &quot;, indent string (must be non-empty and all whitespace)</span>
+<span class="sd">        :param initial_commas: bool = False, if True write initial commas instead of after commas</span>
+<span class="sd">        :param warn_on_method_support: bool = True, if True warn on translation to untrusted methods</span>
+<span class="sd">        :param warn_on_novel_methods: bool = True, if True warn on translation to unrecognized methods</span>
+<span class="sd">        :param use_cte_elim: bool = False, if True optimize SQL by re-using common table expressions (experimental!)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">use_with</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annotate</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_indent</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">sql_indent</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">sql_indent</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">initial_commas</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">use_cte_elim</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+        <span class="n">SimpleNamespace</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">use_with</span><span class="o">=</span><span class="n">use_with</span><span class="p">,</span>
+            <span class="n">annotate</span><span class="o">=</span><span class="n">annotate</span><span class="p">,</span>
+            <span class="n">sql_indent</span><span class="o">=</span><span class="n">sql_indent</span><span class="p">,</span>
+            <span class="n">initial_commas</span><span class="o">=</span><span class="n">initial_commas</span><span class="p">,</span>
+            <span class="n">warn_on_method_support</span><span class="o">=</span><span class="n">warn_on_method_support</span><span class="p">,</span>
+            <span class="n">warn_on_novel_methods</span><span class="o">=</span><span class="n">warn_on_novel_methods</span><span class="p">,</span>
+            <span class="n">use_cte_elim</span><span class="o">=</span><span class="n">use_cte_elim</span><span class="p">,</span>
+        <span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>SQL formatting options.</p>
+
+<p>:param use_with: bool, if True use with to introduce common table expressions
+:param annotate: bool, if True add annotations from original pipeline as SQL comments
+:param sql_indent: str = " ", indent string (must be non-empty and all whitespace)
+:param initial_commas: bool = False, if True write initial commas instead of after commas
+:param warn_on_method_support: bool = True, if True warn on translation to untrusted methods
+:param warn_on_novel_methods: bool = True, if True warn on translation to unrecognized methods
+:param use_cte_elim: bool = False, if True optimize SQL by re-using common table expressions (experimental!)</p>
+</div>
+
+
+                            </div>
                 </section>
     </main>
 <script>
@@ -233,7 +349,7 @@ the <code>rquery</code><a href="https://github.com/WinVector/rquery">https://git
                 script.async = true;
                 script.onload = () => resolve(window.pdocSearch);
                 script.onerror = (e) => reject(e);
-                script.src = "search.js";
+                script.src = "../search.js";
                 document.getElementsByTagName("head")[0].appendChild(script);
             });
         } catch (e) {
@@ -275,7 +391,7 @@ the <code>rquery</code><a href="https://github.com/WinVector/rquery">https://git
             }
             for (let result of results.slice(0, 10)) {
                 let doc = result.doc;
-                let url = `${doc.modulename.replaceAll(".", "/")}.html`;
+                let url = `../${doc.modulename.replaceAll(".", "/")}.html`;
                 if (doc.qualname) {
                     url += `#${doc.qualname}`;
                 }

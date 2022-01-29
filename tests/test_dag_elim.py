@@ -2,6 +2,7 @@
 import re
 
 import data_algebra
+import data_algebra.sql_format_options
 from data_algebra.data_ops import descr
 import data_algebra.test_util
 import data_algebra.db_model
@@ -28,7 +29,7 @@ def test_dag_elim():
     db_model = data_algebra.SQLite.SQLiteModel()
     sql = db_model.to_sql(
         ops,
-        sql_format_options=data_algebra.db_model.SQLFormatOptions(
+        sql_format_options=data_algebra.sql_format_options.SQLFormatOptions(
             use_with=True,
             annotate=False,
             use_cte_elim=True)
@@ -171,7 +172,7 @@ def test_dag_elim_bttb():
     db_model = data_algebra.SQLite.SQLiteModel()
     sql = db_model.to_sql(
         ops,
-        sql_format_options=data_algebra.db_model.SQLFormatOptions(use_with=False, annotate=False)
+        sql_format_options=data_algebra.sql_format_options.SQLFormatOptions(use_with=False, annotate=False)
     )
     expect = pd.DataFrame({
         'x': [1, 2, 3],
@@ -198,7 +199,7 @@ def test_dag_elim_uee():
     db_model = data_algebra.SQLite.SQLiteModel()
     sql = db_model.to_sql(
         ops,
-        sql_format_options=data_algebra.db_model.SQLFormatOptions(use_with=True, annotate=False)
+        sql_format_options=data_algebra.sql_format_options.SQLFormatOptions(use_with=True, annotate=False)
     )
     expect = pd.DataFrame({
         'x': [1, 2, 3, 1, 2, 3],
@@ -267,7 +268,7 @@ def test_dag_elim_utt():
     db_model = data_algebra.SQLite.SQLiteModel()
     sql = db_model.to_sql(
         ops,
-        sql_format_options=data_algebra.db_model.SQLFormatOptions(use_with=True, annotate=False)
+        sql_format_options=data_algebra.sql_format_options.SQLFormatOptions(use_with=True, annotate=False)
     )
     expect = pd.DataFrame({
         'x': [1, 2, 3, 1, 2, 3],

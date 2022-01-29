@@ -16,6 +16,7 @@ import data_algebra.BigQuery
 import data_algebra.PostgreSQL
 import data_algebra.MySQL
 import data_algebra.SparkSQL
+from data_algebra.sql_format_options import SQLFormatOptions
 
 from data_algebra.data_ops import *
 
@@ -412,7 +413,7 @@ def check_transform_on_handles(
             for initial_commas in [True, False]:
                 for use_with in [True, False]:
                     for annotate in [True, False]:
-                        sql_format_options = data_algebra.db_model.SQLFormatOptions(
+                        sql_format_options = SQLFormatOptions(
                             use_with=use_with,
                             annotate=annotate,
                             initial_commas=initial_commas,

@@ -1,5 +1,6 @@
 import data_algebra
 import data_algebra.db_model
+import data_algebra.sql_format_options
 from data_algebra.data_ops import *
 import data_algebra.BigQuery
 
@@ -14,7 +15,7 @@ def test_set_quoting_1():
 
     ops = describe_table(d, table_name="d").extend({"select": f"x.is_in({targets})"})
 
-    sql_format_options = data_algebra.db_model.SQLFormatOptions(
+    sql_format_options = data_algebra.sql_format_options.SQLFormatOptions(
         use_with=True, annotate=False, sql_indent=" ", initial_commas=False
     )
     sql = bq_handle.to_sql(ops, sql_format_options=sql_format_options)
@@ -29,7 +30,7 @@ def test_set_quoting_2():
 
     ops = describe_table(d, table_name="d").extend({"select": "x.is_in({-5, 3})"})
 
-    sql_format_options = data_algebra.db_model.SQLFormatOptions(
+    sql_format_options = data_algebra.sql_format_options.SQLFormatOptions(
         use_with=True, annotate=False, sql_indent=" ", initial_commas=False
     )
     sql = bq_handle.to_sql(ops, sql_format_options=sql_format_options)

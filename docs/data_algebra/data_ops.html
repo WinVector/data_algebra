@@ -3060,6 +3060,7 @@
                 <span class="n">sub_sql</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLContainer</span><span class="p">(</span><span class="n">near_sql</span><span class="o">=</span><span class="n">near_sql</span><span class="p">),</span>
                 <span class="n">suffix</span><span class="o">=</span><span class="n">si</span><span class="p">,</span>
                 <span class="n">annotation</span><span class="o">=</span><span class="s2">&quot;convert records blocks in&quot;</span><span class="p">,</span>
+                <span class="n">ops_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -3075,6 +3076,7 @@
                 <span class="n">sub_sql</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLContainer</span><span class="p">(</span><span class="n">near_sql</span><span class="o">=</span><span class="n">near_sql</span><span class="p">),</span>
                 <span class="n">suffix</span><span class="o">=</span><span class="n">si</span><span class="p">,</span>
                 <span class="n">annotation</span><span class="o">=</span><span class="s2">&quot;convert records blocks out&quot;</span><span class="p">,</span>
+                <span class="n">ops_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
@@ -3175,6 +3177,7 @@
             <span class="n">suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">annotation</span><span class="o">=</span><span class="s2">&quot;user supplied SQL&quot;</span><span class="p">,</span>
             <span class="n">add_select</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">ops_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
@@ -10691,6 +10694,7 @@ raise an exception if the values are not consistent</p>
                 <span class="n">sub_sql</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLContainer</span><span class="p">(</span><span class="n">near_sql</span><span class="o">=</span><span class="n">near_sql</span><span class="p">),</span>
                 <span class="n">suffix</span><span class="o">=</span><span class="n">si</span><span class="p">,</span>
                 <span class="n">annotation</span><span class="o">=</span><span class="s2">&quot;convert records blocks in&quot;</span><span class="p">,</span>
+                <span class="n">ops_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -10706,6 +10710,7 @@ raise an exception if the values are not consistent</p>
                 <span class="n">sub_sql</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLContainer</span><span class="p">(</span><span class="n">near_sql</span><span class="o">=</span><span class="n">near_sql</span><span class="p">),</span>
                 <span class="n">suffix</span><span class="o">=</span><span class="n">si</span><span class="p">,</span>
                 <span class="n">annotation</span><span class="o">=</span><span class="s2">&quot;convert records blocks out&quot;</span><span class="p">,</span>
+                <span class="n">ops_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
@@ -10907,6 +10912,7 @@ raise an exception if the values are not consistent</p>
                 <span class="n">sub_sql</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLContainer</span><span class="p">(</span><span class="n">near_sql</span><span class="o">=</span><span class="n">near_sql</span><span class="p">),</span>
                 <span class="n">suffix</span><span class="o">=</span><span class="n">si</span><span class="p">,</span>
                 <span class="n">annotation</span><span class="o">=</span><span class="s2">&quot;convert records blocks in&quot;</span><span class="p">,</span>
+                <span class="n">ops_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -10922,6 +10928,7 @@ raise an exception if the values are not consistent</p>
                 <span class="n">sub_sql</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLContainer</span><span class="p">(</span><span class="n">near_sql</span><span class="o">=</span><span class="n">near_sql</span><span class="p">),</span>
                 <span class="n">suffix</span><span class="o">=</span><span class="n">si</span><span class="p">,</span>
                 <span class="n">annotation</span><span class="o">=</span><span class="s2">&quot;convert records blocks out&quot;</span><span class="p">,</span>
+                <span class="n">ops_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
@@ -11098,6 +11105,7 @@ raise an exception if the values are not consistent</p>
             <span class="n">suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">annotation</span><span class="o">=</span><span class="s2">&quot;user supplied SQL&quot;</span><span class="p">,</span>
             <span class="n">add_select</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">ops_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 </pre></div>
@@ -11309,6 +11317,7 @@ raise an exception if the values are not consistent.</p>
             <span class="n">suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">annotation</span><span class="o">=</span><span class="s2">&quot;user supplied SQL&quot;</span><span class="p">,</span>
             <span class="n">add_select</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">ops_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 </pre></div>
