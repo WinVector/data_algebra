@@ -1,4 +1,5 @@
-import pytest
+
+import re
 
 import data_algebra
 from data_algebra.data_ops import descr
@@ -32,9 +33,9 @@ def test_dag_elim():
             annotate=False,
             use_cte_elim=True)
     )
-    n_d = sql.count('"d"')
-    assert n_d > 0
-    assert n_d <= 2
+    sql_smushed = re.sub(r'\s+', '', sql)
+    assert sql.count('"d"') == 1
+    assert sql_smushed.count('"x"+1') == 1
     # assert n_d == 1  # show table is referenced exactly once
     expect = pd.DataFrame({
         'x': [1, 2, 3],

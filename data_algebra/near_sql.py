@@ -199,6 +199,13 @@ class NearSQLContainer:
             assert isinstance(v[0], str)
             assert isinstance(v[1], NearSQLContainer)
         if not stub.is_table:
+            # first check cache
+            ops_key = self.near_sql.ops_key
+            if (cte_cache is not None) and (ops_key is not None):
+                try:
+                    return cte_cache[ops_key]
+                except KeyError:
+                    pass
             # replace step with a reference
             if stub.quoted_query_name not in {k for k, v in sequence}:
                 sequence.append(
@@ -214,11 +221,14 @@ class NearSQLContainer:
                 near_sql=NearSQLCommonTableExpression(
                     query_name=stub.query_name,
                     quoted_query_name=stub.quoted_query_name,
+                    ops_key=ops_key,
                 ),
                 force_sql=self.force_sql,
                 public_name=self.public_name,
                 public_name_quoted=self.public_name_quoted,
             )
+            if (cte_cache is not None) and (ops_key is not None):
+                cte_cache[ops_key] = (new_stub, [])
         else:
             assert len(sequence) == 0
             new_stub = NearSQLContainer(
@@ -232,14 +242,14 @@ class NearSQLContainer:
 
 class NearSQLNamedEntity(NearSQL, abc.ABC):
     """Model for tables and common table expressions"""
-    def __init__(self, *, terms, query_name: str, quoted_query_name: str):
+    def __init__(self, *, terms, query_name: str, quoted_query_name: str, ops_key: Optional[str]):
         NearSQL.__init__(
             self,
             terms=terms,
             query_name=query_name,
             quoted_query_name=quoted_query_name,
             is_table=True,
-            ops_key=query_name,
+            ops_key=ops_key,
         )
 
     def to_with_form(self, *, cte_cache: Optional[Dict]) -> SQLWithList:
@@ -258,9 +268,9 @@ class NearSQLNamedEntity(NearSQL, abc.ABC):
 
 
 class NearSQLCommonTableExpression(NearSQLNamedEntity):
-    def __init__(self, *, query_name: str, quoted_query_name: str):
+    def __init__(self, *, query_name: str, quoted_query_name: str, ops_key: Optional[str]):
         NearSQLNamedEntity.__init__(
-            self, terms=None, query_name=query_name, quoted_query_name=quoted_query_name
+            self, terms=None, query_name=query_name, quoted_query_name=quoted_query_name, ops_key=ops_key
         )
 
     def to_sql_str_list(
@@ -286,6 +296,7 @@ class NearSQLTable(NearSQLNamedEntity):
             terms=terms,
             query_name=table_name,
             quoted_query_name=quoted_table_name,
+            ops_key=table_name,
         )
         self.table_name = table_name
         self.quoted_table_name = quoted_table_name
