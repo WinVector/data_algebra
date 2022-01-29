@@ -1640,17 +1640,15 @@ class DBModel:
             temp_id_source = [0]
         if using is None:
             using = OrderedSet(join_node.column_names)
+        view_name = f"natural_join_{temp_id_source[0]}"
+        left_q = f"join_source_left_{temp_id_source[0]}"
+        right_q = f"join_source_right_{temp_id_source[0]}"
+        temp_id_source[0] = temp_id_source[0] + 1
         using_left, sql_left, using_right, sql_right = self._natural_join_sub_queries(
             join_node=join_node, using=using, temp_id_source=temp_id_source
         )
-        left_qqn = sql_left.quoted_query_name
-        right_qqn = sql_right.quoted_query_name
-        if left_qqn == right_qqn:
-            raise ValueError("""In join steps left and right subquery must not be identical, 
-                one can work around this by using an extend() to add a new column on one side of join
-                (though one must make sure query optimization does not eliminate such a column).""")
-        view_name = "natural_join_" + str(temp_id_source[0])
-        temp_id_source[0] = temp_id_source[0] + 1
+        left_qqn = self.quote_identifier(left_q)
+        right_qqn = self.quote_identifier(right_q)
         common = using_left.intersection(using_right)
         if left_is_first:
             terms = self._coalesce_terms(
@@ -1694,11 +1692,15 @@ class DBModel:
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql1=sql_left.to_bound_near_sql(
                 columns=using_left,
-                force_sql=False),
+                force_sql=False,
+                public_name=left_q,
+                public_name_quoted=left_qqn),
             joiner=join_node.jointype + " JOIN",
             sub_sql2=sql_right.to_bound_near_sql(
                 columns=using_right,
-                force_sql=False),
+                force_sql=False,
+                public_name=right_q,
+                public_name_quoted=right_qqn),
             suffix=on_terms,
             annotation=str(
                 join_node.to_python_src_(print_sources=False, indent=-1)
@@ -2204,12 +2206,12 @@ class DBModel:
         substr_1 = near_sql.sub_sql1.convert_subsql(
             db_model=self,
             sql_format_options=sql_format_options,
-            quoted_query_name_annotation=near_sql.sub_sql1.near_sql.quoted_query_name if subsql_add_query_name else None
+            quoted_query_name_annotation=near_sql.sub_sql1.public_name_quoted if subsql_add_query_name else None
         )
         substr_2 = near_sql.sub_sql2.convert_subsql(
             db_model=self,
             sql_format_options=sql_format_options,
-            quoted_query_name_annotation=near_sql.sub_sql2.near_sql.quoted_query_name if subsql_add_query_name else None
+            quoted_query_name_annotation=near_sql.sub_sql2.public_name_quoted if subsql_add_query_name else None
         )
         sql = (
             [sql_start]

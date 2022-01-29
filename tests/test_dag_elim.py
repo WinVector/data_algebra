@@ -123,9 +123,10 @@ def test_dag_elim_btt():
                 jointype='left',
             )
     )
-    sqlite_model = data_algebra.SQLite.SQLiteModel()
-    with pytest.raises(ValueError):
-        sqlite_model.to_sql(ops)
+    expect = pd.DataFrame({
+        'x': [1, 2, 3],
+    })
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
 
 
 def test_dag_elim_bttf():
