@@ -413,16 +413,18 @@ def check_transform_on_handles(
             for initial_commas in [True, False]:
                 for use_with in [True, False]:
                     for annotate in [True, False]:
-                        sql_format_options = SQLFormatOptions(
-                            use_with=use_with,
-                            annotate=annotate,
-                            initial_commas=initial_commas,
-                        )
-                        sql = db_handle.to_sql(
-                            ops, sql_format_options=sql_format_options,
-                        )
-                        assert isinstance(sql, str)
-                        sql_statements.add(sql)
+                        for use_cte_elim in [True, False]:
+                            sql_format_options = SQLFormatOptions(
+                                use_with=use_with,
+                                annotate=annotate,
+                                initial_commas=initial_commas,
+                                use_cte_elim=use_cte_elim,
+                            )
+                            sql = db_handle.to_sql(
+                                ops, sql_format_options=sql_format_options,
+                            )
+                            assert isinstance(sql, str)
+                            sql_statements.add(sql)
             if db_handle.conn is not None:
                 _run_handle_experiments(
                     db_handle=db_handle,
