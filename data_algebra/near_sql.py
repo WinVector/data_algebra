@@ -83,7 +83,7 @@ class NearSQL(abc.ABC):
         self.is_table = is_table
         self.annotation = annotation
 
-    def to_bound_near_sql(self, *, columns=None, force_sql=False):
+    def to_bound_near_sql(self, *, columns=None, force_sql: bool = False) -> 'NearSQLContainer':
         return NearSQLContainer(
             near_sql=self, columns=columns, force_sql=force_sql
         )
@@ -113,7 +113,12 @@ class NearSQLContainer:
     force_sql: bool
     columns: Optional[data_algebra.OrderedSet.OrderedSet]
 
-    def __init__(self, *, near_sql: NearSQL, columns: Optional[Iterable[str]] = None, force_sql: bool = False):
+    def __init__(
+            self,
+            *,
+            near_sql: NearSQL,
+            columns: Optional[Iterable[str]] = None,
+            force_sql: bool = False):
         assert isinstance(near_sql, NearSQL)
         assert isinstance(force_sql, bool)
         self.near_sql = near_sql
