@@ -487,16 +487,18 @@
             <span class="k">for</span> <span class="n">initial_commas</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]:</span>
                 <span class="k">for</span> <span class="n">use_with</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]:</span>
                     <span class="k">for</span> <span class="n">annotate</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]:</span>
-                        <span class="n">sql_format_options</span> <span class="o">=</span> <span class="n">SQLFormatOptions</span><span class="p">(</span>
-                            <span class="n">use_with</span><span class="o">=</span><span class="n">use_with</span><span class="p">,</span>
-                            <span class="n">annotate</span><span class="o">=</span><span class="n">annotate</span><span class="p">,</span>
-                            <span class="n">initial_commas</span><span class="o">=</span><span class="n">initial_commas</span><span class="p">,</span>
-                        <span class="p">)</span>
-                        <span class="n">sql</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
-                            <span class="n">ops</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
-                        <span class="p">)</span>
-                        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-                        <span class="n">sql_statements</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">use_cte_elim</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">False</span><span class="p">]:</span>  <span class="c1">#  [True, False]:  # TODO: add False case back in</span>
+                            <span class="n">sql_format_options</span> <span class="o">=</span> <span class="n">SQLFormatOptions</span><span class="p">(</span>
+                                <span class="n">use_with</span><span class="o">=</span><span class="n">use_with</span><span class="p">,</span>
+                                <span class="n">annotate</span><span class="o">=</span><span class="n">annotate</span><span class="p">,</span>
+                                <span class="n">initial_commas</span><span class="o">=</span><span class="n">initial_commas</span><span class="p">,</span>
+                                <span class="n">use_cte_elim</span><span class="o">=</span><span class="n">use_cte_elim</span><span class="p">,</span>
+                            <span class="p">)</span>
+                            <span class="n">sql</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
+                                <span class="n">ops</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
+                            <span class="p">)</span>
+                            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+                            <span class="n">sql_statements</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">_run_handle_experiments</span><span class="p">(</span>
                     <span class="n">db_handle</span><span class="o">=</span><span class="n">db_handle</span><span class="p">,</span>
@@ -1013,16 +1015,18 @@ Ignores indexing. None and nan are considered equivalent in numeric contexts.</p
             <span class="k">for</span> <span class="n">initial_commas</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]:</span>
                 <span class="k">for</span> <span class="n">use_with</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]:</span>
                     <span class="k">for</span> <span class="n">annotate</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]:</span>
-                        <span class="n">sql_format_options</span> <span class="o">=</span> <span class="n">SQLFormatOptions</span><span class="p">(</span>
-                            <span class="n">use_with</span><span class="o">=</span><span class="n">use_with</span><span class="p">,</span>
-                            <span class="n">annotate</span><span class="o">=</span><span class="n">annotate</span><span class="p">,</span>
-                            <span class="n">initial_commas</span><span class="o">=</span><span class="n">initial_commas</span><span class="p">,</span>
-                        <span class="p">)</span>
-                        <span class="n">sql</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
-                            <span class="n">ops</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
-                        <span class="p">)</span>
-                        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-                        <span class="n">sql_statements</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">use_cte_elim</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">False</span><span class="p">]:</span>  <span class="c1">#  [True, False]:  # TODO: add False case back in</span>
+                            <span class="n">sql_format_options</span> <span class="o">=</span> <span class="n">SQLFormatOptions</span><span class="p">(</span>
+                                <span class="n">use_with</span><span class="o">=</span><span class="n">use_with</span><span class="p">,</span>
+                                <span class="n">annotate</span><span class="o">=</span><span class="n">annotate</span><span class="p">,</span>
+                                <span class="n">initial_commas</span><span class="o">=</span><span class="n">initial_commas</span><span class="p">,</span>
+                                <span class="n">use_cte_elim</span><span class="o">=</span><span class="n">use_cte_elim</span><span class="p">,</span>
+                            <span class="p">)</span>
+                            <span class="n">sql</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
+                                <span class="n">ops</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
+                            <span class="p">)</span>
+                            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+                            <span class="n">sql_statements</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">_run_handle_experiments</span><span class="p">(</span>
                     <span class="n">db_handle</span><span class="o">=</span><span class="n">db_handle</span><span class="p">,</span>

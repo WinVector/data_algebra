@@ -148,8 +148,22 @@ class NearSQLContainer:
             assert not isinstance(columns, str)
             self.columns = data_algebra.OrderedSet.OrderedSet(columns)
         self.force_sql = force_sql
+        assert (public_name is not None) == (public_name_quoted is not None)
+        if (public_name is not None) or (public_name_quoted is not None):
+            assert isinstance(public_name, str)
+            assert isinstance(public_name_quoted, str)
         self.public_name = public_name
         self.public_name_quoted = public_name_quoted
+
+    def copy(self) -> 'NearSQLContainer':
+        """shallow copy"""
+        return NearSQLContainer(
+            near_sql=self.near_sql,
+            columns=self.columns,
+            force_sql=self.force_sql,
+            public_name=self.public_name,
+            public_name_quoted=self.public_name_quoted
+        )
 
     def convert_subsql(
             self,
@@ -203,7 +217,10 @@ class NearSQLContainer:
             ops_key = self.near_sql.ops_key
             if (cte_cache is not None) and (ops_key is not None):
                 try:
-                    return cte_cache[ops_key]
+                    stored_stub = cte_cache[ops_key].copy()
+                    stored_stub.public_name = self.public_name
+                    stored_stub.public_name_quoted = self.public_name_quoted
+                    return stored_stub, []
                 except KeyError:
                     pass
             # replace step with a reference
@@ -228,7 +245,7 @@ class NearSQLContainer:
                 public_name_quoted=self.public_name_quoted,
             )
             if (cte_cache is not None) and (ops_key is not None):
-                cte_cache[ops_key] = (new_stub, [])
+                cte_cache[ops_key] = new_stub
         else:
             assert len(sequence) == 0
             new_stub = NearSQLContainer(
