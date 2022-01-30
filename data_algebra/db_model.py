@@ -1787,7 +1787,7 @@ class DBModel:
         sql_str_list = None
         if sql_format_options.use_with and self.supports_with:
             cte_cache: Optional[Dict] = None
-            if sql_format_options.use_cte_elim:
+            if sql_format_options.use_with and sql_format_options.use_cte_elim:
                 cte_cache = dict()
             sequence = near_sql.to_with_form(cte_cache=cte_cache)
             len_sequence = len(sequence.previous_steps)
