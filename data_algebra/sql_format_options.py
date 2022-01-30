@@ -15,7 +15,7 @@ class SQLFormatOptions(SimpleNamespace):
     :param initial_commas: bool = False, if True write initial commas instead of after commas
     :param warn_on_method_support: bool = True, if True warn on translation to untrusted methods
     :param warn_on_novel_methods: bool = True, if True warn on translation to unrecognized methods
-    :param use_cte_elim: bool = False, if True optimzie SQL by re-using common table expressions (experimental! NOT WORKING YET)
+    :param use_cte_elim: bool = False, if True optimize SQL by re-using common table expressions (experimental)
     """
 
     def __init__(
@@ -37,7 +37,7 @@ class SQLFormatOptions(SimpleNamespace):
         :param initial_commas: bool = False, if True write initial commas instead of after commas
         :param warn_on_method_support: bool = True, if True warn on translation to untrusted methods
         :param warn_on_novel_methods: bool = True, if True warn on translation to unrecognized methods
-        :param use_cte_elim: bool = False, if True optimize SQL by re-using common table expressions (experimental! NOT WORKING YET)
+        :param use_cte_elim: bool = False, if True optimize SQL by re-using common table expressions (experimental)
         """
         assert isinstance(use_with, bool)
         assert isinstance(annotate, bool)

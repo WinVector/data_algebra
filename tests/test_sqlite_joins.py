@@ -94,6 +94,16 @@ def test_sqlite_joins_simulate_full_join():
         .natural_join(b=descr(d1=d1), by=join_columns, jointype="left")
         .natural_join(b=descr(d2=d2), by=join_columns, jointype="left")
     )
+    db_model = data_algebra.BigQuery.BigQueryModel()
+    sql = db_model.to_sql(
+        ops_simulate,
+        sql_format_options=data_algebra.sql_format_options.SQLFormatOptions(
+            use_with=True,
+            annotate=False,
+            use_cte_elim=True,
+        )
+    )
+    assert isinstance(sql, str)
     data_algebra.test_util.check_transform(
         ops=ops_simulate,
         data={"d1": d1, "d2": d2},
