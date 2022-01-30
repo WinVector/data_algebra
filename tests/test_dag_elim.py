@@ -6,6 +6,7 @@ import data_algebra.sql_format_options
 from data_algebra.data_ops import descr
 import data_algebra.test_util
 import data_algebra.db_model
+import data_algebra.BigQuery
 import data_algebra.SQLite
 
 
@@ -26,19 +27,19 @@ def test_dag_elim():
                 jointype='left',
             )
     )
-    db_model = data_algebra.SQLite.SQLiteModel()
+    db_model = data_algebra.BigQuery.BigQueryModel()
     sql = db_model.to_sql(
         ops,
         sql_format_options=data_algebra.sql_format_options.SQLFormatOptions(
             use_with=True,
             annotate=False,
-            # use_cte_elim=True,  # TODO: put this back
+            use_cte_elim=True,
         )
     )
     assert isinstance(sql, str)
-    # sql_smushed = re.sub(r'\s+', '', sql)  # TODO: put these back
-    # assert sql.count('"d"') == 1  # show table is referenced exactly once
-    # assert sql_smushed.count('"x"+1') == 1
+    assert sql.count('`d`') == 1  # show table is referenced exactly once
+    sql_smushed = re.sub(r'\s+', '', sql)
+    assert sql_smushed.count('`x`+1') == 1
     expect = pd.DataFrame({
         'x': [1, 2, 3],
         'y': [2, 3, 4],
@@ -175,6 +176,7 @@ def test_dag_elim_bttb():
         ops,
         sql_format_options=data_algebra.sql_format_options.SQLFormatOptions(use_with=False, annotate=False)
     )
+    assert isinstance(sql, str)
     expect = pd.DataFrame({
         'x': [1, 2, 3],
     })
@@ -202,6 +204,7 @@ def test_dag_elim_uee():
         ops,
         sql_format_options=data_algebra.sql_format_options.SQLFormatOptions(use_with=True, annotate=False)
     )
+    assert isinstance(sql, str)
     expect = pd.DataFrame({
         'x': [1, 2, 3, 1, 2, 3],
         'y': [1, 2, 3, 1, 2, 3],
@@ -271,6 +274,7 @@ def test_dag_elim_utt():
         ops,
         sql_format_options=data_algebra.sql_format_options.SQLFormatOptions(use_with=True, annotate=False)
     )
+    assert isinstance(sql, str)
     expect = pd.DataFrame({
         'x': [1, 2, 3, 1, 2, 3],
         'y': [1, 2, 3, 1, 2, 3],

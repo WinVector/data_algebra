@@ -61,9 +61,6 @@
                                 <a class="function" href="#NearSQLContainer.__init__">NearSQLContainer</a>
                         </li>
                         <li>
-                                <a class="function" href="#NearSQLContainer.copy">copy</a>
-                        </li>
-                        <li>
                                 <a class="function" href="#NearSQLContainer.convert_subsql">convert_subsql</a>
                         </li>
                         <li>
@@ -331,16 +328,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">public_name</span> <span class="o">=</span> <span class="n">public_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">public_name_quoted</span> <span class="o">=</span> <span class="n">public_name_quoted</span>
 
-    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;NearSQLContainer&#39;</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;shallow copy&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">NearSQLContainer</span><span class="p">(</span>
-            <span class="n">near_sql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">near_sql</span><span class="p">,</span>
-            <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
-            <span class="n">force_sql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_sql</span><span class="p">,</span>
-            <span class="n">public_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">public_name</span><span class="p">,</span>
-            <span class="n">public_name_quoted</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">public_name_quoted</span>
-        <span class="p">)</span>
-
     <span class="k">def</span> <span class="nf">convert_subsql</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="o">*</span><span class="p">,</span>
@@ -390,13 +377,19 @@
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">NearSQLContainer</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">stub</span><span class="o">.</span><span class="n">is_table</span><span class="p">:</span>
             <span class="c1"># first check cache</span>
-            <span class="n">ops_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">ops_key</span>
+            <span class="n">ops_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">ops_key</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">cte_cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">ops_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="n">stored_stub</span> <span class="o">=</span> <span class="n">cte_cache</span><span class="p">[</span><span class="n">ops_key</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-                    <span class="n">stored_stub</span><span class="o">.</span><span class="n">public_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">public_name</span>
-                    <span class="n">stored_stub</span><span class="o">.</span><span class="n">public_name_quoted</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">public_name_quoted</span>
-                    <span class="k">return</span> <span class="n">stored_stub</span><span class="p">,</span> <span class="p">[]</span>
+                    <span class="n">retrieved_cte</span> <span class="o">=</span> <span class="n">cte_cache</span><span class="p">[</span><span class="n">ops_key</span><span class="p">]</span>
+                    <span class="c1"># copy in context fields</span>
+                    <span class="n">new_stub</span> <span class="o">=</span> <span class="n">NearSQLContainer</span><span class="p">(</span>
+                        <span class="n">near_sql</span><span class="o">=</span><span class="n">retrieved_cte</span><span class="p">,</span>
+                        <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
+                        <span class="n">force_sql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_sql</span><span class="p">,</span>
+                        <span class="n">public_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">public_name</span><span class="p">,</span>
+                        <span class="n">public_name_quoted</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">public_name_quoted</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="k">return</span> <span class="n">new_stub</span><span class="p">,</span> <span class="p">[]</span>
                 <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
                     <span class="k">pass</span>
             <span class="c1"># replace step with a reference</span>
@@ -407,26 +400,30 @@
                         <span class="n">NearSQLContainer</span><span class="p">(</span>
                             <span class="n">near_sql</span><span class="o">=</span><span class="n">stub</span><span class="p">,</span>
                             <span class="n">force_sql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_sql</span><span class="p">,</span>
+                            <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
                         <span class="p">),</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
-            <span class="n">new_stub</span> <span class="o">=</span> <span class="n">NearSQLContainer</span><span class="p">(</span>
-                <span class="n">near_sql</span><span class="o">=</span><span class="n">NearSQLCommonTableExpression</span><span class="p">(</span>
+            <span class="n">new_stub_cte</span> <span class="o">=</span> <span class="n">NearSQLCommonTableExpression</span><span class="p">(</span>
                     <span class="n">query_name</span><span class="o">=</span><span class="n">stub</span><span class="o">.</span><span class="n">query_name</span><span class="p">,</span>
                     <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">stub</span><span class="o">.</span><span class="n">quoted_query_name</span><span class="p">,</span>
                     <span class="n">ops_key</span><span class="o">=</span><span class="n">ops_key</span><span class="p">,</span>
-                <span class="p">),</span>
+                <span class="p">)</span>
+            <span class="n">new_stub</span> <span class="o">=</span> <span class="n">NearSQLContainer</span><span class="p">(</span>
+                <span class="n">near_sql</span><span class="o">=</span><span class="n">new_stub_cte</span><span class="p">,</span>
                 <span class="n">force_sql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_sql</span><span class="p">,</span>
+                <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
                 <span class="n">public_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">public_name</span><span class="p">,</span>
                 <span class="n">public_name_quoted</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">public_name_quoted</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">cte_cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">ops_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
-                <span class="n">cte_cache</span><span class="p">[</span><span class="n">ops_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_stub</span>
+                <span class="n">cte_cache</span><span class="p">[</span><span class="n">ops_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_stub_cte</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
             <span class="n">new_stub</span> <span class="o">=</span> <span class="n">NearSQLContainer</span><span class="p">(</span>
                 <span class="n">near_sql</span><span class="o">=</span><span class="n">stub</span><span class="p">,</span>
                 <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
                 <span class="n">public_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">public_name</span><span class="p">,</span>
                 <span class="n">public_name_quoted</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">public_name_quoted</span><span class="p">,</span>
             <span class="p">)</span>
@@ -1097,16 +1094,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">public_name</span> <span class="o">=</span> <span class="n">public_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">public_name_quoted</span> <span class="o">=</span> <span class="n">public_name_quoted</span>
 
-    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;NearSQLContainer&#39;</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;shallow copy&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">NearSQLContainer</span><span class="p">(</span>
-            <span class="n">near_sql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">near_sql</span><span class="p">,</span>
-            <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
-            <span class="n">force_sql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_sql</span><span class="p">,</span>
-            <span class="n">public_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">public_name</span><span class="p">,</span>
-            <span class="n">public_name_quoted</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">public_name_quoted</span>
-        <span class="p">)</span>
-
     <span class="k">def</span> <span class="nf">convert_subsql</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="o">*</span><span class="p">,</span>
@@ -1156,13 +1143,19 @@
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">NearSQLContainer</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">stub</span><span class="o">.</span><span class="n">is_table</span><span class="p">:</span>
             <span class="c1"># first check cache</span>
-            <span class="n">ops_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">ops_key</span>
+            <span class="n">ops_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">ops_key</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">cte_cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">ops_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="n">stored_stub</span> <span class="o">=</span> <span class="n">cte_cache</span><span class="p">[</span><span class="n">ops_key</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-                    <span class="n">stored_stub</span><span class="o">.</span><span class="n">public_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">public_name</span>
-                    <span class="n">stored_stub</span><span class="o">.</span><span class="n">public_name_quoted</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">public_name_quoted</span>
-                    <span class="k">return</span> <span class="n">stored_stub</span><span class="p">,</span> <span class="p">[]</span>
+                    <span class="n">retrieved_cte</span> <span class="o">=</span> <span class="n">cte_cache</span><span class="p">[</span><span class="n">ops_key</span><span class="p">]</span>
+                    <span class="c1"># copy in context fields</span>
+                    <span class="n">new_stub</span> <span class="o">=</span> <span class="n">NearSQLContainer</span><span class="p">(</span>
+                        <span class="n">near_sql</span><span class="o">=</span><span class="n">retrieved_cte</span><span class="p">,</span>
+                        <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
+                        <span class="n">force_sql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_sql</span><span class="p">,</span>
+                        <span class="n">public_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">public_name</span><span class="p">,</span>
+                        <span class="n">public_name_quoted</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">public_name_quoted</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="k">return</span> <span class="n">new_stub</span><span class="p">,</span> <span class="p">[]</span>
                 <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
                     <span class="k">pass</span>
             <span class="c1"># replace step with a reference</span>
@@ -1173,26 +1166,30 @@
                         <span class="n">NearSQLContainer</span><span class="p">(</span>
                             <span class="n">near_sql</span><span class="o">=</span><span class="n">stub</span><span class="p">,</span>
                             <span class="n">force_sql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_sql</span><span class="p">,</span>
+                            <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
                         <span class="p">),</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
-            <span class="n">new_stub</span> <span class="o">=</span> <span class="n">NearSQLContainer</span><span class="p">(</span>
-                <span class="n">near_sql</span><span class="o">=</span><span class="n">NearSQLCommonTableExpression</span><span class="p">(</span>
+            <span class="n">new_stub_cte</span> <span class="o">=</span> <span class="n">NearSQLCommonTableExpression</span><span class="p">(</span>
                     <span class="n">query_name</span><span class="o">=</span><span class="n">stub</span><span class="o">.</span><span class="n">query_name</span><span class="p">,</span>
                     <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">stub</span><span class="o">.</span><span class="n">quoted_query_name</span><span class="p">,</span>
                     <span class="n">ops_key</span><span class="o">=</span><span class="n">ops_key</span><span class="p">,</span>
-                <span class="p">),</span>
+                <span class="p">)</span>
+            <span class="n">new_stub</span> <span class="o">=</span> <span class="n">NearSQLContainer</span><span class="p">(</span>
+                <span class="n">near_sql</span><span class="o">=</span><span class="n">new_stub_cte</span><span class="p">,</span>
                 <span class="n">force_sql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_sql</span><span class="p">,</span>
+                <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
                 <span class="n">public_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">public_name</span><span class="p">,</span>
                 <span class="n">public_name_quoted</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">public_name_quoted</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">cte_cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">ops_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
-                <span class="n">cte_cache</span><span class="p">[</span><span class="n">ops_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_stub</span>
+                <span class="n">cte_cache</span><span class="p">[</span><span class="n">ops_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_stub_cte</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
             <span class="n">new_stub</span> <span class="o">=</span> <span class="n">NearSQLContainer</span><span class="p">(</span>
                 <span class="n">near_sql</span><span class="o">=</span><span class="n">stub</span><span class="p">,</span>
                 <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
                 <span class="n">public_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">public_name</span><span class="p">,</span>
                 <span class="n">public_name_quoted</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">public_name_quoted</span><span class="p">,</span>
             <span class="p">)</span>
@@ -1249,34 +1246,6 @@
         </details>
 
     
-
-                            </div>
-                            <div id="NearSQLContainer.copy" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#NearSQLContainer.copy">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">copy</span><span class="signature">(self) -&gt; <a href="#NearSQLContainer">data_algebra.near_sql.NearSQLContainer</a></span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;NearSQLContainer&#39;</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;shallow copy&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">NearSQLContainer</span><span class="p">(</span>
-            <span class="n">near_sql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">near_sql</span><span class="p">,</span>
-            <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
-            <span class="n">force_sql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_sql</span><span class="p">,</span>
-            <span class="n">public_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">public_name</span><span class="p">,</span>
-            <span class="n">public_name_quoted</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">public_name_quoted</span>
-        <span class="p">)</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>shallow copy</p>
-</div>
-
 
                             </div>
                             <div id="NearSQLContainer.convert_subsql" class="classattr">
@@ -1364,13 +1333,19 @@
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">NearSQLContainer</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">stub</span><span class="o">.</span><span class="n">is_table</span><span class="p">:</span>
             <span class="c1"># first check cache</span>
-            <span class="n">ops_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">ops_key</span>
+            <span class="n">ops_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">ops_key</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">cte_cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">ops_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="n">stored_stub</span> <span class="o">=</span> <span class="n">cte_cache</span><span class="p">[</span><span class="n">ops_key</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-                    <span class="n">stored_stub</span><span class="o">.</span><span class="n">public_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">public_name</span>
-                    <span class="n">stored_stub</span><span class="o">.</span><span class="n">public_name_quoted</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">public_name_quoted</span>
-                    <span class="k">return</span> <span class="n">stored_stub</span><span class="p">,</span> <span class="p">[]</span>
+                    <span class="n">retrieved_cte</span> <span class="o">=</span> <span class="n">cte_cache</span><span class="p">[</span><span class="n">ops_key</span><span class="p">]</span>
+                    <span class="c1"># copy in context fields</span>
+                    <span class="n">new_stub</span> <span class="o">=</span> <span class="n">NearSQLContainer</span><span class="p">(</span>
+                        <span class="n">near_sql</span><span class="o">=</span><span class="n">retrieved_cte</span><span class="p">,</span>
+                        <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
+                        <span class="n">force_sql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_sql</span><span class="p">,</span>
+                        <span class="n">public_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">public_name</span><span class="p">,</span>
+                        <span class="n">public_name_quoted</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">public_name_quoted</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="k">return</span> <span class="n">new_stub</span><span class="p">,</span> <span class="p">[]</span>
                 <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
                     <span class="k">pass</span>
             <span class="c1"># replace step with a reference</span>
@@ -1381,26 +1356,30 @@
                         <span class="n">NearSQLContainer</span><span class="p">(</span>
                             <span class="n">near_sql</span><span class="o">=</span><span class="n">stub</span><span class="p">,</span>
                             <span class="n">force_sql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_sql</span><span class="p">,</span>
+                            <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
                         <span class="p">),</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
-            <span class="n">new_stub</span> <span class="o">=</span> <span class="n">NearSQLContainer</span><span class="p">(</span>
-                <span class="n">near_sql</span><span class="o">=</span><span class="n">NearSQLCommonTableExpression</span><span class="p">(</span>
+            <span class="n">new_stub_cte</span> <span class="o">=</span> <span class="n">NearSQLCommonTableExpression</span><span class="p">(</span>
                     <span class="n">query_name</span><span class="o">=</span><span class="n">stub</span><span class="o">.</span><span class="n">query_name</span><span class="p">,</span>
                     <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">stub</span><span class="o">.</span><span class="n">quoted_query_name</span><span class="p">,</span>
                     <span class="n">ops_key</span><span class="o">=</span><span class="n">ops_key</span><span class="p">,</span>
-                <span class="p">),</span>
+                <span class="p">)</span>
+            <span class="n">new_stub</span> <span class="o">=</span> <span class="n">NearSQLContainer</span><span class="p">(</span>
+                <span class="n">near_sql</span><span class="o">=</span><span class="n">new_stub_cte</span><span class="p">,</span>
                 <span class="n">force_sql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_sql</span><span class="p">,</span>
+                <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
                 <span class="n">public_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">public_name</span><span class="p">,</span>
                 <span class="n">public_name_quoted</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">public_name_quoted</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">cte_cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">ops_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
-                <span class="n">cte_cache</span><span class="p">[</span><span class="n">ops_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_stub</span>
+                <span class="n">cte_cache</span><span class="p">[</span><span class="n">ops_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_stub_cte</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
             <span class="n">new_stub</span> <span class="o">=</span> <span class="n">NearSQLContainer</span><span class="p">(</span>
                 <span class="n">near_sql</span><span class="o">=</span><span class="n">stub</span><span class="p">,</span>
                 <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
                 <span class="n">public_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">public_name</span><span class="p">,</span>
                 <span class="n">public_name_quoted</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">public_name_quoted</span><span class="p">,</span>
             <span class="p">)</span>

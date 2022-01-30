@@ -155,16 +155,6 @@ class NearSQLContainer:
         self.public_name = public_name
         self.public_name_quoted = public_name_quoted
 
-    def copy(self) -> 'NearSQLContainer':
-        """shallow copy"""
-        return NearSQLContainer(
-            near_sql=self.near_sql,
-            columns=self.columns,
-            force_sql=self.force_sql,
-            public_name=self.public_name,
-            public_name_quoted=self.public_name_quoted
-        )
-
     def convert_subsql(
             self,
             *,
@@ -214,13 +204,19 @@ class NearSQLContainer:
             assert isinstance(v[1], NearSQLContainer)
         if not stub.is_table:
             # first check cache
-            ops_key = self.near_sql.ops_key
+            ops_key = f"{self.near_sql.ops_key}_{self.columns}"
             if (cte_cache is not None) and (ops_key is not None):
                 try:
-                    stored_stub = cte_cache[ops_key].copy()
-                    stored_stub.public_name = self.public_name
-                    stored_stub.public_name_quoted = self.public_name_quoted
-                    return stored_stub, []
+                    retrieved_cte = cte_cache[ops_key]
+                    # copy in context fields
+                    new_stub = NearSQLContainer(
+                        near_sql=retrieved_cte,
+                        columns=self.columns,
+                        force_sql=self.force_sql,
+                        public_name=self.public_name,
+                        public_name_quoted=self.public_name_quoted,
+                    )
+                    return new_stub, []
                 except KeyError:
                     pass
             # replace step with a reference
@@ -231,26 +227,30 @@ class NearSQLContainer:
                         NearSQLContainer(
                             near_sql=stub,
                             force_sql=self.force_sql,
+                            columns=self.columns,
                         ),
                     )
                 )
-            new_stub = NearSQLContainer(
-                near_sql=NearSQLCommonTableExpression(
+            new_stub_cte = NearSQLCommonTableExpression(
                     query_name=stub.query_name,
                     quoted_query_name=stub.quoted_query_name,
                     ops_key=ops_key,
-                ),
+                )
+            new_stub = NearSQLContainer(
+                near_sql=new_stub_cte,
                 force_sql=self.force_sql,
+                columns=self.columns,
                 public_name=self.public_name,
                 public_name_quoted=self.public_name_quoted,
             )
             if (cte_cache is not None) and (ops_key is not None):
-                cte_cache[ops_key] = new_stub
+                cte_cache[ops_key] = new_stub_cte
         else:
             assert len(sequence) == 0
             new_stub = NearSQLContainer(
                 near_sql=stub,
                 force_sql=True,
+                columns=self.columns,
                 public_name=self.public_name,
                 public_name_quoted=self.public_name_quoted,
             )

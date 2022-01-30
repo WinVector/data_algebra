@@ -46,7 +46,6 @@ class SQLFormatOptions(SimpleNamespace):
         assert len(sql_indent.strip()) == 0
         assert isinstance(initial_commas, bool)
         assert isinstance(use_cte_elim, bool)
-        assert use_cte_elim == False  # TODO: remove
         SimpleNamespace.__init__(
             self,
             use_with=use_with,
