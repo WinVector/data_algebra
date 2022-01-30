@@ -4,8 +4,10 @@ import data_algebra
 import data_algebra.test_util
 import data_algebra.util
 from data_algebra.data_ops import *
+import data_algebra.BigQuery
 import data_algebra.SQLite
 import data_algebra.MySQL
+from data_algebra.sql_format_options import SQLFormatOptions
 
 
 def test_sqlite_joins_left_to_right():
@@ -18,11 +20,9 @@ def test_sqlite_joins_left_to_right():
             "v2": [None, 1, 2, 7, 8],
         }
     )
-
     d2 = data_algebra.default_data_model.pd.DataFrame(
         {"g": ["c", "b", "b"], "v1": [None, 1, None], "v2": [1, None, 2],}
     )
-
     ops_1 = descr(d1=d1).natural_join(b=descr(d2=d2), by=["g"], jointype="left")
     expect_1 = data_algebra.default_data_model.pd.DataFrame(
         {
@@ -39,7 +39,6 @@ def test_sqlite_joins_left_to_right():
         expect=expect_1,
         models_to_skip={str(data_algebra.MySQL.MySQLModel())},
     )
-
     ops_2 = descr(d1=d1).natural_join(b=descr(d2=d2), by=["g"], jointype="right")
     expect_2 = data_algebra.default_data_model.pd.DataFrame(
         {
@@ -56,10 +55,8 @@ def test_sqlite_joins_left_to_right():
         expect=expect_2,
         models_to_skip={str(data_algebra.MySQL.MySQLModel())},
     )
-
     # check test is strong enough
     assert not data_algebra.test_util.equivalent_frames(expect_1, expect_2)
-
     # naive reversal (interferes with coalesce)
     ops_n = descr(d2=d2).natural_join(b=descr(d1=d1), by=["g"], jointype="left")
     res_n = ops_n.eval({"d1": d1, "d2": d2})
@@ -75,24 +72,18 @@ def test_sqlite_joins_simulate_full_join():
             "v2": [None, 1, None, 7, 8],
         }
     )
-
     d2 = data_algebra.default_data_model.pd.DataFrame(
         {"g": ["c", "b", "b"], "v1": [None, 1, None], "v2": [1, None, 2],}
     )
-
     join_columns = ["g"]
-
     ops = descr(d1=d1).natural_join(b=descr(d2=d2), by=join_columns, jointype="full")
-
     res_pandas = ops.eval({"d1": d1, "d2": d2})
-
     data_algebra.test_util.check_transform(
         ops=ops,
         data={"d1": d1, "d2": d2},
         expect=res_pandas,
         models_to_skip={str(data_algebra.MySQL.MySQLModel())},
     )
-
     ops_simulate = (
         # get shared key set
         descr(d1=d1)
@@ -103,7 +94,6 @@ def test_sqlite_joins_simulate_full_join():
         .natural_join(b=descr(d1=d1), by=join_columns, jointype="left")
         .natural_join(b=descr(d2=d2), by=join_columns, jointype="left")
     )
-
     data_algebra.test_util.check_transform(
         ops=ops_simulate,
         data={"d1": d1, "d2": d2},
@@ -120,13 +110,10 @@ def test_sqlite_joins_staged():
             "v2": [None, 1, None, 7, 8],
         }
     )
-
     d2 = data_algebra.default_data_model.pd.DataFrame(
         {"g": ["c", "b", "b"], "v1": [None, 1, None], "v2": [1, None, 2],}
     )
-
     join_columns = ["g"]
-
     ops = (
         descr(d1=d1)
         .extend({"v1": "v1 * v1"})
@@ -134,12 +121,12 @@ def test_sqlite_joins_staged():
             b=(descr(d2=d2).extend({"v2": "v2 + v2"})), by=join_columns, jointype="full"
         )
     )
-
     res_pandas = ops.eval({"d1": d1, "d2": d2})
-
     data_algebra.test_util.check_transform(
         ops=ops,
         data={"d1": d1, "d2": d2},
         expect=res_pandas,
-        models_to_skip={str(data_algebra.MySQL.MySQLModel())},
+        models_to_skip={
+            data_algebra.MySQL.MySQLModel(),
+        },
     )

@@ -307,6 +307,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             identifier_quote='"',
             string_quote="'",
             sql_formatters=SQLite_formatters,
+            supports_cte_elim=False,
             on_joiner="AND",
             union_all_term_start="",
             union_all_term_end="",
