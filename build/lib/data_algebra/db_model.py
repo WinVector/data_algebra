@@ -1133,7 +1133,7 @@ class DBModel:
                 query_name=view_name,
                 quoted_query_name=self.quote_identifier(view_name),
                 sub_sql=subsql.to_bound_near_sql(columns=using),
-                ops_key=f"table({table_def.node_name}, {terms.keys()})",
+                ops_key=f"table({table_def.table_name}, {terms.keys()})",
             )
         return near_sql
 

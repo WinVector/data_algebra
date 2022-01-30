@@ -413,7 +413,7 @@ def check_transform_on_handles(
             for initial_commas in [True, False]:
                 for use_with in [True, False]:
                     for annotate in [True, False]:
-                        for use_cte_elim in [False]:  #  [True, False]:  # TODO: put back
+                        for use_cte_elim in [True, False]:
                             sql_format_options = SQLFormatOptions(
                                 use_with=use_with,
                                 annotate=annotate,

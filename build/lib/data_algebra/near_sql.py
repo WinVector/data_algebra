@@ -204,7 +204,9 @@ class NearSQLContainer:
             assert isinstance(v[1], NearSQLContainer)
         if not stub.is_table:
             # first check cache
-            ops_key = f"{self.near_sql.ops_key}_{self.columns}"
+            ops_key = f"{self.near_sql.ops_key}"
+            if self.columns is not None:
+                ops_key = f"{ops_key}_{list(self.columns)}"
             if (cte_cache is not None) and (ops_key is not None):
                 try:
                     retrieved_cte = cte_cache[ops_key]
