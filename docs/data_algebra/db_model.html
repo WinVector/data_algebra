@@ -400,10 +400,6 @@
         <span class="o">+</span> <span class="n">if_expr</span>
         <span class="o">+</span> <span class="s2">&quot; THEN &quot;</span>
         <span class="o">+</span> <span class="n">x_expr</span>
-        <span class="o">+</span> <span class="s2">&quot; WHEN NOT &quot;</span>
-        <span class="o">+</span> <span class="n">if_expr</span>
-        <span class="o">+</span> <span class="s2">&quot; THEN &quot;</span>
-        <span class="o">+</span> <span class="n">y_expr</span>
         <span class="o">+</span> <span class="s2">&quot; ELSE &quot;</span>
         <span class="o">+</span> <span class="n">y_expr</span>
         <span class="o">+</span> <span class="s2">&quot; END&quot;</span>
@@ -943,6 +939,7 @@
     <span class="n">drop_text</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">string_type</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">supports_with</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">supports_cte_elim</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="n">allow_extend_merges</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="n">default_SQL_format_options</span><span class="p">:</span> <span class="n">SQLFormatOptions</span>
     <span class="n">union_all_term_start</span><span class="p">:</span> <span class="nb">str</span>
@@ -965,6 +962,7 @@
         <span class="n">string_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;VARCHAR&quot;</span><span class="p">,</span>
         <span class="n">float_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;FLOAT64&#39;</span><span class="p">,</span>
         <span class="n">supports_with</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">supports_cte_elim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">allow_extend_merges</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">default_SQL_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">union_all_term_start</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;(&quot;</span><span class="p">,</span>
@@ -996,6 +994,7 @@
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_SQL_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span> <span class="o">=</span> <span class="n">default_SQL_format_options</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">supports_with</span> <span class="o">=</span> <span class="n">supports_with</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">supports_cte_elim</span> <span class="o">=</span> <span class="n">supports_cte_elim</span> <span class="ow">and</span> <span class="n">supports_with</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">allow_extend_merges</span> <span class="o">=</span> <span class="n">allow_extend_merges</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">union_all_term_start</span> <span class="o">=</span> <span class="n">union_all_term_start</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">union_all_term_end</span> <span class="o">=</span> <span class="n">union_all_term_end</span>
@@ -1484,7 +1483,7 @@
             <span class="n">annotation</span><span class="o">=</span><span class="n">annotation</span><span class="p">,</span>
             <span class="n">mergeable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">declared_term_dependencies</span><span class="o">=</span><span class="n">declared_term_dependencies</span><span class="p">,</span>
-            <span class="n">ops_key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">extend_node</span><span class="p">),</span>
+            <span class="n">ops_key</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;extend(</span><span class="si">{</span><span class="n">extend_node</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">terms</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
@@ -1526,7 +1525,7 @@
             <span class="n">annotation</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span>
                 <span class="n">project_node</span><span class="o">.</span><span class="n">to_python_src_</span><span class="p">(</span><span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
             <span class="p">),</span>
-            <span class="n">ops_key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">project_node</span><span class="p">),</span>
+            <span class="n">ops_key</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;project(</span><span class="si">{</span><span class="n">project_node</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">terms</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
@@ -1573,7 +1572,7 @@
                     <span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span>
                 <span class="p">)</span>
             <span class="p">),</span>
-            <span class="n">ops_key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">select_rows_node</span><span class="p">),</span>
+            <span class="n">ops_key</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;select(</span><span class="si">{</span><span class="n">select_rows_node</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">terms</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
@@ -1696,7 +1695,7 @@
             <span class="n">annotation</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span>
                 <span class="n">order_node</span><span class="o">.</span><span class="n">to_python_src_</span><span class="p">(</span><span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
             <span class="p">),</span>
-            <span class="n">ops_key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">order_node</span><span class="p">),</span>
+            <span class="n">ops_key</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;order(</span><span class="si">{</span><span class="n">order_node</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>  <span class="c1"># no terms</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
@@ -1736,7 +1735,7 @@
             <span class="n">annotation</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span>
                 <span class="n">rename_node</span><span class="o">.</span><span class="n">to_python_src_</span><span class="p">(</span><span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
             <span class="p">),</span>
-            <span class="n">ops_key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">rename_node</span><span class="p">),</span>
+            <span class="n">ops_key</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;rename(</span><span class="si">{</span><span class="n">rename_node</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">terms</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
@@ -1875,7 +1874,7 @@
             <span class="n">annotation</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span>
                 <span class="n">join_node</span><span class="o">.</span><span class="n">to_python_src_</span><span class="p">(</span><span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
             <span class="p">),</span>
-            <span class="n">ops_key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">join_node</span><span class="p">),</span>
+            <span class="n">ops_key</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;join(</span><span class="si">{</span><span class="n">join_node</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">terms</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
@@ -1932,7 +1931,7 @@
             <span class="n">annotation</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span>
                 <span class="n">concat_node</span><span class="o">.</span><span class="n">to_python_src_</span><span class="p">(</span><span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
             <span class="p">),</span>
-            <span class="n">ops_key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">concat_node</span><span class="p">),</span>
+            <span class="n">ops_key</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;concat(</span><span class="si">{</span><span class="n">concat_node</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">terms</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
@@ -1993,7 +1992,7 @@
         <span class="n">sql_str_list</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">sql_format_options</span><span class="o">.</span><span class="n">use_with</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">supports_with</span><span class="p">:</span>
             <span class="n">cte_cache</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">if</span> <span class="n">sql_format_options</span><span class="o">.</span><span class="n">use_with</span> <span class="ow">and</span> <span class="n">sql_format_options</span><span class="o">.</span><span class="n">use_cte_elim</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sql_format_options</span><span class="o">.</span><span class="n">use_cte_elim</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">supports_with</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">supports_cte_elim</span><span class="p">:</span>
                 <span class="n">cte_cache</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
             <span class="n">sequence</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">to_with_form</span><span class="p">(</span><span class="n">cte_cache</span><span class="o">=</span><span class="n">cte_cache</span><span class="p">)</span>
             <span class="n">len_sequence</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="o">.</span><span class="n">previous_steps</span><span class="p">)</span>
@@ -2574,6 +2573,7 @@
     <span class="n">drop_text</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">string_type</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">supports_with</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">supports_cte_elim</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="n">allow_extend_merges</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="n">default_SQL_format_options</span><span class="p">:</span> <span class="n">SQLFormatOptions</span>
     <span class="n">union_all_term_start</span><span class="p">:</span> <span class="nb">str</span>
@@ -2596,6 +2596,7 @@
         <span class="n">string_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;VARCHAR&quot;</span><span class="p">,</span>
         <span class="n">float_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;FLOAT64&#39;</span><span class="p">,</span>
         <span class="n">supports_with</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">supports_cte_elim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">allow_extend_merges</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">default_SQL_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">union_all_term_start</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;(&quot;</span><span class="p">,</span>
@@ -2627,6 +2628,7 @@
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_SQL_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span> <span class="o">=</span> <span class="n">default_SQL_format_options</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">supports_with</span> <span class="o">=</span> <span class="n">supports_with</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">supports_cte_elim</span> <span class="o">=</span> <span class="n">supports_cte_elim</span> <span class="ow">and</span> <span class="n">supports_with</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">allow_extend_merges</span> <span class="o">=</span> <span class="n">allow_extend_merges</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">union_all_term_start</span> <span class="o">=</span> <span class="n">union_all_term_start</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">union_all_term_end</span> <span class="o">=</span> <span class="n">union_all_term_end</span>
@@ -3115,7 +3117,7 @@
             <span class="n">annotation</span><span class="o">=</span><span class="n">annotation</span><span class="p">,</span>
             <span class="n">mergeable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">declared_term_dependencies</span><span class="o">=</span><span class="n">declared_term_dependencies</span><span class="p">,</span>
-            <span class="n">ops_key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">extend_node</span><span class="p">),</span>
+            <span class="n">ops_key</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;extend(</span><span class="si">{</span><span class="n">extend_node</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">terms</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
@@ -3157,7 +3159,7 @@
             <span class="n">annotation</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span>
                 <span class="n">project_node</span><span class="o">.</span><span class="n">to_python_src_</span><span class="p">(</span><span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
             <span class="p">),</span>
-            <span class="n">ops_key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">project_node</span><span class="p">),</span>
+            <span class="n">ops_key</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;project(</span><span class="si">{</span><span class="n">project_node</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">terms</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
@@ -3204,7 +3206,7 @@
                     <span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span>
                 <span class="p">)</span>
             <span class="p">),</span>
-            <span class="n">ops_key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">select_rows_node</span><span class="p">),</span>
+            <span class="n">ops_key</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;select(</span><span class="si">{</span><span class="n">select_rows_node</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">terms</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
@@ -3327,7 +3329,7 @@
             <span class="n">annotation</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span>
                 <span class="n">order_node</span><span class="o">.</span><span class="n">to_python_src_</span><span class="p">(</span><span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
             <span class="p">),</span>
-            <span class="n">ops_key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">order_node</span><span class="p">),</span>
+            <span class="n">ops_key</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;order(</span><span class="si">{</span><span class="n">order_node</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>  <span class="c1"># no terms</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
@@ -3367,7 +3369,7 @@
             <span class="n">annotation</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span>
                 <span class="n">rename_node</span><span class="o">.</span><span class="n">to_python_src_</span><span class="p">(</span><span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
             <span class="p">),</span>
-            <span class="n">ops_key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">rename_node</span><span class="p">),</span>
+            <span class="n">ops_key</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;rename(</span><span class="si">{</span><span class="n">rename_node</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">terms</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
@@ -3506,7 +3508,7 @@
             <span class="n">annotation</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span>
                 <span class="n">join_node</span><span class="o">.</span><span class="n">to_python_src_</span><span class="p">(</span><span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
             <span class="p">),</span>
-            <span class="n">ops_key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">join_node</span><span class="p">),</span>
+            <span class="n">ops_key</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;join(</span><span class="si">{</span><span class="n">join_node</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">terms</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
@@ -3563,7 +3565,7 @@
             <span class="n">annotation</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span>
                 <span class="n">concat_node</span><span class="o">.</span><span class="n">to_python_src_</span><span class="p">(</span><span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
             <span class="p">),</span>
-            <span class="n">ops_key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">concat_node</span><span class="p">),</span>
+            <span class="n">ops_key</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;concat(</span><span class="si">{</span><span class="n">concat_node</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">terms</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
@@ -3624,7 +3626,7 @@
         <span class="n">sql_str_list</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">sql_format_options</span><span class="o">.</span><span class="n">use_with</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">supports_with</span><span class="p">:</span>
             <span class="n">cte_cache</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">if</span> <span class="n">sql_format_options</span><span class="o">.</span><span class="n">use_with</span> <span class="ow">and</span> <span class="n">sql_format_options</span><span class="o">.</span><span class="n">use_cte_elim</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sql_format_options</span><span class="o">.</span><span class="n">use_cte_elim</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">supports_with</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">supports_cte_elim</span><span class="p">:</span>
                 <span class="n">cte_cache</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
             <span class="n">sequence</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">to_with_form</span><span class="p">(</span><span class="n">cte_cache</span><span class="o">=</span><span class="n">cte_cache</span><span class="p">)</span>
             <span class="n">len_sequence</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="o">.</span><span class="n">previous_steps</span><span class="p">)</span>
@@ -4073,6 +4075,7 @@
     string_type: str = &#39;VARCHAR&#39;,
     float_type: str = &#39;FLOAT64&#39;,
     supports_with: bool = True,
+    supports_cte_elim: bool = True,
     allow_extend_merges: bool = True,
     default_SQL_format_options=None,
     union_all_term_start: str = &#39;(&#39;,
@@ -4097,6 +4100,7 @@
         <span class="n">string_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;VARCHAR&quot;</span><span class="p">,</span>
         <span class="n">float_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;FLOAT64&#39;</span><span class="p">,</span>
         <span class="n">supports_with</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">supports_cte_elim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">allow_extend_merges</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">default_SQL_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">union_all_term_start</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;(&quot;</span><span class="p">,</span>
@@ -4128,6 +4132,7 @@
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_SQL_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span> <span class="o">=</span> <span class="n">default_SQL_format_options</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">supports_with</span> <span class="o">=</span> <span class="n">supports_with</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">supports_cte_elim</span> <span class="o">=</span> <span class="n">supports_cte_elim</span> <span class="ow">and</span> <span class="n">supports_with</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">allow_extend_merges</span> <span class="o">=</span> <span class="n">allow_extend_merges</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">union_all_term_start</span> <span class="o">=</span> <span class="n">union_all_term_start</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">union_all_term_end</span> <span class="o">=</span> <span class="n">union_all_term_end</span>
@@ -4924,7 +4929,7 @@
             <span class="n">annotation</span><span class="o">=</span><span class="n">annotation</span><span class="p">,</span>
             <span class="n">mergeable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">declared_term_dependencies</span><span class="o">=</span><span class="n">declared_term_dependencies</span><span class="p">,</span>
-            <span class="n">ops_key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">extend_node</span><span class="p">),</span>
+            <span class="n">ops_key</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;extend(</span><span class="si">{</span><span class="n">extend_node</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">terms</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 </pre></div>
@@ -4991,7 +4996,7 @@
             <span class="n">annotation</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span>
                 <span class="n">project_node</span><span class="o">.</span><span class="n">to_python_src_</span><span class="p">(</span><span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
             <span class="p">),</span>
-            <span class="n">ops_key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">project_node</span><span class="p">),</span>
+            <span class="n">ops_key</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;project(</span><span class="si">{</span><span class="n">project_node</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">terms</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 </pre></div>
@@ -5063,7 +5068,7 @@
                     <span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span>
                 <span class="p">)</span>
             <span class="p">),</span>
-            <span class="n">ops_key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">select_rows_node</span><span class="p">),</span>
+            <span class="n">ops_key</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;select(</span><span class="si">{</span><span class="n">select_rows_node</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">terms</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 </pre></div>
@@ -5261,7 +5266,7 @@
             <span class="n">annotation</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span>
                 <span class="n">order_node</span><span class="o">.</span><span class="n">to_python_src_</span><span class="p">(</span><span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
             <span class="p">),</span>
-            <span class="n">ops_key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">order_node</span><span class="p">),</span>
+            <span class="n">ops_key</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;order(</span><span class="si">{</span><span class="n">order_node</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>  <span class="c1"># no terms</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 </pre></div>
@@ -5326,7 +5331,7 @@
             <span class="n">annotation</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span>
                 <span class="n">rename_node</span><span class="o">.</span><span class="n">to_python_src_</span><span class="p">(</span><span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
             <span class="p">),</span>
-            <span class="n">ops_key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">rename_node</span><span class="p">),</span>
+            <span class="n">ops_key</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;rename(</span><span class="si">{</span><span class="n">rename_node</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">terms</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 </pre></div>
@@ -5437,7 +5442,7 @@
             <span class="n">annotation</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span>
                 <span class="n">join_node</span><span class="o">.</span><span class="n">to_python_src_</span><span class="p">(</span><span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
             <span class="p">),</span>
-            <span class="n">ops_key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">join_node</span><span class="p">),</span>
+            <span class="n">ops_key</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;join(</span><span class="si">{</span><span class="n">join_node</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">terms</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 </pre></div>
@@ -5519,7 +5524,7 @@
             <span class="n">annotation</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span>
                 <span class="n">concat_node</span><span class="o">.</span><span class="n">to_python_src_</span><span class="p">(</span><span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
             <span class="p">),</span>
-            <span class="n">ops_key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">concat_node</span><span class="p">),</span>
+            <span class="n">ops_key</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;concat(</span><span class="si">{</span><span class="n">concat_node</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">terms</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 </pre></div>
@@ -5645,7 +5650,7 @@
         <span class="n">sql_str_list</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">sql_format_options</span><span class="o">.</span><span class="n">use_with</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">supports_with</span><span class="p">:</span>
             <span class="n">cte_cache</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">if</span> <span class="n">sql_format_options</span><span class="o">.</span><span class="n">use_with</span> <span class="ow">and</span> <span class="n">sql_format_options</span><span class="o">.</span><span class="n">use_cte_elim</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sql_format_options</span><span class="o">.</span><span class="n">use_cte_elim</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">supports_with</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">supports_cte_elim</span><span class="p">:</span>
                 <span class="n">cte_cache</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
             <span class="n">sequence</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">to_with_form</span><span class="p">(</span><span class="n">cte_cache</span><span class="o">=</span><span class="n">cte_cache</span><span class="p">)</span>
             <span class="n">len_sequence</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="o">.</span><span class="n">previous_steps</span><span class="p">)</span>

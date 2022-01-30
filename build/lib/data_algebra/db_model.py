@@ -194,10 +194,6 @@ def _db_where_expr(dbmodel, expression):
         + if_expr
         + " THEN "
         + x_expr
-        + " WHEN NOT "
-        + if_expr
-        + " THEN "
-        + y_expr
         + " ELSE "
         + y_expr
         + " END"
@@ -737,6 +733,7 @@ class DBModel:
     drop_text: str
     string_type: str
     supports_with: bool
+    supports_cte_elim: bool
     allow_extend_merges: bool
     default_SQL_format_options: SQLFormatOptions
     union_all_term_start: str
@@ -759,6 +756,7 @@ class DBModel:
         string_type: str = "VARCHAR",
         float_type: str = 'FLOAT64',
         supports_with: bool = True,
+        supports_cte_elim: bool = True,
         allow_extend_merges: bool = True,
         default_SQL_format_options=None,
         union_all_term_start: str = "(",
@@ -790,6 +788,7 @@ class DBModel:
         assert isinstance(default_SQL_format_options, SQLFormatOptions)
         self.default_SQL_format_options = default_SQL_format_options
         self.supports_with = supports_with
+        self.supports_cte_elim = supports_cte_elim and supports_with
         self.allow_extend_merges = allow_extend_merges
         self.union_all_term_start = union_all_term_start
         self.union_all_term_end = union_all_term_end
@@ -1278,7 +1277,7 @@ class DBModel:
             annotation=annotation,
             mergeable=True,
             declared_term_dependencies=declared_term_dependencies,
-            ops_key=str(extend_node),
+            ops_key=f"extend({extend_node}, {terms.keys()})",
         )
         return near_sql
 
@@ -1320,7 +1319,7 @@ class DBModel:
             annotation=str(
                 project_node.to_python_src_(print_sources=False, indent=-1)
             ),
-            ops_key=str(project_node),
+            ops_key=f"project({project_node}, {terms.keys()})",
         )
         return near_sql
 
@@ -1367,7 +1366,7 @@ class DBModel:
                     print_sources=False, indent=-1
                 )
             ),
-            ops_key=str(select_rows_node),
+            ops_key=f"select({select_rows_node}, {terms.keys()})",
         )
         return near_sql
 
@@ -1490,7 +1489,7 @@ class DBModel:
             annotation=str(
                 order_node.to_python_src_(print_sources=False, indent=-1)
             ),
-            ops_key=str(order_node),
+            ops_key=f"order({order_node})",  # no terms
         )
         return near_sql
 
@@ -1530,7 +1529,7 @@ class DBModel:
             annotation=str(
                 rename_node.to_python_src_(print_sources=False, indent=-1)
             ),
-            ops_key=str(rename_node),
+            ops_key=f"rename({rename_node}, {terms.keys()})",
         )
         return near_sql
 
@@ -1669,7 +1668,7 @@ class DBModel:
             annotation=str(
                 join_node.to_python_src_(print_sources=False, indent=-1)
             ),
-            ops_key=str(join_node),
+            ops_key=f"join({join_node}, {terms.keys()})",
         )
         return near_sql
 
@@ -1726,7 +1725,7 @@ class DBModel:
             annotation=str(
                 concat_node.to_python_src_(print_sources=False, indent=-1)
             ),
-            ops_key=str(concat_node),
+            ops_key=f"concat({concat_node}, {terms.keys()})",
         )
         return near_sql
 
@@ -1787,7 +1786,7 @@ class DBModel:
         sql_str_list = None
         if sql_format_options.use_with and self.supports_with:
             cte_cache: Optional[Dict] = None
-            if sql_format_options.use_with and sql_format_options.use_cte_elim:
+            if sql_format_options.use_cte_elim and self.supports_with and self.supports_cte_elim:
                 cte_cache = dict()
             sequence = near_sql.to_with_form(cte_cache=cte_cache)
             len_sequence = len(sequence.previous_steps)

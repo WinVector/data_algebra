@@ -77,7 +77,7 @@
 <span class="sd">    :param initial_commas: bool = False, if True write initial commas instead of after commas</span>
 <span class="sd">    :param warn_on_method_support: bool = True, if True warn on translation to untrusted methods</span>
 <span class="sd">    :param warn_on_novel_methods: bool = True, if True warn on translation to unrecognized methods</span>
-<span class="sd">    :param use_cte_elim: bool = False, if True optimzie SQL by re-using common table expressions (experimental!) NOT WORKING YET</span>
+<span class="sd">    :param use_cte_elim: bool = False, if True optimzie SQL by re-using common table expressions (experimental! NOT WORKING YET)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -99,7 +99,7 @@
 <span class="sd">        :param initial_commas: bool = False, if True write initial commas instead of after commas</span>
 <span class="sd">        :param warn_on_method_support: bool = True, if True warn on translation to untrusted methods</span>
 <span class="sd">        :param warn_on_novel_methods: bool = True, if True warn on translation to unrecognized methods</span>
-<span class="sd">        :param use_cte_elim: bool = False, if True optimize SQL by re-using common table expressions (experimental!) NOT WORKING YET</span>
+<span class="sd">        :param use_cte_elim: bool = False, if True optimize SQL by re-using common table expressions (experimental! NOT WORKING YET)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">use_with</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annotate</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
@@ -108,7 +108,7 @@
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">sql_indent</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">initial_commas</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">use_cte_elim</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="n">use_cte_elim</span> <span class="o">==</span> <span class="kc">False</span>  <span class="c1"># TODO: fix cte paths and remove this guard</span>
+        <span class="k">assert</span> <span class="n">use_cte_elim</span> <span class="o">==</span> <span class="kc">False</span>  <span class="c1"># TODO: remove</span>
         <span class="n">SimpleNamespace</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">use_with</span><span class="o">=</span><span class="n">use_with</span><span class="p">,</span>
@@ -156,7 +156,7 @@
 <span class="sd">    :param initial_commas: bool = False, if True write initial commas instead of after commas</span>
 <span class="sd">    :param warn_on_method_support: bool = True, if True warn on translation to untrusted methods</span>
 <span class="sd">    :param warn_on_novel_methods: bool = True, if True warn on translation to unrecognized methods</span>
-<span class="sd">    :param use_cte_elim: bool = False, if True optimzie SQL by re-using common table expressions (experimental!) NOT WORKING YET</span>
+<span class="sd">    :param use_cte_elim: bool = False, if True optimzie SQL by re-using common table expressions (experimental! NOT WORKING YET)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -178,7 +178,7 @@
 <span class="sd">        :param initial_commas: bool = False, if True write initial commas instead of after commas</span>
 <span class="sd">        :param warn_on_method_support: bool = True, if True warn on translation to untrusted methods</span>
 <span class="sd">        :param warn_on_novel_methods: bool = True, if True warn on translation to unrecognized methods</span>
-<span class="sd">        :param use_cte_elim: bool = False, if True optimize SQL by re-using common table expressions (experimental!) NOT WORKING YET</span>
+<span class="sd">        :param use_cte_elim: bool = False, if True optimize SQL by re-using common table expressions (experimental! NOT WORKING YET)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">use_with</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annotate</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
@@ -187,7 +187,7 @@
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">sql_indent</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">initial_commas</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">use_cte_elim</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="n">use_cte_elim</span> <span class="o">==</span> <span class="kc">False</span>  <span class="c1"># TODO: fix cte paths and remove this guard</span>
+        <span class="k">assert</span> <span class="n">use_cte_elim</span> <span class="o">==</span> <span class="kc">False</span>  <span class="c1"># TODO: remove</span>
         <span class="n">SimpleNamespace</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">use_with</span><span class="o">=</span><span class="n">use_with</span><span class="p">,</span>
@@ -221,7 +221,7 @@
 :param initial_commas: bool = False, if True write initial commas instead of after commas
 :param warn_on_method_support: bool = True, if True warn on translation to untrusted methods
 :param warn_on_novel_methods: bool = True, if True warn on translation to unrecognized methods
-:param use_cte_elim: bool = False, if True optimzie SQL by re-using common table expressions (experimental!) NOT WORKING YET</p>
+:param use_cte_elim: bool = False, if True optimzie SQL by re-using common table expressions (experimental! NOT WORKING YET)</p>
 </div>
 
 
@@ -261,7 +261,7 @@
 <span class="sd">        :param initial_commas: bool = False, if True write initial commas instead of after commas</span>
 <span class="sd">        :param warn_on_method_support: bool = True, if True warn on translation to untrusted methods</span>
 <span class="sd">        :param warn_on_novel_methods: bool = True, if True warn on translation to unrecognized methods</span>
-<span class="sd">        :param use_cte_elim: bool = False, if True optimize SQL by re-using common table expressions (experimental!) NOT WORKING YET</span>
+<span class="sd">        :param use_cte_elim: bool = False, if True optimize SQL by re-using common table expressions (experimental! NOT WORKING YET)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">use_with</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annotate</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
@@ -270,7 +270,7 @@
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">sql_indent</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">initial_commas</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">use_cte_elim</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="n">use_cte_elim</span> <span class="o">==</span> <span class="kc">False</span>  <span class="c1"># TODO: fix cte paths and remove this guard</span>
+        <span class="k">assert</span> <span class="n">use_cte_elim</span> <span class="o">==</span> <span class="kc">False</span>  <span class="c1"># TODO: remove</span>
         <span class="n">SimpleNamespace</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">use_with</span><span class="o">=</span><span class="n">use_with</span><span class="p">,</span>
@@ -293,7 +293,7 @@
 :param initial_commas: bool = False, if True write initial commas instead of after commas
 :param warn_on_method_support: bool = True, if True warn on translation to untrusted methods
 :param warn_on_novel_methods: bool = True, if True warn on translation to unrecognized methods
-:param use_cte_elim: bool = False, if True optimize SQL by re-using common table expressions (experimental!) NOT WORKING YET</p>
+:param use_cte_elim: bool = False, if True optimize SQL by re-using common table expressions (experimental! NOT WORKING YET)</p>
 </div>
 
 
