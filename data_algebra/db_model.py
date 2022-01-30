@@ -194,10 +194,6 @@ def _db_where_expr(dbmodel, expression):
         + if_expr
         + " THEN "
         + x_expr
-        + " WHEN NOT "
-        + if_expr
-        + " THEN "
-        + y_expr
         + " ELSE "
         + y_expr
         + " END"
