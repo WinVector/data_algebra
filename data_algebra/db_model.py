@@ -649,6 +649,11 @@ db_expr_formatters = {
 db_default_op_replacements = {
     "==": "=",
     "cumsum": "SUM",
+    "cumcount": "COUNT",
+    "cummax": "MAX",
+    "cummin": "MIN",
+    "cumprod": "PROD",
+    "cummean": "AVG",
     "and": "AND",
     "&": "AND",
     "&&": "AND",
