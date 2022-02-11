@@ -22,7 +22,7 @@ def test_or_1():
         }
     )
 
-    ops = describe_table(d, table_name="d").select_rows("(ID == 3) | (ID == 4)")
+    ops = describe_table(d, table_name="d").select_rows("(ID == 3) or (ID == 4)")
 
     expect = data_algebra.default_data_model.pd.DataFrame(
         {"ID": [3, 4, 4, 4, 4], "OP": ["D", "C", "A", "D", "B"],}

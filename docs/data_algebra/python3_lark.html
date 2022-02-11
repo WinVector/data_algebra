@@ -71,8 +71,6 @@ Licence: https://github.com/lark-parser/lark/blob/master/LICENSE (MIT)</p>
 <span class="c1"># !_mul_op: &quot;*&quot;|&quot;@&quot;|&quot;/&quot;|&quot;%&quot;|&quot;//&quot;</span>
 <span class="c1"># redefined as</span>
 <span class="c1"># !_mul_op: &quot;*&quot;|&quot;/&quot;|&quot;%+%&quot;|&quot;%?%&quot;|&quot;%&quot;|&quot;//&quot;|&quot;%/%&quot;</span>
-<span class="c1"># added in or_test_sym and and_test_sym</span>
-<span class="c1"># removed expression &amp; and |</span>
 
 <span class="n">grammar</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">// Python 3 grammar for Lark</span>
@@ -164,15 +162,15 @@ Licence: https://github.com/lark-parser/lark/blob/master/LICENSE (MIT)</p>
 <span class="s2">?test_nocond: or_test | lambdef_nocond</span>
 <span class="s2">lambdef: &quot;lambda&quot; [varargslist] &quot;:&quot; test</span>
 <span class="s2">lambdef_nocond: &quot;lambda&quot; [varargslist] &quot;:&quot; test_nocond</span>
-<span class="s2">?or_test: or_test_sym (&quot;or&quot; or_test_sym)*</span>
-<span class="s2">?or_test_sym: and_test_sym (&quot;|&quot; and_test_sym)*</span>
-<span class="s2">?and_test_sym: and_test (&quot;&amp;&quot; and_test)*</span>
+<span class="s2">?or_test: and_test (&quot;or&quot; and_test)*</span>
 <span class="s2">?and_test: not_test (&quot;and&quot; not_test)*</span>
 <span class="s2">?not_test: &quot;not&quot; not_test -&gt; not</span>
 <span class="s2">         | comparison</span>
 <span class="s2">?comparison: expr (_comp_op expr)*</span>
 <span class="s2">star_expr: &quot;*&quot; expr</span>
-<span class="s2">?expr: shift_expr (&quot;^&quot; shift_expr)*</span>
+<span class="s2">?expr: xor_expr (&quot;|&quot; xor_expr)*</span>
+<span class="s2">?xor_expr: and_expr (&quot;^&quot; and_expr)*</span>
+<span class="s2">?and_expr: shift_expr (&quot;&amp;&quot; shift_expr)*</span>
 <span class="s2">?shift_expr: arith_expr (_shift_op arith_expr)*</span>
 <span class="s2">?arith_expr: term (_add_op term)*</span>
 <span class="s2">?term: factor (_mul_op factor)*</span>

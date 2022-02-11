@@ -18,8 +18,6 @@ Licence: https://github.com/lark-parser/lark/blob/master/LICENSE (MIT)
 # !_mul_op: "*"|"@"|"/"|"%"|"//"
 # redefined as
 # !_mul_op: "*"|"/"|"%+%"|"%?%"|"%"|"//"|"%/%"
-# added in or_test_sym and and_test_sym
-# removed expression & and |
 
 grammar = r"""
 // Python 3 grammar for Lark
@@ -111,15 +109,15 @@ suite: simple_stmt | _NEWLINE _INDENT stmt+ _DEDENT
 ?test_nocond: or_test | lambdef_nocond
 lambdef: "lambda" [varargslist] ":" test
 lambdef_nocond: "lambda" [varargslist] ":" test_nocond
-?or_test: or_test_sym ("or" or_test_sym)*
-?or_test_sym: and_test_sym ("|" and_test_sym)*
-?and_test_sym: and_test ("&" and_test)*
+?or_test: and_test ("or" and_test)*
 ?and_test: not_test ("and" not_test)*
 ?not_test: "not" not_test -> not
          | comparison
 ?comparison: expr (_comp_op expr)*
 star_expr: "*" expr
-?expr: shift_expr ("^" shift_expr)*
+?expr: xor_expr ("|" xor_expr)*
+?xor_expr: and_expr ("^" and_expr)*
+?and_expr: shift_expr ("&" shift_expr)*
 ?shift_expr: arith_expr (_shift_op arith_expr)*
 ?arith_expr: term (_add_op term)*
 ?term: factor (_mul_op factor)*

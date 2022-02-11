@@ -15,7 +15,7 @@ def test_parens_select_rows():
     })
     ops = (
         descr(d=d)
-            .select_rows('x > 1 & x < 4')
+            .select_rows('x > 1 and x < 4')
     )
     sql = data_algebra.SQLite.SQLiteModel().to_sql(ops)
     smushed_sql = re.sub(r'\s+', '', sql)
@@ -33,7 +33,7 @@ def test_parens_extend():
     })
     ops = (
         descr(d=d)
-            .extend({'y': 'x > 1 & x < 4'})
+            .extend({'y': 'x > 1 and x < 4'})
     )
     sql = data_algebra.SQLite.SQLiteModel().to_sql(
         ops,

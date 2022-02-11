@@ -259,7 +259,7 @@ def test_complex_expr_logic():
             "z": [True, False, False, True, True, False, False, True, False, False],
         }
     )
-    ops = describe_table(d, table_name="d").extend({"res": "a&b&c | u&v&w | x&y&z"})
+    ops = describe_table(d, table_name="d").extend({"res": "a and b and c or u and v and w or x and y and z"})
     expect = data_algebra.default_data_model.pd.DataFrame(
         {
             "a": [True, True, False, True, False, False, True, False, False, True],

@@ -47,14 +47,14 @@ def test_compare_data_frames():
     summary_table = summary_ops.eval({"d1": d1, "d2": d2})
     res = ex(
         data(summary_table)
-        .select_rows("(d1_count <= 0) | (d2_count <= 0)")
+        .select_rows("(d1_count <= 0) or (d2_count <= 0)")
         .order_rows(grouping_columns)
     )
     expect = data_algebra.default_data_model.pd.DataFrame(
         {"group": ["u", "w"], "d1_count": [0.0, 4.0], "d2_count": [3.0, 0.0],}
     )
     assert data_algebra.test_util.equivalent_frames(res, expect)
-    ops2 = summary_ops.select_rows("(d1_count <= 0) | (d2_count <= 0)").order_rows(
+    ops2 = summary_ops.select_rows("(d1_count <= 0) or (d2_count <= 0)").order_rows(
         grouping_columns
     )
     data_algebra.test_util.check_transform(

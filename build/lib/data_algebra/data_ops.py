@@ -696,7 +696,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             elif len(expr) == 1:
                 expr = expr[0]
             else:
-                expr = " & ".join(["(" + vi + ")" for vi in expr])
+                expr = " and ".join(["(" + vi + ")" for vi in expr])
         assert isinstance(expr, (str, data_algebra.expr_rep.PreTerm))
         if self.is_trivial_when_intermediate_():
             return self.sources[0].select_rows(expr)

@@ -35,13 +35,13 @@ def test_parse_2():
 
 def test_parse_4():
     ops = TableDescription(table_name="d", column_names=["x", "y", "s"]).extend(
-        {"z": "x | y"}
+        {"z": "x or y"}
     )
 
 
 def test_parse_4b():
     ops = TableDescription(table_name="d", column_names=["x", "y", "s"]).extend(
-        {"z": "x | y | s"}
+        {"z": "x or y or s"}
     )
 
 
@@ -125,7 +125,7 @@ def test_parse_6b():
 def test_parse_7():
     ops = TableDescription(
         table_name="d", column_names=["u", "v", "w", "x", "y"]
-    ).extend({"z": "u & v & w"})
+    ).extend({"z": "u and v and w"})
     recovered = ops.ops["z"]
     assert str(recovered) == "u and v and w"
 

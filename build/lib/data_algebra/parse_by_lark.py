@@ -43,11 +43,9 @@ op_remap = {
     "//": "__floordiv__",
     "%": "__mod__",
     "**": "__pow__",
-    "&": "__and__",
-    "&&": "__and__",
-    "^": "__xor__",
-    "|": "__or__",
-    "||": "__or__",
+    "&": "__and__",  # bitwise logical
+    "^": "__xor__",  # bitwise logical
+    "|": "__or__",  # bitwise logical
     "%+%": "concat",
     "%?%": "coalesce",
     '%/%': 'float_divide',
@@ -134,13 +132,28 @@ def _walk_lark_tree(op, *, data_def=None) -> data_algebra.expr_rep.Term:
                         _r_walk_lark_tree(r_op.children[2 * i + 2])
                     )
                 return res
-            if r_op.data == "power":
-                if len(r_op.children) != 2:
+            if r_op.data in ["power", "expr", 'and_expr', 'xor_expr']:
+                if len(r_op.children) < 2:
                     raise ValueError("unexpected " + r_op.data + " length")
-                left = _r_walk_lark_tree(r_op.children[0])
-                op_name = "__pow__"
-                right = _r_walk_lark_tree(r_op.children[1])
-                return getattr(left, op_name)(right)
+                op_name = {
+                              "power": "__pow__",
+                              "expr": "__or__",
+                              'and_expr': "__and__",
+                              'xor_expr': "__xor__",
+                    }[r_op.data]
+                forbidden = {
+                    "__or__": '| (use or)',
+                    "__and__": '& (use and)',
+                    "__xor__": '^',
+                }
+                if op_name in forbidden.keys():
+                    raise ValueError(f"bitwise operation {forbidden[op_name]}, not currently supported as it can be confused with logic/arith")
+                subs = [_r_walk_lark_tree(c) for c in r_op.children]
+                # linearize chain
+                res = subs[0]
+                for i in range(1, len(subs)):
+                    res = getattr(res, op_name)(subs[i])
+                return res
             if r_op.data == "factor":
                 if len(r_op.children) != 2:
                     raise ValueError("unexpected arith_expr length")
