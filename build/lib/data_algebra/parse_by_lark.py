@@ -185,7 +185,7 @@ def _walk_lark_tree(op, *, data_def=None) -> data_algebra.expr_rep.Term:
                 if op_name is None:
                     raise ValueError("couldn't work out method name")
                 args = []
-                if len(r_op.children) > 1:
+                if (len(r_op.children) > 1) and (r_op.children[1] is not None):
                     raw_args = r_op.children[1].children
                     args = [_r_walk_lark_tree(ai) for ai in raw_args]
                 if var is not None:

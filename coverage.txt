@@ -1,7 +1,7 @@
 ============================= test session starts ==============================
-platform darwin -- Python 3.9.7, pytest-6.2.4, py-1.10.0, pluggy-0.13.1
+platform darwin -- Python 3.9.7, pytest-6.2.5, py-1.11.0, pluggy-1.0.0
 rootdir: /Users/johnmount/Documents/work/data_algebra
-plugins: cov-2.12.1, anyio-2.2.0, typeguard-2.13.0
+plugins: anyio-3.5.0, cov-3.0.0
 collected 300 items
 
 tests/test_OrderedSet.py ......                                          [  2%]
@@ -123,7 +123,7 @@ tests/test_xicor.py ..                                                   [100%]
 
 =============================== warnings summary ===============================
 tests/test_expression_expectations.py: 19 warnings
-  /Users/johnmount/opt/anaconda3/envs/ai_academy_3_9/lib/python3.9/site-packages/pyspark/sql/pandas/conversion.py:238: DeprecationWarning: `np.bool` is a deprecated alias for the builtin `bool`. To silence this warning, use `bool` by itself. Doing this will not modify any behavior and is safe. If you specifically wanted the numpy scalar type, use `np.bool_` here.
+  /Users/johnmount/opt/anaconda3/envs/data_algebra_dev_env/lib/python3.9/site-packages/pyspark/sql/pandas/conversion.py:222: DeprecationWarning: `np.bool` is a deprecated alias for the builtin `bool`. To silence this warning, use `bool` by itself. Doing this will not modify any behavior and is safe. If you specifically wanted the numpy scalar type, use `np.bool_` here.
   Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations
     return np.bool
 
@@ -165,4 +165,4 @@ data_algebra/util.py                     140     29    79%   26, 51, 56, 61, 84-
 --------------------------------------------------------------------
 TOTAL                                   5767    710    88%
 
-================ 300 passed, 19 warnings in 1025.68s (0:17:05) =================
+================= 300 passed, 19 warnings in 989.07s (0:16:29) =================

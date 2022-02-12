@@ -1,0 +1,32 @@
+name: data_algebra_dev_env
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - numpy
+  - pandas
+  - lark
+  - scipy
+  - jupyterlab
+  - python=3.9.*
+  - scikit-learn
+  - scikit-image
+  - seaborn
+  - matplotlib
+  - PyYAML
+  - black
+  - twine
+  - pytest
+  - pytest-cov
+  - twine
+  - pyarrow
+  - sqlalchemy
+  - psycopg2
+  - pymysql
+  - pyspark
+  - pip
+  - pip:
+    - pdoc
+    - google.cloud
+    - google-cloud-bigquery
+
