@@ -10,7 +10,6 @@ dependencies:
   - jupyterlab
   - python=3.9.*
   - scikit-learn
-  - scikit-image
   - seaborn
   - matplotlib
   - PyYAML
@@ -18,7 +17,6 @@ dependencies:
   - twine
   - pytest
   - pytest-cov
-  - twine
   - pyarrow
   - sqlalchemy
   - psycopg2
