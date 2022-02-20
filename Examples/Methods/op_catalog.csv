@@ -91,8 +91,10 @@ median,x.median(),g,y,n,y,n,n,n,1.4.1
 min,x.min(),g,y,y,y,y,y,y,1.4.1
 nunique,x.nunique(),g,y,n,y,n,n,n,1.4.1
 size,x.size(),g,y,y,y,y,y,y,1.4.1
+std,x.std(),g,y,n,y,y,y,y,1.4.1
 sum,(1).sum(),g,y,y,y,y,y,y,1.4.1
 sum,x.sum(),g,y,y,y,y,y,y,1.4.1
+var,x.var(),g,y,n,y,y,y,y,1.4.1
 _size,_size(),p,y,y,y,y,y,y,1.4.1
 all,a.all(),p,y,y,y,y,y,y,1.4.1
 any,a.any(),p,y,y,y,y,y,y,1.4.1

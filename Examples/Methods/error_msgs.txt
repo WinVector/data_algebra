@@ -561,6 +561,72 @@ ORDER BY
 
 
 error (n)
+op: std, op_class: g, example expression: x.std(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel 1.4.1
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "x" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'x.std()'}, partition_by=['g'])
+   "g" ,
+   "row_id" ,
+   STD("x") OVER ( PARTITION BY "g"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+': STD() may not be used as a window function
+
+
+error (n)
+op: var, op_class: g, example expression: x.var(), db: SQLiteModel
+caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
+--  dialect: SQLiteModel 1.4.1
+--       string quote: '
+--   identifier quote: "
+WITH
+ "table_reference_0" AS (
+  SELECT
+   "row_id" ,
+   "x" ,
+   "g"
+  FROM
+   "d"
+ ) ,
+ "extend_1" AS (
+  SELECT  -- .extend({ 'new_column': 'x.var()'}, partition_by=['g'])
+   "g" ,
+   "row_id" ,
+   VAR("x") OVER ( PARTITION BY "g"  )  AS "new_column"
+  FROM
+   "table_reference_0"
+ )
+SELECT  -- .order_rows(['g', 'row_id'])
+ *
+FROM
+ "extend_1"
+ORDER BY
+ "g" ,
+ "row_id"
+': VAR() may not be used as a window function
+
+
+error (n)
 op: nunique, op_class: g, example expression: x.nunique(), db: SQLiteModel
 caught: Execution failed on sql '-- data_algebra SQL https://github.com/WinVector/data_algebra
 --  dialect: SQLiteModel 1.4.1
@@ -887,7 +953,7 @@ op: arcsin, op_class: e, example expression: x.arcsin(), db: BigQueryModel
 caught: 400 Function not found: ARCSIN; Did you mean asin? at [16:4]
 
 Location: US
-Job ID: 127a1faf-baca-4f9f-b639-4f8ce5024a90
+Job ID: 238558e9-306f-4304-938e-fe387eab191d
 
 
 
@@ -896,7 +962,7 @@ op: arccos, op_class: e, example expression: x.arccos(), db: BigQueryModel
 caught: 400 Function not found: ARCCOS; Did you mean acos? at [16:4]
 
 Location: US
-Job ID: dff3b2f5-e04e-4da0-9de7-ea89a16a26d2
+Job ID: fc8d27b1-da4d-4348-b3e2-f6bf395bfb14
 
 
 
@@ -905,7 +971,7 @@ op: arctan, op_class: e, example expression: x.arctan(), db: BigQueryModel
 caught: 400 Function not found: ARCTAN; Did you mean atan? at [16:4]
 
 Location: US
-Job ID: cc285880-b69c-4143-82f1-b4946a3f70f8
+Job ID: 473bef45-2322-4cab-b63f-00636d4a2704
 
 
 
@@ -914,7 +980,7 @@ op: arctan2, op_class: e, example expression: x.arctan2(y), db: BigQueryModel
 caught: 400 Function not found: ARCTAN2; Did you mean atan2? at [17:4]
 
 Location: US
-Job ID: 2b68abcd-bda2-444f-9823-f3883ea9b8cc
+Job ID: d89c110b-88c7-4ff1-8edf-4d2f4fecf575
 
 
 
@@ -923,7 +989,7 @@ op: arcsinh, op_class: e, example expression: x.arcsinh(), db: BigQueryModel
 caught: 400 Function not found: ARCSINH; Did you mean asinh? at [16:4]
 
 Location: US
-Job ID: 382720d7-99bf-4e1c-ae29-11fd05c9da45
+Job ID: 991a7d88-91fe-4af2-8945-c8f0c213f73d
 
 
 
@@ -932,7 +998,7 @@ op: arccosh, op_class: e, example expression: x.arccosh(), db: BigQueryModel
 caught: 400 Function not found: ARCCOSH; Did you mean acosh? at [16:4]
 
 Location: US
-Job ID: a96731b5-51f7-4301-ba03-5fccc27d3bc3
+Job ID: b39b5fe6-f0bd-4637-b95e-43d20565bf07
 
 
 
@@ -941,7 +1007,7 @@ op: arctanh, op_class: e, example expression: x.arctanh(), db: BigQueryModel
 caught: 400 Function not found: ARCTANH; Did you mean atanh? at [16:4]
 
 Location: US
-Job ID: 4db3dbb9-e3e8-471b-bcc4-dcf088b5c773
+Job ID: b0973290-8bde-4990-bb68-870d159437a7
 
 
 
@@ -950,7 +1016,7 @@ op: expm1, op_class: e, example expression: y.expm1(), db: BigQueryModel
 caught: 400 Function not found: EXPM1; Did you mean exp? at [16:4]
 
 Location: US
-Job ID: 42fad1d4-3c74-4ab6-8957-873084dafe2d
+Job ID: 799f390b-47f9-46fe-a785-fbfd05cb4664
 
 
 
@@ -959,7 +1025,7 @@ op: log1p, op_class: e, example expression: x.log1p(), db: BigQueryModel
 caught: 400 Function not found: LOG1P; Did you mean log10? at [16:4]
 
 Location: US
-Job ID: c35842c8-93e2-47bd-80da-7ad6ebc32b57
+Job ID: f63ba6fb-1c63-4019-b073-4d67595d5779
 
 
 
@@ -968,7 +1034,7 @@ op: _ngroup, op_class: g, example expression: _ngroup(), db: BigQueryModel
 caught: 400 Function not found: NGROUP at [17:4]
 
 Location: US
-Job ID: 1a40e082-4cb8-4c4d-9f07-af6ea3a20945
+Job ID: e8dfcdb8-ac87-45d3-b1f0-91978a68dc7e
 
 
 
@@ -1022,7 +1088,7 @@ op: median, op_class: p, example expression: x.median(), db: BigQueryModel
 caught: 400 percentile_cont aggregate function is not supported.
 
 Location: US
-Job ID: 54cfcfca-5f8d-45c3-af28-1fa1313940c8
+Job ID: c96cf6a2-4336-4e85-9e12-567578e42597
 
 
 
@@ -1031,7 +1097,7 @@ op: bfill, op_class: w, example expression: z.bfill(), db: BigQueryModel
 caught: 400 Function not found: BFILL at [18:4]
 
 Location: US
-Job ID: 9218b582-8f0b-499a-8b23-83cf7be6639a
+Job ID: 9a5fe092-e1b2-41d0-bd32-397bfc9a1c1e
 
 
 
@@ -1040,7 +1106,7 @@ op: ffill, op_class: w, example expression: z.ffill(), db: BigQueryModel
 caught: 400 Function not found: FFILL at [18:4]
 
 Location: US
-Job ID: 14056a9e-bf3b-4420-99f0-016a397b7b50
+Job ID: de3a0b56-8f7c-40f1-873a-d2af68a0bcb2
 
 
 
@@ -1049,7 +1115,7 @@ op: first, op_class: w, example expression: x.first(), db: BigQueryModel
 caught: 400 Function not found: FIRST at [18:4]
 
 Location: US
-Job ID: 320603b9-52bc-4522-8b2e-e124da66a61b
+Job ID: 1503ef50-0a46-4988-b7a4-b9b727439059
 
 
 
@@ -1058,7 +1124,7 @@ op: last, op_class: w, example expression: x.last(), db: BigQueryModel
 caught: 400 Function not found: LAST; Did you mean least? at [18:4]
 
 Location: US
-Job ID: 7bbc6fa9-eea9-48a4-9b27-8933d886f3f6
+Job ID: d27333b9-1a20-48dd-a7bd-7d85ec27b832
 
 
 
@@ -1067,7 +1133,7 @@ op: rank, op_class: w, example expression: x.rank(), db: BigQueryModel
 caught: 400 Number of arguments does not match for analytic function RANK. Supported signature: RANK() at [18:4]
 
 Location: US
-Job ID: 1ee191f3-394d-4633-ad57-ac739bef6528
+Job ID: feda1d09-e1e2-471f-a464-20e30e5b7d5d
 
 
 
@@ -1076,7 +1142,7 @@ op: cumprod, op_class: w, example expression: x.cumprod(), db: BigQueryModel
 caught: 400 Function not found: PROD at [18:4]
 
 Location: US
-Job ID: 6d93e0fa-bb72-45a5-8f1a-7324f40c8aa6
+Job ID: f4904c67-3a03-48ff-910b-9bd334c63544
 
 
 
@@ -1861,8 +1927,8 @@ HINT:  No function matches the given name and argument types. You might need to 
 WITH
  "table_reference_0" AS (
   SELECT
-   "x" ,
-   "g"
+   "g" ,
+   "x"
   FROM
    "d"
  ) ,
@@ -2490,11 +2556,11 @@ error (n)
 op: nunique, op_class: g, example expression: x.nunique(), db: SparkSQLModel
 caught: Distinct window functions are not supported: count(distinct x#4) windowspecdefinition(g#7, specifiedwindowframe(RowFrame, unboundedpreceding$(), unboundedfollowing$()));
 Sort [g#7 ASC NULLS FIRST, row_id#0L ASC NULLS FIRST], true
-+- Project [g#7, row_id#0L, new_column#2686L]
++- Project [g#7, row_id#0L, new_column#2712L]
    +- SubqueryAlias extend_1
-      +- Project [g#7, row_id#0L, new_column#2686L]
-         +- Project [g#7, row_id#0L, x#4, new_column#2686L, new_column#2686L]
-            +- Window [count(distinct x#4) windowspecdefinition(g#7, specifiedwindowframe(RowFrame, unboundedpreceding$(), unboundedfollowing$())) AS new_column#2686L], [g#7]
+      +- Project [g#7, row_id#0L, new_column#2712L]
+         +- Project [g#7, row_id#0L, x#4, new_column#2712L, new_column#2712L]
+            +- Window [count(distinct x#4) windowspecdefinition(g#7, specifiedwindowframe(RowFrame, unboundedpreceding$(), unboundedfollowing$())) AS new_column#2712L], [g#7]
                +- Project [g#7, row_id#0L, x#4]
                   +- SubqueryAlias table_reference_0
                      +- Project [row_id#0L, x#4, g#7]
@@ -2619,8 +2685,8 @@ query
 WITH
  `table_reference_0` AS (
   SELECT
-   `g` ,
-   `z`
+   `z` ,
+   `g`
   FROM
    `d`
  ) ,
@@ -3539,8 +3605,8 @@ caught: (pymysql.err.OperationalError) (1305, 'FUNCTION jmount.MEDIAN does not e
 WITH
  `table_reference_0` AS (
   SELECT
-   `x` ,
-   `g`
+   `g` ,
+   `x`
   FROM
    `d`
  ) ,

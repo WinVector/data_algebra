@@ -4,7 +4,6 @@ import data_algebra.test_util
 from data_algebra.data_ops import *
 import data_algebra.util
 import numpy
-import data_algebra.MySQL
 import data_algebra.SQLite
 
 
@@ -62,3 +61,47 @@ def test_std_var_extend_disallow_ordered_std():
                     order_by=['z'],
                 )
         )
+
+
+def test_std_var_extend_allow_extend_var():
+    pd = data_algebra.default_data_model.pd
+    d = pd.DataFrame({'x': [1., 3., 2., 2.], 'g': ['a', 'a', 'b', 'b'], 'z': [1, 2, 3, 4]})
+    ops = (
+        descr(d=d)
+            .extend(
+                {
+                    'v': 'x.var()',
+                },
+                partition_by=['g'],
+            )
+    )
+    res = ops.transform(d)
+    expect = pd.DataFrame({
+        'x': [1.0, 3.0, 2.0, 2.0],
+        'g': ['a', 'a', 'b', 'b'],
+        'z': [1, 2, 3, 4],
+        'v': [2.0, 2.0, 0.0, 0.0],
+        })
+    assert data_algebra.test_util.equivalent_frames(res, expect)
+
+
+def test_std_var_extend_allow_extend_std():
+    pd = data_algebra.default_data_model.pd
+    d = pd.DataFrame({'x': [1., 3., 2., 2.], 'g': ['a', 'a', 'b', 'b'], 'z': [1, 2, 3, 4]})
+    ops = (
+        descr(d=d)
+            .extend(
+                {
+                    's': 'x.std()',
+                },
+                partition_by=['g'],
+            )
+    )
+    res = ops.transform(d)
+    expect = pd.DataFrame({
+        'x': [1.0, 3.0, 2.0, 2.0],
+        'g': ['a', 'a', 'b', 'b'],
+        'z': [1, 2, 3, 4],
+        's': [1.4142135623730951, 1.4142135623730951, 0.0, 0.0],
+        })
+    assert data_algebra.test_util.equivalent_frames(res, expect, float_tol=1e-4)

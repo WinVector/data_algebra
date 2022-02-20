@@ -109,10 +109,7 @@ fn_names_not_allowed_in_project = {
 
 
 # fns that don't have consistent windowed implementations we want to support
-fn_names_that_contradict_windowed_situation = {
-    'std',
-    'var',
-}
+fn_names_that_contradict_windowed_situation = set()
 
 
 # a competing idea should be to remove ordering if
