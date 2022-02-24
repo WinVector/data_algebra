@@ -10,3 +10,4 @@ htmlcov
 .eggs
 .coverage*
 
+.vscode/settings.json
