@@ -1,5 +1,5 @@
 ============================= test session starts ==============================
-platform darwin -- Python 3.9.7, pytest-6.2.5, py-1.11.0, pluggy-1.0.0
+platform darwin -- Python 3.9.12, pytest-7.1.1, pluggy-1.0.0
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: anyio-3.5.0, cov-3.0.0
 collected 302 items
@@ -121,7 +121,7 @@ tests/test_window_fns.py .....                                           [ 98%]
 tests/test_with.py ..                                                    [ 99%]
 tests/test_xicor.py ..                                                   [100%]
 
----------- coverage: platform darwin, python 3.9.7-final-0 -----------
+---------- coverage: platform darwin, python 3.9.12-final-0 ----------
 Name                                   Stmts   Miss  Cover   Missing
 --------------------------------------------------------------------
 data_algebra/BigQuery.py                 131     71    46%   23-24, 28, 128-132, 136, 150-157, 166-175, 180-198, 212-239, 243-266, 277-292
@@ -158,4 +158,4 @@ data_algebra/util.py                     140     29    79%   26, 51, 56, 61, 84-
 TOTAL                                   5767    847    85%
 
 
-======================= 302 passed in 414.20s (0:06:54) ========================
+======================= 302 passed in 446.23s (0:07:26) ========================
