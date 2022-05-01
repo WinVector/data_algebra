@@ -3,7 +3,7 @@ Type defs for data operations.
 """
 
 import abc
-from typing import Dict, Optional, Set, NamedTuple
+from typing import Dict, List, Optional, Set, NamedTuple
 
 import data_algebra.expr_rep
 import data_algebra.cdata
@@ -28,13 +28,14 @@ class OperatorPlatform(abc.ABC):
         self.node_name = node_name
 
     @abc.abstractmethod
-    def eval(self, data_map, *, data_model=None, narrow=True):
+    def eval(self, data_map, *, data_model=None, narrow: bool = True, check_incoming_data_constraints: bool = False):
         """
         Evaluate operators with respect to Pandas data frames.
 
         :param data_map: map from table names to data frames
         :param data_model: adaptor to data dialect (Pandas for now)
         :param narrow: logical, if True don't copy unexpected columns
+        :param check_incoming_data_constraints: logical, if True check incoming data meets constraints
         :return: table result
         """
 
@@ -144,7 +145,7 @@ class OperatorPlatform(abc.ABC):
     # info
 
     @abc.abstractmethod
-    def columns_produced(self):
+    def columns_produced(self) -> List[str]:
         """
         Return list of columns produced by pipeline.
         """
@@ -158,7 +159,7 @@ class OperatorPlatform(abc.ABC):
     # query generation
 
     @abc.abstractmethod
-    def to_near_sql_implementation_(self, db_model, *, using, temp_id_source):
+    def to_near_sql_implementation_(self, db_model, *, using, temp_id_source, sql_format_options=None):
         """
         Convert to NearSQL as a step in converting to a SQL string. Internal method.
 
@@ -328,7 +329,6 @@ class OperatorPlatform(abc.ABC):
     # noinspection PyPep8Naming, PyUnusedLocal
     def fit(self, X, y=None):
         """sklearn interface, fit() is a noop"""
-        pass
 
     # noinspection PyPep8Naming, PyUnusedLocal
     def fit_transform(self, X, y=None):
@@ -351,7 +351,6 @@ class OperatorPlatform(abc.ABC):
 
     def set_params(self, **params):
         """sklearn interface, noop"""
-        pass
 
     # noinspection PyPep8Naming
     def inverse_transform(self, X):

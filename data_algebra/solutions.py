@@ -3,7 +3,7 @@
 data algebra solutions to common data processing problems
 """
 
-from typing import Dict, Iterable, Optional
+from typing import Any, Dict, Iterable, Optional, Tuple
 
 import numpy
 import data_algebra
@@ -95,7 +95,7 @@ def xicor_query(
         *,
         x_name: str = 'x',
         y_name: str = 'y',
-        var_keys: Iterable[str] = tuple()):
+        var_keys: Iterable[str] = tuple()) -> ViewRepresentation:
     """
     Build a query computing the xicor of y_name as a function of x_name for each var_keys group of rows.
     Ref: https://arxiv.org/abs/1909.10140
@@ -165,7 +165,7 @@ def xicor_score_variables_plan(
         x_vars: Iterable[str],
         y_name: str,
         n_rep: int = 25,
-):
+) -> Tuple[ViewRepresentation, str, Any]:
     """
     Set up a query to batch compute xicor.
 
@@ -228,7 +228,7 @@ def last_observed_carried_forward(
         locf_to_use_column_name: str = 'locf_to_use',
         locf_non_null_rank_column_name: str = 'locf_non_null_rank',
         locf_tiebreaker_column_name: str = 'locf_tiebreaker',
-):
+) -> ViewRepresentation:
     """
     Copy last observed non-null value in column value_column_name forward using order order_by and
     optional partition_by partition.
@@ -241,6 +241,7 @@ def last_observed_carried_forward(
     :param locf_to_use_column_name: name for a temporary values column
     :param locf_non_null_rank_column_name: name for a temporary values column
     :param locf_tiebreaker_column_name: name for a temporary values column
+    :return: ops
     """
     assert isinstance(d, ViewRepresentation)
     assert isinstance(locf_to_use_column_name, str)
@@ -294,7 +295,7 @@ def braid_data(
         locf_to_use_column_name: str = 'locf_to_use',
         locf_non_null_rank_column_name: str = 'locf_non_null_rank',
         locf_tiebreaker_column_name: str = 'locf_tiebreaker',
-):
+) -> ViewRepresentation:
     """
     Mix data from two sources, ordering by order_by columns and carrying forward observations
     on d_state value column.
@@ -313,6 +314,7 @@ def braid_data(
     :param locf_to_use_column_name: name for a temporary values column
     :param locf_non_null_rank_column_name: name for a temporary values column
     :param locf_tiebreaker_column_name: name for a temporary values column
+    :return: ops
     """
     assert isinstance(d_state, ViewRepresentation)
     assert isinstance(d_event, ViewRepresentation)
@@ -378,7 +380,7 @@ def rank_to_average(
         partition_by: Optional[Iterable[str]] = None,
         rank_column_name: str,
         tie_breaker_column_name: str = 'rank_tie_breaker',
-):
+) -> ViewRepresentation:
     """
     Compute rank where the rank of each item is the average of all items with same order
     position. That is rank_to_average([1, 1, 2]) = [1.5, 1.5, 3].
@@ -388,6 +390,7 @@ def rank_to_average(
     :param partition_by: optional partitioning column
     :param rank_column_name: column to land ranks in
     :param tie_breaker_column_name: temp column
+    :return: ops
     """
     assert isinstance(d, ViewRepresentation)
     assert not isinstance(order_by, str)

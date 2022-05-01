@@ -17,7 +17,7 @@ import data_algebra.flow_text
 import data_algebra.data_model
 import data_algebra.pandas_model
 import data_algebra.expr_rep
-from data_algebra.data_ops_types import *
+from data_algebra.data_ops_types import MethodUse, OperatorPlatform
 import data_algebra.data_ops_utils
 import data_algebra.near_sql
 from data_algebra.OrderedSet import (
@@ -188,7 +188,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         return tables
 
     @abc.abstractmethod
-    def columns_used_from_sources(self, using: Optional[set] = None) -> List:
+    def columns_used_from_sources(self, using: Optional[set] = None) -> List[str]:
         """
         Get columns used from sources. Internal method.
 
@@ -214,11 +214,11 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         for s in self.sources:
             s.get_method_uses_(methods_seen)
 
-    def columns_produced(self):
+    def columns_produced(self) -> List[str]:
         """Return list of columns produced by operator dag."""
         return list(self.column_names)
 
-    def columns_used_implementation_(self, *, using, columns_currently_using_records):
+    def columns_used_implementation_(self, *, using, columns_currently_using_records) -> None:
         """Implementation of columns used calculation, internal method."""
         self_merged_rep_id = self.merged_rep_id()
         try:
@@ -240,7 +240,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
                 columns_currently_using_records=columns_currently_using_records,
             )
 
-    def columns_used(self, *, using=None):
+    def columns_used(self, *, using=None) -> Dict:
         """Determine which columns are used from source tables."""
 
         tables = self.get_tables()
@@ -251,8 +251,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             using=using, columns_currently_using_records=columns_currently_using_records
         )
         columns_used = dict()
-        for k in tables.keys():
-            ti = tables[k]
+        for k, ti in tables.items():
             vi = columns_currently_using_records[ti.merged_rep_id()]
             columns_used[k] = vi.copy()
         return columns_used
@@ -281,7 +280,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
 
     # printing
 
-    def to_python_src_(self, *, indent=0, strict=True, print_sources=True):
+    def to_python_src_(self, *, indent=0, strict=True, print_sources=True) -> str:
         """
         Return text representing operations. Internal method, allows skipping of sources.
 
@@ -292,7 +291,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         return "ViewRepresentation(" + self.column_names.__repr__() + ")"
 
     # noinspection PyBroadException
-    def to_python(self, *, indent=0, strict=True, pretty=False, black_mode=None):
+    def to_python(self, *, indent=0, strict=True, pretty=False, black_mode=None) -> str:
         """
         Return Python source code for operations.
 
@@ -496,7 +495,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
     # implement builders for all non-initial ops types on base class
     def extend_parsed_(
         self, parsed_ops, *, partition_by=None, order_by=None, reverse=None
-    ):
+    ) -> 'ViewRepresentation':
         """
         Add new derived columns, can replace existing columns for parsed operations. Internal method.
 
@@ -565,7 +564,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             reverse=reverse,
         )
 
-    def extend(self, ops, *, partition_by=None, order_by=None, reverse=None):
+    def extend(self, ops, *, partition_by=None, order_by=None, reverse=None) -> 'ViewRepresentation':
         """
         Add new derived columns, can replace existing columns.
 
@@ -585,7 +584,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             reverse=reverse,
         )
 
-    def project_parsed_(self, parsed_ops=None, *, group_by=None):
+    def project_parsed_(self, parsed_ops=None, *, group_by=None) -> 'ViewRepresentation':
         """
         Compute projection, or grouped calculation for parsed ops. Internal method.
 
@@ -605,7 +604,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             return self.sources[0].project_parsed_(parsed_ops, group_by=group_by)
         return ProjectNode(source=self, parsed_ops=parsed_ops, group_by=group_by)
 
-    def project(self, ops=None, *, group_by=None):
+    def project(self, ops=None, *, group_by=None) -> 'ViewRepresentation':
         """
         Compute projection, or grouped calculation.
 
@@ -618,7 +617,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         )
         return self.project_parsed_(parsed_ops=parsed_ops, group_by=group_by)
 
-    def natural_join(self, b, *, by, jointype, check_all_common_keys_in_by=False):
+    def natural_join(self, b, *, by, jointype, check_all_common_keys_in_by=False) -> 'ViewRepresentation':
         """
         Join self (left) results with b (right).
 
@@ -642,7 +641,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             check_all_common_keys_in_by=check_all_common_keys_in_by,
         )
 
-    def concat_rows(self, b, *, id_column="source_name", a_name="a", b_name="b"):
+    def concat_rows(self, b, *, id_column="source_name", a_name="a", b_name="b") -> 'ViewRepresentation':
         """
         Union or concatenate rows of self with rows of b.
 
@@ -666,7 +665,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             a=self, b=b, id_column=id_column, a_name=a_name, b_name=b_name
         )
 
-    def select_rows_parsed_(self, parsed_expr):
+    def select_rows_parsed_(self, parsed_expr) -> 'ViewRepresentation':
         """
         Select rows matching parsed expr criteria. Internal method.
 
@@ -679,7 +678,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             return self.sources[0].select_rows_parsed_(parsed_expr=parsed_expr)
         return SelectRowsNode(source=self, ops=parsed_expr)
 
-    def select_rows(self, expr):
+    def select_rows(self, expr) -> 'ViewRepresentation':
         """
         Select rows matching expr criteria.
 
@@ -715,7 +714,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             r_walk_expr(op)
         return self.select_rows_parsed_(parsed_expr=ops)
 
-    def drop_columns(self, column_deletions):
+    def drop_columns(self, column_deletions) -> 'ViewRepresentation':
         """
         Remove columns from result.
 
@@ -730,7 +729,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             return self.sources[0].drop_columns(column_deletions)
         return DropColumnsNode(source=self, column_deletions=column_deletions)
 
-    def select_columns(self, columns):
+    def select_columns(self, columns) -> 'ViewRepresentation':
         """
         Narrow to columns in result.
 
@@ -751,7 +750,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             return self.sources[0].select_columns(columns)
         return SelectColumnsNode(source=self, columns=columns)
 
-    def rename_columns(self, column_remapping):
+    def rename_columns(self, column_remapping) -> 'ViewRepresentation':
         """
         Rename columns.
 
@@ -766,7 +765,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             return self.sources[0].rename_columns(column_remapping)
         return RenameColumnsNode(source=self, column_remapping=column_remapping)
 
-    def order_rows(self, columns, *, reverse=None, limit=None):
+    def order_rows(self, columns, *, reverse=None, limit=None) -> 'ViewRepresentation':
         """
         Order rows by column set.
 
@@ -785,7 +784,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             return self.sources[0].order_rows(columns, reverse=reverse, limit=limit)
         return OrderRowsNode(source=self, columns=columns, reverse=reverse, limit=limit)
 
-    def convert_records(self, record_map):
+    def convert_records(self, record_map) -> 'ViewRepresentation':
         """
         Apply a record mapping taking blocks_in to blocks_out structures.
 
