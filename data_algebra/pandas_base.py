@@ -309,9 +309,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         )
         self.pd = pd
         self.impl_map = populate_impl_map(data_model=self)
-        self.transform_op_map = {
-            'any_value': 'first'
-        }
+        self.transform_op_map = {"any_value": "first"}
         self.user_fun_map = dict()
         self._method_dispatch_table = {
             "ConcatRowsNode": self.concat_rows_step,
@@ -462,7 +460,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             try:
                 res = self.pd.DataFrame(cols)
                 if res.shape[0] > 0:
-                    res = res.loc[[False] * res.shape[0], :].reset_index(drop=True, inplace=False)
+                    res = res.loc[[False] * res.shape[0], :].reset_index(
+                        drop=True, inplace=False
+                    )
             except Exception:
                 res = self.pd.DataFrame({k: [] for k in cols.keys()})
             return res
@@ -534,7 +534,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         """
         Evaluate an incoming (or value source) node.
         """
-        return self._method_dispatch_table[s.node_name](op=s, data_map=data_map, narrow=narrow)
+        return self._method_dispatch_table[s.node_name](
+            op=s, data_map=data_map, narrow=narrow
+        )
 
     def extend_step(self, op, *, data_map, narrow):
         """
@@ -552,7 +554,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         res = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
         if not window_situation:
             with warnings.catch_warnings():
-                warnings.simplefilter("ignore")  # out of range things like arccosh were warning
+                warnings.simplefilter(
+                    "ignore"
+                )  # out of range things like arccosh were warning
                 new_cols = {k: opk.evaluate(res) for k, opk in op.ops.items()}
             new_frame = self.columns_to_frame_(new_cols, target_rows=res.shape[0])
             res = self.add_data_frame_columns_to_data_frame_(res, new_frame)
@@ -611,7 +615,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                     # check for and remove initial underbar
                     assert isinstance(opk.op, str)
                     assert len(opk.op) > 1
-                    assert opk.op[0] == '_'
+                    assert opk.op[0] == "_"
                     zero_op = opk.op[1:]
                     if zero_op in {"row_number", "count"}:
                         subframe[k] = opframe.cumcount() + 1
@@ -627,7 +631,12 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                             transform_op
                         )  # Pandas transform, not data_algebra
                     else:
-                        raise KeyError("not implemented in windowed situation: " + str(k) + ": " + str(opk))
+                        raise KeyError(
+                            "not implemented in windowed situation: "
+                            + str(k)
+                            + ": "
+                            + str(opk)
+                        )
                 else:
                     transform_args = []
                     if len(opk.args) > 1:
@@ -659,7 +668,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                             transform_op, *transform_args
                         )  # Pandas transform, not data_algegra
                     else:
-                        raise ValueError(f"opk must be a ColumnReference or Value ({opk})")
+                        raise ValueError(
+                            f"opk must be a ColumnReference or Value ({opk})"
+                        )
             # clear some temps
             for value_name in data_algebra_temp_cols.values():
                 del res[value_name]
@@ -729,7 +740,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                     # expect and strip off initial underbar
                     assert isinstance(transform_op, str)
                     assert len(transform_op) > 1
-                    assert transform_op[0] == '_'
+                    assert transform_op[0] == "_"
                     transform_op = transform_op[1:]
                     try:
                         transform_op = self.transform_op_map[transform_op]

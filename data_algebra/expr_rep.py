@@ -102,10 +102,9 @@ fn_names_that_imply_ordered_windowed_situation = {
 
 
 # noinspection SpellCheckingInspection
-fn_names_not_allowed_in_project = {
-    "ngroup",
-    "_ngroup",
-}.union(fn_names_that_imply_ordered_windowed_situation)
+fn_names_not_allowed_in_project = {"ngroup", "_ngroup",}.union(
+    fn_names_that_imply_ordered_windowed_situation
+)
 
 
 # fns that don't have consistent windowed implementations we want to support
@@ -121,8 +120,8 @@ fn_names_that_contradict_ordered_windowed_situation = {
     "min",
     "prod",
     "sum",
-    'std',
-    'var',
+    "std",
+    "var",
 }
 
 
@@ -283,7 +282,7 @@ class Term(PreTerm, abc.ABC):
                 )
         return Expression(op, (self, other), inline=inline, method=method)
 
-    def __rop_expr__(self, op, other, *,  check_types=True):
+    def __rop_expr__(self, op, other, *, check_types=True):
         """reversed binary expression"""
         inline = True
         method = False
@@ -1014,6 +1013,7 @@ class Value(Term):
     """
     Class for holding constants.
     """
+
     def __init__(self, value):
         allowed = {
             data_algebra.util.map_type_to_canonical(t)
@@ -1076,6 +1076,7 @@ class ListTerm(PreTerm):
     """
     Class to hold a collection.
     """
+
     # derived from PreTerm as this is not combinable
     def __init__(self, value):
         assert isinstance(value, (list, tuple))
@@ -1130,6 +1131,7 @@ class ListTerm(PreTerm):
         :param want_inline_parens: bool, if True put parens around complex expressions that don't already have a grouper.
         :return: PythonText
         """
+
         def li_to_python(value):
             """convert a list item to Python"""
             try:
@@ -1154,6 +1156,7 @@ class ListTerm(PreTerm):
 
 class DictTerm(PreTerm):
     """Class for carrying a dictionary or map."""
+
     # derived from PreTerm as this is not combinable
     # only holds values
     def __init__(self, value):
@@ -1196,6 +1199,7 @@ class DictTerm(PreTerm):
         :param want_inline_parens: bool, if True put parens around complex expressions that don't already have a grouper.
         :return: PythonText
         """
+
         def li_to_python(value):
             """Convert an item to python"""
             try:
@@ -1334,7 +1338,10 @@ class Expression(Term):
     """
     Class for carrying an expression.
     """
-    def __init__(self, op: str, args, *, params=None, inline: bool = False, method: bool = False):
+
+    def __init__(
+        self, op: str, args, *, params=None, inline: bool = False, method: bool = False
+    ):
         assert isinstance(op, str)
         if not _can_find_method_by_name(op):
             raise KeyError(f"can't find implementation for function/method {op}")
@@ -1438,7 +1445,7 @@ class Expression(Term):
             pass
         # special zero argument functions
         if len(args) == 0:
-            if self.op == '_uniform':
+            if self.op == "_uniform":
                 return numpy.random.uniform(size=data_frame.shape[0])
             else:
                 KeyError(f"zero-argument function {self.op} not found")
@@ -1489,7 +1496,9 @@ class Expression(Term):
             if want_inline_parens:
                 return PythonText("(" + result + ")", is_in_parens=True)
             return PythonText(result, is_in_parens=False)
-        subs: List[PythonText] = [ai.to_python(want_inline_parens=False) for ai in self.args]
+        subs: List[PythonText] = [
+            ai.to_python(want_inline_parens=False) for ai in self.args
+        ]
         subs_0 = subs[0]
         subs_strs = [str(si) for si in subs]
         if self.method:
@@ -1500,11 +1509,19 @@ class Expression(Term):
                 )
             else:
                 return PythonText(
-                    "(" + subs_strs[0] + ")." + self.op + "(" + ", ".join(subs_strs[1:]) + ")",
+                    "("
+                    + subs_strs[0]
+                    + ")."
+                    + self.op
+                    + "("
+                    + ", ".join(subs_strs[1:])
+                    + ")",
                     is_in_parens=False,
                 )
         # treat as fn call
-        return PythonText(self.op + "(" + ", ".join(subs_strs) + ")", is_in_parens=False)
+        return PythonText(
+            self.op + "(" + ", ".join(subs_strs) + ")", is_in_parens=False
+        )
 
 
 # define with def so function has usable __name__

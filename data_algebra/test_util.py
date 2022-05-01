@@ -139,7 +139,7 @@ def equivalent_frames(
                 except Exception:
                     pass
                 cb_can_be_numeric = False
-                cb_n = numpy.asarray([0.0])   # just a typing hint
+                cb_n = numpy.asarray([0.0])  # just a typing hint
                 # noinspection PyBroadException
                 try:
                     cb_n = numpy.asarray(cb, dtype=float)
@@ -156,12 +156,16 @@ def equivalent_frames(
                     if numpy.any(ca_inf != cb_inf):
                         return False
                     if numpy.any(ca_inf):
-                        if numpy.any(numpy.sign(ca_n[ca_inf]) != numpy.sign(cb_n[cb_inf])):
+                        if numpy.any(
+                            numpy.sign(ca_n[ca_inf]) != numpy.sign(cb_n[cb_inf])
+                        ):
                             return False
                     if numpy.any(numpy.logical_not(ca_inf)):
                         ca_f = ca_n[numpy.logical_not(ca_inf)]
                         cb_f = cb_n[numpy.logical_not(cb_inf)]
-                        dif = numpy.abs(ca_f - cb_f) / numpy.maximum(numpy.maximum(numpy.abs(ca_f), numpy.abs(cb_f)), 1.0)
+                        dif = numpy.abs(ca_f - cb_f) / numpy.maximum(
+                            numpy.maximum(numpy.abs(ca_f), numpy.abs(cb_f)), 1.0
+                        )
                         if numpy.max(dif) > float_tol:
                             return False
                 else:
@@ -195,7 +199,9 @@ def _run_handle_experiments(
     if isinstance(db_handle.db_model, data_algebra.SQLite.SQLiteModel):
         test_direct_ops_path = True
     sql_statements = list(sql_statements)
-    res_db_sql = list([None] * len(sql_statements))  # extra list() wrapper for PyCharm's type checker
+    res_db_sql = list(
+        [None] * len(sql_statements)
+    )  # extra list() wrapper for PyCharm's type checker
     res_db_ops = None
     need_to_run = True
     # inspect result cache for any prior results
@@ -203,9 +209,7 @@ def _run_handle_experiments(
         for i in range(len(sql_statements)):
             try:
                 res_db_sql[i] = test_result_cache.get(
-                    db_model=db_handle.db_model,
-                    sql=sql_statements[i],
-                    data_map=data,
+                    db_model=db_handle.db_model, sql=sql_statements[i], data_map=data,
                 )
             except KeyError:
                 pass
@@ -349,7 +353,8 @@ def check_transform_on_handles(
         res_2 = ops_2.eval(data_map=data, check_incoming_data_constraints=True)
         if not local_data_model.is_appropriate_data_instance(res_2):
             raise ValueError(
-                "(reparse) expected res to be local_data_model.pd.DataFrame, got: " + str(type(res_2))
+                "(reparse) expected res to be local_data_model.pd.DataFrame, got: "
+                + str(type(res_2))
             )
         if not equivalent_frames(
             res_2,
@@ -361,7 +366,9 @@ def check_transform_on_handles(
         ):
             raise ValueError("(reparse) Pandas eval result did not match expect")
     if len(data) == 1:
-        res_t = ops.transform(list(data.values())[0], check_incoming_data_constraints=True)
+        res_t = ops.transform(
+            list(data.values())[0], check_incoming_data_constraints=True
+        )
         if not equivalent_frames(
             res_t,
             expect,

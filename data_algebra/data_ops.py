@@ -218,7 +218,9 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         """Return list of columns produced by operator dag."""
         return list(self.column_names)
 
-    def columns_used_implementation_(self, *, using, columns_currently_using_records) -> None:
+    def columns_used_implementation_(
+        self, *, using, columns_currently_using_records
+    ) -> None:
         """Implementation of columns used calculation, internal method."""
         self_merged_rep_id = self.merged_rep_id()
         try:
@@ -256,7 +258,9 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             columns_used[k] = vi.copy()
         return columns_used
 
-    def forbidden_columns(self, *, forbidden: Optional[Set[str]] = None) -> Dict[str, Set[str]]:
+    def forbidden_columns(
+        self, *, forbidden: Optional[Set[str]] = None
+    ) -> Dict[str, Set[str]]:
         """
         Determine which columns should not be in source tables
         (were not in declared structure, and interfere with column production).
@@ -305,9 +309,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             strict = True
         python_str = (
             "(\n"
-            + self.to_python_src_(
-                indent=indent, strict=strict, print_sources=True
-            )
+            + self.to_python_src_(indent=indent, strict=strict, print_sources=True)
             + "\n)\n"
         )
         if pretty:
@@ -364,9 +366,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         :return: data_algebra.near_sql.NearSQL
         """
 
-    def to_sql(
-        self, db_model, *, sql_format_options=None,
-    ) -> str:
+    def to_sql(self, db_model, *, sql_format_options=None,) -> str:
         """
         Convert operator dag to SQL.
 
@@ -408,7 +408,14 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
                         "Table " + k + " has forbidden columns: " + str(excess)
                     )
 
-    def eval(self, data_map, *, data_model=None, narrow: bool = True, check_incoming_data_constraints: bool = False):
+    def eval(
+        self,
+        data_map,
+        *,
+        data_model=None,
+        narrow: bool = True,
+        check_incoming_data_constraints: bool = False,
+    ):
         """
          Evaluate operators with respect to Pandas data frames.
 
@@ -425,7 +432,11 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             data_model = data_algebra.default_data_model
         assert isinstance(data_model, data_algebra.data_model.DataModel)
 
-        if check_incoming_data_constraints and (data_map is not None) and (len(data_map) > 0):
+        if (
+            check_incoming_data_constraints
+            and (data_map is not None)
+            and (len(data_map) > 0)
+        ):
             self.columns_used()  # for table consistency check/raise
             tables = self.get_tables()
             self.check_constraints(
@@ -440,7 +451,14 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         return data_model.eval(op=self, data_map=data_map, narrow=narrow)
 
     # noinspection PyPep8Naming
-    def transform(self, X, *, data_model=None, narrow: bool = True, check_incoming_data_constraints: bool = False):
+    def transform(
+        self,
+        X,
+        *,
+        data_model=None,
+        narrow: bool = True,
+        check_incoming_data_constraints: bool = False,
+    ):
         """
         Apply data transform to a table
 
@@ -468,7 +486,8 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             data_map=data_map,
             data_model=data_model,
             narrow=narrow,
-            check_incoming_data_constraints=check_incoming_data_constraints)
+            check_incoming_data_constraints=check_incoming_data_constraints,
+        )
 
     # composition (used to eliminate intermediate order nodes)
 
@@ -495,7 +514,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
     # implement builders for all non-initial ops types on base class
     def extend_parsed_(
         self, parsed_ops, *, partition_by=None, order_by=None, reverse=None
-    ) -> 'ViewRepresentation':
+    ) -> "ViewRepresentation":
         """
         Add new derived columns, can replace existing columns for parsed operations. Internal method.
 
@@ -507,15 +526,23 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         """
         if (parsed_ops is None) or (len(parsed_ops) < 1):
             return self
-        partition_by = _work_col_group_arg(partition_by, arg_name='partition_by', columns=self.column_names)
-        order_by = _work_col_group_arg(order_by, arg_name='order_by', columns=self.column_names)
-        reverse = _work_col_group_arg(reverse, arg_name='reverse', columns=self.column_names)
+        partition_by = _work_col_group_arg(
+            partition_by, arg_name="partition_by", columns=self.column_names
+        )
+        order_by = _work_col_group_arg(
+            order_by, arg_name="order_by", columns=self.column_names
+        )
+        reverse = _work_col_group_arg(
+            reverse, arg_name="reverse", columns=self.column_names
+        )
         assert reverse != 1
         new_cols_produced_in_calc = set([k for k in parsed_ops.keys()])
         if (partition_by != 1) and (len(partition_by) > 0):
             if len(new_cols_produced_in_calc.intersection(partition_by)) > 0:
                 raise ValueError("must not change partition_by columns")
-            if (order_by != 1) and len(set(partition_by).intersection(set(order_by))) > 0:
+            if (order_by != 1) and len(
+                set(partition_by).intersection(set(order_by))
+            ) > 0:
                 raise ValueError("order_by and partition_by columns must be disjoint")
         if len(new_cols_produced_in_calc.intersection(order_by)) > 0:
             raise ValueError("must not change partition_by columns")
@@ -564,7 +591,9 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             reverse=reverse,
         )
 
-    def extend(self, ops, *, partition_by=None, order_by=None, reverse=None) -> 'ViewRepresentation':
+    def extend(
+        self, ops, *, partition_by=None, order_by=None, reverse=None
+    ) -> "ViewRepresentation":
         """
         Add new derived columns, can replace existing columns.
 
@@ -584,7 +613,9 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             reverse=reverse,
         )
 
-    def project_parsed_(self, parsed_ops=None, *, group_by=None) -> 'ViewRepresentation':
+    def project_parsed_(
+        self, parsed_ops=None, *, group_by=None
+    ) -> "ViewRepresentation":
         """
         Compute projection, or grouped calculation for parsed ops. Internal method.
 
@@ -593,7 +624,9 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         :return: compose operator directed acyclic graph
         """
 
-        group_by = _work_col_group_arg(group_by, arg_name='group_by', columns=self.column_names)
+        group_by = _work_col_group_arg(
+            group_by, arg_name="group_by", columns=self.column_names
+        )
         assert group_by != 1
         if ((parsed_ops is None) or (len(parsed_ops) < 1)) and (len(group_by) < 1):
             raise ValueError("project must have ops or group_by")
@@ -604,7 +637,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             return self.sources[0].project_parsed_(parsed_ops, group_by=group_by)
         return ProjectNode(source=self, parsed_ops=parsed_ops, group_by=group_by)
 
-    def project(self, ops=None, *, group_by=None) -> 'ViewRepresentation':
+    def project(self, ops=None, *, group_by=None) -> "ViewRepresentation":
         """
         Compute projection, or grouped calculation.
 
@@ -617,7 +650,9 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         )
         return self.project_parsed_(parsed_ops=parsed_ops, group_by=group_by)
 
-    def natural_join(self, b, *, by, jointype, check_all_common_keys_in_by=False) -> 'ViewRepresentation':
+    def natural_join(
+        self, b, *, by, jointype, check_all_common_keys_in_by=False
+    ) -> "ViewRepresentation":
         """
         Join self (left) results with b (right).
 
@@ -641,7 +676,9 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             check_all_common_keys_in_by=check_all_common_keys_in_by,
         )
 
-    def concat_rows(self, b, *, id_column="source_name", a_name="a", b_name="b") -> 'ViewRepresentation':
+    def concat_rows(
+        self, b, *, id_column="source_name", a_name="a", b_name="b"
+    ) -> "ViewRepresentation":
         """
         Union or concatenate rows of self with rows of b.
 
@@ -665,7 +702,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             a=self, b=b, id_column=id_column, a_name=a_name, b_name=b_name
         )
 
-    def select_rows_parsed_(self, parsed_expr) -> 'ViewRepresentation':
+    def select_rows_parsed_(self, parsed_expr) -> "ViewRepresentation":
         """
         Select rows matching parsed expr criteria. Internal method.
 
@@ -678,7 +715,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             return self.sources[0].select_rows_parsed_(parsed_expr=parsed_expr)
         return SelectRowsNode(source=self, ops=parsed_expr)
 
-    def select_rows(self, expr) -> 'ViewRepresentation':
+    def select_rows(self, expr) -> "ViewRepresentation":
         """
         Select rows matching expr criteria.
 
@@ -714,7 +751,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             r_walk_expr(op)
         return self.select_rows_parsed_(parsed_expr=ops)
 
-    def drop_columns(self, column_deletions) -> 'ViewRepresentation':
+    def drop_columns(self, column_deletions) -> "ViewRepresentation":
         """
         Remove columns from result.
 
@@ -729,7 +766,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             return self.sources[0].drop_columns(column_deletions)
         return DropColumnsNode(source=self, column_deletions=column_deletions)
 
-    def select_columns(self, columns) -> 'ViewRepresentation':
+    def select_columns(self, columns) -> "ViewRepresentation":
         """
         Narrow to columns in result.
 
@@ -750,7 +787,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             return self.sources[0].select_columns(columns)
         return SelectColumnsNode(source=self, columns=columns)
 
-    def rename_columns(self, column_remapping) -> 'ViewRepresentation':
+    def rename_columns(self, column_remapping) -> "ViewRepresentation":
         """
         Rename columns.
 
@@ -765,7 +802,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             return self.sources[0].rename_columns(column_remapping)
         return RenameColumnsNode(source=self, column_remapping=column_remapping)
 
-    def order_rows(self, columns, *, reverse=None, limit=None) -> 'ViewRepresentation':
+    def order_rows(self, columns, *, reverse=None, limit=None) -> "ViewRepresentation":
         """
         Order rows by column set.
 
@@ -784,7 +821,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             return self.sources[0].order_rows(columns, reverse=reverse, limit=limit)
         return OrderRowsNode(source=self, columns=columns, reverse=reverse, limit=limit)
 
-    def convert_records(self, record_map) -> 'ViewRepresentation':
+    def convert_records(self, record_map) -> "ViewRepresentation":
         """
         Apply a record mapping taking blocks_in to blocks_out structures.
 
@@ -830,9 +867,11 @@ class TableDescription(ViewRepresentation):
         nrows: Optional[int] = None,
     ):
         if isinstance(column_names, str):
-            column_names = (column_names, )
+            column_names = (column_names,)
         else:
-            column_names = tuple(column_names)  # convert to tuple from other types such as series
+            column_names = tuple(
+                column_names
+            )  # convert to tuple from other types such as series
         ViewRepresentation.__init__(
             self, column_names=column_names, node_name="TableDescription"
         )
@@ -884,7 +923,9 @@ class TableDescription(ViewRepresentation):
         """
         return "table_" + str(self.key)
 
-    def forbidden_columns(self, *, forbidden: Optional[Set[str]] = None) -> Dict[str, Set[str]]:
+    def forbidden_columns(
+        self, *, forbidden: Optional[Set[str]] = None
+    ) -> Dict[str, Set[str]]:
         """
         Determine which columns should not be in source tables
         (were not in declared structure, and interfere with column production).
@@ -1311,7 +1352,9 @@ class ExtendNode(ViewRepresentation):
                     k,
                     is_project=False,
                     is_windowed=self.windowed_situation,
-                    is_ordered=self.ordered_windowed_situation))
+                    is_ordered=self.ordered_windowed_situation,
+                )
+            )
 
     def check_extend_window_fns_(self):
         """
@@ -1377,10 +1420,7 @@ class ExtendNode(ViewRepresentation):
             spacer = "\n   " + " " * indent
         s = ""
         if print_sources:
-            s = (
-                self.sources[0].to_python_src_(indent=indent, strict=strict)
-                + spacer
-            )
+            s = self.sources[0].to_python_src_(indent=indent, strict=strict) + spacer
         ops = [
             k.__repr__() + ": " + opi.to_python().__repr__()
             for (k, opi) in self.ops.items()
@@ -1423,6 +1463,7 @@ class ProjectNode(ViewRepresentation):
     """
     Class representation of .project() method/step.
     """
+
     # TODO: should project to take an optional order for last() style calculations?
     def __init__(self, *, source, parsed_ops, group_by=None):
         self.ops = parsed_ops
@@ -1486,7 +1527,9 @@ class ProjectNode(ViewRepresentation):
             # TODO: check op is in list of aggregators
             # Note: non-aggregators making through will be caught by table shape check
 
-    def forbidden_columns(self, *, forbidden: Optional[Set[str]] = None) -> Dict[str, Set[str]]:
+    def forbidden_columns(
+        self, *, forbidden: Optional[Set[str]] = None
+    ) -> Dict[str, Set[str]]:
         """
         Determine which columns should not be in source tables
         (were not in declared structure, and interfere with column production).
@@ -1512,7 +1555,9 @@ class ProjectNode(ViewRepresentation):
         for opk in self.ops.values():
             opk.get_method_names(method_names_seen)
         for k in method_names_seen:
-            methods_seen.add(MethodUse(k, is_project=True, is_windowed=False, is_ordered=False))
+            methods_seen.add(
+                MethodUse(k, is_project=True, is_windowed=False, is_ordered=False)
+            )
 
     def apply_to(self, a, *, target_table_key=None):
         """
@@ -1616,6 +1661,7 @@ class SelectRowsNode(ViewRepresentation):
     """
     Class representation of .select() method/step.
     """
+
     expr: data_algebra.expr_rep.Expression
     decision_columns: Set[str]
 
@@ -1647,7 +1693,9 @@ class SelectRowsNode(ViewRepresentation):
         method_names_seen: Set[str] = set()
         self.expr.get_method_names(method_names_seen)
         for k in method_names_seen:
-            methods_seen.add(MethodUse(k, is_project=False, is_windowed=False, is_ordered=False))
+            methods_seen.add(
+                MethodUse(k, is_project=False, is_windowed=False, is_ordered=False)
+            )
 
     def apply_to(self, a, *, target_table_key=None):
         """
@@ -1727,6 +1775,7 @@ class SelectColumnsNode(ViewRepresentation):
     """
     Class representation of .select_columns() method/step.
     """
+
     column_selection: List[str]
 
     def __init__(self, source, columns):
@@ -1748,7 +1797,9 @@ class SelectColumnsNode(ViewRepresentation):
             node_name="SelectColumnsNode",
         )
 
-    def forbidden_columns(self, *, forbidden: Optional[Set[str]] = None) -> Dict[str, Set[str]]:
+    def forbidden_columns(
+        self, *, forbidden: Optional[Set[str]] = None
+    ) -> Dict[str, Set[str]]:
         """
         Determine which columns should not be in source tables
         (were not in declared structure, and interfere with column production).
@@ -1835,6 +1886,7 @@ class DropColumnsNode(ViewRepresentation):
     """
     Class representation of .drop_columns() method/step.
     """
+
     column_deletions: List[str]
 
     def __init__(self, source, column_deletions):
@@ -1857,7 +1909,9 @@ class DropColumnsNode(ViewRepresentation):
             node_name="DropColumnsNode",
         )
 
-    def forbidden_columns(self, *, forbidden: Optional[Set[str]] = None) -> Dict[str, Set[str]]:
+    def forbidden_columns(
+        self, *, forbidden: Optional[Set[str]] = None
+    ) -> Dict[str, Set[str]]:
         """
         Determine which columns should not be in source tables
         (were not in declared structure, and interfere with column production).
@@ -1943,6 +1997,7 @@ class OrderRowsNode(ViewRepresentation):
     """
     Class representation of .order_rows() method/step.
     """
+
     order_columns: List[str]
     reverse: List[str]
 
@@ -2064,6 +2119,7 @@ class RenameColumnsNode(ViewRepresentation):
     """
     Class representation of .rename_columns() method/step.
     """
+
     column_remapping: Dict[str, str]
     reverse_mapping: Dict[str, str]
     mapped_columns: Set[str]
@@ -2101,7 +2157,9 @@ class RenameColumnsNode(ViewRepresentation):
             node_name="RenameColumnsNode",
         )
 
-    def forbidden_columns(self, *, forbidden: Optional[Set[str]] = None) -> Dict[str, Set[str]]:
+    def forbidden_columns(
+        self, *, forbidden: Optional[Set[str]] = None
+    ) -> Dict[str, Set[str]]:
         """
         Determine which columns should not be in source tables
         (were not in declared structure, and interfere with column production).
@@ -2195,6 +2253,7 @@ class NaturalJoinNode(ViewRepresentation):
     """
     Class representation of .natural_join() method/step.
     """
+
     by: List[str]
     jointype: str
 
@@ -2317,9 +2376,7 @@ class NaturalJoinNode(ViewRepresentation):
         s = s + (".natural_join(b=\n" + " " * (indent + 6))
         if print_sources:
             s = s + (
-                self.sources[1].to_python_src_(
-                    indent=max(indent, 0) + 6, strict=strict
-                )
+                self.sources[1].to_python_src_(indent=max(indent, 0) + 6, strict=strict)
                 + ",\n"
                 + " " * (max(indent, 0) + 6)
             )
@@ -2354,6 +2411,7 @@ class ConcatRowsNode(ViewRepresentation):
     """
     Class representation of .concat_rows() method/step.
     """
+
     id_column: Union[str, None]
 
     def __init__(self, a, b, *, id_column="table_name", a_name="a", b_name="b"):
@@ -2446,9 +2504,7 @@ class ConcatRowsNode(ViewRepresentation):
         s = s + (".concat_rows(b=\n" + " " * (indent + 6))
         if print_sources:
             s = s + (
-                self.sources[1].to_python_src_(
-                    indent=max(indent, 0) + 6, strict=strict
-                )
+                self.sources[1].to_python_src_(indent=max(indent, 0) + 6, strict=strict)
                 + ",\n"
                 + " " * (max(indent, 0) + 6)
             )
@@ -2489,6 +2545,7 @@ class ConvertRecordsNode(ViewRepresentation):
     """
     Class representation of .convert_records() method/step.
     """
+
     def __init__(self, *, source, record_map):
         sources = [source]
         self.record_map = record_map
@@ -2615,6 +2672,7 @@ class SQLNode(ViewRepresentation):
     """
     Class representation of user SQL step in pipeline. Can be used to start a pipeline instead of a TableDescription.
     """
+
     def __init__(
         self, *, sql: Union[str, List[str]], column_names: List[str], view_name: str
     ):

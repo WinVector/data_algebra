@@ -74,13 +74,21 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         return res
 
     # noinspection PyPep8Naming
-    def transform(self, X, *, data_model=None, narrow: bool = True, check_incoming_data_constraints: bool = False):
+    def transform(
+        self,
+        X,
+        *,
+        data_model=None,
+        narrow: bool = True,
+        check_incoming_data_constraints: bool = False
+    ):
         assert isinstance(self.ops, data_algebra.data_ops.ViewRepresentation)
         return self.ops.transform(
             X=X,
             data_model=data_model,
             narrow=narrow,
-            check_incoming_data_constraints=check_incoming_data_constraints)
+            check_incoming_data_constraints=check_incoming_data_constraints,
+        )
 
     # noinspection PyPep8Naming
     def act_on(self, X, *, data_model=None):

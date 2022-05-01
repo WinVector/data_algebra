@@ -1,4 +1,3 @@
-
 """
 SparkSQL adapter for the data algebra.
 """
@@ -20,7 +19,7 @@ except ImportError:
 
 def _sparksql_is_nan_expr(dbmodel, expression):
     subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-    return f'isNaN({subexpr})'
+    return f"isNaN({subexpr})"
 
 
 def _sparksql_is_bad_expr(dbmodel, expression):
@@ -50,6 +49,7 @@ def _sparksql_coalesce_expr(dbmodel, expression) -> str:
     """
     Return coalesce expression.
     """
+
     def coalesce_step(x: str) -> str:
         """
         Return one caes of coalesce.
@@ -118,8 +118,8 @@ SparkSQL_formatters = {
     "is_bad": _sparksql_is_bad_expr,
     "coalesce": _sparksql_coalesce_expr,
     "mapv": _sparksql_db_mapv,
-    'var': _spark_var_expr,
-    'std': _spark_std_expr,
+    "var": _spark_var_expr,
+    "std": _spark_std_expr,
 }
 
 
@@ -127,6 +127,7 @@ class SparkConnection:
     """
     Holder for spark conext and session as a connection (defines close).
     """
+
     def __init__(self, *, spark_context, spark_session):
         assert have_Spark
         assert isinstance(spark_context, pyspark.context.SparkContext)

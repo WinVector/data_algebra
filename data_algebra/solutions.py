@@ -1,4 +1,3 @@
-
 """
 data algebra solutions to common data processing problems
 """
@@ -8,20 +7,25 @@ from typing import Any, Dict, Iterable, Optional, Tuple
 import numpy
 import data_algebra
 from data_algebra.data_ops import descr, ViewRepresentation
-from data_algebra.cdata import pivot_specification, unpivot_specification, RecordMap, RecordSpecification
+from data_algebra.cdata import (
+    pivot_specification,
+    unpivot_specification,
+    RecordMap,
+    RecordSpecification,
+)
 
 
 def def_multi_column_map(
-        d: ViewRepresentation,
-        *,
-        mapping_table: ViewRepresentation,
-        row_keys: Iterable[str],
-        col_name_key: str = 'column_name',
-        col_value_key: str = 'column_value',
-        mapped_value_key: str = 'mapped_value',
-        cols_to_map: Iterable[str],
-        coalesce_value=None,
-        cols_to_map_back: Optional[Iterable[str]] = None,
+    d: ViewRepresentation,
+    *,
+    mapping_table: ViewRepresentation,
+    row_keys: Iterable[str],
+    col_name_key: str = "column_name",
+    col_value_key: str = "column_value",
+    mapped_value_key: str = "mapped_value",
+    cols_to_map: Iterable[str],
+    coalesce_value=None,
+    cols_to_map_back: Optional[Iterable[str]] = None,
 ) -> ViewRepresentation:
     """
     Map all columns in list cols_to_map through the mapping in mapping table (key by column name and value).
@@ -64,38 +68,48 @@ def def_multi_column_map(
         row_keys=row_keys,
         col_name_key=col_name_key,
         col_value_key=col_value_key,
-        value_cols=cols_to_map)
+        value_cols=cols_to_map,
+    )
     record_map_back = pivot_specification(
         row_keys=row_keys,
         col_name_key=col_name_key,
         col_value_key=mapped_value_key,
-        value_cols=cols_to_map)
+        value_cols=cols_to_map,
+    )
     ops = (
-        d
-            .select_columns(row_keys + cols_to_map)
-            .convert_records(record_map_to)
-            .natural_join(
-                b=mapping_table
-                    .select_columns([col_name_key, col_value_key, mapped_value_key]),
-                jointype='left',
-                by=[col_name_key, col_value_key],
-                )
+        d.select_columns(row_keys + cols_to_map)
+        .convert_records(record_map_to)
+        .natural_join(
+            b=mapping_table.select_columns(
+                [col_name_key, col_value_key, mapped_value_key]
+            ),
+            jointype="left",
+            by=[col_name_key, col_value_key],
         )
+    )
     if coalesce_value is not None:
-        ops = ops.extend({mapped_value_key: f'{mapped_value_key}.coalesce({coalesce_value})'})
+        ops = ops.extend(
+            {mapped_value_key: f"{mapped_value_key}.coalesce({coalesce_value})"}
+        )
     ops = ops.convert_records(record_map_back)
     if cols_to_map_back is not None:
         # could do this in the record mapping, but this seems easier to read
-        ops = ops.rename_columns({new_name: old_name for new_name, old_name in zip(cols_to_map_back, cols_to_map)})
+        ops = ops.rename_columns(
+            {
+                new_name: old_name
+                for new_name, old_name in zip(cols_to_map_back, cols_to_map)
+            }
+        )
     return ops
 
 
 def xicor_query(
-        data: ViewRepresentation,
-        *,
-        x_name: str = 'x',
-        y_name: str = 'y',
-        var_keys: Iterable[str] = tuple()) -> ViewRepresentation:
+    data: ViewRepresentation,
+    *,
+    x_name: str = "x",
+    y_name: str = "y",
+    var_keys: Iterable[str] = tuple(),
+) -> ViewRepresentation:
     """
     Build a query computing the xicor of y_name as a function of x_name for each var_keys group of rows.
     Ref: https://arxiv.org/abs/1909.10140
@@ -117,54 +131,72 @@ def xicor_query(
     x_tie_breaker = x_name + "_tie_breaker"
     y_group = y_name + "_group"
     names = [
-        x_name, y_name, x_tie_breaker, y_group,
-        'l', 'n', 'r',
-        'rplus', 'rdiff', 'lterm', 'num_sum', 'den_sum',
-        'xicor'
-        ] + var_keys
-    assert(len(names) == len(set(names)))
+        x_name,
+        y_name,
+        x_tie_breaker,
+        y_group,
+        "l",
+        "n",
+        "r",
+        "rplus",
+        "rdiff",
+        "lterm",
+        "num_sum",
+        "den_sum",
+        "xicor",
+    ] + var_keys
+    assert len(names) == len(set(names))
     ops = (
-        data
-            .extend({y_group: f"{y_name}.as_str()"})  # Google BigQuery won't group by float
-            .extend({    # convert types, and add in tie breaking column
+        data.extend(
+            {y_group: f"{y_name}.as_str()"}
+        )  # Google BigQuery won't group by float
+        .extend(
+            {  # convert types, and add in tie breaking column
                 x_name: f"1.0 * {x_name}",
                 y_name: f"1.0 * {y_name}",
-                x_tie_breaker: "_uniform()"})
-            .extend(
-                {"n": "(1).sum()"}, partition_by=var_keys)  # annotate in number of rows
-            .extend(  # compute y ranks, that we will use to compare rank changes wrt x
-                {"r": "(1).cumsum()"}, order_by=[y_name], partition_by=var_keys)
-            .extend(  # compute reverse y ranks, used to normalize for ties in denominator
-                {"l": "(1).cumsum()"}, order_by=[y_name], reverse=[y_name], partition_by=var_keys)
-            .extend(  # go to max rank of group tie breaking, also why we don't need tiebreaker in cumsums
-                {"l": "l.max()", "r": "r.max()"}, partition_by=[y_group] + var_keys)
-            .extend(  # get y rank and y rank of next x-item into same row so we can take a difference
-                {"rplus": "r.shift(1)"},
-                order_by=[x_name, x_tie_breaker],
-                reverse=[x_name, x_tie_breaker],
-                partition_by=var_keys,
-                )
-            .extend(  # compute numerator and denominator terms
-                {"rdiff": "((rplus - r).abs()).coalesce(0)", "lterm": "l * (n - l)"})
-            .project(   # aggregate to compute sums in xicor definition
-                {"num_sum": "rdiff.sum()", "den_sum": "lterm.sum()",
-                 "n": "n.max()"  # pseudo-aggregation n is constant across rows
-                 },
-                group_by=var_keys,
-                )
-            .extend(  # apply actual xicor formula
-                {"xicor": "1.0 - ((n * num_sum) / (2.0 * den_sum))"})
-            .select_columns(var_keys + ["xicor"])
+                x_tie_breaker: "_uniform()",
+            }
         )
+        .extend({"n": "(1).sum()"}, partition_by=var_keys)  # annotate in number of rows
+        .extend(  # compute y ranks, that we will use to compare rank changes wrt x
+            {"r": "(1).cumsum()"}, order_by=[y_name], partition_by=var_keys
+        )
+        .extend(  # compute reverse y ranks, used to normalize for ties in denominator
+            {"l": "(1).cumsum()"},
+            order_by=[y_name],
+            reverse=[y_name],
+            partition_by=var_keys,
+        )
+        .extend(  # go to max rank of group tie breaking, also why we don't need tiebreaker in cumsums
+            {"l": "l.max()", "r": "r.max()"}, partition_by=[y_group] + var_keys
+        )
+        .extend(  # get y rank and y rank of next x-item into same row so we can take a difference
+            {"rplus": "r.shift(1)"},
+            order_by=[x_name, x_tie_breaker],
+            reverse=[x_name, x_tie_breaker],
+            partition_by=var_keys,
+        )
+        .extend(  # compute numerator and denominator terms
+            {"rdiff": "((rplus - r).abs()).coalesce(0)", "lterm": "l * (n - l)"}
+        )
+        .project(  # aggregate to compute sums in xicor definition
+            {
+                "num_sum": "rdiff.sum()",
+                "den_sum": "lterm.sum()",
+                "n": "n.max()",  # pseudo-aggregation n is constant across rows
+            },
+            group_by=var_keys,
+        )
+        .extend(  # apply actual xicor formula
+            {"xicor": "1.0 - ((n * num_sum) / (2.0 * den_sum))"}
+        )
+        .select_columns(var_keys + ["xicor"])
+    )
     return ops
 
 
 def xicor_score_variables_plan(
-        d: ViewRepresentation,
-        *,
-        x_vars: Iterable[str],
-        y_name: str,
-        n_rep: int = 25,
+    d: ViewRepresentation, *, x_vars: Iterable[str], y_name: str, n_rep: int = 25,
 ) -> Tuple[ViewRepresentation, str, Any]:
     """
     Set up a query to batch compute xicor.
@@ -188,46 +220,42 @@ def xicor_score_variables_plan(
     assert isinstance(n_rep, int)
     record_map = RecordMap(
         blocks_out=RecordSpecification(
-            control_table=data_algebra.pandas_model.pd.DataFrame({
-                'variable_name': x_vars,
-                'x': x_vars,
-                'y': y_name,
-
-            }),
+            control_table=data_algebra.pandas_model.pd.DataFrame(
+                {"variable_name": x_vars, "x": x_vars, "y": y_name,}
+            ),
             record_keys=[],
-            control_table_keys=['variable_name'])
+            control_table_keys=["variable_name"],
+        )
     )
-    rep_frame = data_algebra.default_data_model.pd.DataFrame({'rep': range(n_rep)})
+    rep_frame = data_algebra.default_data_model.pd.DataFrame({"rep": range(n_rep)})
     grouped_calc = (
         xicor_query(
-            d
-                .convert_records(record_map)
-                .natural_join(  # cross join rows to get experiment repetitions
-                        b=descr(rep_frame=rep_frame),
-                        by=[],
-                        jointype='cross',
-                    ),
-                var_keys=['variable_name', 'rep'])
-            .project({
-                    'xicor_mean': 'xicor.mean()',
-                    'xicor_std': 'xicor.std()',
-                },
-                group_by=['variable_name'])
-            .order_rows(['variable_name'])
+            d.convert_records(
+                record_map
+            ).natural_join(  # cross join rows to get experiment repetitions
+                b=descr(rep_frame=rep_frame), by=[], jointype="cross",
+            ),
+            var_keys=["variable_name", "rep"],
+        )
+        .project(
+            {"xicor_mean": "xicor.mean()", "xicor_std": "xicor.std()",},
+            group_by=["variable_name"],
+        )
+        .order_rows(["variable_name"])
     )
-    return grouped_calc, 'rep_frame', rep_frame
+    return grouped_calc, "rep_frame", rep_frame
 
 
 def last_observed_carried_forward(
-        d: ViewRepresentation,
-        *,
-        order_by: Iterable[str],
-        partition_by: Optional[Iterable[str]] = None,
-        value_column_name: str,
-        selection_predicate: str = 'is_null()',
-        locf_to_use_column_name: str = 'locf_to_use',
-        locf_non_null_rank_column_name: str = 'locf_non_null_rank',
-        locf_tiebreaker_column_name: str = 'locf_tiebreaker',
+    d: ViewRepresentation,
+    *,
+    order_by: Iterable[str],
+    partition_by: Optional[Iterable[str]] = None,
+    value_column_name: str,
+    selection_predicate: str = "is_null()",
+    locf_to_use_column_name: str = "locf_to_use",
+    locf_non_null_rank_column_name: str = "locf_non_null_rank",
+    locf_tiebreaker_column_name: str = "locf_tiebreaker",
 ) -> ViewRepresentation:
     """
     Copy last observed non-null value in column value_column_name forward using order order_by and
@@ -246,7 +274,11 @@ def last_observed_carried_forward(
     assert isinstance(d, ViewRepresentation)
     assert isinstance(locf_to_use_column_name, str)
     assert isinstance(locf_non_null_rank_column_name, str)
-    cols = [locf_to_use_column_name, locf_non_null_rank_column_name, locf_tiebreaker_column_name] + list(d.column_names)
+    cols = [
+        locf_to_use_column_name,
+        locf_non_null_rank_column_name,
+        locf_tiebreaker_column_name,
+    ] + list(d.column_names)
     assert len(cols) == len(set(cols))
     assert not isinstance(order_by, str)
     assert isinstance(selection_predicate, str)
@@ -260,41 +292,52 @@ def last_observed_carried_forward(
         assert not isinstance(partition_by, str)
         partition_by = list(partition_by)
     d_marked = (
-        d
-            .extend({locf_to_use_column_name: f'{value_column_name}.{selection_predicate}.where(0, 1)'})
-            .extend({locf_tiebreaker_column_name: '_row_number()'}, order_by=partition_by + order_by)
-            .extend({locf_non_null_rank_column_name: f'{locf_to_use_column_name}.cumsum()'},
-                    order_by=order_by + [locf_tiebreaker_column_name],
-                    partition_by=partition_by)
+        d.extend(
+            {
+                locf_to_use_column_name: f"{value_column_name}.{selection_predicate}.where(0, 1)"
+            }
+        )
+        .extend(
+            {locf_tiebreaker_column_name: "_row_number()"},
+            order_by=partition_by + order_by,
+        )
+        .extend(
+            {locf_non_null_rank_column_name: f"{locf_to_use_column_name}.cumsum()"},
+            order_by=order_by + [locf_tiebreaker_column_name],
+            partition_by=partition_by,
+        )
     )
-    ops = (
-        d_marked
-            .natural_join(
-                b=d_marked
-                    .select_rows(f'{locf_to_use_column_name} == 1')
-                    .select_columns(partition_by + [locf_non_null_rank_column_name, value_column_name]),
-                by=partition_by + [locf_non_null_rank_column_name],
-                jointype='left')
-            .drop_columns([locf_to_use_column_name, locf_non_null_rank_column_name, locf_tiebreaker_column_name])
+    ops = d_marked.natural_join(
+        b=d_marked.select_rows(f"{locf_to_use_column_name} == 1").select_columns(
+            partition_by + [locf_non_null_rank_column_name, value_column_name]
+        ),
+        by=partition_by + [locf_non_null_rank_column_name],
+        jointype="left",
+    ).drop_columns(
+        [
+            locf_to_use_column_name,
+            locf_non_null_rank_column_name,
+            locf_tiebreaker_column_name,
+        ]
     )
     return ops
 
 
 def braid_data(
-        *,
-        d_state: ViewRepresentation,
-        d_event: ViewRepresentation,
-        order_by: Iterable[str],
-        partition_by: Optional[Iterable[str]] = None,
-        state_value_column_name: str,
-        event_value_column_names: Iterable[str],
-        source_id_column: str = 'record_type',
-        state_row_mark: str = 'state_row',
-        event_row_mark: str = 'event_row',
-        stand_in_values: Dict,
-        locf_to_use_column_name: str = 'locf_to_use',
-        locf_non_null_rank_column_name: str = 'locf_non_null_rank',
-        locf_tiebreaker_column_name: str = 'locf_tiebreaker',
+    *,
+    d_state: ViewRepresentation,
+    d_event: ViewRepresentation,
+    order_by: Iterable[str],
+    partition_by: Optional[Iterable[str]] = None,
+    state_value_column_name: str,
+    event_value_column_names: Iterable[str],
+    source_id_column: str = "record_type",
+    state_row_mark: str = "state_row",
+    event_row_mark: str = "event_row",
+    stand_in_values: Dict,
+    locf_to_use_column_name: str = "locf_to_use",
+    locf_non_null_rank_column_name: str = "locf_non_null_rank",
+    locf_tiebreaker_column_name: str = "locf_tiebreaker",
 ) -> ViewRepresentation:
     """
     Mix data from two sources, ordering by order_by columns and carrying forward observations
@@ -337,49 +380,61 @@ def braid_data(
     assert isinstance(locf_tiebreaker_column_name, str)
     assert isinstance(stand_in_values, dict)
     together = (
-        d_state
-            .extend({k: stand_in_values[k] for k in event_value_column_names})
-            .select_columns(partition_by + order_by + [state_value_column_name] + event_value_column_names)
-            .concat_rows(
-                b=(
-                    d_event
-                        .extend({state_value_column_name: stand_in_values[state_value_column_name]})
-                        .select_columns(partition_by + order_by + [state_value_column_name] + event_value_column_names)
-                    ),
-                id_column=source_id_column,
-                a_name=state_row_mark,
-                b_name=event_row_mark,
+        d_state.extend({k: stand_in_values[k] for k in event_value_column_names})
+        .select_columns(
+            partition_by
+            + order_by
+            + [state_value_column_name]
+            + event_value_column_names
+        )
+        .concat_rows(
+            b=(
+                d_event.extend(
+                    {state_value_column_name: stand_in_values[state_value_column_name]}
+                ).select_columns(
+                    partition_by
+                    + order_by
+                    + [state_value_column_name]
+                    + event_value_column_names
                 )
-            # clear out stand-in values
-            .extend({
-                state_value_column_name:
-                    f'({source_id_column} == "{event_row_mark}").if_else(None, {state_value_column_name})'})
-            .extend({
-                k:
-                    f'({source_id_column} == "{state_row_mark}").if_else(None, {k})' for k in event_value_column_names})
+            ),
+            id_column=source_id_column,
+            a_name=state_row_mark,
+            b_name=event_row_mark,
         )
-    ops = (
-        last_observed_carried_forward(
-            together,
-            order_by=order_by,
-            partition_by=partition_by,
-            value_column_name=state_value_column_name,
-            selection_predicate='is_null()',
-            locf_to_use_column_name=locf_to_use_column_name,
-            locf_non_null_rank_column_name=locf_non_null_rank_column_name,
-            locf_tiebreaker_column_name=locf_tiebreaker_column_name,
-            )
+        # clear out stand-in values
+        .extend(
+            {
+                state_value_column_name: f'({source_id_column} == "{event_row_mark}").if_else(None, {state_value_column_name})'
+            }
         )
+        .extend(
+            {
+                k: f'({source_id_column} == "{state_row_mark}").if_else(None, {k})'
+                for k in event_value_column_names
+            }
+        )
+    )
+    ops = last_observed_carried_forward(
+        together,
+        order_by=order_by,
+        partition_by=partition_by,
+        value_column_name=state_value_column_name,
+        selection_predicate="is_null()",
+        locf_to_use_column_name=locf_to_use_column_name,
+        locf_non_null_rank_column_name=locf_non_null_rank_column_name,
+        locf_tiebreaker_column_name=locf_tiebreaker_column_name,
+    )
     return ops
 
 
 def rank_to_average(
-        d: ViewRepresentation,
-        *,
-        order_by: Iterable[str],
-        partition_by: Optional[Iterable[str]] = None,
-        rank_column_name: str,
-        tie_breaker_column_name: str = 'rank_tie_breaker',
+    d: ViewRepresentation,
+    *,
+    order_by: Iterable[str],
+    partition_by: Optional[Iterable[str]] = None,
+    rank_column_name: str,
+    tie_breaker_column_name: str = "rank_tie_breaker",
 ) -> ViewRepresentation:
     """
     Compute rank where the rank of each item is the average of all items with same order
@@ -403,19 +458,18 @@ def rank_to_average(
     cols = [rank_column_name, tie_breaker_column_name] + list(d.column_names)
     assert len(cols) == len(set(cols))
     ops = (
-        d  # database sum() is constant per group when partitioned, so cumsum fails without tiebreaker
-            .extend({tie_breaker_column_name: '_row_number()'}, order_by=order_by)
-            .extend(
-                {
-                    rank_column_name: '(1.0).cumsum()',
-                },
-                order_by=order_by + [tie_breaker_column_name],
-                partition_by=partition_by)
-            .extend(
-                {
-                    rank_column_name: f'{rank_column_name}.mean()',
-                },
-                partition_by=partition_by + order_by)
-            .drop_columns([tie_breaker_column_name])
+        d.extend(  # database sum() is constant per group when partitioned, so cumsum fails without tiebreaker
+            {tie_breaker_column_name: "_row_number()"}, order_by=order_by
+        )
+        .extend(
+            {rank_column_name: "(1.0).cumsum()",},
+            order_by=order_by + [tie_breaker_column_name],
+            partition_by=partition_by,
+        )
+        .extend(
+            {rank_column_name: f"{rank_column_name}.mean()",},
+            partition_by=partition_by + order_by,
+        )
+        .drop_columns([tie_breaker_column_name])
     )
     return ops

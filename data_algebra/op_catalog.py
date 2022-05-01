@@ -1,10 +1,8 @@
-
-
 import data_algebra
 
 pd = data_algebra.default_data_model.pd
 
-    
+
 methods_table = pd.DataFrame(
     {
         "op": [
@@ -1269,4 +1267,3 @@ methods_table = pd.DataFrame(
         ],
     }
 )
-

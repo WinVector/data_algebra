@@ -355,11 +355,13 @@ class RecordMap:
     """
     Class for specifying general record to record transforms.
     """
+
     def __init__(
-            self,
-            *,
-            blocks_in: Optional[RecordSpecification] = None,
-            blocks_out: Optional[RecordSpecification] = None):
+        self,
+        *,
+        blocks_in: Optional[RecordSpecification] = None,
+        blocks_out: Optional[RecordSpecification] = None
+    ):
         """
         Build the transform specification. At least one of blocks_in or blocks_out must not be None.
 
@@ -445,11 +447,8 @@ class RecordMap:
 
     # noinspection PyPep8Naming
     def transform(
-            self,
-            X,
-            *,
-            check_blocks_out_keying: bool = False,
-            local_data_model=None):
+        self, X, *, check_blocks_out_keying: bool = False, local_data_model=None
+    ):
         """
         Transform X records.
 
@@ -705,11 +704,11 @@ def pivot_rowrecs_to_blocks(
 
 
 def pivot_specification(
-        *,
-        row_keys: Iterable[str],
-        col_name_key: str = 'column_name',
-        col_value_key: str = 'column_value',
-        value_cols: Iterable[str]
+    *,
+    row_keys: Iterable[str],
+    col_name_key: str = "column_name",
+    col_value_key: str = "column_value",
+    value_cols: Iterable[str]
 ) -> RecordMap:
     """
     Specify the cdata transformation that pivots records from a single column of values into collected rows.
@@ -731,22 +730,22 @@ def pivot_specification(
     assert len(known_cols) == len(set(known_cols))
     record_map = RecordMap(
         blocks_in=RecordSpecification(
-            control_table=data_algebra.pandas_model.pd.DataFrame({
-                col_name_key: value_cols,
-                col_value_key: value_cols,
-            }),
+            control_table=data_algebra.pandas_model.pd.DataFrame(
+                {col_name_key: value_cols, col_value_key: value_cols,}
+            ),
             record_keys=row_keys,
-            control_table_keys=[col_name_key])
+            control_table_keys=[col_name_key],
         )
+    )
     return record_map
 
 
 def unpivot_specification(
-        *,
-        row_keys: Iterable[str],
-        col_name_key: str = 'column_name',
-        col_value_key: str = 'column_value',
-        value_cols: Iterable[str]
+    *,
+    row_keys: Iterable[str],
+    col_name_key: str = "column_name",
+    col_value_key: str = "column_value",
+    value_cols: Iterable[str]
 ) -> RecordMap:
     """
     Specify the cdata transformation that un-pivots records into a single column of values plus keys.
@@ -768,11 +767,11 @@ def unpivot_specification(
     assert len(known_cols) == len(set(known_cols))
     record_map = RecordMap(
         blocks_out=RecordSpecification(
-            control_table=data_algebra.pandas_model.pd.DataFrame({
-                col_name_key: value_cols,
-                col_value_key: value_cols,
-            }),
+            control_table=data_algebra.pandas_model.pd.DataFrame(
+                {col_name_key: value_cols, col_value_key: value_cols,}
+            ),
             record_keys=row_keys,
-            control_table_keys=[col_name_key])
+            control_table_keys=[col_name_key],
         )
+    )
     return record_map

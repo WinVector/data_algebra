@@ -46,7 +46,9 @@ def _clean_annotation(annotation: Optional[str]) -> Optional[str]:
         return annotation
     annotation = annotation.strip()
     annotation = re.sub(r"(\s|\r|\n)+", " ", annotation)
-    annotation = annotation.replace('%', "percent")  # SQL alchemy doesn't like these in comments
+    annotation = annotation.replace(
+        "%", "percent"
+    )  # SQL alchemy doesn't like these in comments
     return annotation.strip()
 
 
@@ -125,11 +127,11 @@ def _db_is_inf_expr(dbmodel, expression):
     plus_inf = f"CAST({dbmodel.value_to_sql('+infinity')} AS {dbmodel.float_type})"
     minus_inf = f"CAST({dbmodel.value_to_sql('-infinity')} AS {dbmodel.float_type})"
     return (
-            "(CASE"
-            + f' WHEN {subexpr} IS NULL THEN FALSE'
-            + f' WHEN NOT (({subexpr} > {minus_inf}) AND ({subexpr} < {plus_inf})) THEN TRUE'
-            + ' ELSE FALSE'
-            + ' END)'
+        "(CASE"
+        + f" WHEN {subexpr} IS NULL THEN FALSE"
+        + f" WHEN NOT (({subexpr} > {minus_inf}) AND ({subexpr} < {plus_inf})) THEN TRUE"
+        + " ELSE FALSE"
+        + " END)"
     )
 
 
@@ -137,12 +139,12 @@ def _db_is_nan_expr(dbmodel, expression):
     subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
     return (
         "(CASE"
-        + f' WHEN {subexpr} IS NULL THEN TRUE'
-        + f' WHEN ({subexpr} > 0) AND (-{subexpr} > 0) THEN TRUE'
-        + f' WHEN ({subexpr} != {subexpr}) THEN TRUE'
-        + f' WHEN ({subexpr} != 0) AND ({subexpr} = -{subexpr}) THEN TRUE'
-        + ' ELSE FALSE'
-        + ' END)'
+        + f" WHEN {subexpr} IS NULL THEN TRUE"
+        + f" WHEN ({subexpr} > 0) AND (-{subexpr} > 0) THEN TRUE"
+        + f" WHEN ({subexpr} != {subexpr}) THEN TRUE"
+        + f" WHEN ({subexpr} != 0) AND ({subexpr} = -{subexpr}) THEN TRUE"
+        + " ELSE FALSE"
+        + " END)"
     )
 
 
@@ -152,39 +154,18 @@ def _db_is_bad_expr(dbmodel, expression):
     minus_inf = f"CAST({dbmodel.value_to_sql('-infinity')} AS {dbmodel.float_type})"
     return (
         "(CASE"
-        + f' WHEN {subexpr} IS NULL THEN TRUE'
-        + f' WHEN ({subexpr} > 0) AND (-{subexpr} > 0) THEN TRUE'
-        + f' WHEN ({subexpr} != {subexpr}) THEN TRUE'
-        + f' WHEN ({subexpr} != 0) AND ({subexpr} = -{subexpr}) THEN TRUE'
-        + f' WHEN NOT (({subexpr} > {minus_inf}) AND ({subexpr} < {plus_inf})) THEN TRUE'
-        + ' ELSE FALSE'
-        + ' END)'
+        + f" WHEN {subexpr} IS NULL THEN TRUE"
+        + f" WHEN ({subexpr} > 0) AND (-{subexpr} > 0) THEN TRUE"
+        + f" WHEN ({subexpr} != {subexpr}) THEN TRUE"
+        + f" WHEN ({subexpr} != 0) AND ({subexpr} = -{subexpr}) THEN TRUE"
+        + f" WHEN NOT (({subexpr} > {minus_inf}) AND ({subexpr} < {plus_inf})) THEN TRUE"
+        + " ELSE FALSE"
+        + " END)"
     )
 
 
 def _db_if_else_expr(dbmodel, expression):
-    assert len(expression.args)==3
-    if_expr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
-    x_expr = dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
-    y_expr = dbmodel.expr_to_sql(expression.args[2], want_inline_parens=True)
-    return (
-            "CASE"
-            + " WHEN "
-            + if_expr
-            + " THEN "
-            + x_expr
-            + " WHEN NOT "
-            + if_expr
-            + " THEN "
-            + y_expr
-            + " ELSE "
-            + "NULL"
-            + " END"
-    )
-
-
-def _db_where_expr(dbmodel, expression):
-    assert len(expression.args)==3
+    assert len(expression.args) == 3
     if_expr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
     x_expr = dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
     y_expr = dbmodel.expr_to_sql(expression.args[2], want_inline_parens=True)
@@ -194,10 +175,22 @@ def _db_where_expr(dbmodel, expression):
         + if_expr
         + " THEN "
         + x_expr
-        + " ELSE "
+        + " WHEN NOT "
+        + if_expr
+        + " THEN "
         + y_expr
+        + " ELSE "
+        + "NULL"
         + " END"
     )
+
+
+def _db_where_expr(dbmodel, expression):
+    assert len(expression.args) == 3
+    if_expr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
+    x_expr = dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
+    y_expr = dbmodel.expr_to_sql(expression.args[2], want_inline_parens=True)
+    return "CASE" + " WHEN " + if_expr + " THEN " + x_expr + " ELSE " + y_expr + " END"
 
 
 def _db_mapv(dbmodel, expression):
@@ -230,13 +223,25 @@ def _db_maximum_expr(dbmodel, expression):
     return (
         "CASE"
         + " WHEN "
-        + "((" + y_expr + " IS NULL) OR "
-        + "(" + x_expr + ") >= (" + y_expr + "))"
+        + "(("
+        + y_expr
+        + " IS NULL) OR "
+        + "("
+        + x_expr
+        + ") >= ("
+        + y_expr
+        + "))"
         + " THEN "
         + x_expr
         + " WHEN "
-        + "((" + x_expr + " IS NULL) OR "
-        + "(" + y_expr + ") >= (" + x_expr + "))"
+        + "(("
+        + x_expr
+        + " IS NULL) OR "
+        + "("
+        + y_expr
+        + ") >= ("
+        + x_expr
+        + "))"
         + " THEN "
         + y_expr
         + " ELSE NULL END"
@@ -274,13 +279,25 @@ def _db_minimum_expr(dbmodel, expression):
     return (
         "CASE"
         + " WHEN "
-        + "((" + y_expr + " IS NULL) OR "
-        + "(" + x_expr + ") <= (" + y_expr + "))"
+        + "(("
+        + y_expr
+        + " IS NULL) OR "
+        + "("
+        + x_expr
+        + ") <= ("
+        + y_expr
+        + "))"
         + " THEN "
         + x_expr
         + " WHEN "
-        + "((" + x_expr + " IS NULL) OR "
-        + "(" + y_expr + ") <= (" + x_expr + "))"
+        + "(("
+        + x_expr
+        + " IS NULL) OR "
+        + "("
+        + y_expr
+        + ") <= ("
+        + x_expr
+        + "))"
         + " THEN "
         + y_expr
         + " ELSE NULL END"
@@ -340,7 +357,9 @@ def _db_coalesce_expr(dbmodel, expression):
 
 
 def _db_pow_expr(dbmodel, expression):
-    if isinstance(expression.args[1], data_algebra.expr_rep.Value) and (expression.args[1].value == 1):
+    if isinstance(expression.args[1], data_algebra.expr_rep.Value) and (
+        expression.args[1].value == 1
+    ):
         return dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
     return (
         "POWER("
@@ -360,7 +379,9 @@ def _db_round_expr(dbmodel, expression):
 
 
 def _db_around_expr(dbmodel, expression):
-    if isinstance(expression.args[1], data_algebra.expr_rep.Value) and (expression.args[1].value == 0):
+    if isinstance(expression.args[1], data_algebra.expr_rep.Value) and (
+        expression.args[1].value == 0
+    ):
         return dbmodel.expr_to_sql(expression.args[0].round(), want_inline_parens=False)
     mult = data_algebra.expr_rep.Value(10.0).__pow__(expression.args[1])
     derived = (expression.args[0] * mult).round() / mult
@@ -395,7 +416,7 @@ def _db_float_divide_expr(dbmodel, expression):
     assert len(expression.args) == 2
     e0 = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
     e1 = dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
-    return f'({e0} / (1.0 * {e1}))'
+    return f"({e0} / (1.0 * {e1}))"
 
 
 def _db_nunique_expr(dbmodel, expression):
@@ -428,7 +449,10 @@ def _db_concat_expr(dbmodel, expression):
     return (
         "("
         + " || ".join(
-            [dbmodel.expr_to_sql(ai.as_str(), want_inline_parens=True) for ai in expression.args]
+            [
+                dbmodel.expr_to_sql(ai.as_str(), want_inline_parens=True)
+                for ai in expression.args
+            ]
         )
         + ")"
     )
@@ -457,10 +481,13 @@ def _all_expr(dbmodel, expression):
 
 
 def _any_value_expr(dbmodel, expression):
-    return 'MAX(' + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + ')'
+    return (
+        "MAX(" + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + ")"
+    )
 
 
 # date/time fns
+
 
 def _datetime_to_date(dbmodel, expression):
     return (
@@ -614,7 +641,7 @@ db_expr_formatters = {
     "floor": _db_floor_expr,
     "ceil": _db_ceil_expr,
     "//": _db_int_divide_expr,
-    '%/%': _db_float_divide_expr,
+    "%/%": _db_float_divide_expr,
     "**": _db_pow_expr,
     "nunique": _db_nunique_expr,
     "mapv": _db_mapv,
@@ -666,10 +693,11 @@ db_default_op_replacements = {
 
 
 def _annotated_method_catalogue(
-        model_name: str) -> Tuple[
-            Set[data_algebra.data_ops_types.MethodUse],
-            Set[data_algebra.data_ops_types.MethodUse]
-            ]:
+    model_name: str,
+) -> Tuple[
+    Set[data_algebra.data_ops_types.MethodUse],
+    Set[data_algebra.data_ops_types.MethodUse],
+]:
     """
     Prepare method lookup tables
 
@@ -681,38 +709,34 @@ def _annotated_method_catalogue(
     for i in range(data_algebra.op_catalog.methods_table.shape[0]):
         row = data_algebra.op_catalog.methods_table.loc[i, :]
         matches = []
-        if row['op_class'] in {'p', 'up'}:
-            matches.append(data_algebra.data_ops_types.MethodUse(
-                row['op'],
-                is_project=True,
-                is_windowed=False,
-                is_ordered=False,
-            ))
-        elif row['op_class'] == 'g':
-            matches.append(data_algebra.data_ops_types.MethodUse(
-                row['op'],
-                is_project=False,
-                is_windowed=True,
-                is_ordered=False,
-            ))
-        elif row['op_class'] == 'w':
-            matches.append(data_algebra.data_ops_types.MethodUse(
-                row['op'],
-                is_project=False,
-                is_windowed=True,
-                is_ordered=True,
-            ))
+        if row["op_class"] in {"p", "up"}:
+            matches.append(
+                data_algebra.data_ops_types.MethodUse(
+                    row["op"], is_project=True, is_windowed=False, is_ordered=False,
+                )
+            )
+        elif row["op_class"] == "g":
+            matches.append(
+                data_algebra.data_ops_types.MethodUse(
+                    row["op"], is_project=False, is_windowed=True, is_ordered=False,
+                )
+            )
+        elif row["op_class"] == "w":
+            matches.append(
+                data_algebra.data_ops_types.MethodUse(
+                    row["op"], is_project=False, is_windowed=True, is_ordered=True,
+                )
+            )
         else:  # e and u case
-            matches.append(data_algebra.data_ops_types.MethodUse(
-                row['op'],
-                is_project=False,
-                is_windowed=False,
-                is_ordered=False,
-            ))
+            matches.append(
+                data_algebra.data_ops_types.MethodUse(
+                    row["op"], is_project=False, is_windowed=False, is_ordered=False,
+                )
+            )
         if len(matches) > 0:
             good_use = (
-                (model_name in data_algebra.op_catalog.methods_table.columns)
-                and (data_algebra.op_catalog.methods_table[model_name].values[i] == 'y'))
+                model_name in data_algebra.op_catalog.methods_table.columns
+            ) and (data_algebra.op_catalog.methods_table[model_name].values[i] == "y")
             for m in matches:
                 known_method_uses.add(m)
                 if good_use:
@@ -753,7 +777,7 @@ class DBModel:
         on_joiner: str = "AND",
         drop_text: str = "DROP TABLE",
         string_type: str = "VARCHAR",
-        float_type: str = 'FLOAT64',
+        float_type: str = "FLOAT64",
         supports_with: bool = True,
         supports_cte_elim: bool = True,
         allow_extend_merges: bool = True,
@@ -1205,9 +1229,7 @@ class DBModel:
             oi.get_column_names(cols_used_in_term)
             cols_used_in_term.update(window_vars)
             declared_term_dependencies[ci] = cols_used_in_term
-        annotation = str(
-            extend_node.to_python_src_(print_sources=False, indent=-1)
-        )
+        annotation = str(extend_node.to_python_src_(print_sources=False, indent=-1))
         # TODO: see if we can merge with subsql instead of building a new one
         if (
             self.allow_extend_merges
@@ -1315,9 +1337,7 @@ class DBModel:
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
             suffix=suffix,
-            annotation=str(
-                project_node.to_python_src_(print_sources=False, indent=-1)
-            ),
+            annotation=str(project_node.to_python_src_(print_sources=False, indent=-1)),
             ops_key=f"project({project_node}, {terms.keys()})",
         )
         return near_sql
@@ -1361,9 +1381,7 @@ class DBModel:
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
             suffix=suffix,
             annotation=str(
-                select_rows_node.to_python_src_(
-                    print_sources=False, indent=-1
-                )
+                select_rows_node.to_python_src_(print_sources=False, indent=-1)
             ),
             ops_key=f"select({select_rows_node}, {terms.keys()})",
         )
@@ -1485,9 +1503,7 @@ class DBModel:
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
             suffix=suffix,
-            annotation=str(
-                order_node.to_python_src_(print_sources=False, indent=-1)
-            ),
+            annotation=str(order_node.to_python_src_(print_sources=False, indent=-1)),
             ops_key=f"order({order_node})",  # no terms
         )
         return near_sql
@@ -1525,20 +1541,21 @@ class DBModel:
             query_name=view_name,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
-            annotation=str(
-                rename_node.to_python_src_(print_sources=False, indent=-1)
-            ),
+            annotation=str(rename_node.to_python_src_(print_sources=False, indent=-1)),
             ops_key=f"rename({rename_node}, {terms.keys()})",
         )
         return near_sql
 
-    def _coalesce_terms(self, *, sub_view_name_first, sub_view_name_second, cols) -> OrderedDict:
+    def _coalesce_terms(
+        self, *, sub_view_name_first, sub_view_name_second, cols
+    ) -> OrderedDict:
         coalesce_formatter = self.sql_formatters["coalesce"]
 
         class PseudoExpression:
             """
             Class to carry info into a method expecting an actual expression type.
             """
+
             def __init__(self, args):
                 self.args = args.copy()
 
@@ -1556,13 +1573,13 @@ class DBModel:
         return terms
 
     def _natural_join_sub_queries(
-            self, 
-            *, 
-            join_node, 
-            using,
-            temp_id_source: List
-    ) -> Tuple[OrderedSet, data_algebra.near_sql.NearSQL,
-               OrderedSet, data_algebra.near_sql.NearSQL]:
+        self, *, join_node, using, temp_id_source: List
+    ) -> Tuple[
+        OrderedSet,
+        data_algebra.near_sql.NearSQL,
+        OrderedSet,
+        data_algebra.near_sql.NearSQL,
+    ]:
         if join_node.node_name != "NaturalJoinNode":
             raise TypeError(
                 "Expected join_node to be a data_algebra.data_ops.NaturalJoinNode)"
@@ -1656,17 +1673,17 @@ class DBModel:
                 columns=using_left,
                 force_sql=False,
                 public_name=left_q,
-                public_name_quoted=left_qqn),
+                public_name_quoted=left_qqn,
+            ),
             joiner=join_node.jointype + " JOIN",
             sub_sql2=sql_right.to_bound_near_sql(
                 columns=using_right,
                 force_sql=False,
                 public_name=right_q,
-                public_name_quoted=right_qqn),
-            suffix=on_terms,
-            annotation=str(
-                join_node.to_python_src_(print_sources=False, indent=-1)
+                public_name_quoted=right_qqn,
             ),
+            suffix=on_terms,
+            annotation=str(join_node.to_python_src_(print_sources=False, indent=-1)),
             ops_key=f"join({join_node}, {terms.keys()})",
         )
         return near_sql
@@ -1700,8 +1717,12 @@ class DBModel:
         expr_left = concat_node.sources[0]
         expr_right = concat_node.sources[1]
         if concat_node.id_column is not None:
-            expr_left = expr_left.extend({concat_node.id_column: f'"{concat_node.a_name}"'})
-            expr_right = expr_right.extend({concat_node.id_column: f'"{concat_node.b_name}"'})
+            expr_left = expr_left.extend(
+                {concat_node.id_column: f'"{concat_node.a_name}"'}
+            )
+            expr_right = expr_right.extend(
+                {concat_node.id_column: f'"{concat_node.b_name}"'}
+            )
             using_joint.add(concat_node.id_column)
             terms.update({concat_node.id_column: None})
         sql_left = expr_left.to_near_sql_implementation_(
@@ -1717,20 +1738,20 @@ class DBModel:
             query_name=view_name,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql1=sql_left.to_bound_near_sql(
-                columns=using_joint.copy(), force_sql=True),
+                columns=using_joint.copy(), force_sql=True
+            ),
             joiner="UNION ALL",
             sub_sql2=sql_right.to_bound_near_sql(
-                columns=using_joint.copy(), force_sql=True),
-            annotation=str(
-                concat_node.to_python_src_(print_sources=False, indent=-1)
+                columns=using_joint.copy(), force_sql=True
             ),
+            annotation=str(concat_node.to_python_src_(print_sources=False, indent=-1)),
             ops_key=f"concat({concat_node}, {terms.keys()})",
         )
         return near_sql
 
     def non_known_methods(
-            self,
-            ops: data_algebra.data_ops.ViewRepresentation) -> List[data_algebra.data_ops_types.MethodUse]:
+        self, ops: data_algebra.data_ops.ViewRepresentation
+    ) -> List[data_algebra.data_ops_types.MethodUse]:
         """Return list of used non-recommended methods."""
         if self.known_methods is None:
             return []  # can't check, just pass
@@ -1740,21 +1761,25 @@ class DBModel:
         return non_recommended
 
     def non_recommended_methods(
-            self,
-            ops: data_algebra.data_ops.ViewRepresentation) -> List[data_algebra.data_ops_types.MethodUse]:
+        self, ops: data_algebra.data_ops.ViewRepresentation
+    ) -> List[data_algebra.data_ops_types.MethodUse]:
         """Return list of used non-recommended methods."""
         if (self.recommended_methods is None) or (self.known_methods is None):
             return []  # can't check, just pass
         method_uses = ops.methods_used()
-        non_recommended = [op for op in method_uses if
-                           (op not in self.recommended_methods) and (op in self.known_methods)]
+        non_recommended = [
+            op
+            for op in method_uses
+            if (op not in self.recommended_methods) and (op in self.known_methods)
+        ]
         return non_recommended
 
     def to_sql(
-            self,
-            ops: data_algebra.data_ops.ViewRepresentation,
-            *,
-            sql_format_options: Optional[SQLFormatOptions] = None) -> str:
+        self,
+        ops: data_algebra.data_ops.ViewRepresentation,
+        *,
+        sql_format_options: Optional[SQLFormatOptions] = None,
+    ) -> str:
         """
         Convert ViewRepresentation into SQL string.
 
@@ -1771,11 +1796,17 @@ class DBModel:
         if sql_format_options.warn_on_novel_methods:
             non_known = self.non_known_methods(ops)
             if len(non_known) > 0:
-                warnings.warn(f"{self} translation using undocumented method context: {non_known}", UserWarning)
+                warnings.warn(
+                    f"{self} translation using undocumented method context: {non_known}",
+                    UserWarning,
+                )
         if sql_format_options.warn_on_method_support:
             non_rec = self.non_recommended_methods(ops)
             if len(non_rec) > 0:
-                warnings.warn(f"{self} translation doesn't fully support method context: {non_rec}", UserWarning)
+                warnings.warn(
+                    f"{self} translation doesn't fully support method context: {non_rec}",
+                    UserWarning,
+                )
         # TODO: put common sub-expression control object here and pass into converters
         temp_id_source = [0]
         near_sql = ops.to_near_sql_implementation_(
@@ -1785,7 +1816,11 @@ class DBModel:
         sql_str_list = None
         if sql_format_options.use_with and self.supports_with:
             cte_cache: Optional[Dict] = None
-            if sql_format_options.use_cte_elim and self.supports_with and self.supports_cte_elim:
+            if (
+                sql_format_options.use_cte_elim
+                and self.supports_with
+                and self.supports_cte_elim
+            ):
                 cte_cache = dict()
             sequence = near_sql.to_with_form(cte_cache=cte_cache)
             len_sequence = len(sequence.previous_steps)
@@ -1993,12 +2028,7 @@ class DBModel:
         return v + " AS " + self.quote_identifier(k)
 
     def nearsqlcte_to_sql_str_list_(
-        self,
-        near_sql,
-        *,
-        columns=None,
-        force_sql=False,
-        sql_format_options=None,
+        self, near_sql, *, columns=None, force_sql=False, sql_format_options=None,
     ) -> List[str]:
         """
         Convert SQL common table expression to list of SQL string lines.
@@ -2017,12 +2047,7 @@ class DBModel:
         return [near_sql.quoted_query_name]
 
     def nearsqltable_to_sql_str_list_(
-        self,
-        near_sql,
-        *,
-        columns=None,
-        force_sql=False,
-        sql_format_options=None,
+        self, near_sql, *, columns=None, force_sql=False, sql_format_options=None,
     ) -> List[str]:
         """
         Convert SQL table description to list of SQL string lines.
@@ -2053,12 +2078,7 @@ class DBModel:
         return [near_sql.quoted_table_name]
 
     def nearsqlunary_to_sql_str_list_(
-        self,
-        near_sql,
-        *,
-        columns=None,
-        force_sql=False,
-        sql_format_options=None,
+        self, near_sql, *, columns=None, force_sql=False, sql_format_options=None,
     ) -> List[str]:
         """
         Convert SQL unary operation to list of SQL string lines.
@@ -2095,7 +2115,7 @@ class DBModel:
                 for si in near_sql.sub_sql.convert_subsql(
                     db_model=self,
                     sql_format_options=sql_format_options,
-                    quoted_query_name_annotation=near_sql.sub_sql.near_sql.quoted_query_name
+                    quoted_query_name_annotation=near_sql.sub_sql.near_sql.quoted_query_name,
                 )
             ]
         )
@@ -2127,7 +2147,7 @@ class DBModel:
                 for si in near_sql.sub_sql.convert_subsql(
                     db_model=self,
                     sql_format_options=sql_format_options,
-                    quoted_query_name_annotation=near_sql.sub_sql.near_sql.quoted_query_name
+                    quoted_query_name_annotation=near_sql.sub_sql.near_sql.quoted_query_name,
                 )
             ]
         if (near_sql.suffix is not None) and (len(near_sql.suffix) > 0):
@@ -2173,12 +2193,16 @@ class DBModel:
         substr_1 = near_sql.sub_sql1.convert_subsql(
             db_model=self,
             sql_format_options=sql_format_options,
-            quoted_query_name_annotation=near_sql.sub_sql1.public_name_quoted if subsql_add_query_name else None
+            quoted_query_name_annotation=near_sql.sub_sql1.public_name_quoted
+            if subsql_add_query_name
+            else None,
         )
         substr_2 = near_sql.sub_sql2.convert_subsql(
             db_model=self,
             sql_format_options=sql_format_options,
-            quoted_query_name_annotation=near_sql.sub_sql2.public_name_quoted if subsql_add_query_name else None
+            quoted_query_name_annotation=near_sql.sub_sql2.public_name_quoted
+            if subsql_add_query_name
+            else None,
         )
         sql = (
             [sql_start]
@@ -2198,7 +2222,9 @@ class DBModel:
             and (quoted_query_name is not None)
             and (len(quoted_query_name) > 0)
         ):
-            sql = sql + [") " + quoted_query_name]  # duplicate name, but not of whole query
+            sql = sql + [
+                ") " + quoted_query_name
+            ]  # duplicate name, but not of whole query
         else:
             sql = sql + [")"]
         return sql
@@ -2214,6 +2240,7 @@ class DBHandle:
     """
     Container for database connection handles.
     """
+
     def __init__(self, *, db_model: DBModel, conn, db_engine=None):
         """
 
@@ -2277,10 +2304,11 @@ class DBHandle:
         return self.describe_table(table_name)
 
     def to_sql(
-            self,
-            ops: data_algebra.data_ops.ViewRepresentation,
-            *,
-            sql_format_options: Optional[SQLFormatOptions] = None) -> str:
+        self,
+        ops: data_algebra.data_ops.ViewRepresentation,
+        *,
+        sql_format_options: Optional[SQLFormatOptions] = None,
+    ) -> str:
         """
         Convert operations into SQL
         """
@@ -2337,4 +2365,4 @@ class DBHandle:
             self.db_engine = None
             self.conn = None
             if caught is not None:
-                raise ValueError('close caught: ' + str(caught))
+                raise ValueError("close caught: " + str(caught))
