@@ -6,7 +6,7 @@ from typing import Any, Dict, Iterable, Optional, Tuple
 
 import numpy
 import data_algebra
-from data_algebra.data_ops import descr, ViewRepresentation
+from data_algebra.data_ops import descr, TableDescription, ViewRepresentation
 from data_algebra.cdata import (
     pivot_specification,
     unpivot_specification,
@@ -473,3 +473,68 @@ def rank_to_average(
         .drop_columns([tie_breaker_column_name])
     )
     return ops
+
+
+def replicate_rows_query(
+    d: ViewRepresentation,
+    *,
+    count_column_name: str,
+    seq_column_name: str,
+    join_temp_name: str,
+    max_count: int,
+) -> Tuple(ViewRepresentation, Any):
+    """
+    Build query to replicate each row by count_column_name copies.
+
+    :param d: incoming data description.
+    :param count_column_name: name of count column, should be non-negative integers.
+    :param seq_column_name: name of colulmn to land sequence in.
+    :param join_temp_name: name for join temp table.
+    :param max_count: maximum in count column we need to handle, should be a reasonable upper bound.
+    :return: ops and table to join against
+    """
+    assert isinstance(d, TableDescription)
+    assert isinstance(count_column_name, str)
+    assert count_column_name in d.column_names
+    assert isinstance(seq_column_name, str)
+    assert seq_column_name not in d.column_names
+    assert isinstance(join_temp_name, str)
+    assert isinstance(max_count, int)
+    assert max_count > 0
+    # reserve a power key column
+    power_key_colname = 'power'
+    assert power_key_colname != count_column_name
+    assert power_key_colname not in d.column_names
+    # get a pandas namespace
+    pd = data_algebra.default_data_model.pd
+    # build powers of 2 until max_count is met or exceeded
+    powers = list(range(int(numpy.ceil(numpy.log(max_count)/numpy.log(2))) + 1))
+    # replicate each power the number of times it specifies
+    count_frame = pd.concat([
+            pd.DataFrame({
+                power_key_colname: f'p{p}',
+                seq_column_name: range(int(2 ** p)),
+            })
+            for p in powers
+        ])
+    count_frame.reset_index(drop=True, inplace=True)
+    # specify ops that produce row replicates
+    ops = (
+        d
+            # specify which power table we want to join with
+            .extend({power_key_colname: f'"p" %+% ({count_column_name}.log() / (2).log()).ceil()'})
+            # get one row for each number less than or equal to power by under-specified join
+            .natural_join(
+                b=TableDescription(
+                    table_name=join_temp_name,
+                    column_names=[power_key_colname, seq_column_name],
+                    ),
+                by=[power_key_colname],
+                jointype='inner',
+                )
+            # drop rows exceeding desired count
+            .select_rows(f'{seq_column_name} < {count_column_name}')
+            # drop the power group column id
+            .drop_columns([power_key_colname])
+    )
+    return ops, count_frame
