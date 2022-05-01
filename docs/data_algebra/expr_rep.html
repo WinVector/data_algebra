@@ -611,10 +611,9 @@
 
 
 <span class="c1"># noinspection SpellCheckingInspection</span>
-<span class="n">fn_names_not_allowed_in_project</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;ngroup&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;_ngroup&quot;</span><span class="p">,</span>
-<span class="p">}</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">fn_names_that_imply_ordered_windowed_situation</span><span class="p">)</span>
+<span class="n">fn_names_not_allowed_in_project</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ngroup&quot;</span><span class="p">,</span> <span class="s2">&quot;_ngroup&quot;</span><span class="p">,}</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
+    <span class="n">fn_names_that_imply_ordered_windowed_situation</span>
+<span class="p">)</span>
 
 
 <span class="c1"># fns that don&#39;t have consistent windowed implementations we want to support</span>
@@ -630,8 +629,8 @@
     <span class="s2">&quot;min&quot;</span><span class="p">,</span>
     <span class="s2">&quot;prod&quot;</span><span class="p">,</span>
     <span class="s2">&quot;sum&quot;</span><span class="p">,</span>
-    <span class="s1">&#39;std&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;var&#39;</span><span class="p">,</span>
+    <span class="s2">&quot;std&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;var&quot;</span><span class="p">,</span>
 <span class="p">}</span>
 
 
@@ -792,7 +791,7 @@
                 <span class="p">)</span>
         <span class="k">return</span> <span class="n">Expression</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">),</span> <span class="n">inline</span><span class="o">=</span><span class="n">inline</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__rop_expr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span>  <span class="n">check_types</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__rop_expr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">check_types</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;reversed binary expression&quot;&quot;&quot;</span>
         <span class="n">inline</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">method</span> <span class="o">=</span> <span class="kc">False</span>
@@ -1523,6 +1522,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class for holding constants.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="n">allowed</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">map_type_to_canonical</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
@@ -1585,6 +1585,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class to hold a collection.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="c1"># derived from PreTerm as this is not combinable</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span>
@@ -1639,6 +1640,7 @@
 <span class="sd">        :param want_inline_parens: bool, if True put parens around complex expressions that don&#39;t already have a grouper.</span>
 <span class="sd">        :return: PythonText</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">def</span> <span class="nf">li_to_python</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="sd">&quot;&quot;&quot;convert a list item to Python&quot;&quot;&quot;</span>
             <span class="k">try</span><span class="p">:</span>
@@ -1663,6 +1665,7 @@
 
 <span class="k">class</span> <span class="nc">DictTerm</span><span class="p">(</span><span class="n">PreTerm</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Class for carrying a dictionary or map.&quot;&quot;&quot;</span>
+
     <span class="c1"># derived from PreTerm as this is not combinable</span>
     <span class="c1"># only holds values</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
@@ -1705,6 +1708,7 @@
 <span class="sd">        :param want_inline_parens: bool, if True put parens around complex expressions that don&#39;t already have a grouper.</span>
 <span class="sd">        :return: PythonText</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">def</span> <span class="nf">li_to_python</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="sd">&quot;&quot;&quot;Convert an item to python&quot;&quot;&quot;</span>
             <span class="k">try</span><span class="p">:</span>
@@ -1843,7 +1847,10 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class for carrying an expression.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inline</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inline</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">_can_find_method_by_name</span><span class="p">(</span><span class="n">op</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;can&#39;t find implementation for function/method </span><span class="si">{</span><span class="n">op</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -1947,7 +1954,7 @@
             <span class="k">pass</span>
         <span class="c1"># special zero argument functions</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">==</span> <span class="s1">&#39;_uniform&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;_uniform&quot;</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">data_frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;zero-argument function </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
@@ -1998,7 +2005,9 @@
             <span class="k">if</span> <span class="n">want_inline_parens</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="n">result</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="n">subs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PythonText</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">ai</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
+        <span class="n">subs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PythonText</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">ai</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span>
+        <span class="p">]</span>
         <span class="n">subs_0</span> <span class="o">=</span> <span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">subs_strs</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">si</span><span class="p">)</span> <span class="k">for</span> <span class="n">si</span> <span class="ow">in</span> <span class="n">subs</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">:</span>
@@ -2009,11 +2018,19 @@
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span>
-                    <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="n">subs_strs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;).&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs_strs</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;(&quot;</span>
+                    <span class="o">+</span> <span class="n">subs_strs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="o">+</span> <span class="s2">&quot;).&quot;</span>
+                    <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span>
+                    <span class="o">+</span> <span class="s2">&quot;(&quot;</span>
+                    <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs_strs</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+                    <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">,</span>
                     <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="p">)</span>
         <span class="c1"># treat as fn call</span>
-        <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs_strs</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs_strs</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
 
 
 <span class="c1"># define with def so function has usable __name__</span>
@@ -2504,7 +2521,7 @@ str() method returns only the text for interoperability.</p>
                 <span class="p">)</span>
         <span class="k">return</span> <span class="n">Expression</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">),</span> <span class="n">inline</span><span class="o">=</span><span class="n">inline</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__rop_expr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span>  <span class="n">check_types</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__rop_expr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">check_types</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;reversed binary expression&quot;&quot;&quot;</span>
         <span class="n">inline</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">method</span> <span class="o">=</span> <span class="kc">False</span>
@@ -5430,6 +5447,7 @@ numpy.where behavior: where(None, 1, 2) -> 2</p>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class for holding constants.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="n">allowed</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">map_type_to_canonical</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
@@ -5776,6 +5794,7 @@ numpy.where behavior: where(None, 1, 2) -> 2</p>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class to hold a collection.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="c1"># derived from PreTerm as this is not combinable</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span>
@@ -5830,6 +5849,7 @@ numpy.where behavior: where(None, 1, 2) -> 2</p>
 <span class="sd">        :param want_inline_parens: bool, if True put parens around complex expressions that don&#39;t already have a grouper.</span>
 <span class="sd">        :return: PythonText</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">def</span> <span class="nf">li_to_python</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="sd">&quot;&quot;&quot;convert a list item to Python&quot;&quot;&quot;</span>
             <span class="k">try</span><span class="p">:</span>
@@ -6012,6 +6032,7 @@ numpy.where behavior: where(None, 1, 2) -> 2</p>
 <span class="sd">        :param want_inline_parens: bool, if True put parens around complex expressions that don&#39;t already have a grouper.</span>
 <span class="sd">        :return: PythonText</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">def</span> <span class="nf">li_to_python</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="sd">&quot;&quot;&quot;convert a list item to Python&quot;&quot;&quot;</span>
             <span class="k">try</span><span class="p">:</span>
@@ -6088,6 +6109,7 @@ numpy.where behavior: where(None, 1, 2) -> 2</p>
             <summary>View Source</summary>
             <div class="pdoc-code codehilite"><pre><span></span><span class="k">class</span> <span class="nc">DictTerm</span><span class="p">(</span><span class="n">PreTerm</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Class for carrying a dictionary or map.&quot;&quot;&quot;</span>
+
     <span class="c1"># derived from PreTerm as this is not combinable</span>
     <span class="c1"># only holds values</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
@@ -6130,6 +6152,7 @@ numpy.where behavior: where(None, 1, 2) -> 2</p>
 <span class="sd">        :param want_inline_parens: bool, if True put parens around complex expressions that don&#39;t already have a grouper.</span>
 <span class="sd">        :return: PythonText</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">def</span> <span class="nf">li_to_python</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="sd">&quot;&quot;&quot;Convert an item to python&quot;&quot;&quot;</span>
             <span class="k">try</span><span class="p">:</span>
@@ -6290,6 +6313,7 @@ numpy.where behavior: where(None, 1, 2) -> 2</p>
 <span class="sd">        :param want_inline_parens: bool, if True put parens around complex expressions that don&#39;t already have a grouper.</span>
 <span class="sd">        :return: PythonText</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">def</span> <span class="nf">li_to_python</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="sd">&quot;&quot;&quot;Convert an item to python&quot;&quot;&quot;</span>
             <span class="k">try</span><span class="p">:</span>
@@ -6751,7 +6775,10 @@ numpy.where behavior: where(None, 1, 2) -> 2</p>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class for carrying an expression.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inline</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inline</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">_can_find_method_by_name</span><span class="p">(</span><span class="n">op</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;can&#39;t find implementation for function/method </span><span class="si">{</span><span class="n">op</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -6855,7 +6882,7 @@ numpy.where behavior: where(None, 1, 2) -> 2</p>
             <span class="k">pass</span>
         <span class="c1"># special zero argument functions</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">==</span> <span class="s1">&#39;_uniform&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;_uniform&quot;</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">data_frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;zero-argument function </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
@@ -6906,7 +6933,9 @@ numpy.where behavior: where(None, 1, 2) -> 2</p>
             <span class="k">if</span> <span class="n">want_inline_parens</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="n">result</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="n">subs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PythonText</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">ai</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
+        <span class="n">subs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PythonText</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">ai</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span>
+        <span class="p">]</span>
         <span class="n">subs_0</span> <span class="o">=</span> <span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">subs_strs</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">si</span><span class="p">)</span> <span class="k">for</span> <span class="n">si</span> <span class="ow">in</span> <span class="n">subs</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">:</span>
@@ -6917,11 +6946,19 @@ numpy.where behavior: where(None, 1, 2) -> 2</p>
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span>
-                    <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="n">subs_strs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;).&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs_strs</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;(&quot;</span>
+                    <span class="o">+</span> <span class="n">subs_strs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="o">+</span> <span class="s2">&quot;).&quot;</span>
+                    <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span>
+                    <span class="o">+</span> <span class="s2">&quot;(&quot;</span>
+                    <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs_strs</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+                    <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">,</span>
                     <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="p">)</span>
         <span class="c1"># treat as fn call</span>
-        <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs_strs</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs_strs</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
 </pre></div>
 
         </details>
@@ -6946,7 +6983,9 @@ numpy.where behavior: where(None, 1, 2) -> 2</p>
 
             <details>
             <summary>View Source</summary>
-            <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inline</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inline</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">_can_find_method_by_name</span><span class="p">(</span><span class="n">op</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;can&#39;t find implementation for function/method </span><span class="si">{</span><span class="n">op</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -7161,7 +7200,7 @@ numpy.where behavior: where(None, 1, 2) -> 2</p>
             <span class="k">pass</span>
         <span class="c1"># special zero argument functions</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">==</span> <span class="s1">&#39;_uniform&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;_uniform&quot;</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">data_frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;zero-argument function </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
@@ -7234,7 +7273,9 @@ numpy.where behavior: where(None, 1, 2) -> 2</p>
             <span class="k">if</span> <span class="n">want_inline_parens</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="n">result</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="n">subs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PythonText</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">ai</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
+        <span class="n">subs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PythonText</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">ai</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span>
+        <span class="p">]</span>
         <span class="n">subs_0</span> <span class="o">=</span> <span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">subs_strs</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">si</span><span class="p">)</span> <span class="k">for</span> <span class="n">si</span> <span class="ow">in</span> <span class="n">subs</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">:</span>
@@ -7245,11 +7286,19 @@ numpy.where behavior: where(None, 1, 2) -> 2</p>
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span>
-                    <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="n">subs_strs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;).&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs_strs</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;(&quot;</span>
+                    <span class="o">+</span> <span class="n">subs_strs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="o">+</span> <span class="s2">&quot;).&quot;</span>
+                    <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span>
+                    <span class="o">+</span> <span class="s2">&quot;(&quot;</span>
+                    <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs_strs</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+                    <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">,</span>
                     <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="p">)</span>
         <span class="c1"># treat as fn call</span>
-        <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs_strs</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs_strs</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
 </pre></div>
 
         </details>

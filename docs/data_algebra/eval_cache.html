@@ -109,21 +109,19 @@
     <span class="n">hash_str</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hash_pandas_object</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
     <span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
-    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">hash_str</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">hash_str</span><span class="si">}</span><span class="s2">&quot;</span>
 
 
 <span class="k">class</span> <span class="nc">EvalKey</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Carry description of data transform key&quot;&quot;&quot;</span>
+
     <span class="n">db_model_name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">dat_map_list</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span>
 
 
 <span class="k">def</span> <span class="nf">make_cache_key</span><span class="p">(</span>
-        <span class="o">*</span><span class="p">,</span>
-        <span class="n">db_model</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">,</span>
-        <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="o">*</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">,</span> <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create an immutable, hashable key.</span>
@@ -139,12 +137,13 @@
     <span class="k">return</span> <span class="n">EvalKey</span><span class="p">(</span>
         <span class="n">db_model_name</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">db_model</span><span class="p">),</span>
         <span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">,</span>
-        <span class="n">dat_map_list</span><span class="o">=</span><span class="nb">tuple</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span> <span class="n">hash_data_frame</span><span class="p">(</span><span class="n">data_map</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">data_map_keys</span><span class="p">])</span>
+        <span class="n">dat_map_list</span><span class="o">=</span><span class="nb">tuple</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span> <span class="n">hash_data_frame</span><span class="p">(</span><span class="n">data_map</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">data_map_keys</span><span class="p">]),</span>
     <span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">ResultCache</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Cache for test results. Maps keys to data frames.&quot;&quot;&quot;</span>
+
     <span class="n">dirty</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="n">data_cache</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
     <span class="n">result_cache</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">EvalKey</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
@@ -154,32 +153,30 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">data_cache</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">result_cache</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-            <span class="o">*</span><span class="p">,</span>
-            <span class="n">db_model</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">,</span>
-            <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">db_model</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">,</span>
+        <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;get result from cache, raise KeyError if not present&quot;&quot;&quot;</span>
-        <span class="n">k</span> <span class="o">=</span> <span class="n">make_cache_key</span><span class="p">(</span>
-            <span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span>
-            <span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">,</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">)</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">make_cache_key</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">)</span>
         <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_cache</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
         <span class="k">assert</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                <span class="o">*</span><span class="p">,</span>
-                <span class="n">db_model</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">,</span>
-                <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
-                <span class="n">res</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">store</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">db_model</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">,</span>
+        <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">res</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Store result to cache, mark dirty if change.&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
-        <span class="n">op_key</span> <span class="o">=</span> <span class="n">make_cache_key</span><span class="p">(</span>
-            <span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span>
-            <span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">,</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">)</span>
+        <span class="n">op_key</span> <span class="o">=</span> <span class="n">make_cache_key</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">previous</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_cache</span><span class="p">[</span><span class="n">op_key</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">previous</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
@@ -190,7 +187,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">result_cache</span><span class="p">[</span><span class="n">op_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="c1"># values saved for debugging</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">data_map</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="p">[</span><span class="n">res</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">data_map</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="p">[</span><span class="n">res</span><span class="p">]:</span>
                 <span class="n">d_key</span> <span class="o">=</span> <span class="n">hash_data_frame</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
                 <span class="c1"># assuming no spurious key collisions</span>
                 <span class="k">if</span> <span class="n">d_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cache</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -221,7 +218,7 @@
     <span class="n">hash_str</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hash_pandas_object</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
     <span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
-    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">hash_str</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">hash_str</span><span class="si">}</span><span class="s2">&quot;</span>
 </pre></div>
 
         </details>
@@ -247,6 +244,7 @@
             <summary>View Source</summary>
             <div class="pdoc-code codehilite"><pre><span></span><span class="k">class</span> <span class="nc">EvalKey</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Carry description of data transform key&quot;&quot;&quot;</span>
+
     <span class="n">db_model_name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">dat_map_list</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span>
@@ -338,10 +336,7 @@
             <details>
             <summary>View Source</summary>
             <div class="pdoc-code codehilite"><pre><span></span><span class="k">def</span> <span class="nf">make_cache_key</span><span class="p">(</span>
-        <span class="o">*</span><span class="p">,</span>
-        <span class="n">db_model</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">,</span>
-        <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="o">*</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">,</span> <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create an immutable, hashable key.</span>
@@ -357,7 +352,7 @@
     <span class="k">return</span> <span class="n">EvalKey</span><span class="p">(</span>
         <span class="n">db_model_name</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">db_model</span><span class="p">),</span>
         <span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">,</span>
-        <span class="n">dat_map_list</span><span class="o">=</span><span class="nb">tuple</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span> <span class="n">hash_data_frame</span><span class="p">(</span><span class="n">data_map</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">data_map_keys</span><span class="p">])</span>
+        <span class="n">dat_map_list</span><span class="o">=</span><span class="nb">tuple</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span> <span class="n">hash_data_frame</span><span class="p">(</span><span class="n">data_map</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">data_map_keys</span><span class="p">]),</span>
     <span class="p">)</span>
 </pre></div>
 
@@ -381,6 +376,7 @@
             <summary>View Source</summary>
             <div class="pdoc-code codehilite"><pre><span></span><span class="k">class</span> <span class="nc">ResultCache</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Cache for test results. Maps keys to data frames.&quot;&quot;&quot;</span>
+
     <span class="n">dirty</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="n">data_cache</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
     <span class="n">result_cache</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">EvalKey</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
@@ -390,32 +386,30 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">data_cache</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">result_cache</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-            <span class="o">*</span><span class="p">,</span>
-            <span class="n">db_model</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">,</span>
-            <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">db_model</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">,</span>
+        <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;get result from cache, raise KeyError if not present&quot;&quot;&quot;</span>
-        <span class="n">k</span> <span class="o">=</span> <span class="n">make_cache_key</span><span class="p">(</span>
-            <span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span>
-            <span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">,</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">)</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">make_cache_key</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">)</span>
         <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_cache</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
         <span class="k">assert</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                <span class="o">*</span><span class="p">,</span>
-                <span class="n">db_model</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">,</span>
-                <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
-                <span class="n">res</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">store</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">db_model</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">,</span>
+        <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">res</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Store result to cache, mark dirty if change.&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
-        <span class="n">op_key</span> <span class="o">=</span> <span class="n">make_cache_key</span><span class="p">(</span>
-            <span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span>
-            <span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">,</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">)</span>
+        <span class="n">op_key</span> <span class="o">=</span> <span class="n">make_cache_key</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">previous</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_cache</span><span class="p">[</span><span class="n">op_key</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">previous</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
@@ -426,7 +420,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">result_cache</span><span class="p">[</span><span class="n">op_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="c1"># values saved for debugging</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">data_map</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="p">[</span><span class="n">res</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">data_map</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="p">[</span><span class="n">res</span><span class="p">]:</span>
                 <span class="n">d_key</span> <span class="o">=</span> <span class="n">hash_data_frame</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
                 <span class="c1"># assuming no spurious key collisions</span>
                 <span class="k">if</span> <span class="n">d_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cache</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -475,16 +469,15 @@
 
             <details>
             <summary>View Source</summary>
-            <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-            <span class="o">*</span><span class="p">,</span>
-            <span class="n">db_model</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">,</span>
-            <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+            <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">db_model</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">,</span>
+        <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;get result from cache, raise KeyError if not present&quot;&quot;&quot;</span>
-        <span class="n">k</span> <span class="o">=</span> <span class="n">make_cache_key</span><span class="p">(</span>
-            <span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span>
-            <span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">,</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">)</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">make_cache_key</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">)</span>
         <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_cache</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
         <span class="k">assert</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -514,18 +507,17 @@
 
             <details>
             <summary>View Source</summary>
-            <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                <span class="o">*</span><span class="p">,</span>
-                <span class="n">db_model</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">,</span>
-                <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
-                <span class="n">res</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">store</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">db_model</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">,</span>
+        <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">res</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Store result to cache, mark dirty if change.&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
-        <span class="n">op_key</span> <span class="o">=</span> <span class="n">make_cache_key</span><span class="p">(</span>
-            <span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span>
-            <span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">,</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">)</span>
+        <span class="n">op_key</span> <span class="o">=</span> <span class="n">make_cache_key</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">previous</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_cache</span><span class="p">[</span><span class="n">op_key</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">previous</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
@@ -536,7 +528,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">result_cache</span><span class="p">[</span><span class="n">op_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="c1"># values saved for debugging</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">data_map</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="p">[</span><span class="n">res</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">data_map</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="p">[</span><span class="n">res</span><span class="p">]:</span>
                 <span class="n">d_key</span> <span class="o">=</span> <span class="n">hash_data_frame</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
                 <span class="c1"># assuming no spurious key collisions</span>
                 <span class="k">if</span> <span class="n">d_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cache</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>

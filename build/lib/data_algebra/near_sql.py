@@ -89,13 +89,13 @@ class NearSQL(abc.ABC):
         self.ops_key = ops_key
 
     def to_bound_near_sql(
-            self,
-            *,
-            columns=None,
-            force_sql: bool = False,
-            public_name: Optional[str] = None,
-            public_name_quoted: Optional[str] = None,
-    ) -> 'NearSQLContainer':
+        self,
+        *,
+        columns=None,
+        force_sql: bool = False,
+        public_name: Optional[str] = None,
+        public_name_quoted: Optional[str] = None,
+    ) -> "NearSQLContainer":
         return NearSQLContainer(
             near_sql=self,
             columns=columns,
@@ -106,12 +106,7 @@ class NearSQL(abc.ABC):
 
     @abc.abstractmethod
     def to_sql_str_list(
-        self,
-        *,
-        columns=None,
-        force_sql=False,
-        db_model,
-        sql_format_options=None,
+        self, *, columns=None, force_sql=False, db_model, sql_format_options=None,
     ) -> List[str]:
         """export"""
 
@@ -132,13 +127,13 @@ class NearSQLContainer:
     public_name_quoted: Optional[str]
 
     def __init__(
-            self,
-            *,
-            near_sql: NearSQL,
-            columns: Optional[Iterable[str]] = None,
-            force_sql: bool = False,
-            public_name: Optional[str] = None,
-            public_name_quoted: Optional[str] = None,
+        self,
+        *,
+        near_sql: NearSQL,
+        columns: Optional[Iterable[str]] = None,
+        force_sql: bool = False,
+        public_name: Optional[str] = None,
+        public_name_quoted: Optional[str] = None,
     ):
         assert isinstance(near_sql, NearSQL)
         assert isinstance(force_sql, bool)
@@ -156,21 +151,26 @@ class NearSQLContainer:
         self.public_name_quoted = public_name_quoted
 
     def convert_subsql(
-            self,
-            *,
-            db_model,
-            sql_format_options=None,
-            quoted_query_name_annotation: Optional[str] = None) -> List[str]:
+        self,
+        *,
+        db_model,
+        sql_format_options=None,
+        quoted_query_name_annotation: Optional[str] = None,
+    ) -> List[str]:
         """Convert subsql, possibly adding query name"""
-        non_trivial_annotation = ((quoted_query_name_annotation is not None)
-                                  and (quoted_query_name_annotation != self.near_sql.quoted_query_name))
-        if (isinstance(self.near_sql, data_algebra.near_sql.NearSQLNamedEntity)
-            and (not self.force_sql)):
+        non_trivial_annotation = (quoted_query_name_annotation is not None) and (
+            quoted_query_name_annotation != self.near_sql.quoted_query_name
+        )
+        if isinstance(self.near_sql, data_algebra.near_sql.NearSQLNamedEntity) and (
+            not self.force_sql
+        ):
             # short circuit table and cte path
             if non_trivial_annotation:
                 assert quoted_query_name_annotation is not None  # type hint
                 assert isinstance(quoted_query_name_annotation, str)  # type hint
-                sql = [self.near_sql.quoted_query_name + ' ' + quoted_query_name_annotation]  # table name and alias
+                sql = [
+                    self.near_sql.quoted_query_name + " " + quoted_query_name_annotation
+                ]  # table name and alias
             else:
                 sql = [self.near_sql.quoted_query_name]
         else:
@@ -234,10 +234,10 @@ class NearSQLContainer:
                     )
                 )
             new_stub_cte = NearSQLCommonTableExpression(
-                    query_name=stub.query_name,
-                    quoted_query_name=stub.quoted_query_name,
-                    ops_key=ops_key,
-                )
+                query_name=stub.query_name,
+                quoted_query_name=stub.quoted_query_name,
+                ops_key=ops_key,
+            )
             new_stub = NearSQLContainer(
                 near_sql=new_stub_cte,
                 force_sql=self.force_sql,
@@ -261,7 +261,10 @@ class NearSQLContainer:
 
 class NearSQLNamedEntity(NearSQL, abc.ABC):
     """Model for tables and common table expressions"""
-    def __init__(self, *, terms, query_name: str, quoted_query_name: str, ops_key: Optional[str]):
+
+    def __init__(
+        self, *, terms, query_name: str, quoted_query_name: str, ops_key: Optional[str]
+    ):
         NearSQL.__init__(
             self,
             terms=terms,
@@ -276,29 +279,25 @@ class NearSQLNamedEntity(NearSQL, abc.ABC):
 
     @abc.abstractmethod
     def to_sql_str_list(
-        self,
-        *,
-        columns=None,
-        force_sql=False,
-        db_model,
-        sql_format_options=None,
+        self, *, columns=None, force_sql=False, db_model, sql_format_options=None,
     ) -> List[str]:
         """export"""
 
 
 class NearSQLCommonTableExpression(NearSQLNamedEntity):
-    def __init__(self, *, query_name: str, quoted_query_name: str, ops_key: Optional[str]):
+    def __init__(
+        self, *, query_name: str, quoted_query_name: str, ops_key: Optional[str]
+    ):
         NearSQLNamedEntity.__init__(
-            self, terms=None, query_name=query_name, quoted_query_name=quoted_query_name, ops_key=ops_key
+            self,
+            terms=None,
+            query_name=query_name,
+            quoted_query_name=quoted_query_name,
+            ops_key=ops_key,
         )
 
     def to_sql_str_list(
-        self,
-        *,
-        columns=None,
-        force_sql=False,
-        db_model,
-        sql_format_options=None,
+        self, *, columns=None, force_sql=False, db_model, sql_format_options=None,
     ) -> List[str]:
         return db_model.nearsqlcte_to_sql_str_list_(
             near_sql=self,
@@ -321,12 +320,7 @@ class NearSQLTable(NearSQLNamedEntity):
         self.quoted_table_name = quoted_table_name
 
     def to_sql_str_list(
-        self,
-        *,
-        columns=None,
-        force_sql=False,
-        db_model,
-        sql_format_options=None,
+        self, *, columns=None, force_sql=False, db_model, sql_format_options=None,
     ) -> List[str]:
         return db_model.nearsqltable_to_sql_str_list_(
             near_sql=self,
@@ -380,17 +374,10 @@ class NearSQLUnaryStep(NearSQL):
             self.mergeable = False
 
     def to_sql_str_list(
-        self,
-        *,
-        columns=None,
-        force_sql=False,
-        db_model,
-        sql_format_options=None,
+        self, *, columns=None, force_sql=False, db_model, sql_format_options=None,
     ) -> List[str]:
         return db_model.nearsqlunary_to_sql_str_list_(
-            near_sql=self,
-            columns=columns,
-            sql_format_options=sql_format_options,
+            near_sql=self, columns=columns, sql_format_options=sql_format_options,
         )
 
     def to_with_form(self, *, cte_cache: Optional[Dict]) -> SQLWithList:
@@ -451,12 +438,7 @@ class NearSQLBinaryStep(NearSQL):
         self.suffix = suffix
 
     def to_sql_str_list(
-        self,
-        *,
-        columns=None,
-        force_sql=False,
-        db_model,
-        sql_format_options=None,
+        self, *, columns=None, force_sql=False, db_model, sql_format_options=None,
     ) -> List[str]:
         return db_model.nearsqlbinary_to_sql_str_list_(
             near_sql=self,
@@ -467,7 +449,9 @@ class NearSQLBinaryStep(NearSQL):
         )
 
     def to_with_form(self, *, cte_cache: Optional[Dict]) -> SQLWithList:
-        if self.sub_sql1.near_sql.is_table and self.sub_sql2.near_sql.is_table:  # TODO: remove this?
+        if (
+            self.sub_sql1.near_sql.is_table and self.sub_sql2.near_sql.is_table
+        ):  # TODO: remove this?
             # tables references don't need to be re-encoded
             return SQLWithList(last_step=self, previous_steps=[])
         # non-trivial sequence
@@ -543,12 +527,7 @@ class NearSQLRawQStep(NearSQL):
         self.add_select = add_select
 
     def to_sql_str_list(
-        self,
-        *,
-        columns=None,
-        force_sql=False,
-        db_model,
-        sql_format_options=None,
+        self, *, columns=None, force_sql=False, db_model, sql_format_options=None,
     ) -> List[str]:
         return db_model.nearsqlrawq_to_sql_str_list_(
             near_sql=self,

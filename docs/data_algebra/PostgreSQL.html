@@ -93,7 +93,7 @@
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
     <span class="n">e0</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">e1</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;(</span><span class="si">{</span><span class="n">e0</span><span class="si">}</span><span class="s1"> / NULLIF(1.0 * </span><span class="si">{</span><span class="n">e1</span><span class="si">}</span><span class="s1">, 0))&#39;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">e0</span><span class="si">}</span><span class="s2"> / NULLIF(1.0 * </span><span class="si">{</span><span class="n">e1</span><span class="si">}</span><span class="s2">, 0))&quot;</span>
 
 
 <span class="c1"># map from op-name to special SQL formatting code</span>
@@ -111,17 +111,17 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">op_replacements</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">db_default_op_replacements</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;log&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LN&#39;</span>
-        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;_uniform&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RANDOM&#39;</span>
-        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;STDDEV_SAMP&#39;</span>
-        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;var&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;VAR_SAMP&#39;</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s2">&quot;log&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;LN&quot;</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s2">&quot;_uniform&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;RANDOM&quot;</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s2">&quot;std&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;STDDEV_SAMP&quot;</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s2">&quot;var&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;VAR_SAMP&quot;</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">identifier_quote</span><span class="o">=</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span>
             <span class="n">string_quote</span><span class="o">=</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span>
             <span class="n">sql_formatters</span><span class="o">=</span><span class="n">PostgreSQL_formatters</span><span class="p">,</span>
             <span class="n">op_replacements</span><span class="o">=</span><span class="n">op_replacements</span><span class="p">,</span>
-            <span class="n">float_type</span><span class="o">=</span><span class="s1">&#39;DOUBLE PRECISION&#39;</span><span class="p">,</span>
+            <span class="n">float_type</span><span class="o">=</span><span class="s2">&quot;DOUBLE PRECISION&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 
 
@@ -132,7 +132,9 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># TODO: parameterize this</span>
     <span class="k">assert</span> <span class="n">have_sqlalchemy</span>
-    <span class="n">db_engine</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;postgresql://johnmount@localhost/johnmount&quot;</span><span class="p">)</span>
+    <span class="n">db_engine</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span>
+        <span class="sa">r</span><span class="s2">&quot;postgresql://johnmount@localhost/johnmount&quot;</span>
+    <span class="p">)</span>
     <span class="n">db_handle</span> <span class="o">=</span> <span class="n">PostgreSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">conn</span><span class="o">=</span><span class="n">db_engine</span><span class="p">,</span> <span class="n">db_engine</span><span class="o">=</span><span class="n">db_engine</span><span class="p">)</span>
     <span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">db_handle</span>
@@ -159,17 +161,17 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">op_replacements</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">db_default_op_replacements</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;log&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LN&#39;</span>
-        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;_uniform&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RANDOM&#39;</span>
-        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;STDDEV_SAMP&#39;</span>
-        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;var&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;VAR_SAMP&#39;</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s2">&quot;log&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;LN&quot;</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s2">&quot;_uniform&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;RANDOM&quot;</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s2">&quot;std&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;STDDEV_SAMP&quot;</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s2">&quot;var&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;VAR_SAMP&quot;</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">identifier_quote</span><span class="o">=</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span>
             <span class="n">string_quote</span><span class="o">=</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span>
             <span class="n">sql_formatters</span><span class="o">=</span><span class="n">PostgreSQL_formatters</span><span class="p">,</span>
             <span class="n">op_replacements</span><span class="o">=</span><span class="n">op_replacements</span><span class="p">,</span>
-            <span class="n">float_type</span><span class="o">=</span><span class="s1">&#39;DOUBLE PRECISION&#39;</span><span class="p">,</span>
+            <span class="n">float_type</span><span class="o">=</span><span class="s2">&quot;DOUBLE PRECISION&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 </pre></div>
 
@@ -191,17 +193,17 @@ Assuming we are using a sqlalchemy engine as our connection</p>
             <summary>View Source</summary>
             <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">op_replacements</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">db_default_op_replacements</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;log&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LN&#39;</span>
-        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;_uniform&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RANDOM&#39;</span>
-        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;STDDEV_SAMP&#39;</span>
-        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;var&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;VAR_SAMP&#39;</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s2">&quot;log&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;LN&quot;</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s2">&quot;_uniform&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;RANDOM&quot;</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s2">&quot;std&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;STDDEV_SAMP&quot;</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s2">&quot;var&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;VAR_SAMP&quot;</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">identifier_quote</span><span class="o">=</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span>
             <span class="n">string_quote</span><span class="o">=</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span>
             <span class="n">sql_formatters</span><span class="o">=</span><span class="n">PostgreSQL_formatters</span><span class="p">,</span>
             <span class="n">op_replacements</span><span class="o">=</span><span class="n">op_replacements</span><span class="p">,</span>
-            <span class="n">float_type</span><span class="o">=</span><span class="s1">&#39;DOUBLE PRECISION&#39;</span><span class="p">,</span>
+            <span class="n">float_type</span><span class="o">=</span><span class="s2">&quot;DOUBLE PRECISION&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 </pre></div>
 
@@ -272,7 +274,9 @@ Assuming we are using a sqlalchemy engine as our connection</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># TODO: parameterize this</span>
     <span class="k">assert</span> <span class="n">have_sqlalchemy</span>
-    <span class="n">db_engine</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;postgresql://johnmount@localhost/johnmount&quot;</span><span class="p">)</span>
+    <span class="n">db_engine</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span>
+        <span class="sa">r</span><span class="s2">&quot;postgresql://johnmount@localhost/johnmount&quot;</span>
+    <span class="p">)</span>
     <span class="n">db_handle</span> <span class="o">=</span> <span class="n">PostgreSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">conn</span><span class="o">=</span><span class="n">db_engine</span><span class="p">,</span> <span class="n">db_engine</span><span class="o">=</span><span class="n">db_engine</span><span class="p">)</span>
     <span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">db_handle</span>

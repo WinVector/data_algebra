@@ -3,7 +3,7 @@ Type defs for data operations.
 """
 
 import abc
-from typing import Dict, Optional, Set, NamedTuple
+from typing import Dict, List, Optional, Set, NamedTuple
 
 import data_algebra.expr_rep
 import data_algebra.cdata
@@ -12,6 +12,7 @@ import data_algebra.OrderedSet
 
 class MethodUse(NamedTuple):
     """Carry description of a method use"""
+
     op_name: str
     is_project: bool = False
     is_windowed: bool = False
@@ -28,19 +29,34 @@ class OperatorPlatform(abc.ABC):
         self.node_name = node_name
 
     @abc.abstractmethod
-    def eval(self, data_map, *, data_model=None, narrow=True):
+    def eval(
+        self,
+        data_map,
+        *,
+        data_model=None,
+        narrow: bool = True,
+        check_incoming_data_constraints: bool = False
+    ):
         """
         Evaluate operators with respect to Pandas data frames.
 
         :param data_map: map from table names to data frames
         :param data_model: adaptor to data dialect (Pandas for now)
         :param narrow: logical, if True don't copy unexpected columns
+        :param check_incoming_data_constraints: logical, if True check incoming data meets constraints
         :return: table result
         """
 
     # noinspection PyPep8Naming
     @abc.abstractmethod
-    def transform(self, X, *, data_model=None, narrow: bool = True, check_incoming_data_constraints: bool = False):
+    def transform(
+        self,
+        X,
+        *,
+        data_model=None,
+        narrow: bool = True,
+        check_incoming_data_constraints: bool = False
+    ):
         """
         apply self to data frame X, may or may not commute with composition
 
@@ -60,7 +76,12 @@ class OperatorPlatform(abc.ABC):
         :param data_model implementation to use
         :return: transformed dataframe
         """
-        return self.transform(X=X, data_model=data_model, narrow=False, check_incoming_data_constraints=True)
+        return self.transform(
+            X=X,
+            data_model=data_model,
+            narrow=False,
+            check_incoming_data_constraints=True,
+        )
 
     @abc.abstractmethod
     def apply_to(self, a, *, target_table_key=None):
@@ -144,7 +165,7 @@ class OperatorPlatform(abc.ABC):
     # info
 
     @abc.abstractmethod
-    def columns_produced(self):
+    def columns_produced(self) -> List[str]:
         """
         Return list of columns produced by pipeline.
         """
@@ -158,7 +179,9 @@ class OperatorPlatform(abc.ABC):
     # query generation
 
     @abc.abstractmethod
-    def to_near_sql_implementation_(self, db_model, *, using, temp_id_source):
+    def to_near_sql_implementation_(
+        self, db_model, *, using, temp_id_source, sql_format_options=None
+    ):
         """
         Convert to NearSQL as a step in converting to a SQL string. Internal method.
 
@@ -307,9 +330,10 @@ class OperatorPlatform(abc.ABC):
         """
 
     def map_records(
-            self,
-            blocks_in: Optional[data_algebra.cdata.RecordSpecification] = None,
-            blocks_out: Optional[data_algebra.cdata.RecordSpecification] = None):
+        self,
+        blocks_in: Optional[data_algebra.cdata.RecordSpecification] = None,
+        blocks_out: Optional[data_algebra.cdata.RecordSpecification] = None,
+    ):
         """
         Apply a record mapping taking blocks_in to blocks_out structures.
 
@@ -328,7 +352,6 @@ class OperatorPlatform(abc.ABC):
     # noinspection PyPep8Naming, PyUnusedLocal
     def fit(self, X, y=None):
         """sklearn interface, fit() is a noop"""
-        pass
 
     # noinspection PyPep8Naming, PyUnusedLocal
     def fit_transform(self, X, y=None):
@@ -351,7 +374,6 @@ class OperatorPlatform(abc.ABC):
 
     def set_params(self, **params):
         """sklearn interface, noop"""
-        pass
 
     # noinspection PyPep8Naming
     def inverse_transform(self, X):

@@ -48,7 +48,7 @@ op_remap = {
     "|": "__or__",  # bitwise logical
     "%+%": "concat",
     "%?%": "coalesce",
-    '%/%': 'float_divide',
+    "%/%": "float_divide",
 }
 
 
@@ -132,22 +132,24 @@ def _walk_lark_tree(op, *, data_def=None) -> data_algebra.expr_rep.Term:
                         _r_walk_lark_tree(r_op.children[2 * i + 2])
                     )
                 return res
-            if r_op.data in ["power", "expr", 'and_expr', 'xor_expr']:
+            if r_op.data in ["power", "expr", "and_expr", "xor_expr"]:
                 if len(r_op.children) < 2:
                     raise ValueError("unexpected " + r_op.data + " length")
                 op_name = {
-                              "power": "__pow__",
-                              "expr": "__or__",
-                              'and_expr': "__and__",
-                              'xor_expr': "__xor__",
-                    }[r_op.data]
+                    "power": "__pow__",
+                    "expr": "__or__",
+                    "and_expr": "__and__",
+                    "xor_expr": "__xor__",
+                }[r_op.data]
                 forbidden = {
-                    "__or__": '| (use or)',
-                    "__and__": '& (use and)',
-                    "__xor__": '^',
+                    "__or__": "| (use or)",
+                    "__and__": "& (use and)",
+                    "__xor__": "^",
                 }
                 if op_name in forbidden.keys():
-                    raise ValueError(f"bitwise operation {forbidden[op_name]}, not currently supported as it can be confused with logic/arith")
+                    raise ValueError(
+                        f"bitwise operation {forbidden[op_name]}, not currently supported as it can be confused with logic/arith"
+                    )
                 subs = [_r_walk_lark_tree(c) for c in r_op.children]
                 # linearize chain
                 res = subs[0]

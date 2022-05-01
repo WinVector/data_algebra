@@ -189,9 +189,7 @@
 <span class="sd">    # ref: https://www.sqlite.org/lang_corefunc.html#random</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">return</span> <span class="p">(</span>
-        <span class="s2">&quot;(1.0 + random() / 9223372036854775808.0) / 2.0&quot;</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;(1.0 + random() / 9223372036854775808.0) / 2.0&quot;</span>
 
 
 <span class="k">def</span> <span class="nf">_sqlite_remainder_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
@@ -202,7 +200,7 @@
     <span class="k">return</span> <span class="p">(</span>
         <span class="s2">&quot;(&quot;</span>
         <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="o">+</span> <span class="s1">&#39; % &#39;</span>
+        <span class="o">+</span> <span class="s2">&quot; % &quot;</span>
         <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
     <span class="p">)</span>
@@ -214,9 +212,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">return</span> <span class="p">(</span>
-        <span class="s2">&quot;ANY(&quot;</span>
-        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+        <span class="s2">&quot;ANY(&quot;</span> <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
     <span class="p">)</span>
 
 
@@ -226,9 +222,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">return</span> <span class="p">(</span>
-        <span class="s2">&quot;ALL(&quot;</span>
-        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+        <span class="s2">&quot;ALL(&quot;</span> <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
     <span class="p">)</span>
 
 
@@ -238,8 +232,8 @@
     <span class="s2">&quot;is_inf&quot;</span><span class="p">:</span> <span class="n">_sqlite_is_inf_expr</span><span class="p">,</span>
     <span class="s2">&quot;rand&quot;</span><span class="p">:</span> <span class="n">_sqlite_RAND_expr</span><span class="p">,</span>
     <span class="s2">&quot;remainder&quot;</span><span class="p">:</span> <span class="n">_sqlite_remainder_expr</span><span class="p">,</span>
-    <span class="s1">&#39;logical_or&#39;</span><span class="p">:</span> <span class="n">_sqlite_logical_or_expr</span><span class="p">,</span>
-    <span class="s1">&#39;logical_and&#39;</span><span class="p">:</span> <span class="n">_sqlite_logical_and_expr</span><span class="p">,</span>
+    <span class="s2">&quot;logical_or&quot;</span><span class="p">:</span> <span class="n">_sqlite_logical_or_expr</span><span class="p">,</span>
+    <span class="s2">&quot;logical_and&quot;</span><span class="p">:</span> <span class="n">_sqlite_logical_and_expr</span><span class="p">,</span>
 <span class="p">}</span>
 
 
@@ -395,7 +389,7 @@
         <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nan</span>
-        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span> <span class="o">*</span> <span class="n">n</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span> <span class="o">*</span> <span class="n">n</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
 
 
 <span class="k">class</span> <span class="nc">SampStdDevAgg</span><span class="p">(</span><span class="n">CollectingAgg</span><span class="p">):</span>
@@ -416,7 +410,7 @@
         <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nan</span>
-        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span>
 
 
 <span class="k">class</span> <span class="nc">SQLiteModel</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">):</span>
@@ -438,7 +432,7 @@
         <span class="c1"># good enough</span>
         <span class="k">assert</span> <span class="n">s</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">s</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span><span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">:(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span> <span class="p">:</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">res</span>
         <span class="k">return</span> <span class="n">res</span>
 
@@ -450,7 +444,7 @@
         <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="s2">&quot;is_bad&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">_check_scalar_bad</span><span class="p">)</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="s2">&quot;is_nan&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">_check_scalar_nan</span><span class="p">)</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="s2">&quot;is_inf&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">_check_scalar_inf</span><span class="p">)</span>
-        <span class="n">saw</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;is_bad&#39;</span><span class="p">,</span> <span class="s1">&#39;is_nan&#39;</span><span class="p">,</span> <span class="s1">&#39;is_inf&#39;</span><span class="p">}</span>
+        <span class="n">saw</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;is_bad&quot;</span><span class="p">,</span> <span class="s2">&quot;is_nan&quot;</span><span class="p">,</span> <span class="s2">&quot;is_inf&quot;</span><span class="p">}</span>
         <span class="c1"># math fns</span>
         <span class="n">math_fns</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;acos&quot;</span><span class="p">:</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">_wrap_scalar_fn</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">acos</span><span class="p">),</span>
@@ -893,7 +887,7 @@
         <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nan</span>
-        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span> <span class="o">*</span> <span class="n">n</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span> <span class="o">*</span> <span class="n">n</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
 </pre></div>
 
         </details>
@@ -940,7 +934,7 @@ This version keeps the data instead of using the E[(x-E[x])^2] = E[x^2] - E[x]^2
         <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nan</span>
-        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span> <span class="o">*</span> <span class="n">n</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span> <span class="o">*</span> <span class="n">n</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
 </pre></div>
 
         </details>
@@ -990,7 +984,7 @@ This version keeps the data instead of using the E[(x-E[x])^2] = E[x^2] - E[x]^2
         <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nan</span>
-        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span>
 </pre></div>
 
         </details>
@@ -1037,7 +1031,7 @@ This version keeps the data instead of using the E[(x-E[x])^2] = E[x^2] - E[x]^2
         <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nan</span>
-        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span>
 </pre></div>
 
         </details>
@@ -1088,7 +1082,7 @@ This version keeps the data instead of using the E[(x-E[x])^2] = E[x^2] - E[x]^2
         <span class="c1"># good enough</span>
         <span class="k">assert</span> <span class="n">s</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">s</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span><span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">:(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span> <span class="p">:</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">res</span>
         <span class="k">return</span> <span class="n">res</span>
 
@@ -1100,7 +1094,7 @@ This version keeps the data instead of using the E[(x-E[x])^2] = E[x^2] - E[x]^2
         <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="s2">&quot;is_bad&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">_check_scalar_bad</span><span class="p">)</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="s2">&quot;is_nan&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">_check_scalar_nan</span><span class="p">)</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="s2">&quot;is_inf&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">_check_scalar_inf</span><span class="p">)</span>
-        <span class="n">saw</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;is_bad&#39;</span><span class="p">,</span> <span class="s1">&#39;is_nan&#39;</span><span class="p">,</span> <span class="s1">&#39;is_inf&#39;</span><span class="p">}</span>
+        <span class="n">saw</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;is_bad&quot;</span><span class="p">,</span> <span class="s2">&quot;is_nan&quot;</span><span class="p">,</span> <span class="s2">&quot;is_inf&quot;</span><span class="p">}</span>
         <span class="c1"># math fns</span>
         <span class="n">math_fns</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;acos&quot;</span><span class="p">:</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">_wrap_scalar_fn</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">acos</span><span class="p">),</span>
@@ -1341,7 +1335,7 @@ This version keeps the data instead of using the E[(x-E[x])^2] = E[x^2] - E[x]^2
         <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="s2">&quot;is_bad&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">_check_scalar_bad</span><span class="p">)</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="s2">&quot;is_nan&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">_check_scalar_nan</span><span class="p">)</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="s2">&quot;is_inf&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">_check_scalar_inf</span><span class="p">)</span>
-        <span class="n">saw</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;is_bad&#39;</span><span class="p">,</span> <span class="s1">&#39;is_nan&#39;</span><span class="p">,</span> <span class="s1">&#39;is_inf&#39;</span><span class="p">}</span>
+        <span class="n">saw</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;is_bad&quot;</span><span class="p">,</span> <span class="s2">&quot;is_nan&quot;</span><span class="p">,</span> <span class="s2">&quot;is_inf&quot;</span><span class="p">}</span>
         <span class="c1"># math fns</span>
         <span class="n">math_fns</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;acos&quot;</span><span class="p">:</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">_wrap_scalar_fn</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">acos</span><span class="p">),</span>

@@ -492,11 +492,13 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class for specifying general record to record transforms.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="o">*</span><span class="p">,</span>
-            <span class="n">blocks_in</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">blocks_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">blocks_in</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">blocks_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Build the transform specification. At least one of blocks_in or blocks_out must not be None.</span>
 
@@ -582,11 +584,8 @@
 
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">X</span><span class="p">,</span>
-            <span class="o">*</span><span class="p">,</span>
-            <span class="n">check_blocks_out_keying</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-            <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">check_blocks_out_keying</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Transform X records.</span>
 
@@ -842,11 +841,11 @@
 
 
 <span class="k">def</span> <span class="nf">pivot_specification</span><span class="p">(</span>
-        <span class="o">*</span><span class="p">,</span>
-        <span class="n">row_keys</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-        <span class="n">col_name_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;column_name&#39;</span><span class="p">,</span>
-        <span class="n">col_value_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;column_value&#39;</span><span class="p">,</span>
-        <span class="n">value_cols</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">row_keys</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">col_name_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;column_name&quot;</span><span class="p">,</span>
+    <span class="n">col_value_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;column_value&quot;</span><span class="p">,</span>
+    <span class="n">value_cols</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecordMap</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Specify the cdata transformation that pivots records from a single column of values into collected rows.</span>
@@ -868,22 +867,22 @@
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">known_cols</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">known_cols</span><span class="p">))</span>
     <span class="n">record_map</span> <span class="o">=</span> <span class="n">RecordMap</span><span class="p">(</span>
         <span class="n">blocks_in</span><span class="o">=</span><span class="n">RecordSpecification</span><span class="p">(</span>
-            <span class="n">control_table</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">pandas_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
-                <span class="n">col_name_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span>
-                <span class="n">col_value_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span>
-            <span class="p">}),</span>
+            <span class="n">control_table</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">pandas_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="p">{</span><span class="n">col_name_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span> <span class="n">col_value_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,}</span>
+            <span class="p">),</span>
             <span class="n">record_keys</span><span class="o">=</span><span class="n">row_keys</span><span class="p">,</span>
-            <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">col_name_key</span><span class="p">])</span>
+            <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">col_name_key</span><span class="p">],</span>
         <span class="p">)</span>
+    <span class="p">)</span>
     <span class="k">return</span> <span class="n">record_map</span>
 
 
 <span class="k">def</span> <span class="nf">unpivot_specification</span><span class="p">(</span>
-        <span class="o">*</span><span class="p">,</span>
-        <span class="n">row_keys</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-        <span class="n">col_name_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;column_name&#39;</span><span class="p">,</span>
-        <span class="n">col_value_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;column_value&#39;</span><span class="p">,</span>
-        <span class="n">value_cols</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">row_keys</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">col_name_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;column_name&quot;</span><span class="p">,</span>
+    <span class="n">col_value_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;column_value&quot;</span><span class="p">,</span>
+    <span class="n">value_cols</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecordMap</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Specify the cdata transformation that un-pivots records into a single column of values plus keys.</span>
@@ -905,13 +904,13 @@
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">known_cols</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">known_cols</span><span class="p">))</span>
     <span class="n">record_map</span> <span class="o">=</span> <span class="n">RecordMap</span><span class="p">(</span>
         <span class="n">blocks_out</span><span class="o">=</span><span class="n">RecordSpecification</span><span class="p">(</span>
-            <span class="n">control_table</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">pandas_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
-                <span class="n">col_name_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span>
-                <span class="n">col_value_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span>
-            <span class="p">}),</span>
+            <span class="n">control_table</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">pandas_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="p">{</span><span class="n">col_name_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span> <span class="n">col_value_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,}</span>
+            <span class="p">),</span>
             <span class="n">record_keys</span><span class="o">=</span><span class="n">row_keys</span><span class="p">,</span>
-            <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">col_name_key</span><span class="p">])</span>
+            <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">col_name_key</span><span class="p">],</span>
         <span class="p">)</span>
+    <span class="p">)</span>
     <span class="k">return</span> <span class="n">record_map</span>
 </pre></div>
 
@@ -1598,11 +1597,13 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class for specifying general record to record transforms.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="o">*</span><span class="p">,</span>
-            <span class="n">blocks_in</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">blocks_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">blocks_in</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">blocks_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Build the transform specification. At least one of blocks_in or blocks_out must not be None.</span>
 
@@ -1688,11 +1689,8 @@
 
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">X</span><span class="p">,</span>
-            <span class="o">*</span><span class="p">,</span>
-            <span class="n">check_blocks_out_keying</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-            <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">check_blocks_out_keying</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Transform X records.</span>
 
@@ -1895,10 +1893,11 @@
             <details>
             <summary>View Source</summary>
             <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="o">*</span><span class="p">,</span>
-            <span class="n">blocks_in</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">blocks_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">blocks_in</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">blocks_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Build the transform specification. At least one of blocks_in or blocks_out must not be None.</span>
 
@@ -2034,11 +2033,8 @@
             <details>
             <summary>View Source</summary>
             <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">X</span><span class="p">,</span>
-            <span class="o">*</span><span class="p">,</span>
-            <span class="n">check_blocks_out_keying</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-            <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">check_blocks_out_keying</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Transform X records.</span>
 
@@ -2521,11 +2517,11 @@
             <details>
             <summary>View Source</summary>
             <div class="pdoc-code codehilite"><pre><span></span><span class="k">def</span> <span class="nf">pivot_specification</span><span class="p">(</span>
-        <span class="o">*</span><span class="p">,</span>
-        <span class="n">row_keys</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-        <span class="n">col_name_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;column_name&#39;</span><span class="p">,</span>
-        <span class="n">col_value_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;column_value&#39;</span><span class="p">,</span>
-        <span class="n">value_cols</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">row_keys</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">col_name_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;column_name&quot;</span><span class="p">,</span>
+    <span class="n">col_value_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;column_value&quot;</span><span class="p">,</span>
+    <span class="n">value_cols</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecordMap</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Specify the cdata transformation that pivots records from a single column of values into collected rows.</span>
@@ -2547,13 +2543,13 @@
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">known_cols</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">known_cols</span><span class="p">))</span>
     <span class="n">record_map</span> <span class="o">=</span> <span class="n">RecordMap</span><span class="p">(</span>
         <span class="n">blocks_in</span><span class="o">=</span><span class="n">RecordSpecification</span><span class="p">(</span>
-            <span class="n">control_table</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">pandas_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
-                <span class="n">col_name_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span>
-                <span class="n">col_value_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span>
-            <span class="p">}),</span>
+            <span class="n">control_table</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">pandas_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="p">{</span><span class="n">col_name_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span> <span class="n">col_value_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,}</span>
+            <span class="p">),</span>
             <span class="n">record_keys</span><span class="o">=</span><span class="n">row_keys</span><span class="p">,</span>
-            <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">col_name_key</span><span class="p">])</span>
+            <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">col_name_key</span><span class="p">],</span>
         <span class="p">)</span>
+    <span class="p">)</span>
     <span class="k">return</span> <span class="n">record_map</span>
 </pre></div>
 
@@ -2588,11 +2584,11 @@ https://en.wikipedia.org/wiki/Pivot_table#History</p>
             <details>
             <summary>View Source</summary>
             <div class="pdoc-code codehilite"><pre><span></span><span class="k">def</span> <span class="nf">unpivot_specification</span><span class="p">(</span>
-        <span class="o">*</span><span class="p">,</span>
-        <span class="n">row_keys</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-        <span class="n">col_name_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;column_name&#39;</span><span class="p">,</span>
-        <span class="n">col_value_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;column_value&#39;</span><span class="p">,</span>
-        <span class="n">value_cols</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">row_keys</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">col_name_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;column_name&quot;</span><span class="p">,</span>
+    <span class="n">col_value_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;column_value&quot;</span><span class="p">,</span>
+    <span class="n">value_cols</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecordMap</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Specify the cdata transformation that un-pivots records into a single column of values plus keys.</span>
@@ -2614,13 +2610,13 @@ https://en.wikipedia.org/wiki/Pivot_table#History</p>
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">known_cols</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">known_cols</span><span class="p">))</span>
     <span class="n">record_map</span> <span class="o">=</span> <span class="n">RecordMap</span><span class="p">(</span>
         <span class="n">blocks_out</span><span class="o">=</span><span class="n">RecordSpecification</span><span class="p">(</span>
-            <span class="n">control_table</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">pandas_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
-                <span class="n">col_name_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span>
-                <span class="n">col_value_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span>
-            <span class="p">}),</span>
+            <span class="n">control_table</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">pandas_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="p">{</span><span class="n">col_name_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span> <span class="n">col_value_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,}</span>
+            <span class="p">),</span>
             <span class="n">record_keys</span><span class="o">=</span><span class="n">row_keys</span><span class="p">,</span>
-            <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">col_name_key</span><span class="p">])</span>
+            <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">col_name_key</span><span class="p">],</span>
         <span class="p">)</span>
+    <span class="p">)</span>
     <span class="k">return</span> <span class="n">record_map</span>
 </pre></div>
 

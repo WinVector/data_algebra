@@ -443,9 +443,7 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pd</span> <span class="o">=</span> <span class="n">pd</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">impl_map</span> <span class="o">=</span> <span class="n">populate_impl_map</span><span class="p">(</span><span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">transform_op_map</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;any_value&#39;</span><span class="p">:</span> <span class="s1">&#39;first&#39;</span>
-        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transform_op_map</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;any_value&quot;</span><span class="p">:</span> <span class="s2">&quot;first&quot;</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">user_fun_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_method_dispatch_table</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;ConcatRowsNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">concat_rows_step</span><span class="p">,</span>
@@ -596,7 +594,9 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="kc">False</span><span class="p">]</span> <span class="o">*</span> <span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="kc">False</span><span class="p">]</span> <span class="o">*</span> <span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span>
+                        <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span>
+                    <span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cols</span><span class="o">.</span><span class="n">keys</span><span class="p">()})</span>
             <span class="k">return</span> <span class="n">res</span>
@@ -668,7 +668,9 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluate an incoming (or value source) node.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_method_dispatch_table</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">node_name</span><span class="p">](</span><span class="n">op</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_method_dispatch_table</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">node_name</span><span class="p">](</span>
+            <span class="n">op</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
+        <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">extend_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -686,7 +688,9 @@
         <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">window_situation</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>  <span class="c1"># out of range things like arccosh were warning</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span>
+                    <span class="s2">&quot;ignore&quot;</span>
+                <span class="p">)</span>  <span class="c1"># out of range things like arccosh were warning</span>
                 <span class="n">new_cols</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">opk</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">opk</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
             <span class="n">new_frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_to_frame_</span><span class="p">(</span><span class="n">new_cols</span><span class="p">,</span> <span class="n">target_rows</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_data_frame_columns_to_data_frame_</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">new_frame</span><span class="p">)</span>
@@ -745,7 +749,7 @@
                     <span class="c1"># check for and remove initial underbar</span>
                     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">op</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
                     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">op</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
-                    <span class="k">assert</span> <span class="n">opk</span><span class="o">.</span><span class="n">op</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;_&#39;</span>
+                    <span class="k">assert</span> <span class="n">opk</span><span class="o">.</span><span class="n">op</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;_&quot;</span>
                     <span class="n">zero_op</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">op</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
                     <span class="k">if</span> <span class="n">zero_op</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;row_number&quot;</span><span class="p">,</span> <span class="s2">&quot;count&quot;</span><span class="p">}:</span>
                         <span class="n">subframe</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">opframe</span><span class="o">.</span><span class="n">cumcount</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
@@ -761,7 +765,12 @@
                             <span class="n">transform_op</span>
                         <span class="p">)</span>  <span class="c1"># Pandas transform, not data_algebra</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;not implemented in windowed situation: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="p">))</span>
+                        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+                            <span class="s2">&quot;not implemented in windowed situation: &quot;</span>
+                            <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                            <span class="o">+</span> <span class="s2">&quot;: &quot;</span>
+                            <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="p">)</span>
+                        <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">transform_args</span> <span class="o">=</span> <span class="p">[]</span>
                     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
@@ -793,7 +802,9 @@
                             <span class="n">transform_op</span><span class="p">,</span> <span class="o">*</span><span class="n">transform_args</span>
                         <span class="p">)</span>  <span class="c1"># Pandas transform, not data_algegra</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;opk must be a ColumnReference or Value (</span><span class="si">{</span><span class="n">opk</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;opk must be a ColumnReference or Value (</span><span class="si">{</span><span class="n">opk</span><span class="si">}</span><span class="s2">)&quot;</span>
+                        <span class="p">)</span>
             <span class="c1"># clear some temps</span>
             <span class="k">for</span> <span class="n">value_name</span> <span class="ow">in</span> <span class="n">data_algebra_temp_cols</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
                 <span class="k">del</span> <span class="n">res</span><span class="p">[</span><span class="n">value_name</span><span class="p">]</span>
@@ -863,7 +874,7 @@
                     <span class="c1"># expect and strip off initial underbar</span>
                     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transform_op</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
                     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">transform_op</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
-                    <span class="k">assert</span> <span class="n">transform_op</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;_&#39;</span>
+                    <span class="k">assert</span> <span class="n">transform_op</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;_&quot;</span>
                     <span class="n">transform_op</span> <span class="o">=</span> <span class="n">transform_op</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">transform_op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_op_map</span><span class="p">[</span><span class="n">transform_op</span><span class="p">]</span>
@@ -1211,9 +1222,7 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pd</span> <span class="o">=</span> <span class="n">pd</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">impl_map</span> <span class="o">=</span> <span class="n">populate_impl_map</span><span class="p">(</span><span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">transform_op_map</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;any_value&#39;</span><span class="p">:</span> <span class="s1">&#39;first&#39;</span>
-        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transform_op_map</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;any_value&quot;</span><span class="p">:</span> <span class="s2">&quot;first&quot;</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">user_fun_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_method_dispatch_table</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;ConcatRowsNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">concat_rows_step</span><span class="p">,</span>
@@ -1364,7 +1373,9 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="kc">False</span><span class="p">]</span> <span class="o">*</span> <span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="kc">False</span><span class="p">]</span> <span class="o">*</span> <span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span>
+                        <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span>
+                    <span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cols</span><span class="o">.</span><span class="n">keys</span><span class="p">()})</span>
             <span class="k">return</span> <span class="n">res</span>
@@ -1436,7 +1447,9 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluate an incoming (or value source) node.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_method_dispatch_table</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">node_name</span><span class="p">](</span><span class="n">op</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_method_dispatch_table</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">node_name</span><span class="p">](</span>
+            <span class="n">op</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
+        <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">extend_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1454,7 +1467,9 @@
         <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">window_situation</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>  <span class="c1"># out of range things like arccosh were warning</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span>
+                    <span class="s2">&quot;ignore&quot;</span>
+                <span class="p">)</span>  <span class="c1"># out of range things like arccosh were warning</span>
                 <span class="n">new_cols</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">opk</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">opk</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
             <span class="n">new_frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_to_frame_</span><span class="p">(</span><span class="n">new_cols</span><span class="p">,</span> <span class="n">target_rows</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_data_frame_columns_to_data_frame_</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">new_frame</span><span class="p">)</span>
@@ -1513,7 +1528,7 @@
                     <span class="c1"># check for and remove initial underbar</span>
                     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">op</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
                     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">op</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
-                    <span class="k">assert</span> <span class="n">opk</span><span class="o">.</span><span class="n">op</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;_&#39;</span>
+                    <span class="k">assert</span> <span class="n">opk</span><span class="o">.</span><span class="n">op</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;_&quot;</span>
                     <span class="n">zero_op</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">op</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
                     <span class="k">if</span> <span class="n">zero_op</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;row_number&quot;</span><span class="p">,</span> <span class="s2">&quot;count&quot;</span><span class="p">}:</span>
                         <span class="n">subframe</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">opframe</span><span class="o">.</span><span class="n">cumcount</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
@@ -1529,7 +1544,12 @@
                             <span class="n">transform_op</span>
                         <span class="p">)</span>  <span class="c1"># Pandas transform, not data_algebra</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;not implemented in windowed situation: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="p">))</span>
+                        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+                            <span class="s2">&quot;not implemented in windowed situation: &quot;</span>
+                            <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                            <span class="o">+</span> <span class="s2">&quot;: &quot;</span>
+                            <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="p">)</span>
+                        <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">transform_args</span> <span class="o">=</span> <span class="p">[]</span>
                     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
@@ -1561,7 +1581,9 @@
                             <span class="n">transform_op</span><span class="p">,</span> <span class="o">*</span><span class="n">transform_args</span>
                         <span class="p">)</span>  <span class="c1"># Pandas transform, not data_algegra</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;opk must be a ColumnReference or Value (</span><span class="si">{</span><span class="n">opk</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;opk must be a ColumnReference or Value (</span><span class="si">{</span><span class="n">opk</span><span class="si">}</span><span class="s2">)&quot;</span>
+                        <span class="p">)</span>
             <span class="c1"># clear some temps</span>
             <span class="k">for</span> <span class="n">value_name</span> <span class="ow">in</span> <span class="n">data_algebra_temp_cols</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
                 <span class="k">del</span> <span class="n">res</span><span class="p">[</span><span class="n">value_name</span><span class="p">]</span>
@@ -1631,7 +1653,7 @@
                     <span class="c1"># expect and strip off initial underbar</span>
                     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transform_op</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
                     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">transform_op</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
-                    <span class="k">assert</span> <span class="n">transform_op</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;_&#39;</span>
+                    <span class="k">assert</span> <span class="n">transform_op</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;_&quot;</span>
                     <span class="n">transform_op</span> <span class="o">=</span> <span class="n">transform_op</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">transform_op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_op_map</span><span class="p">[</span><span class="n">transform_op</span><span class="p">]</span>
@@ -1853,9 +1875,7 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pd</span> <span class="o">=</span> <span class="n">pd</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">impl_map</span> <span class="o">=</span> <span class="n">populate_impl_map</span><span class="p">(</span><span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">transform_op_map</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;any_value&#39;</span><span class="p">:</span> <span class="s1">&#39;first&#39;</span>
-        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transform_op_map</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;any_value&quot;</span><span class="p">:</span> <span class="s2">&quot;first&quot;</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">user_fun_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_method_dispatch_table</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;ConcatRowsNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">concat_rows_step</span><span class="p">,</span>
@@ -2175,7 +2195,9 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="kc">False</span><span class="p">]</span> <span class="o">*</span> <span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="kc">False</span><span class="p">]</span> <span class="o">*</span> <span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span>
+                        <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span>
+                    <span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cols</span><span class="o">.</span><span class="n">keys</span><span class="p">()})</span>
             <span class="k">return</span> <span class="n">res</span>
@@ -2323,7 +2345,9 @@ transient_new_frame may be returned.</p>
         <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">window_situation</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>  <span class="c1"># out of range things like arccosh were warning</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span>
+                    <span class="s2">&quot;ignore&quot;</span>
+                <span class="p">)</span>  <span class="c1"># out of range things like arccosh were warning</span>
                 <span class="n">new_cols</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">opk</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">opk</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
             <span class="n">new_frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_to_frame_</span><span class="p">(</span><span class="n">new_cols</span><span class="p">,</span> <span class="n">target_rows</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_data_frame_columns_to_data_frame_</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">new_frame</span><span class="p">)</span>
@@ -2382,7 +2406,7 @@ transient_new_frame may be returned.</p>
                     <span class="c1"># check for and remove initial underbar</span>
                     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">op</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
                     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">op</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
-                    <span class="k">assert</span> <span class="n">opk</span><span class="o">.</span><span class="n">op</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;_&#39;</span>
+                    <span class="k">assert</span> <span class="n">opk</span><span class="o">.</span><span class="n">op</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;_&quot;</span>
                     <span class="n">zero_op</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">op</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
                     <span class="k">if</span> <span class="n">zero_op</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;row_number&quot;</span><span class="p">,</span> <span class="s2">&quot;count&quot;</span><span class="p">}:</span>
                         <span class="n">subframe</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">opframe</span><span class="o">.</span><span class="n">cumcount</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
@@ -2398,7 +2422,12 @@ transient_new_frame may be returned.</p>
                             <span class="n">transform_op</span>
                         <span class="p">)</span>  <span class="c1"># Pandas transform, not data_algebra</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;not implemented in windowed situation: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="p">))</span>
+                        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+                            <span class="s2">&quot;not implemented in windowed situation: &quot;</span>
+                            <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                            <span class="o">+</span> <span class="s2">&quot;: &quot;</span>
+                            <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="p">)</span>
+                        <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">transform_args</span> <span class="o">=</span> <span class="p">[]</span>
                     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
@@ -2430,7 +2459,9 @@ transient_new_frame may be returned.</p>
                             <span class="n">transform_op</span><span class="p">,</span> <span class="o">*</span><span class="n">transform_args</span>
                         <span class="p">)</span>  <span class="c1"># Pandas transform, not data_algegra</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;opk must be a ColumnReference or Value (</span><span class="si">{</span><span class="n">opk</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;opk must be a ColumnReference or Value (</span><span class="si">{</span><span class="n">opk</span><span class="si">}</span><span class="s2">)&quot;</span>
+                        <span class="p">)</span>
             <span class="c1"># clear some temps</span>
             <span class="k">for</span> <span class="n">value_name</span> <span class="ow">in</span> <span class="n">data_algebra_temp_cols</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
                 <span class="k">del</span> <span class="n">res</span><span class="p">[</span><span class="n">value_name</span><span class="p">]</span>
@@ -2518,7 +2549,7 @@ transient_new_frame may be returned.</p>
                     <span class="c1"># expect and strip off initial underbar</span>
                     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transform_op</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
                     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">transform_op</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
-                    <span class="k">assert</span> <span class="n">transform_op</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;_&#39;</span>
+                    <span class="k">assert</span> <span class="n">transform_op</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;_&quot;</span>
                     <span class="n">transform_op</span> <span class="o">=</span> <span class="n">transform_op</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">transform_op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_op_map</span><span class="p">[</span><span class="n">transform_op</span><span class="p">]</span>

@@ -129,8 +129,8 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">op_replacements</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">db_default_op_replacements</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;STDDEV_SAMP&#39;</span>
-        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;var&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;VAR_SAMP&#39;</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s2">&quot;std&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;STDDEV_SAMP&quot;</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s2">&quot;var&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;VAR_SAMP&quot;</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">string_type</span><span class="o">=</span><span class="s2">&quot;CHAR&quot;</span><span class="p">,</span>
@@ -157,7 +157,9 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># TODO: parameterize this</span>
     <span class="k">assert</span> <span class="n">have_sqlalchemy</span>
-    <span class="n">db_engine</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="s2">&quot;mysql+pymysql://jmount@localhost/jmount&quot;</span><span class="p">)</span>
+    <span class="n">db_engine</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span>
+        <span class="s2">&quot;mysql+pymysql://jmount@localhost/jmount&quot;</span>
+    <span class="p">)</span>
     <span class="n">db_handle</span> <span class="o">=</span> <span class="n">MySQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">conn</span><span class="o">=</span><span class="n">db_engine</span><span class="p">,</span> <span class="n">db_engine</span><span class="o">=</span><span class="n">db_engine</span><span class="p">)</span>
     <span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">db_handle</span>
@@ -184,8 +186,8 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">op_replacements</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">db_default_op_replacements</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;STDDEV_SAMP&#39;</span>
-        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;var&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;VAR_SAMP&#39;</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s2">&quot;std&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;STDDEV_SAMP&quot;</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s2">&quot;var&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;VAR_SAMP&quot;</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">string_type</span><span class="o">=</span><span class="s2">&quot;CHAR&quot;</span><span class="p">,</span>
@@ -223,8 +225,8 @@ Assuming we are using a sqlalchemy engine as our connection.</p>
             <summary>View Source</summary>
             <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">op_replacements</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">db_default_op_replacements</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;STDDEV_SAMP&#39;</span>
-        <span class="n">op_replacements</span><span class="p">[</span><span class="s1">&#39;var&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;VAR_SAMP&#39;</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s2">&quot;std&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;STDDEV_SAMP&quot;</span>
+        <span class="n">op_replacements</span><span class="p">[</span><span class="s2">&quot;var&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;VAR_SAMP&quot;</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">string_type</span><span class="o">=</span><span class="s2">&quot;CHAR&quot;</span><span class="p">,</span>
@@ -328,7 +330,9 @@ Assuming we are using a sqlalchemy engine as our connection.</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># TODO: parameterize this</span>
     <span class="k">assert</span> <span class="n">have_sqlalchemy</span>
-    <span class="n">db_engine</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="s2">&quot;mysql+pymysql://jmount@localhost/jmount&quot;</span><span class="p">)</span>
+    <span class="n">db_engine</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span>
+        <span class="s2">&quot;mysql+pymysql://jmount@localhost/jmount&quot;</span>
+    <span class="p">)</span>
     <span class="n">db_handle</span> <span class="o">=</span> <span class="n">MySQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">conn</span><span class="o">=</span><span class="n">db_engine</span><span class="p">,</span> <span class="n">db_engine</span><span class="o">=</span><span class="n">db_engine</span><span class="p">)</span>
     <span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">db_handle</span>

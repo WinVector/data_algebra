@@ -104,7 +104,7 @@
     <span class="s2">&quot;|&quot;</span><span class="p">:</span> <span class="s2">&quot;__or__&quot;</span><span class="p">,</span>  <span class="c1"># bitwise logical</span>
     <span class="s2">&quot;</span><span class="si">%+%</span><span class="s2">&quot;</span><span class="p">:</span> <span class="s2">&quot;concat&quot;</span><span class="p">,</span>
     <span class="s2">&quot;%?%&quot;</span><span class="p">:</span> <span class="s2">&quot;coalesce&quot;</span><span class="p">,</span>
-    <span class="s1">&#39;%/%&#39;</span><span class="p">:</span> <span class="s1">&#39;float_divide&#39;</span><span class="p">,</span>
+    <span class="s2">&quot;%/%&quot;</span><span class="p">:</span> <span class="s2">&quot;float_divide&quot;</span><span class="p">,</span>
 <span class="p">}</span>
 
 
@@ -188,22 +188,24 @@
                         <span class="n">_r_walk_lark_tree</span><span class="p">(</span><span class="n">r_op</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">])</span>
                     <span class="p">)</span>
                 <span class="k">return</span> <span class="n">res</span>
-            <span class="k">if</span> <span class="n">r_op</span><span class="o">.</span><span class="n">data</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;power&quot;</span><span class="p">,</span> <span class="s2">&quot;expr&quot;</span><span class="p">,</span> <span class="s1">&#39;and_expr&#39;</span><span class="p">,</span> <span class="s1">&#39;xor_expr&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">r_op</span><span class="o">.</span><span class="n">data</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;power&quot;</span><span class="p">,</span> <span class="s2">&quot;expr&quot;</span><span class="p">,</span> <span class="s2">&quot;and_expr&quot;</span><span class="p">,</span> <span class="s2">&quot;xor_expr&quot;</span><span class="p">]:</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r_op</span><span class="o">.</span><span class="n">children</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unexpected &quot;</span> <span class="o">+</span> <span class="n">r_op</span><span class="o">.</span><span class="n">data</span> <span class="o">+</span> <span class="s2">&quot; length&quot;</span><span class="p">)</span>
                 <span class="n">op_name</span> <span class="o">=</span> <span class="p">{</span>
-                              <span class="s2">&quot;power&quot;</span><span class="p">:</span> <span class="s2">&quot;__pow__&quot;</span><span class="p">,</span>
-                              <span class="s2">&quot;expr&quot;</span><span class="p">:</span> <span class="s2">&quot;__or__&quot;</span><span class="p">,</span>
-                              <span class="s1">&#39;and_expr&#39;</span><span class="p">:</span> <span class="s2">&quot;__and__&quot;</span><span class="p">,</span>
-                              <span class="s1">&#39;xor_expr&#39;</span><span class="p">:</span> <span class="s2">&quot;__xor__&quot;</span><span class="p">,</span>
-                    <span class="p">}[</span><span class="n">r_op</span><span class="o">.</span><span class="n">data</span><span class="p">]</span>
+                    <span class="s2">&quot;power&quot;</span><span class="p">:</span> <span class="s2">&quot;__pow__&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;expr&quot;</span><span class="p">:</span> <span class="s2">&quot;__or__&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;and_expr&quot;</span><span class="p">:</span> <span class="s2">&quot;__and__&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;xor_expr&quot;</span><span class="p">:</span> <span class="s2">&quot;__xor__&quot;</span><span class="p">,</span>
+                <span class="p">}[</span><span class="n">r_op</span><span class="o">.</span><span class="n">data</span><span class="p">]</span>
                 <span class="n">forbidden</span> <span class="o">=</span> <span class="p">{</span>
-                    <span class="s2">&quot;__or__&quot;</span><span class="p">:</span> <span class="s1">&#39;| (use or)&#39;</span><span class="p">,</span>
-                    <span class="s2">&quot;__and__&quot;</span><span class="p">:</span> <span class="s1">&#39;&amp; (use and)&#39;</span><span class="p">,</span>
-                    <span class="s2">&quot;__xor__&quot;</span><span class="p">:</span> <span class="s1">&#39;^&#39;</span><span class="p">,</span>
+                    <span class="s2">&quot;__or__&quot;</span><span class="p">:</span> <span class="s2">&quot;| (use or)&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;__and__&quot;</span><span class="p">:</span> <span class="s2">&quot;&amp; (use and)&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;__xor__&quot;</span><span class="p">:</span> <span class="s2">&quot;^&quot;</span><span class="p">,</span>
                 <span class="p">}</span>
                 <span class="k">if</span> <span class="n">op_name</span> <span class="ow">in</span> <span class="n">forbidden</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;bitwise operation </span><span class="si">{</span><span class="n">forbidden</span><span class="p">[</span><span class="n">op_name</span><span class="p">]</span><span class="si">}</span><span class="s2">, not currently supported as it can be confused with logic/arith&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;bitwise operation </span><span class="si">{</span><span class="n">forbidden</span><span class="p">[</span><span class="n">op_name</span><span class="p">]</span><span class="si">}</span><span class="s2">, not currently supported as it can be confused with logic/arith&quot;</span>
+                    <span class="p">)</span>
                 <span class="n">subs</span> <span class="o">=</span> <span class="p">[</span><span class="n">_r_walk_lark_tree</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">r_op</span><span class="o">.</span><span class="n">children</span><span class="p">]</span>
                 <span class="c1"># linearize chain</span>
                 <span class="n">res</span> <span class="o">=</span> <span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>

@@ -176,7 +176,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">abc</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">NamedTuple</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">NamedTuple</span>
 
 <span class="kn">import</span> <span class="nn">data_algebra.expr_rep</span>
 <span class="kn">import</span> <span class="nn">data_algebra.cdata</span>
@@ -185,6 +185,7 @@
 
 <span class="k">class</span> <span class="nc">MethodUse</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Carry description of a method use&quot;&quot;&quot;</span>
+
     <span class="n">op_name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">is_project</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">is_windowed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
@@ -201,19 +202,34 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">node_name</span> <span class="o">=</span> <span class="n">node_name</span>
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">data_map</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">check_incoming_data_constraints</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluate operators with respect to Pandas data frames.</span>
 
 <span class="sd">        :param data_map: map from table names to data frames</span>
 <span class="sd">        :param data_model: adaptor to data dialect (Pandas for now)</span>
 <span class="sd">        :param narrow: logical, if True don&#39;t copy unexpected columns</span>
+<span class="sd">        :param check_incoming_data_constraints: logical, if True check incoming data meets constraints</span>
 <span class="sd">        :return: table result</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">check_incoming_data_constraints</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">X</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">check_incoming_data_constraints</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        apply self to data frame X, may or may not commute with composition</span>
 
@@ -233,7 +249,12 @@
 <span class="sd">        :param data_model implementation to use</span>
 <span class="sd">        :return: transformed dataframe</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">check_incoming_data_constraints</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+            <span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span>
+            <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span>
+            <span class="n">narrow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">check_incoming_data_constraints</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_table_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -317,7 +338,7 @@
     <span class="c1"># info</span>
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">columns_produced</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">columns_produced</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return list of columns produced by pipeline.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -331,7 +352,9 @@
     <span class="c1"># query generation</span>
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">to_near_sql_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">to_near_sql_implementation_</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert to NearSQL as a step in converting to a SQL string. Internal method.</span>
 
@@ -480,9 +503,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">map_records</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">blocks_in</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">blocks_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">blocks_in</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">blocks_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Apply a record mapping taking blocks_in to blocks_out structures.</span>
 
@@ -501,7 +525,6 @@
     <span class="c1"># noinspection PyPep8Naming, PyUnusedLocal</span>
     <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;sklearn interface, fit() is a noop&quot;&quot;&quot;</span>
-        <span class="k">pass</span>
 
     <span class="c1"># noinspection PyPep8Naming, PyUnusedLocal</span>
     <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -524,7 +547,6 @@
 
     <span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;sklearn interface, noop&quot;&quot;&quot;</span>
-        <span class="k">pass</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="nf">inverse_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
@@ -548,6 +570,7 @@
             <summary>View Source</summary>
             <div class="pdoc-code codehilite"><pre><span></span><span class="k">class</span> <span class="nc">MethodUse</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Carry description of a method use&quot;&quot;&quot;</span>
+
     <span class="n">op_name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">is_project</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">is_windowed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
@@ -658,19 +681,34 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">node_name</span> <span class="o">=</span> <span class="n">node_name</span>
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">data_map</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">check_incoming_data_constraints</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluate operators with respect to Pandas data frames.</span>
 
 <span class="sd">        :param data_map: map from table names to data frames</span>
 <span class="sd">        :param data_model: adaptor to data dialect (Pandas for now)</span>
 <span class="sd">        :param narrow: logical, if True don&#39;t copy unexpected columns</span>
+<span class="sd">        :param check_incoming_data_constraints: logical, if True check incoming data meets constraints</span>
 <span class="sd">        :return: table result</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">check_incoming_data_constraints</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">X</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">check_incoming_data_constraints</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        apply self to data frame X, may or may not commute with composition</span>
 
@@ -690,7 +728,12 @@
 <span class="sd">        :param data_model implementation to use</span>
 <span class="sd">        :return: transformed dataframe</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">check_incoming_data_constraints</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+            <span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span>
+            <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span>
+            <span class="n">narrow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">check_incoming_data_constraints</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_table_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -774,7 +817,7 @@
     <span class="c1"># info</span>
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">columns_produced</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">columns_produced</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return list of columns produced by pipeline.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -788,7 +831,9 @@
     <span class="c1"># query generation</span>
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">to_near_sql_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">to_near_sql_implementation_</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert to NearSQL as a step in converting to a SQL string. Internal method.</span>
 
@@ -937,9 +982,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">map_records</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">blocks_in</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">blocks_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">blocks_in</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">blocks_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Apply a record mapping taking blocks_in to blocks_out structures.</span>
 
@@ -958,7 +1004,6 @@
     <span class="c1"># noinspection PyPep8Naming, PyUnusedLocal</span>
     <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;sklearn interface, fit() is a noop&quot;&quot;&quot;</span>
-        <span class="k">pass</span>
 
     <span class="c1"># noinspection PyPep8Naming, PyUnusedLocal</span>
     <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -981,7 +1026,6 @@
 
     <span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;sklearn interface, noop&quot;&quot;&quot;</span>
-        <span class="k">pass</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="nf">inverse_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
@@ -1001,19 +1045,34 @@
                 <div class="decorator">@abc.abstractmethod</div>
 
             <span class="def">def</span>
-            <span class="name">eval</span><span class="signature">(self, data_map, *, data_model=None, narrow=True)</span>:
+            <span class="name">eval</span><span class="signature">(
+    self,
+    data_map,
+    *,
+    data_model=None,
+    narrow: bool = True,
+    check_incoming_data_constraints: bool = False
+)</span>:
     </div>
 
             <details>
             <summary>View Source</summary>
             <div class="pdoc-code codehilite"><pre><span></span>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">data_map</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">check_incoming_data_constraints</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluate operators with respect to Pandas data frames.</span>
 
 <span class="sd">        :param data_map: map from table names to data frames</span>
 <span class="sd">        :param data_model: adaptor to data dialect (Pandas for now)</span>
 <span class="sd">        :param narrow: logical, if True don&#39;t copy unexpected columns</span>
+<span class="sd">        :param check_incoming_data_constraints: logical, if True check incoming data meets constraints</span>
 <span class="sd">        :return: table result</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 </pre></div>
@@ -1025,6 +1084,7 @@
 <p>:param data_map: map from table names to data frames
 :param data_model: adaptor to data dialect (Pandas for now)
 :param narrow: logical, if True don't copy unexpected columns
+:param check_incoming_data_constraints: logical, if True check incoming data meets constraints
 :return: table result</p>
 </div>
 
@@ -1049,7 +1109,14 @@
             <details>
             <summary>View Source</summary>
             <div class="pdoc-code codehilite"><pre><span></span>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">check_incoming_data_constraints</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">X</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">check_incoming_data_constraints</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        apply self to data frame X, may or may not commute with composition</span>
 
@@ -1092,7 +1159,12 @@
 <span class="sd">        :param data_model implementation to use</span>
 <span class="sd">        :return: transformed dataframe</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">check_incoming_data_constraints</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+            <span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span>
+            <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span>
+            <span class="n">narrow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">check_incoming_data_constraints</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
 </pre></div>
 
         </details>
@@ -1271,13 +1343,13 @@ raise an exception if the values are not consistent.</p>
                 <div class="decorator">@abc.abstractmethod</div>
 
             <span class="def">def</span>
-            <span class="name">columns_produced</span><span class="signature">(self)</span>:
+            <span class="name">columns_produced</span><span class="signature">(self) -&gt; List[str]</span>:
     </div>
 
             <details>
             <summary>View Source</summary>
             <div class="pdoc-code codehilite"><pre><span></span>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">columns_produced</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">columns_produced</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return list of columns produced by pipeline.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1321,13 +1393,15 @@ raise an exception if the values are not consistent.</p>
                 <div class="decorator">@abc.abstractmethod</div>
 
             <span class="def">def</span>
-            <span class="name">to_near_sql_implementation_</span><span class="signature">(self, db_model, *, using, temp_id_source)</span>:
+            <span class="name">to_near_sql_implementation_</span><span class="signature">(self, db_model, *, using, temp_id_source, sql_format_options=None)</span>:
     </div>
 
             <details>
             <summary>View Source</summary>
             <div class="pdoc-code codehilite"><pre><span></span>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">to_near_sql_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">to_near_sql_implementation_</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert to NearSQL as a step in converting to a SQL string. Internal method.</span>
 
@@ -1804,9 +1878,10 @@ raise an exception if the values are not consistent.</p>
             <details>
             <summary>View Source</summary>
             <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">map_records</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">blocks_in</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">blocks_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">blocks_in</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">blocks_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Apply a record mapping taking blocks_in to blocks_out structures.</span>
 
@@ -1844,7 +1919,6 @@ raise an exception if the values are not consistent.</p>
             <summary>View Source</summary>
             <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;sklearn interface, fit() is a noop&quot;&quot;&quot;</span>
-        <span class="k">pass</span>
 </pre></div>
 
         </details>
@@ -1937,7 +2011,6 @@ raise an exception if the values are not consistent.</p>
             <summary>View Source</summary>
             <div class="pdoc-code codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;sklearn interface, noop&quot;&quot;&quot;</span>
-        <span class="k">pass</span>
 </pre></div>
 
         </details>

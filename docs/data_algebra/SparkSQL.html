@@ -105,7 +105,7 @@
 
 <span class="k">def</span> <span class="nf">_sparksql_is_nan_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
     <span class="n">subexpr</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;isNaN(</span><span class="si">{</span><span class="n">subexpr</span><span class="si">}</span><span class="s1">)&#39;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;isNaN(</span><span class="si">{</span><span class="n">subexpr</span><span class="si">}</span><span class="s2">)&quot;</span>
 
 
 <span class="k">def</span> <span class="nf">_sparksql_is_bad_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
@@ -135,6 +135,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return coalesce expression.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="nf">coalesce_step</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return one caes of coalesce.</span>
@@ -203,8 +204,8 @@
     <span class="s2">&quot;is_bad&quot;</span><span class="p">:</span> <span class="n">_sparksql_is_bad_expr</span><span class="p">,</span>
     <span class="s2">&quot;coalesce&quot;</span><span class="p">:</span> <span class="n">_sparksql_coalesce_expr</span><span class="p">,</span>
     <span class="s2">&quot;mapv&quot;</span><span class="p">:</span> <span class="n">_sparksql_db_mapv</span><span class="p">,</span>
-    <span class="s1">&#39;var&#39;</span><span class="p">:</span> <span class="n">_spark_var_expr</span><span class="p">,</span>
-    <span class="s1">&#39;std&#39;</span><span class="p">:</span> <span class="n">_spark_std_expr</span><span class="p">,</span>
+    <span class="s2">&quot;var&quot;</span><span class="p">:</span> <span class="n">_spark_var_expr</span><span class="p">,</span>
+    <span class="s2">&quot;std&quot;</span><span class="p">:</span> <span class="n">_spark_std_expr</span><span class="p">,</span>
 <span class="p">}</span>
 
 
@@ -212,6 +213,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Holder for spark conext and session as a connection (defines close).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">spark_context</span><span class="p">,</span> <span class="n">spark_session</span><span class="p">):</span>
         <span class="k">assert</span> <span class="n">have_Spark</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spark_context</span><span class="p">,</span> <span class="n">pyspark</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">SparkContext</span><span class="p">)</span>
@@ -332,6 +334,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Holder for spark conext and session as a connection (defines close).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">spark_context</span><span class="p">,</span> <span class="n">spark_session</span><span class="p">):</span>
         <span class="k">assert</span> <span class="n">have_Spark</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spark_context</span><span class="p">,</span> <span class="n">pyspark</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">SparkContext</span><span class="p">)</span>

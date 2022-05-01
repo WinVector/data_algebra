@@ -1,4 +1,3 @@
-
 """
 Adapter for Google BigQuery database
 """
@@ -69,16 +68,20 @@ def _bigquery_is_bad_expr(dbmodel, expression):
 
 def _bigquery_any_expr(dbmodel, expression):
     subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-    return f'LOGICAL_OR({subexpr})'
+    return f"LOGICAL_OR({subexpr})"
 
 
 def _bigquery_all_expr(dbmodel, expression):
     subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-    return f'LOGICAL_AND({subexpr})'
+    return f"LOGICAL_AND({subexpr})"
 
 
 def _bigquery_any_value_expr(dbmodel, expression):
-    return 'ANY_VALUE(' + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + ')'
+    return (
+        "ANY_VALUE("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ")"
+    )
 
 
 def _bigquery_ieee_divide_expr(dbmodel, expression):
@@ -87,7 +90,7 @@ def _bigquery_ieee_divide_expr(dbmodel, expression):
     assert len(expression.args) == 2
     e0 = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
     e1 = dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
-    return f'IEEE_DIVIDE({e0}, 1.0 * {e1})'
+    return f"IEEE_DIVIDE({e0}, 1.0 * {e1})"
 
 
 BigQuery_formatters = {
@@ -213,7 +216,9 @@ class BigQuery_DBHandle(data_algebra.db_model.DBHandle):
         head = self.db_model.read_query(
             conn=self.conn,
             q="SELECT * FROM "
-            + self.db_model.quote_identifier(full_name)  # don't quote table name: adds more qualifiers
+            + self.db_model.quote_identifier(
+                full_name
+            )  # don't quote table name: adds more qualifiers
             + " LIMIT "
             + str(row_limit),
         )

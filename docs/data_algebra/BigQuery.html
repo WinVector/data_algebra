@@ -166,16 +166,20 @@
 
 <span class="k">def</span> <span class="nf">_bigquery_any_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
     <span class="n">subexpr</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;LOGICAL_OR(</span><span class="si">{</span><span class="n">subexpr</span><span class="si">}</span><span class="s1">)&#39;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;LOGICAL_OR(</span><span class="si">{</span><span class="n">subexpr</span><span class="si">}</span><span class="s2">)&quot;</span>
 
 
 <span class="k">def</span> <span class="nf">_bigquery_all_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
     <span class="n">subexpr</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;LOGICAL_AND(</span><span class="si">{</span><span class="n">subexpr</span><span class="si">}</span><span class="s1">)&#39;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;LOGICAL_AND(</span><span class="si">{</span><span class="n">subexpr</span><span class="si">}</span><span class="s2">)&quot;</span>
 
 
 <span class="k">def</span> <span class="nf">_bigquery_any_value_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
-    <span class="k">return</span> <span class="s1">&#39;ANY_VALUE(&#39;</span> <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="s2">&quot;ANY_VALUE(&quot;</span>
+        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+    <span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_bigquery_ieee_divide_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
@@ -184,7 +188,7 @@
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
     <span class="n">e0</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">e1</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;IEEE_DIVIDE(</span><span class="si">{</span><span class="n">e0</span><span class="si">}</span><span class="s1">, 1.0 * </span><span class="si">{</span><span class="n">e1</span><span class="si">}</span><span class="s1">)&#39;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;IEEE_DIVIDE(</span><span class="si">{</span><span class="n">e0</span><span class="si">}</span><span class="s2">, 1.0 * </span><span class="si">{</span><span class="n">e1</span><span class="si">}</span><span class="s2">)&quot;</span>
 
 
 <span class="n">BigQuery_formatters</span> <span class="o">=</span> <span class="p">{</span>
@@ -310,7 +314,9 @@
         <span class="n">head</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span>
             <span class="n">conn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="p">,</span>
             <span class="n">q</span><span class="o">=</span><span class="s2">&quot;SELECT * FROM &quot;</span>
-            <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">full_name</span><span class="p">)</span>  <span class="c1"># don&#39;t quote table name: adds more qualifiers</span>
+            <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span>
+                <span class="n">full_name</span>
+            <span class="p">)</span>  <span class="c1"># don&#39;t quote table name: adds more qualifiers</span>
             <span class="o">+</span> <span class="s2">&quot; LIMIT &quot;</span>
             <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">row_limit</span><span class="p">),</span>
         <span class="p">)</span>
@@ -796,7 +802,9 @@ connection should be google.cloud.bigquery.client.Client</p>
         <span class="n">head</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span>
             <span class="n">conn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="p">,</span>
             <span class="n">q</span><span class="o">=</span><span class="s2">&quot;SELECT * FROM &quot;</span>
-            <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">full_name</span><span class="p">)</span>  <span class="c1"># don&#39;t quote table name: adds more qualifiers</span>
+            <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span>
+                <span class="n">full_name</span>
+            <span class="p">)</span>  <span class="c1"># don&#39;t quote table name: adds more qualifiers</span>
             <span class="o">+</span> <span class="s2">&quot; LIMIT &quot;</span>
             <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">row_limit</span><span class="p">),</span>
         <span class="p">)</span>
@@ -902,7 +910,9 @@ connection should be google.cloud.bigquery.client.Client</p>
         <span class="n">head</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span>
             <span class="n">conn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="p">,</span>
             <span class="n">q</span><span class="o">=</span><span class="s2">&quot;SELECT * FROM &quot;</span>
-            <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">full_name</span><span class="p">)</span>  <span class="c1"># don&#39;t quote table name: adds more qualifiers</span>
+            <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span>
+                <span class="n">full_name</span>
+            <span class="p">)</span>  <span class="c1"># don&#39;t quote table name: adds more qualifiers</span>
             <span class="o">+</span> <span class="s2">&quot; LIMIT &quot;</span>
             <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">row_limit</span><span class="p">),</span>
         <span class="p">)</span>

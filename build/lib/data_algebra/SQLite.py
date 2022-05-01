@@ -1,4 +1,3 @@
-
 """
 Adapt data_algebra to SQLite database.
 """
@@ -68,9 +67,7 @@ def _sqlite_RAND_expr(dbmodel, expression):
     # ref: https://www.sqlite.org/lang_corefunc.html#random
     """
 
-    return (
-        "(1.0 + random() / 9223372036854775808.0) / 2.0"
-    )
+    return "(1.0 + random() / 9223372036854775808.0) / 2.0"
 
 
 def _sqlite_remainder_expr(dbmodel, expression):
@@ -81,7 +78,7 @@ def _sqlite_remainder_expr(dbmodel, expression):
     return (
         "("
         + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
-        + ' % '
+        + " % "
         + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
         + ")"
     )
@@ -93,9 +90,7 @@ def _sqlite_logical_or_expr(dbmodel, expression):
     """
 
     return (
-        "ANY("
-        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-        + ")"
+        "ANY(" + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + ")"
     )
 
 
@@ -105,9 +100,7 @@ def _sqlite_logical_and_expr(dbmodel, expression):
     """
 
     return (
-        "ALL("
-        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-        + ")"
+        "ALL(" + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + ")"
     )
 
 
@@ -117,8 +110,8 @@ SQLite_formatters = {
     "is_inf": _sqlite_is_inf_expr,
     "rand": _sqlite_RAND_expr,
     "remainder": _sqlite_remainder_expr,
-    'logical_or': _sqlite_logical_or_expr,
-    'logical_and': _sqlite_logical_and_expr,
+    "logical_or": _sqlite_logical_or_expr,
+    "logical_and": _sqlite_logical_and_expr,
 }
 
 
@@ -274,7 +267,7 @@ class SampVarDevAgg(CollectingAgg):
         n = len(self.collection)
         if n < 2:
             return numpy.nan
-        return float(numpy.var(self.collection) * n / (n-1))
+        return float(numpy.var(self.collection) * n / (n - 1))
 
 
 class SampStdDevAgg(CollectingAgg):
@@ -295,7 +288,7 @@ class SampStdDevAgg(CollectingAgg):
         n = len(self.collection)
         if n < 2:
             return numpy.nan
-        return float(numpy.std(self.collection) * numpy.sqrt(n / (n-1)))
+        return float(numpy.std(self.collection) * numpy.sqrt(n / (n - 1)))
 
 
 class SQLiteModel(data_algebra.db_model.DBModel):
@@ -317,7 +310,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         # good enough
         assert s.startswith(self.identifier_quote)
         assert s.endswith(self.identifier_quote)
-        res = s[1:(len(s) - 1)]
+        res = s[1 : (len(s) - 1)]
         assert self.identifier_quote not in res
         return res
 
@@ -329,7 +322,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         conn.create_function("is_bad", 1, _check_scalar_bad)
         conn.create_function("is_nan", 1, _check_scalar_nan)
         conn.create_function("is_inf", 1, _check_scalar_inf)
-        saw = {'is_bad', 'is_nan', 'is_inf'}
+        saw = {"is_bad", "is_nan", "is_inf"}
         # math fns
         math_fns = {
             "acos": functools.partial(_wrap_scalar_fn, math.acos),
