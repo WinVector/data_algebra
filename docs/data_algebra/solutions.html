@@ -48,6 +48,9 @@
             <li>
                     <a class="function" href="#rank_to_average">rank_to_average</a>
             </li>
+            <li>
+                    <a class="function" href="#replicate_rows_query">replicate_rows_query</a>
+            </li>
     </ul>
 
 
@@ -77,7 +80,7 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">data_algebra</span>
-<span class="kn">from</span> <span class="nn">data_algebra.data_ops</span> <span class="kn">import</span> <span class="n">descr</span><span class="p">,</span> <span class="n">ViewRepresentation</span>
+<span class="kn">from</span> <span class="nn">data_algebra.data_ops</span> <span class="kn">import</span> <span class="n">descr</span><span class="p">,</span> <span class="n">TableDescription</span><span class="p">,</span> <span class="n">ViewRepresentation</span>
 <span class="kn">from</span> <span class="nn">data_algebra.cdata</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">pivot_specification</span><span class="p">,</span>
     <span class="n">unpivot_specification</span><span class="p">,</span>
@@ -544,6 +547,73 @@
         <span class="o">.</span><span class="n">drop_columns</span><span class="p">([</span><span class="n">tie_breaker_column_name</span><span class="p">])</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">ops</span>
+
+
+<span class="k">def</span> <span class="nf">replicate_rows_query</span><span class="p">(</span>
+    <span class="n">d</span><span class="p">:</span> <span class="n">ViewRepresentation</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">count_column_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">seq_column_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">join_temp_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">max_count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ViewRepresentation</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build query to replicate each row by count_column_name copies.</span>
+
+<span class="sd">    :param d: incoming data description.</span>
+<span class="sd">    :param count_column_name: name of count column, should be non-negative integers.</span>
+<span class="sd">    :param seq_column_name: name of colulmn to land sequence in.</span>
+<span class="sd">    :param join_temp_name: name for join temp table.</span>
+<span class="sd">    :param max_count: maximum in count column we need to handle, should be a reasonable upper bound.</span>
+<span class="sd">    :return: ops and table to join against</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">TableDescription</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">count_column_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">count_column_name</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">column_names</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">seq_column_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">seq_column_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">column_names</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">join_temp_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">max_count</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">max_count</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="c1"># reserve a power key column</span>
+    <span class="n">power_key_colname</span> <span class="o">=</span> <span class="s1">&#39;power&#39;</span>
+    <span class="k">assert</span> <span class="n">power_key_colname</span> <span class="o">!=</span> <span class="n">count_column_name</span>
+    <span class="k">assert</span> <span class="n">power_key_colname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">column_names</span>
+    <span class="c1"># get a pandas namespace</span>
+    <span class="n">pd</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span>
+    <span class="c1"># build powers of 2 until max_count is met or exceeded</span>
+    <span class="n">powers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">max_count</span><span class="p">)</span><span class="o">/</span><span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">)))</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="c1"># replicate each power the number of times it specifies</span>
+    <span class="n">count_frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span>
+            <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+                <span class="n">power_key_colname</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;p</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="n">seq_column_name</span><span class="p">:</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="n">p</span><span class="p">)),</span>
+            <span class="p">})</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">powers</span>
+        <span class="p">])</span>
+    <span class="n">count_frame</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># specify ops that produce row replicates</span>
+    <span class="n">ops</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">d</span>
+            <span class="c1"># specify which power table we want to join with</span>
+            <span class="o">.</span><span class="n">extend</span><span class="p">({</span>
+                <span class="n">power_key_colname</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;&quot;p&quot; %+% (</span><span class="si">{</span><span class="n">count_column_name</span><span class="si">}</span><span class="s1">.log() / (2).log()).ceil().as_int64()&#39;</span>
+                <span class="p">})</span>
+            <span class="c1"># get one row for each number less than or equal to power by under-specified join</span>
+            <span class="o">.</span><span class="n">natural_join</span><span class="p">(</span>
+                <span class="n">b</span><span class="o">=</span><span class="n">TableDescription</span><span class="p">(</span>
+                    <span class="n">table_name</span><span class="o">=</span><span class="n">join_temp_name</span><span class="p">,</span>
+                    <span class="n">column_names</span><span class="o">=</span><span class="p">[</span><span class="n">power_key_colname</span><span class="p">,</span> <span class="n">seq_column_name</span><span class="p">],</span>
+                    <span class="p">),</span>
+                <span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="n">power_key_colname</span><span class="p">],</span>
+                <span class="n">jointype</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="c1"># drop rows exceeding desired count</span>
+            <span class="o">.</span><span class="n">select_rows</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">seq_column_name</span><span class="si">}</span><span class="s1"> &lt; </span><span class="si">{</span><span class="n">count_column_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="c1"># drop the power group column id</span>
+            <span class="o">.</span><span class="n">drop_columns</span><span class="p">([</span><span class="n">power_key_colname</span><span class="p">])</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">ops</span><span class="p">,</span> <span class="n">count_frame</span>
 </pre></div>
 
         </details>
@@ -1227,6 +1297,104 @@ position. That is rank_to_average([1, 1, 2]) = [1.5, 1.5, 3].</p>
 :param rank_column_name: column to land ranks in
 :param tie_breaker_column_name: temp column
 :return: ops</p>
+</div>
+
+
+                </section>
+                <section id="replicate_rows_query">
+                            <div class="attr function"><a class="headerlink" href="#replicate_rows_query">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">replicate_rows_query</span><span class="signature">(
+    d: <a href="data_ops.html#ViewRepresentation">data_algebra.data_ops.ViewRepresentation</a>,
+    *,
+    count_column_name: str,
+    seq_column_name: str,
+    join_temp_name: str,
+    max_count: int
+) -&gt; Tuple[<a href="data_ops.html#ViewRepresentation">data_algebra.data_ops.ViewRepresentation</a>, Any]</span>:
+    </div>
+
+            <details>
+            <summary>View Source</summary>
+            <div class="pdoc-code codehilite"><pre><span></span><span class="k">def</span> <span class="nf">replicate_rows_query</span><span class="p">(</span>
+    <span class="n">d</span><span class="p">:</span> <span class="n">ViewRepresentation</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">count_column_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">seq_column_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">join_temp_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">max_count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ViewRepresentation</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build query to replicate each row by count_column_name copies.</span>
+
+<span class="sd">    :param d: incoming data description.</span>
+<span class="sd">    :param count_column_name: name of count column, should be non-negative integers.</span>
+<span class="sd">    :param seq_column_name: name of colulmn to land sequence in.</span>
+<span class="sd">    :param join_temp_name: name for join temp table.</span>
+<span class="sd">    :param max_count: maximum in count column we need to handle, should be a reasonable upper bound.</span>
+<span class="sd">    :return: ops and table to join against</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">TableDescription</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">count_column_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">count_column_name</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">column_names</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">seq_column_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">seq_column_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">column_names</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">join_temp_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">max_count</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">max_count</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="c1"># reserve a power key column</span>
+    <span class="n">power_key_colname</span> <span class="o">=</span> <span class="s1">&#39;power&#39;</span>
+    <span class="k">assert</span> <span class="n">power_key_colname</span> <span class="o">!=</span> <span class="n">count_column_name</span>
+    <span class="k">assert</span> <span class="n">power_key_colname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">column_names</span>
+    <span class="c1"># get a pandas namespace</span>
+    <span class="n">pd</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span>
+    <span class="c1"># build powers of 2 until max_count is met or exceeded</span>
+    <span class="n">powers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">max_count</span><span class="p">)</span><span class="o">/</span><span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">)))</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="c1"># replicate each power the number of times it specifies</span>
+    <span class="n">count_frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span>
+            <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+                <span class="n">power_key_colname</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;p</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="n">seq_column_name</span><span class="p">:</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="n">p</span><span class="p">)),</span>
+            <span class="p">})</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">powers</span>
+        <span class="p">])</span>
+    <span class="n">count_frame</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># specify ops that produce row replicates</span>
+    <span class="n">ops</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">d</span>
+            <span class="c1"># specify which power table we want to join with</span>
+            <span class="o">.</span><span class="n">extend</span><span class="p">({</span>
+                <span class="n">power_key_colname</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;&quot;p&quot; %+% (</span><span class="si">{</span><span class="n">count_column_name</span><span class="si">}</span><span class="s1">.log() / (2).log()).ceil().as_int64()&#39;</span>
+                <span class="p">})</span>
+            <span class="c1"># get one row for each number less than or equal to power by under-specified join</span>
+            <span class="o">.</span><span class="n">natural_join</span><span class="p">(</span>
+                <span class="n">b</span><span class="o">=</span><span class="n">TableDescription</span><span class="p">(</span>
+                    <span class="n">table_name</span><span class="o">=</span><span class="n">join_temp_name</span><span class="p">,</span>
+                    <span class="n">column_names</span><span class="o">=</span><span class="p">[</span><span class="n">power_key_colname</span><span class="p">,</span> <span class="n">seq_column_name</span><span class="p">],</span>
+                    <span class="p">),</span>
+                <span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="n">power_key_colname</span><span class="p">],</span>
+                <span class="n">jointype</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="c1"># drop rows exceeding desired count</span>
+            <span class="o">.</span><span class="n">select_rows</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">seq_column_name</span><span class="si">}</span><span class="s1"> &lt; </span><span class="si">{</span><span class="n">count_column_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="c1"># drop the power group column id</span>
+            <span class="o">.</span><span class="n">drop_columns</span><span class="p">([</span><span class="n">power_key_colname</span><span class="p">])</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">ops</span><span class="p">,</span> <span class="n">count_frame</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Build query to replicate each row by count_column_name copies.</p>
+
+<p>:param d: incoming data description.
+:param count_column_name: name of count column, should be non-negative integers.
+:param seq_column_name: name of colulmn to land sequence in.
+:param join_temp_name: name for join temp table.
+:param max_count: maximum in count column we need to handle, should be a reasonable upper bound.
+:return: ops and table to join against</p>
 </div>
 
 
