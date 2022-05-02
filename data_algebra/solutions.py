@@ -482,7 +482,7 @@ def replicate_rows_query(
     seq_column_name: str,
     join_temp_name: str,
     max_count: int,
-) -> Tuple(ViewRepresentation, Any):
+) -> Tuple[ViewRepresentation, Any]:
     """
     Build query to replicate each row by count_column_name copies.
 
@@ -522,7 +522,9 @@ def replicate_rows_query(
     ops = (
         d
             # specify which power table we want to join with
-            .extend({power_key_colname: f'"p" %+% ({count_column_name}.log() / (2).log()).ceil()'})
+            .extend({
+                power_key_colname: f'"p" %+% ({count_column_name}.log() / (2).log()).ceil().as_int64()'
+                })
             # get one row for each number less than or equal to power by under-specified join
             .natural_join(
                 b=TableDescription(
