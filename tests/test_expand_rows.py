@@ -27,3 +27,8 @@ def test_replicate_rows_query():
         'i': ['0', '0', '1', '0', '1', '2'],
     })
     assert data_algebra.test_util.equivalent_frames(res, expect)
+    data_algebra.test_util.check_transform(
+        ops=ops,
+        data={'d': d, 'rt': rt},
+        expect=expect,
+    )
