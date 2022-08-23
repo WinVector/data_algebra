@@ -6,7 +6,12 @@ import data_algebra.flow_text
 
 
 class Arrow(abc.ABC):
-    """Arrow from category theory: see Steve Awody, "Category Theory, 2nd Edition", Oxford Univ. Press, 2010 pg. 4."""
+    """
+    Arrow from category theory: see Steve Awody, 
+    "Category Theory, 2nd Edition", Oxford Univ. Press, 2010 pg. 4.
+    Essentially this is a tool to expose associativity, without forcing 
+    things to be a function to expose this effect.
+    """
 
     def __init__(self):
         pass
