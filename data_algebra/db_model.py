@@ -1507,6 +1507,44 @@ class DBModel:
             ops_key=f"order({order_node})",  # no terms
         )
         return near_sql
+    
+    def map_columns_to_near_sql(
+        self, map_columns_node, *, using=None, temp_id_source=None, sql_format_options=None
+    ) -> data_algebra.near_sql.NearSQL:
+        """
+        Convert map columns columns to NearSQL.
+        """
+        if map_columns_node.node_name != "MapColumnsNode":
+            raise TypeError(
+                "Expected map_columns_node to be a data_algebra.data_ops.MapColumnsNode)"
+            )
+        if temp_id_source is None:
+            temp_id_source = [0]
+        if using is None:
+            using = OrderedSet(map_columns_node.column_names)
+        subusing = map_columns_node.columns_used_from_sources(using=using)[0]
+        subsql = map_columns_node.sources[0].to_near_sql_implementation_(
+            db_model=self, using=subusing, temp_id_source=temp_id_source
+        )
+        view_name = "map_columns_" + str(temp_id_source[0])
+        temp_id_source[0] = temp_id_source[0] + 1
+        unchanged_columns = subusing - set(map_columns_node.column_remapping.values()).union(
+            map_columns_node.column_remapping.keys()
+        )
+        terms = {
+            ki: self.quote_identifier(vi)
+            for (vi, ki) in map_columns_node.column_remapping.items()
+        }
+        terms.update({vi: None for vi in unchanged_columns})
+        near_sql = data_algebra.near_sql.NearSQLUnaryStep(
+            terms=terms,
+            query_name=view_name,
+            quoted_query_name=self.quote_identifier(view_name),
+            sub_sql=subsql.to_bound_near_sql(columns=subusing),
+            annotation=str(map_columns_node.to_python_src_(print_sources=False, indent=-1)),
+            ops_key=f"map_columns({map_columns_node}, {terms.keys()})",
+        )
+        return near_sql
 
     def rename_to_near_sql(
         self, rename_node, *, using=None, temp_id_source=None, sql_format_options=None

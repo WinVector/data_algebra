@@ -300,6 +300,16 @@ class OperatorPlatform(abc.ABC):
         """
 
     @abc.abstractmethod
+    def map_columns(self, column_remapping: Dict[str, str]):
+        """
+        Map column names or rename.
+
+        :param column_remapping: dictionary mapping old column sources to new column names (same
+                                 direction as Pandas rename).
+        :return: compose operator directed acyclic graph
+        """
+
+    @abc.abstractmethod
     def rename_columns(self, column_remapping: Dict[str, str]):
         """
         Rename columns.

@@ -786,6 +786,21 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         if isinstance(self, DropColumnsNode):
             return self.sources[0].select_columns(columns)
         return SelectColumnsNode(source=self, columns=columns)
+    
+    def map_columns(self, column_remapping) -> "ViewRepresentation":
+        """
+        Map column names or rename.
+
+        :param column_remapping: dictionary mapping old column sources to new column names (same
+                                 direction as Pandas rename).
+        :return: compose operator directed acyclic graph
+        """
+        if (column_remapping is None) or (len(column_remapping) < 1):
+            return self
+        assert isinstance(column_remapping, dict)
+        if self.is_trivial_when_intermediate_():
+            return self.sources[0].map_columns(column_remapping)
+        return MapColumnsNode(source=self, column_remapping=column_remapping)
 
     def rename_columns(self, column_remapping) -> "ViewRepresentation":
         """
@@ -2115,6 +2130,136 @@ class OrderRowsNode(ViewRepresentation):
         return self.limit is None
 
 
+class MapColumnsNode(ViewRepresentation):
+    """
+    Class representation of .map_columns() method/step.
+    """
+
+    column_remapping: Dict[str, str]
+    reverse_mapping: Dict[str, str]
+
+    def __init__(self, source, column_remapping):
+        self.column_remapping = column_remapping.copy()
+        self.reverse_mapping = {v: k for (k, v) in self.column_remapping.items()}
+        new_cols = [k for k in column_remapping.values()]
+        orig_cols = [k for k in column_remapping.keys()]
+        unknown = set(orig_cols) - set(source.column_names)
+        if len(unknown) > 0:
+            raise ValueError("Tried to rename unknown columns: " + str(unknown))
+        collisions = (
+            set(source.column_names) - set(new_cols).intersection(orig_cols)
+        ).intersection(new_cols)
+        if len(collisions) > 0:
+            raise ValueError(
+                "Mapping "
+                + str(self.column_remapping)
+                + " collides with existing columns "
+                + str(collisions)
+            )
+        column_names = [
+            (k if k not in self.column_remapping.keys() else self.column_remapping[k])
+            for k in source.column_names
+        ]
+        self.new_columns = set(new_cols) - set(orig_cols)
+        ViewRepresentation.__init__(
+            self,
+            column_names=column_names,
+            sources=[source],
+            node_name="MapColumnsNode",
+        )
+
+    def forbidden_columns(
+        self, *, forbidden: Optional[Set[str]] = None
+    ) -> Dict[str, Set[str]]:
+        """
+        Determine which columns should not be in source tables
+        (were not in declared structure, and interfere with column production).
+
+        :param forbidden: optional incoming forbids.
+        :return: dictionary operator keys to forbidden sets.
+        """
+        # this is where forbidden columns are introduced
+        if forbidden is None:
+            forbidden = set()
+        new_forbidden = set(forbidden) - self.column_remapping.keys()
+        new_forbidden.update(self.new_columns)
+        return self.sources[0].forbidden_columns(forbidden=new_forbidden)
+
+    def apply_to(self, a, *, target_table_key=None):
+        """
+        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.
+
+        :param a: operators to apply to
+        :param target_table_key: table key to replace with self, None counts as "match all"
+        :return: new operator DAG
+        """
+        new_sources = [
+            s.apply_to(a, target_table_key=target_table_key) for s in self.sources
+        ]
+        return new_sources[0].map_columns(column_remapping=self.column_remapping)
+
+    def _equiv_nodes(self, other):
+        if not isinstance(other, MapColumnsNode):
+            return False
+        if not self.column_remapping == other.column_remapping:
+            return False
+        return True
+
+    def columns_used_from_sources(self, using: Optional[set] = None) -> List:
+        """
+        Get columns used from sources. Internal method.
+
+        :param using: optional column restriction.
+        :return: list of order sets (list parallel to sources).
+        """
+        if using is None:
+            using_tuple = self.column_names
+        else:
+            using_tuple = tuple(using)
+        cols = [
+            (k if k not in self.reverse_mapping.keys() else self.reverse_mapping[k])
+            for k in using_tuple
+        ]
+        return [OrderedSet(cols)]
+
+    def to_python_src_(self, *, indent=0, strict=True, print_sources=True):
+        """
+        Return text representing operations.
+
+        :param indent: additional indent to apply in formatting.
+        :param strict: if False allow eliding of columns names and other long structures.
+        :param print_sources: logical, print children.
+        """
+        s = ""
+        if print_sources:
+            s = (
+                self.sources[0].to_python_src_(indent=indent, strict=strict)
+                + "\n"
+                + " " * (max(indent, 0) + 3)
+            )
+        s = s + (".map_columns(" + self.column_remapping.__repr__() + ")")
+        return s
+
+    def to_near_sql_implementation_(
+        self, db_model, *, using, temp_id_source, sql_format_options=None
+    ) -> data_algebra.near_sql.NearSQL:
+        """
+        Convert operator dag into NearSQL type for translation to SQL string.
+
+        :param db_model: database model
+        :param using: optional column restriction set
+        :param temp_id_source: source of temporary ids
+        :param sql_format_options: options for sql formatting
+        :return: data_algebra.near_sql.NearSQL
+        """
+        return db_model.map_columns_to_near_sql(
+            self,
+            using=using,
+            temp_id_source=temp_id_source,
+            sql_format_options=sql_format_options,
+        )
+
+
 class RenameColumnsNode(ViewRepresentation):
     """
     Class representation of .rename_columns() method/step.
@@ -2122,14 +2267,10 @@ class RenameColumnsNode(ViewRepresentation):
 
     column_remapping: Dict[str, str]
     reverse_mapping: Dict[str, str]
-    mapped_columns: Set[str]
 
     def __init__(self, source, column_remapping):
         self.column_remapping = column_remapping.copy()
         self.reverse_mapping = {v: k for (k, v) in self.column_remapping.items()}
-        self.mapped_columns = set(self.column_remapping.keys()).union(
-            set(self.reverse_mapping.keys())
-        )
         new_cols = [k for k in column_remapping.keys()]
         orig_cols = [k for k in column_remapping.values()]
         unknown = set(orig_cols) - set(source.column_names)

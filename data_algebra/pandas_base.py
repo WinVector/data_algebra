@@ -319,6 +319,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             "NaturalJoinNode": self.natural_join_step,
             "OrderRowsNode": self.order_rows_step,
             "ProjectNode": self.project_step,
+            "MapColumnsNode": self.map_columns_step,
             "RenameColumnsNode": self.rename_columns_step,
             "SelectColumnsNode": self.select_columns_step,
             "SelectRowsNode": self.select_rows_step,
@@ -821,6 +822,17 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         if (op.limit is not None) and (res.shape[0] > op.limit):
             res = res.iloc[range(op.limit), :].reset_index(drop=True)
         return res
+    
+    def map_columns_step(self, op, *, data_map, narrow):
+        """
+        Execute a map columns step, returning a data frame.
+        """
+        if op.node_name != "MapColumnsNode":
+            raise TypeError(
+                "op was supposed to be a data_algebra.data_ops.MapColumnsNode"
+            )
+        res = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
+        return res.rename(columns=op.column_remapping)
 
     def rename_columns_step(self, op, *, data_map, narrow):
         """

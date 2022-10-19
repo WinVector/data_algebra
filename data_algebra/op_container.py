@@ -194,6 +194,10 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         self.set(self.ops.select_columns(columns=columns))
         return self
 
+    def map_columns(self, column_remapping):
+        self.set(self.ops.map_columns(column_remapping=column_remapping))
+        return self
+
     def rename_columns(self, column_remapping):
         self.set(self.ops.rename_columns(column_remapping=column_remapping))
         return self
