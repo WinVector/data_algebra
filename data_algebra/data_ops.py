@@ -370,12 +370,10 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         """
         Convert operator dag to SQL.
 
-        :param db_model: database model
+        :param db_model: database model or handle data_algebra.db_model.DBModel or data_algebra.db_model.DBHandle
         :param sql_format_options: options for sql formatting
         :return: string representation of SQL query
         """
-        if sql_format_options is None:
-            sql_format_options = db_model.default_SQL_format_options
         return db_model.to_sql(ops=self, sql_format_options=sql_format_options,)
 
     # Pandas realization
