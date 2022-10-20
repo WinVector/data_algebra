@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import re
 import sqlite3
 
@@ -428,3 +429,16 @@ def test_sqlite_floor():
     res_db = db_handle.read_query(ops)
     db_handle.close()
     assert data_algebra.test_util.equivalent_frames(expect, res_db)
+
+
+def test_sqlite_default_to_sql():
+    d = data_algebra.default_data_model.pd.DataFrame({"x": [1], "y": [2], "z": ["q"]})
+    td = describe_table(d, table_name="d")
+    ops = td.rename_columns({"y1": "y", "x2": "x"})
+    ops_str = ops.to_sql()
+    assert isinstance(ops_str, str)
+    ops_str_2 = ops.to_sql(data_algebra.SQLite.SQLiteModel())
+    assert ops_str_2 == ops_str
+    with data_algebra.SQLite.example_handle() as hdl:
+        ops_str_3 = ops.to_sql(hdl)
+    assert ops_str_3 == ops_str

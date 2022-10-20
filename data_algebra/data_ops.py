@@ -366,7 +366,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         :return: data_algebra.near_sql.NearSQL
         """
 
-    def to_sql(self, db_model, *, sql_format_options=None,) -> str:
+    def to_sql(self, db_model=None, *, sql_format_options=None,) -> str:
         """
         Convert operator dag to SQL.
 
@@ -374,6 +374,9 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         :param sql_format_options: options for sql formatting
         :return: string representation of SQL query
         """
+        if db_model is None:
+            import data_algebra.SQLite  # import late to avoid circular import issue
+            db_model = data_algebra.SQLite.SQLiteModel()
         return db_model.to_sql(ops=self, sql_format_options=sql_format_options,)
 
     # Pandas realization

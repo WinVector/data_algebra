@@ -12,10 +12,7 @@ purpose of the package is to support an easy to compose and maintain grammar of 
 steps that in turn can be used to generate database specific SQL.  The package also implements
 the same transforms for Pandas DataFrames. 
 
-This package is still under initial development, so some parts are not yet implemented or tested, and APIs
-are subject to change.
-
-Mature, production ready `R`<https://www.r-project.org> versions of the system are available as 
+`R`<https://www.r-project.org> versions of the system are available as 
 the `rquery`<https://github.com/WinVector/rquery> and `rqdatatable`<https://github.com/WinVector/rqdatatable> packages.
 """
 
