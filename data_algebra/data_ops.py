@@ -652,29 +652,49 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         return self.project_parsed_(parsed_ops=parsed_ops, group_by=group_by)
 
     def natural_join(
-        self, b, *, by, jointype, check_all_common_keys_in_by=False
+        self, 
+        b, 
+        *, 
+        on: Optional[Iterable[str]] = None, 
+        jointype: str,
+        check_all_common_keys_in_equi_spec: bool = False,
+        by: Optional[Iterable[str]] = None, 
+        check_all_common_keys_in_by: bool = False,
     ) -> "ViewRepresentation":
         """
         Join self (left) results with b (right).
 
         :param b: second or right table to join to.
-        :param by: list of join key column names.
+        :param on: list of join column names to enforce equality on.
         :param jointype: name of join type.
-        :param check_all_common_keys_in_by: if True, raise if any non-key columns are common to tables.
+        :param check_all_common_keys_in_equi_spec: if True, raise if any non-equality key columns are common to tables.
+        :param by: synonym for on, only set at most one of on or by (deprecated).
+        :param check_all_common_keys_in_by: synonym for check_all_common_keys_in_equi_spec (deprecated).
         :return: compose operator directed acyclic graph
         """
         assert isinstance(b, ViewRepresentation)
-        if isinstance(by, str):
-            by = [by]
+        assert (on is None) or (by is None)
+        if by is not None:
+            on = by
+        if on is None:
+            on = []
+        elif isinstance(on, str):
+            on = [on]
+        else:
+            on = list(on)
+        assert numpy.all([isinstance(c, str) for c in on])
         assert isinstance(jointype, str)
+        assert isinstance(check_all_common_keys_in_equi_spec, bool)
+        assert isinstance(check_all_common_keys_in_by, bool)
+        check_all_common_keys_in_equi_spec = check_all_common_keys_in_equi_spec or check_all_common_keys_in_by
         if self.is_trivial_when_intermediate_():
-            return self.sources[0].natural_join(b, by=by, jointype=jointype)
+            return self.sources[0].natural_join(b, on=on, jointype=jointype)
         return NaturalJoinNode(
             a=self,
             b=b,
-            by=by,
+            on=on,
             jointype=jointype,
-            check_all_common_keys_in_by=check_all_common_keys_in_by,
+            check_all_common_keys_in_equi_spec=check_all_common_keys_in_equi_spec,
         )
 
     def concat_rows(
@@ -955,7 +975,7 @@ class TableDescription(ViewRepresentation):
 
     def apply_to(self, a, *, target_table_key=None):
         """
-        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.
+        Apply self to operator DAG a. Basic OperatorPlatform, composable API.
 
         :param a: operators to apply to
         :param target_table_key: table key to replace with self, None counts as "match all"
@@ -1577,7 +1597,7 @@ class ProjectNode(ViewRepresentation):
 
     def apply_to(self, a, *, target_table_key=None):
         """
-        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.
+        Apply self to operator DAG a. Basic OperatorPlatform, composable API.
 
         :param a: operators to apply to
         :param target_table_key: table key to replace with self, None counts as "match all"
@@ -1715,7 +1735,7 @@ class SelectRowsNode(ViewRepresentation):
 
     def apply_to(self, a, *, target_table_key=None):
         """
-        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.
+        Apply self to operator DAG a. Basic OperatorPlatform, composable API.
 
         :param a: operators to apply to
         :param target_table_key: table key to replace with self, None counts as "match all"
@@ -1830,7 +1850,7 @@ class SelectColumnsNode(ViewRepresentation):
 
     def apply_to(self, a, *, target_table_key=None):
         """
-        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.
+        Apply self to operator DAG a. Basic OperatorPlatform, composable API.
 
         :param a: operators to apply to
         :param target_table_key: table key to replace with self, None counts as "match all"
@@ -1942,7 +1962,7 @@ class DropColumnsNode(ViewRepresentation):
 
     def apply_to(self, a, *, target_table_key=None):
         """
-        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.
+        Apply self to operator DAG a. Basic OperatorPlatform, composable API.
 
         :param a: operators to apply to
         :param target_table_key: table key to replace with self, None counts as "match all"
@@ -2043,7 +2063,7 @@ class OrderRowsNode(ViewRepresentation):
 
     def apply_to(self, a, *, target_table_key=None):
         """
-        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.
+        Apply self to operator DAG a. Basic OperatorPlatform, composable API.
 
         :param a: operators to apply to
         :param target_table_key: table key to replace with self, None counts as "match all"
@@ -2188,7 +2208,7 @@ class MapColumnsNode(ViewRepresentation):
 
     def apply_to(self, a, *, target_table_key=None):
         """
-        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.
+        Apply self to operator DAG a. Basic OperatorPlatform, composable API.
 
         :param a: operators to apply to
         :param target_table_key: table key to replace with self, None counts as "match all"
@@ -2318,7 +2338,7 @@ class RenameColumnsNode(ViewRepresentation):
 
     def apply_to(self, a, *, target_table_key=None):
         """
-        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.
+        Apply self to operator DAG a. Basic OperatorPlatform, composable API.
 
         :param a: operators to apply to
         :param target_table_key: table key to replace with self, None counts as "match all"
@@ -2396,18 +2416,22 @@ class NaturalJoinNode(ViewRepresentation):
     Class representation of .natural_join() method/step.
     """
 
-    by: List[str]
+    on: List[str]
     jointype: str
 
-    def __init__(self, a, b, *, by, jointype, check_all_common_keys_in_by=False):
+    def __init__(self, a, b, *, on: Optional[Iterable[str]], jointype: str, check_all_common_keys_in_equi_spec: bool = False):
         # check set of tables is consistent in both sub-dags
         a_tables = a.get_tables()
         b_tables = b.get_tables()
         _assert_tables_defs_consistent(a_tables, b_tables)
-        if by is None:
-            raise ValueError(
-                "Must specify by in natural joins ([] for empty conditions)"
-            )
+        if on is None:
+            on = []
+        elif isinstance(on, str):
+            on = [on]
+        else:
+            on = list(on)
+        assert isinstance(on, List)
+        assert numpy.all([isinstance(c, str) for c in on])
         common_table_keys = set(a_tables.keys()).intersection(b_tables.keys())
         for k in common_table_keys:
             if not a_tables[k].same_table_description_(b_tables[k]):
@@ -2421,24 +2445,22 @@ class NaturalJoinNode(ViewRepresentation):
             if ci not in columns_seen:
                 column_names.append(ci)
                 columns_seen.add(ci)
-        if isinstance(by, str):
-            by = [by]
-        by_set = set(by)
-        if len(by) != len(by_set):
-            raise ValueError("duplicate column names in by")
-        missing_left = by_set - set(a.column_names)
+        on_set = set(on)
+        if len(on) != len(on_set):
+            raise ValueError("duplicate column names in on")
+        missing_left = on_set - set(a.column_names)
         if len(missing_left) > 0:
             raise KeyError("left table missing join keys: " + str(missing_left))
-        missing_right = by_set - set(b.column_names)
+        missing_right = on_set - set(b.column_names)
         if len(missing_right) > 0:
             raise KeyError("right table missing join keys: " + str(missing_right))
-        if check_all_common_keys_in_by:
+        if check_all_common_keys_in_equi_spec:
             missing_common = (
-                set(a.column_names).intersection(set(b.column_names)) - by_set
+                set(a.column_names).intersection(set(b.column_names)) - on_set
             )
             if len(missing_common) > 0:
                 raise KeyError(
-                    "check_all_common_keys_in_by set, and the following common keys are are not in the by-clause: "
+                    "check_all_common_keys_in_equi_spec set, and the following common keys are are not in the on-clause: "
                     + str(missing_common)
                 )
         # try to re-use column names if possible, saves space in deeply nested join trees.
@@ -2457,14 +2479,14 @@ class NaturalJoinNode(ViewRepresentation):
             sources=[a, b],
             node_name="NaturalJoinNode",
         )
-        self.by = by
+        self.on = on
         self.jointype = data_algebra.expr_rep.standardize_join_type(jointype)
-        if (self.jointype == "CROSS") and (len(self.by) != 0):
-            raise ValueError("CROSS joins must have an empty 'by' list")
+        if (self.jointype == "CROSS") and (len(self.on) != 0):
+            raise ValueError("CROSS joins must have an empty 'on' list")
 
     def apply_to(self, a, *, target_table_key=None):
         """
-        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.
+        Apply self to operator DAG a. Basic OperatorPlatform, composable API.
 
         :param a: operators to apply to
         :param target_table_key: table key to replace with self, None counts as "match all"
@@ -2474,13 +2496,13 @@ class NaturalJoinNode(ViewRepresentation):
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
         return new_sources[0].natural_join(
-            b=new_sources[1], by=self.by, jointype=self.jointype
+            b=new_sources[1], on=self.on, jointype=self.jointype
         )
 
     def _equiv_nodes(self, other):
         if not isinstance(other, NaturalJoinNode):
             return False
-        if not self.by == other.by:
+        if not self.on == other.on:
             return False
         if not self.jointype == other.jointype:
             return False
@@ -2495,7 +2517,7 @@ class NaturalJoinNode(ViewRepresentation):
         """
         if using is None:
             return [OrderedSet(self.sources[i].column_names) for i in range(2)]
-        using = using.union(self.by)
+        using = using.union(self.on)
         return [
             ordered_intersect(self.sources[i].column_names, using) for i in range(2)
         ]
@@ -2525,7 +2547,7 @@ class NaturalJoinNode(ViewRepresentation):
         else:
             s = s + " _1, "
         s = s + (
-            "by=" + self.by.__repr__() + ", jointype=" + self.jointype.__repr__() + ")"
+            "on=" + self.on.__repr__() + ", jointype=" + self.jointype.__repr__() + ")"
         )
         return s
 
@@ -2588,7 +2610,7 @@ class ConcatRowsNode(ViewRepresentation):
 
     def apply_to(self, a, *, target_table_key=None):
         """
-        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.
+        Apply self to operator DAG a. Basic OperatorPlatform, composable API.
 
         :param a: operators to apply to
         :param target_table_key: table key to replace with self, None counts as "match all"
@@ -2703,7 +2725,7 @@ class ConvertRecordsNode(ViewRepresentation):
 
     def apply_to(self, a, *, target_table_key=None):
         """
-        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.
+        Apply self to operator DAG a. Basic OperatorPlatform, composable API.
 
         :param a: operators to apply to
         :param target_table_key: table key to replace with self, None counts as "match all"
@@ -2833,7 +2855,7 @@ class SQLNode(ViewRepresentation):
 
     def apply_to(self, a, *, target_table_key=None):
         """
-        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.
+        Apply self to operator DAG a. Basic OperatorPlatform, composable API.
 
         :param a: operators to apply to
         :param target_table_key: table key to replace with self, None counts as "match all"

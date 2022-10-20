@@ -1624,14 +1624,14 @@ class DBModel:
             )
         if using is None:
             using = OrderedSet(join_node.column_names)
-        by_set = OrderedSet(join_node.by)
+        on_set = OrderedSet(join_node.on)
         if len(using) < 1:
             raise ValueError("join must use or select at least one column")
         missing = using - set(join_node.column_names)
         if len(missing) > 0:
             raise KeyError("referred to unknown columns: " + str(missing))
         using_left, using_right = join_node.columns_used_from_sources(
-            using=using.union(by_set)
+            using=using.union(on_set)
         )
         sql_left = join_node.sources[0].to_near_sql_implementation_(
             db_model=self, using=using_left, temp_id_source=temp_id_source
@@ -1686,7 +1686,7 @@ class DBModel:
             if ci not in common:
                 terms[ci] = None
         on_terms = []
-        if len(join_node.by) > 0:
+        if len(join_node.on) > 0:
             on_terms = ["ON " + self.on_start] + self._indent_and_sep_terms(
                 [
                     left_qqn
@@ -1696,7 +1696,7 @@ class DBModel:
                     + right_qqn
                     + "."
                     + self.quote_identifier(c)
-                    for c in join_node.by
+                    for c in join_node.on
                 ],
                 sep=self.on_joiner,
                 sql_format_options=sql_format_options,

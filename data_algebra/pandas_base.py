@@ -880,13 +880,13 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         )
         if type_checks is not None:
             raise ValueError(f"join: incompatible column types: {type_checks}")
-        by = op.by
-        if by is None:
-            by = []
-        scratch_col = None  # extra column to prevent empty-by issues
-        if len(by) <= 0:
+        on = op.on
+        if on is None:
+            on = []
+        scratch_col = None  # extra column to prevent empty-on issues
+        if len(on) <= 0:
             scratch_col = "data_algebra_temp_merge_col"
-            by = [scratch_col]
+            on = [scratch_col]
             left[scratch_col] = 1
             right[scratch_col] = 1
         # noinspection PyUnresolvedReferences
@@ -894,7 +894,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             left=left,
             right=right,
             how=self.standardize_join_code_(op.jointype),
-            on=by,
+            on=on,
             sort=False,
             suffixes=("", "_tmp_right_col"),
         )
@@ -902,7 +902,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         if scratch_col is not None:
             del res[scratch_col]
         for c in common_cols:
-            if c not in op.by:
+            if c not in op.on:
                 is_null = res[c].isnull()
                 res.loc[is_null, c] = res.loc[is_null, c + "_tmp_right_col"]
                 res = res.drop(c + "_tmp_right_col", axis=1, inplace=False)

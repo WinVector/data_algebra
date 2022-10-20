@@ -3,8 +3,7 @@ Redirecting container.
 """
 
 from types import SimpleNamespace
-import typing
-from typing import Set
+from typing import Iterable, List, Optional, Set
 
 import data_algebra.data_ops_types
 import data_algebra.data_ops
@@ -20,7 +19,7 @@ one = data_algebra.expr_rep.Value(1)
 class OpC(data_algebra.data_ops_types.OperatorPlatform):
     """Container that redirects to another to non-quoted notation."""
 
-    ops: typing.Optional[
+    ops: Optional[
         data_algebra.data_ops.ViewRepresentation
     ]  # this reference gets replaced
     column_namespace: SimpleNamespace  # don't replace the reference, instead mutate (reference shared!)
@@ -161,13 +160,31 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         self.set(self.ops.project(ops=ops, group_by=group_by,))
         return self
 
-    def natural_join(self, b, *, by, jointype, check_all_common_keys_in_by=False):
+    def natural_join(
+        self, 
+        b, 
+        *, 
+        on: Optional[Iterable[str]] = None, 
+        jointype: str,
+        check_all_common_keys_in_equi_spec: bool = False,
+        by: Optional[Iterable[str]] = None, 
+        check_all_common_keys_in_by: bool = False
+    ):
+        assert (on is None) or (by is None)
+        if by is not None:
+            on = by
+        if on is None:
+            on = []
+        elif isinstance(on, str):
+            on = [on]
+        else:
+            on = list(on)
         self.set(
             self.ops.natural_join(
                 b=b,
-                by=by,
+                on=on,
                 jointype=jointype,
-                check_all_common_keys_in_by=check_all_common_keys_in_by,
+                check_all_common_keys_in_by= (check_all_common_keys_in_equi_spec or check_all_common_keys_in_by),
             )
         )
         return self

@@ -84,7 +84,7 @@ def def_multi_column_map(
                 [col_name_key, col_value_key, mapped_value_key]
             ),
             jointype="left",
-            by=[col_name_key, col_value_key],
+            on=[col_name_key, col_value_key],
         )
     )
     if coalesce_value is not None:
@@ -233,7 +233,7 @@ def xicor_score_variables_plan(
             d.convert_records(
                 record_map
             ).natural_join(  # cross join rows to get experiment repetitions
-                b=descr(rep_frame=rep_frame), by=[], jointype="cross",
+                b=descr(rep_frame=rep_frame), on=[], jointype="cross",
             ),
             var_keys=["variable_name", "rep"],
         )
@@ -311,7 +311,7 @@ def last_observed_carried_forward(
         b=d_marked.select_rows(f"{locf_to_use_column_name} == 1").select_columns(
             partition_by + [locf_non_null_rank_column_name, value_column_name]
         ),
-        by=partition_by + [locf_non_null_rank_column_name],
+        on=partition_by + [locf_non_null_rank_column_name],
         jointype="left",
     ).drop_columns(
         [
@@ -531,7 +531,7 @@ def replicate_rows_query(
                     table_name=join_temp_name,
                     column_names=[power_key_colname, seq_column_name],
                     ),
-                by=[power_key_colname],
+                on=[power_key_colname],
                 jointype='inner',
                 )
             # drop rows exceeding desired count

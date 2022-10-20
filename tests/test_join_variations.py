@@ -46,5 +46,5 @@ def test_join_variations_1():
             b=describe_table(d2, table_name="d2"),
             by=["a"],
             jointype="inner",
-            check_all_common_keys_in_by=True,
+            check_all_common_keys_in_equi_spec=True,
         )

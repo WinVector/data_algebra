@@ -3,7 +3,7 @@ Type defs for data operations.
 """
 
 import abc
-from typing import Dict, List, Optional, Set, NamedTuple
+from typing import Dict, Iterable, List, Optional, Set, NamedTuple
 
 import data_algebra.expr_rep
 import data_algebra.cdata
@@ -249,14 +249,25 @@ class OperatorPlatform(abc.ABC):
         """
 
     @abc.abstractmethod
-    def natural_join(self, b, *, by, jointype, check_all_common_keys_in_by=False):
+    def natural_join(
+        self, 
+        b, 
+        *, 
+        on: Optional[Iterable[str]] = None, 
+        jointype: str,
+        check_all_common_keys_in_equi_spec: bool = False,
+        by: Optional[Iterable[str]] = None, 
+        check_all_common_keys_in_by: bool = False
+    ):
         """
         Join self (left) results with b (right).
 
         :param b: second or right table to join to.
-        :param by: list of join key column names.
+        :param on: list of join column names to enforce equality on.
         :param jointype: name of join type.
-        :param check_all_common_keys_in_by: if True, raise if any non-key columns are common to tables.
+        :param check_all_common_keys_in_equi_spec: if True, raise if any non-equality key columns are common to tables.
+        :param by: synonym for on, only set at most one of on or by (deprecated).
+        :param check_all_common_keys_in_by: synonym for check_all_common_keys_in_equi_spec (deprecated).
         :return: compose operator directed acyclic graph
         """
 
