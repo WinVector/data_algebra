@@ -29,7 +29,10 @@ class EvalKey(NamedTuple):
 
 
 def make_cache_key(
-    *, db_model: data_algebra.db_model.DBModel, sql: str, data_map: Dict[str, Any],
+    *,
+    db_model: data_algebra.db_model.DBModel,
+    sql: str,
+    data_map: Dict[str, Any],
 ):
     """
     Create an immutable, hashable key.

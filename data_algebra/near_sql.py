@@ -106,7 +106,12 @@ class NearSQL(abc.ABC):
 
     @abc.abstractmethod
     def to_sql_str_list(
-        self, *, columns=None, force_sql=False, db_model, sql_format_options=None,
+        self,
+        *,
+        columns=None,
+        force_sql=False,
+        db_model,
+        sql_format_options=None,
     ) -> List[str]:
         """export"""
 
@@ -279,7 +284,12 @@ class NearSQLNamedEntity(NearSQL, abc.ABC):
 
     @abc.abstractmethod
     def to_sql_str_list(
-        self, *, columns=None, force_sql=False, db_model, sql_format_options=None,
+        self,
+        *,
+        columns=None,
+        force_sql=False,
+        db_model,
+        sql_format_options=None,
     ) -> List[str]:
         """export"""
 
@@ -297,7 +307,12 @@ class NearSQLCommonTableExpression(NearSQLNamedEntity):
         )
 
     def to_sql_str_list(
-        self, *, columns=None, force_sql=False, db_model, sql_format_options=None,
+        self,
+        *,
+        columns=None,
+        force_sql=False,
+        db_model,
+        sql_format_options=None,
     ) -> List[str]:
         return db_model.nearsqlcte_to_sql_str_list_(
             near_sql=self,
@@ -320,7 +335,12 @@ class NearSQLTable(NearSQLNamedEntity):
         self.quoted_table_name = quoted_table_name
 
     def to_sql_str_list(
-        self, *, columns=None, force_sql=False, db_model, sql_format_options=None,
+        self,
+        *,
+        columns=None,
+        force_sql=False,
+        db_model,
+        sql_format_options=None,
     ) -> List[str]:
         return db_model.nearsqltable_to_sql_str_list_(
             near_sql=self,
@@ -374,10 +394,17 @@ class NearSQLUnaryStep(NearSQL):
             self.mergeable = False
 
     def to_sql_str_list(
-        self, *, columns=None, force_sql=False, db_model, sql_format_options=None,
+        self,
+        *,
+        columns=None,
+        force_sql=False,
+        db_model,
+        sql_format_options=None,
     ) -> List[str]:
         return db_model.nearsqlunary_to_sql_str_list_(
-            near_sql=self, columns=columns, sql_format_options=sql_format_options,
+            near_sql=self,
+            columns=columns,
+            sql_format_options=sql_format_options,
         )
 
     def to_with_form(self, *, cte_cache: Optional[Dict]) -> SQLWithList:
@@ -438,7 +465,12 @@ class NearSQLBinaryStep(NearSQL):
         self.suffix = suffix
 
     def to_sql_str_list(
-        self, *, columns=None, force_sql=False, db_model, sql_format_options=None,
+        self,
+        *,
+        columns=None,
+        force_sql=False,
+        db_model,
+        sql_format_options=None,
     ) -> List[str]:
         return db_model.nearsqlbinary_to_sql_str_list_(
             near_sql=self,
@@ -527,7 +559,12 @@ class NearSQLRawQStep(NearSQL):
         self.add_select = add_select
 
     def to_sql_str_list(
-        self, *, columns=None, force_sql=False, db_model, sql_format_options=None,
+        self,
+        *,
+        columns=None,
+        force_sql=False,
+        db_model,
+        sql_format_options=None,
     ) -> List[str]:
         return db_model.nearsqlrawq_to_sql_str_list_(
             near_sql=self,

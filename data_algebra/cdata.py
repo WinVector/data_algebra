@@ -731,7 +731,10 @@ def pivot_specification(
     record_map = RecordMap(
         blocks_in=RecordSpecification(
             control_table=data_algebra.pandas_model.pd.DataFrame(
-                {col_name_key: value_cols, col_value_key: value_cols,}
+                {
+                    col_name_key: value_cols,
+                    col_value_key: value_cols,
+                }
             ),
             record_keys=row_keys,
             control_table_keys=[col_name_key],
@@ -768,7 +771,10 @@ def unpivot_specification(
     record_map = RecordMap(
         blocks_out=RecordSpecification(
             control_table=data_algebra.pandas_model.pd.DataFrame(
-                {col_name_key: value_cols, col_value_key: value_cols,}
+                {
+                    col_name_key: value_cols,
+                    col_value_key: value_cols,
+                }
             ),
             record_keys=row_keys,
             control_table_keys=[col_name_key],

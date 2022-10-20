@@ -196,7 +196,11 @@ def xicor_query(
 
 
 def xicor_score_variables_plan(
-    d: ViewRepresentation, *, x_vars: Iterable[str], y_name: str, n_rep: int = 25,
+    d: ViewRepresentation,
+    *,
+    x_vars: Iterable[str],
+    y_name: str,
+    n_rep: int = 25,
 ) -> Tuple[ViewRepresentation, str, Any]:
     """
     Set up a query to batch compute xicor.
@@ -221,7 +225,11 @@ def xicor_score_variables_plan(
     record_map = RecordMap(
         blocks_out=RecordSpecification(
             control_table=data_algebra.pandas_model.pd.DataFrame(
-                {"variable_name": x_vars, "x": x_vars, "y": y_name,}
+                {
+                    "variable_name": x_vars,
+                    "x": x_vars,
+                    "y": y_name,
+                }
             ),
             record_keys=[],
             control_table_keys=["variable_name"],
@@ -233,12 +241,17 @@ def xicor_score_variables_plan(
             d.convert_records(
                 record_map
             ).natural_join(  # cross join rows to get experiment repetitions
-                b=descr(rep_frame=rep_frame), on=[], jointype="cross",
+                b=descr(rep_frame=rep_frame),
+                on=[],
+                jointype="cross",
             ),
             var_keys=["variable_name", "rep"],
         )
         .project(
-            {"xicor_mean": "xicor.mean()", "xicor_std": "xicor.std()",},
+            {
+                "xicor_mean": "xicor.mean()",
+                "xicor_std": "xicor.std()",
+            },
             group_by=["variable_name"],
         )
         .order_rows(["variable_name"])
@@ -462,12 +475,16 @@ def rank_to_average(
             {tie_breaker_column_name: "_row_number()"}, order_by=order_by
         )
         .extend(
-            {rank_column_name: "(1.0).cumsum()",},
+            {
+                rank_column_name: "(1.0).cumsum()",
+            },
             order_by=order_by + [tie_breaker_column_name],
             partition_by=partition_by,
         )
         .extend(
-            {rank_column_name: f"{rank_column_name}.mean()",},
+            {
+                rank_column_name: f"{rank_column_name}.mean()",
+            },
             partition_by=partition_by + order_by,
         )
         .drop_columns([tie_breaker_column_name])
@@ -502,41 +519,47 @@ def replicate_rows_query(
     assert isinstance(max_count, int)
     assert max_count > 0
     # reserve a power key column
-    power_key_colname = 'power'
+    power_key_colname = "power"
     assert power_key_colname != count_column_name
     assert power_key_colname not in d.column_names
     # get a pandas namespace
     pd = data_algebra.default_data_model.pd
     # build powers of 2 until max_count is met or exceeded
-    powers = list(range(int(numpy.ceil(numpy.log(max_count)/numpy.log(2))) + 1))
+    powers = list(range(int(numpy.ceil(numpy.log(max_count) / numpy.log(2))) + 1))
     # replicate each power the number of times it specifies
-    count_frame = pd.concat([
-            pd.DataFrame({
-                power_key_colname: f'p{p}',
-                seq_column_name: range(int(2 ** p)),
-            })
+    count_frame = pd.concat(
+        [
+            pd.DataFrame(
+                {
+                    power_key_colname: f"p{p}",
+                    seq_column_name: range(int(2**p)),
+                }
+            )
             for p in powers
-        ])
+        ]
+    )
     count_frame.reset_index(drop=True, inplace=True)
     # specify ops that produce row replicates
     ops = (
         d
-            # specify which power table we want to join with
-            .extend({
+        # specify which power table we want to join with
+        .extend(
+            {
                 power_key_colname: f'"p" %+% ({count_column_name}.log() / (2).log()).ceil().as_int64()'
-                })
-            # get one row for each number less than or equal to power by under-specified join
-            .natural_join(
-                b=TableDescription(
-                    table_name=join_temp_name,
-                    column_names=[power_key_colname, seq_column_name],
-                    ),
-                on=[power_key_colname],
-                jointype='inner',
-                )
-            # drop rows exceeding desired count
-            .select_rows(f'{seq_column_name} < {count_column_name}')
-            # drop the power group column id
-            .drop_columns([power_key_colname])
+            }
+        )
+        # get one row for each number less than or equal to power by under-specified join
+        .natural_join(
+            b=TableDescription(
+                table_name=join_temp_name,
+                column_names=[power_key_colname, seq_column_name],
+            ),
+            on=[power_key_colname],
+            jointype="inner",
+        )
+        # drop rows exceeding desired count
+        .select_rows(f"{seq_column_name} < {count_column_name}")
+        # drop the power group column id
+        .drop_columns([power_key_colname])
     )
     return ops, count_frame

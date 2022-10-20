@@ -209,7 +209,9 @@ def _run_handle_experiments(
         for i in range(len(sql_statements)):
             try:
                 res_db_sql[i] = test_result_cache.get(
-                    db_model=db_handle.db_model, sql=sql_statements[i], data_map=data,
+                    db_model=db_handle.db_model,
+                    sql=sql_statements[i],
+                    data_map=data,
                 )
             except KeyError:
                 pass
@@ -428,7 +430,8 @@ def check_transform_on_handles(
                                 use_cte_elim=use_cte_elim,
                             )
                             sql = db_handle.to_sql(
-                                ops, sql_format_options=sql_format_options,
+                                ops,
+                                sql_format_options=sql_format_options,
                             )
                             assert isinstance(sql, str)
                             sql_statements.add(sql)

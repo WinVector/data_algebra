@@ -250,13 +250,13 @@ class OperatorPlatform(abc.ABC):
 
     @abc.abstractmethod
     def natural_join(
-        self, 
-        b, 
-        *, 
-        on: Optional[Iterable[str]] = None, 
+        self,
+        b,
+        *,
+        on: Optional[Iterable[str]] = None,
         jointype: str,
         check_all_common_keys_in_equi_spec: bool = False,
-        by: Optional[Iterable[str]] = None, 
+        by: Optional[Iterable[str]] = None,
         check_all_common_keys_in_by: bool = False
     ):
         """

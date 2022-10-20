@@ -7,9 +7,9 @@ import data_algebra.flow_text
 
 class Arrow(abc.ABC):
     """
-    Arrow from category theory: see Steve Awody, 
+    Arrow from category theory: see Steve Awody,
     "Category Theory, 2nd Edition", Oxford Univ. Press, 2010 pg. 4.
-    Essentially this is a tool to expose associativity, without forcing 
+    Essentially this is a tool to expose associativity, without forcing
     things to be a function to expose this effect.
     """
 
@@ -26,16 +26,16 @@ class Arrow(abc.ABC):
 
     @abc.abstractmethod
     def apply_to(self, b):
-        """ apply_to b, compose arrows (right to left) """
+        """apply_to b, compose arrows (right to left)"""
 
     # noinspection PyPep8Naming
     @abc.abstractmethod
     def act_on(self, X):
-        """ act on X, must associate with composition """
+        """act on X, must associate with composition"""
 
     # noinspection PyPep8Naming
     def transform(self, X):
-        """ transform X, may or may not associate with composition """
+        """transform X, may or may not associate with composition"""
         return self.act_on(X)
 
     def __rshift__(self, other):  # override self >> other
@@ -177,25 +177,29 @@ class DataOpArrow(Arrow):
     def dom(self):
         return DataOpArrow(
             data_algebra.data_ops.TableDescription(
-                table_name=None, column_names=self.incoming_columns,
+                table_name=None,
+                column_names=self.incoming_columns,
             )
         )
 
     def dom_as_table(self):
         return data_algebra.data_ops.TableDescription(
-            table_name=None, column_names=self.incoming_columns,
+            table_name=None,
+            column_names=self.incoming_columns,
         )
 
     def cod(self):
         return DataOpArrow(
             data_algebra.data_ops.TableDescription(
-                table_name=None, column_names=self.outgoing_columns,
+                table_name=None,
+                column_names=self.outgoing_columns,
             )
         )
 
     def cod_as_table(self):
         return data_algebra.data_ops.TableDescription(
-            table_name=None, column_names=self.outgoing_columns,
+            table_name=None,
+            column_names=self.outgoing_columns,
         )
 
     def __repr__(self):
@@ -234,7 +238,8 @@ class DataOpArrow(Arrow):
 
     def __str__(self):
         in_rep = self.format_end_description(
-            required_cols=self.incoming_columns, forbidden_cols=self.disallowed_columns,
+            required_cols=self.incoming_columns,
+            forbidden_cols=self.disallowed_columns,
         )
         out_rep = self.format_end_description(
             required_cols=self.outgoing_columns,

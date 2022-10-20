@@ -102,9 +102,10 @@ fn_names_that_imply_ordered_windowed_situation = {
 
 
 # noinspection SpellCheckingInspection
-fn_names_not_allowed_in_project = {"ngroup", "_ngroup",}.union(
-    fn_names_that_imply_ordered_windowed_situation
-)
+fn_names_not_allowed_in_project = {
+    "ngroup",
+    "_ngroup",
+}.union(fn_names_that_imply_ordered_windowed_situation)
 
 
 # fns that don't have consistent windowed implementations we want to support
@@ -815,7 +816,11 @@ class Term(PreTerm, abc.ABC):
         Set membership (vectorized).
         """
         return self.__op_expr__(
-            "is_in", x, inline=False, method=True, check_types=False,
+            "is_in",
+            x,
+            inline=False,
+            method=True,
+            check_types=False,
         )
 
     def concat(self, x):
@@ -824,7 +829,11 @@ class Term(PreTerm, abc.ABC):
         """
         # TODO: see if we can format back to infix notation
         return self.__op_expr__(
-            "concat", x, inline=False, method=True, check_types=False,
+            "concat",
+            x,
+            inline=False,
+            method=True,
+            check_types=False,
         )
 
     def coalesce(self, x):
@@ -910,7 +919,11 @@ class Term(PreTerm, abc.ABC):
         if format is None:
             format = Value("%Y-%m-%d")
         return self.__op_expr__(
-            "parse_date", other=format, inline=False, method=True, check_types=False,
+            "parse_date",
+            other=format,
+            inline=False,
+            method=True,
+            check_types=False,
         )
 
     def format_datetime(self, format=None):
@@ -935,7 +948,11 @@ class Term(PreTerm, abc.ABC):
         if format is None:
             format = Value("%Y-%m-%d")
         return self.__op_expr__(
-            "format_date", other=format, inline=False, method=True, check_types=False,
+            "format_date",
+            other=format,
+            inline=False,
+            method=True,
+            check_types=False,
         )
 
     def dayofweek(self):
@@ -991,7 +1008,11 @@ class Term(PreTerm, abc.ABC):
         Compute difference in dates in days (vectorized).
         """
         return self.__op_expr__(
-            "date_diff", other, inline=False, method=True, check_types=False,
+            "date_diff",
+            other,
+            inline=False,
+            method=True,
+            check_types=False,
         )
 
     # noinspection PyPep8Naming

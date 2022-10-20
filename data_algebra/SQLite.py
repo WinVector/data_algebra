@@ -452,7 +452,8 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             # get shared key set
             left_descr.project({}, group_by=join_columns)
             .concat_rows(
-                b=right_descr.project({}, group_by=join_columns), id_column=None,
+                b=right_descr.project({}, group_by=join_columns),
+                id_column=None,
             )
             .project({}, group_by=join_columns)
             # simulate full join with left joins

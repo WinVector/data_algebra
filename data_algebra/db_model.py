@@ -712,25 +712,37 @@ def _annotated_method_catalogue(
         if row["op_class"] in {"p", "up"}:
             matches.append(
                 data_algebra.data_ops_types.MethodUse(
-                    row["op"], is_project=True, is_windowed=False, is_ordered=False,
+                    row["op"],
+                    is_project=True,
+                    is_windowed=False,
+                    is_ordered=False,
                 )
             )
         elif row["op_class"] == "g":
             matches.append(
                 data_algebra.data_ops_types.MethodUse(
-                    row["op"], is_project=False, is_windowed=True, is_ordered=False,
+                    row["op"],
+                    is_project=False,
+                    is_windowed=True,
+                    is_ordered=False,
                 )
             )
         elif row["op_class"] == "w":
             matches.append(
                 data_algebra.data_ops_types.MethodUse(
-                    row["op"], is_project=False, is_windowed=True, is_ordered=True,
+                    row["op"],
+                    is_project=False,
+                    is_windowed=True,
+                    is_ordered=True,
                 )
             )
         else:  # e and u case
             matches.append(
                 data_algebra.data_ops_types.MethodUse(
-                    row["op"], is_project=False, is_windowed=False, is_ordered=False,
+                    row["op"],
+                    is_project=False,
+                    is_windowed=False,
+                    is_ordered=False,
                 )
             )
         if len(matches) > 0:
@@ -745,8 +757,7 @@ def _annotated_method_catalogue(
 
 
 class DBModel:
-    """A model of how SQL should be generated for a given database.
-       """
+    """A model of how SQL should be generated for a given database."""
 
     identifier_quote: str
     string_quote: str
@@ -1507,9 +1518,14 @@ class DBModel:
             ops_key=f"order({order_node})",  # no terms
         )
         return near_sql
-    
+
     def map_columns_to_near_sql(
-        self, map_columns_node, *, using=None, temp_id_source=None, sql_format_options=None
+        self,
+        map_columns_node,
+        *,
+        using=None,
+        temp_id_source=None,
+        sql_format_options=None,
     ) -> data_algebra.near_sql.NearSQL:
         """
         Convert map columns columns to NearSQL.
@@ -1528,9 +1544,9 @@ class DBModel:
         )
         view_name = "map_columns_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
-        unchanged_columns = subusing - set(map_columns_node.column_remapping.values()).union(
-            map_columns_node.column_remapping.keys()
-        )
+        unchanged_columns = subusing - set(
+            map_columns_node.column_remapping.values()
+        ).union(map_columns_node.column_remapping.keys())
         terms = {
             ki: self.quote_identifier(vi)
             for (vi, ki) in map_columns_node.column_remapping.items()
@@ -1541,7 +1557,9 @@ class DBModel:
             query_name=view_name,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
-            annotation=str(map_columns_node.to_python_src_(print_sources=False, indent=-1)),
+            annotation=str(
+                map_columns_node.to_python_src_(print_sources=False, indent=-1)
+            ),
             ops_key=f"map_columns({map_columns_node}, {terms.keys()})",
         )
         return near_sql
@@ -2066,7 +2084,12 @@ class DBModel:
         return v + " AS " + self.quote_identifier(k)
 
     def nearsqlcte_to_sql_str_list_(
-        self, near_sql, *, columns=None, force_sql=False, sql_format_options=None,
+        self,
+        near_sql,
+        *,
+        columns=None,
+        force_sql=False,
+        sql_format_options=None,
     ) -> List[str]:
         """
         Convert SQL common table expression to list of SQL string lines.
@@ -2085,7 +2108,12 @@ class DBModel:
         return [near_sql.quoted_query_name]
 
     def nearsqltable_to_sql_str_list_(
-        self, near_sql, *, columns=None, force_sql=False, sql_format_options=None,
+        self,
+        near_sql,
+        *,
+        columns=None,
+        force_sql=False,
+        sql_format_options=None,
     ) -> List[str]:
         """
         Convert SQL table description to list of SQL string lines.
@@ -2116,7 +2144,12 @@ class DBModel:
         return [near_sql.quoted_table_name]
 
     def nearsqlunary_to_sql_str_list_(
-        self, near_sql, *, columns=None, force_sql=False, sql_format_options=None,
+        self,
+        near_sql,
+        *,
+        columns=None,
+        force_sql=False,
+        sql_format_options=None,
     ) -> List[str]:
         """
         Convert SQL unary operation to list of SQL string lines.
@@ -2162,7 +2195,11 @@ class DBModel:
         return sql
 
     def nearsqlrawq_to_sql_str_list_(
-        self, near_sql, *, sql_format_options=None, add_select=True,
+        self,
+        near_sql,
+        *,
+        sql_format_options=None,
+        add_select=True,
     ) -> List[str]:
         """
         Convert user SQL query to list of SQL string lines.

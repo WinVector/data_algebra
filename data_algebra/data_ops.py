@@ -88,7 +88,7 @@ def _work_col_group_arg(arg, *, arg_name: str, columns: Iterable[str]):
 
 class ViewRepresentation(OperatorPlatform, abc.ABC):
     """Structure to represent the columns of a query or a table.
-       Abstract base class."""
+    Abstract base class."""
 
     column_names: Tuple[str, ...]
     sources: Tuple[
@@ -366,7 +366,12 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         :return: data_algebra.near_sql.NearSQL
         """
 
-    def to_sql(self, db_model=None, *, sql_format_options=None,) -> str:
+    def to_sql(
+        self,
+        db_model=None,
+        *,
+        sql_format_options=None,
+    ) -> str:
         """
         Convert operator dag to SQL.
 
@@ -376,8 +381,12 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         """
         if db_model is None:
             import data_algebra.SQLite  # import late to avoid circular import issue
+
             db_model = data_algebra.SQLite.SQLiteModel()
-        return db_model.to_sql(ops=self, sql_format_options=sql_format_options,)
+        return db_model.to_sql(
+            ops=self,
+            sql_format_options=sql_format_options,
+        )
 
     # Pandas realization
 
@@ -418,14 +427,14 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         check_incoming_data_constraints: bool = False,
     ):
         """
-         Evaluate operators with respect to Pandas data frames.
+        Evaluate operators with respect to Pandas data frames.
 
-         :param data_map: map from table names to data frames
-         :param data_model: adaptor to data dialect (Pandas for now)
-         :param narrow: logical, if True don't copy unexpected columns
-         :param check_incoming_data_constraints: logical, if True check incoming data meets constraints
-         :return: table result
-         """
+        :param data_map: map from table names to data frames
+        :param data_model: adaptor to data dialect (Pandas for now)
+        :param narrow: logical, if True don't copy unexpected columns
+        :param check_incoming_data_constraints: logical, if True check incoming data meets constraints
+        :return: table result
+        """
 
         if data_map is not None:
             assert isinstance(data_map, dict)
@@ -652,13 +661,13 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         return self.project_parsed_(parsed_ops=parsed_ops, group_by=group_by)
 
     def natural_join(
-        self, 
-        b, 
-        *, 
-        on: Optional[Iterable[str]] = None, 
+        self,
+        b,
+        *,
+        on: Optional[Iterable[str]] = None,
         jointype: str,
         check_all_common_keys_in_equi_spec: bool = False,
-        by: Optional[Iterable[str]] = None, 
+        by: Optional[Iterable[str]] = None,
         check_all_common_keys_in_by: bool = False,
     ) -> "ViewRepresentation":
         """
@@ -686,7 +695,9 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         assert isinstance(jointype, str)
         assert isinstance(check_all_common_keys_in_equi_spec, bool)
         assert isinstance(check_all_common_keys_in_by, bool)
-        check_all_common_keys_in_equi_spec = check_all_common_keys_in_equi_spec or check_all_common_keys_in_by
+        check_all_common_keys_in_equi_spec = (
+            check_all_common_keys_in_equi_spec or check_all_common_keys_in_by
+        )
         if self.is_trivial_when_intermediate_():
             return self.sources[0].natural_join(b, on=on, jointype=jointype)
         return NaturalJoinNode(
@@ -807,7 +818,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         if isinstance(self, DropColumnsNode):
             return self.sources[0].select_columns(columns)
         return SelectColumnsNode(source=self, columns=columns)
-    
+
     def map_columns(self, column_remapping) -> "ViewRepresentation":
         """
         Map column names or rename.
@@ -877,12 +888,12 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
 
 class TableDescription(ViewRepresentation):
     """
-        Describe columns, and qualifiers, of a table.
+     Describe columns, and qualifiers, of a table.
 
-       Example:
-           from data_algebra.data_ops import *
-           d = TableDescription(table_name='d', column_names=['x', 'y'])
-           print(d)
+    Example:
+        from data_algebra.data_ops import *
+        d = TableDescription(table_name='d', column_names=['x', 'y'])
+        print(d)
     """
 
     table_name: str
@@ -2419,7 +2430,15 @@ class NaturalJoinNode(ViewRepresentation):
     on: List[str]
     jointype: str
 
-    def __init__(self, a, b, *, on: Optional[Iterable[str]], jointype: str, check_all_common_keys_in_equi_spec: bool = False):
+    def __init__(
+        self,
+        a,
+        b,
+        *,
+        on: Optional[Iterable[str]],
+        jointype: str,
+        check_all_common_keys_in_equi_spec: bool = False,
+    ):
         # check set of tables is consistent in both sub-dags
         a_tables = a.get_tables()
         b_tables = b.get_tables()
@@ -2850,7 +2869,9 @@ class SQLNode(ViewRepresentation):
         self.sql = sql.copy()
         self.view_name = view_name
         ViewRepresentation.__init__(
-            self, column_names=column_names, node_name="SQLNode",
+            self,
+            column_names=column_names,
+            node_name="SQLNode",
         )
 
     def apply_to(self, a, *, target_table_key=None):

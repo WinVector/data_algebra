@@ -157,17 +157,22 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         return self
 
     def project(self, ops=None, *, group_by=None):
-        self.set(self.ops.project(ops=ops, group_by=group_by,))
+        self.set(
+            self.ops.project(
+                ops=ops,
+                group_by=group_by,
+            )
+        )
         return self
 
     def natural_join(
-        self, 
-        b, 
-        *, 
-        on: Optional[Iterable[str]] = None, 
+        self,
+        b,
+        *,
+        on: Optional[Iterable[str]] = None,
         jointype: str,
         check_all_common_keys_in_equi_spec: bool = False,
-        by: Optional[Iterable[str]] = None, 
+        by: Optional[Iterable[str]] = None,
         check_all_common_keys_in_by: bool = False
     ):
         assert (on is None) or (by is None)
@@ -184,7 +189,9 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
                 b=b,
                 on=on,
                 jointype=jointype,
-                check_all_common_keys_in_by= (check_all_common_keys_in_equi_spec or check_all_common_keys_in_by),
+                check_all_common_keys_in_by=(
+                    check_all_common_keys_in_equi_spec or check_all_common_keys_in_by
+                ),
             )
         )
         return self
@@ -200,7 +207,11 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         return self
 
     def select_rows(self, expr):
-        self.set(self.ops.select_rows(expr=expr,))
+        self.set(
+            self.ops.select_rows(
+                expr=expr,
+            )
+        )
         return self
 
     def drop_columns(self, column_deletions):
@@ -229,7 +240,8 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
 
     def map_records(self, blocks_in=None, blocks_out=None):
         self.ops.map_records(
-            blocks_in=blocks_in, blocks_out=blocks_out,
+            blocks_in=blocks_in,
+            blocks_out=blocks_out,
         )
         return self
 

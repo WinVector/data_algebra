@@ -107,7 +107,7 @@ BigQuery_formatters = {
 
 class BigQueryModel(data_algebra.db_model.DBModel):
     """A model of how SQL should be generated for BigQuery
-       connection should be google.cloud.bigquery.client.Client"""
+    connection should be google.cloud.bigquery.client.Client"""
 
     def __init__(self, *, table_prefix: Optional[str] = None):
         data_algebra.db_model.DBModel.__init__(

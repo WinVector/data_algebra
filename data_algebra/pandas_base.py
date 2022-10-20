@@ -822,7 +822,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         if (op.limit is not None) and (res.shape[0] > op.limit):
             res = res.iloc[range(op.limit), :].reset_index(drop=True)
         return res
-    
+
     def map_columns_step(self, op, *, data_map, narrow):
         """
         Execute a map columns step, returning a data frame.
