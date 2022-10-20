@@ -35,3 +35,19 @@ def test_join_warn1():
     data_algebra.test_util.check_transform(
         ops=ops, data={"d_left": d_left, "d_right": d_right}, expect=expect
     )
+
+
+def test_join_where_merge():
+    d = data_algebra.default_data_model.pd.DataFrame({"x": [1], "y": [2], "z": ["q"]})
+    ops = (
+        descr(d=d)
+            .natural_join(
+                descr(d=d),
+                by=[],
+                jointype='outer',
+                )
+            .select_rows("x > y")
+    )
+    sql_str = ops.to_sql()
+    assert isinstance(sql_str, str)
+    # TODO: merge where clause from select_rows() into join step (and check).
