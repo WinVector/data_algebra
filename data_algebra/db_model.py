@@ -1544,12 +1544,12 @@ class DBModel:
         )
         view_name = "map_columns_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
-        unchanged_columns = subusing - set(
-            map_columns_node.column_remapping.values()
-        ).union(map_columns_node.column_remapping.keys())
+        unchanged_columns = subusing - (
+            set(map_columns_node.column_remapping.values()).union(map_columns_node.column_remapping.keys()).union(map_columns_node.column_deletions))
         terms = {
             ki: self.quote_identifier(vi)
             for (vi, ki) in map_columns_node.column_remapping.items()
+            if (vi is not None) and (ki is not None)
         }
         terms.update({vi: None for vi in unchanged_columns})
         near_sql = data_algebra.near_sql.NearSQLUnaryStep(
@@ -1584,9 +1584,8 @@ class DBModel:
         )
         view_name = "rename_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
-        unchanged_columns = subusing - set(rename_node.column_remapping.values()).union(
-            rename_node.column_remapping.keys()
-        )
+        unchanged_columns = subusing - (
+            set(rename_node.column_remapping.values()).union(rename_node.column_remapping.keys()))
         terms = {
             ki: self.quote_identifier(vi)
             for (ki, vi) in rename_node.column_remapping.items()

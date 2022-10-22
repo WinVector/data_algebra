@@ -832,7 +832,11 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                 "op was supposed to be a data_algebra.data_ops.MapColumnsNode"
             )
         res = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
-        return res.rename(columns=op.column_remapping)
+        res = res.rename(columns=op.column_remapping)
+        if (op.column_deletions is not None) and (len(op.column_deletions) > 0):
+            column_selection = [c for c in res.columns if c not in op.column_deletions]
+            res = res[column_selection]
+        return res
 
     def rename_columns_step(self, op, *, data_map, narrow):
         """

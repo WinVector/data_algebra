@@ -792,6 +792,8 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         """
         if isinstance(column_deletions, str):
             column_deletions = [column_deletions]
+        else:
+            column_deletions = list(column_deletions)
         if (column_deletions is None) or (len(column_deletions) < 1):
             return self
         if self.is_trivial_when_intermediate_():
@@ -2168,12 +2170,12 @@ class MapColumnsNode(ViewRepresentation):
     """
 
     column_remapping: Dict[str, str]
-    reverse_mapping: Dict[str, str]
+    column_deletions: List[str]
 
     def __init__(self, source, column_remapping):
-        self.column_remapping = column_remapping.copy()
-        self.reverse_mapping = {v: k for (k, v) in self.column_remapping.items()}
-        new_cols = [k for k in column_remapping.values()]
+        self.column_remapping = {k: v for (k, v) in column_remapping.items() if v is not None}
+        self.column_deletions = [k for (k, v) in column_remapping.items() if v is None]
+        new_cols = [v for (k, v) in column_remapping.items() if v is not None]
         orig_cols = [k for k in column_remapping.keys()]
         unknown = set(orig_cols) - set(source.column_names)
         if len(unknown) > 0:
@@ -2233,7 +2235,9 @@ class MapColumnsNode(ViewRepresentation):
     def _equiv_nodes(self, other):
         if not isinstance(other, MapColumnsNode):
             return False
-        if not self.column_remapping == other.column_remapping:
+        if not (self.column_remapping == other.column_remapping):
+            return False
+        if not (self.column_deletions == other.column_deletions):
             return False
         return True
 
@@ -2248,10 +2252,13 @@ class MapColumnsNode(ViewRepresentation):
             using_tuple = self.column_names
         else:
             using_tuple = tuple(using)
+        cols = [k for k in using_tuple if k ]
+        reverse_mapping = {v: k for k, v in self.column_remapping.items()}
+        rev_keys = set(reverse_mapping.keys())
         cols = [
-            (k if k not in self.reverse_mapping.keys() else self.reverse_mapping[k])
+            (k if k not in rev_keys else reverse_mapping[k])
             for k in using_tuple
-        ]
+        ] + self.column_deletions
         return [OrderedSet(cols)]
 
     def to_python_src_(self, *, indent=0, strict=True, print_sources=True):
@@ -2269,7 +2276,9 @@ class MapColumnsNode(ViewRepresentation):
                 + "\n"
                 + " " * (max(indent, 0) + 3)
             )
-        s = s + (".map_columns(" + self.column_remapping.__repr__() + ")")
+        column_remapping = self.column_remapping.copy()
+        column_remapping.update({k: None for k in self.column_deletions})
+        s = s + (".map_columns(" + column_remapping.__repr__() + ")")
         return s
 
     def to_near_sql_implementation_(
@@ -2302,7 +2311,7 @@ class RenameColumnsNode(ViewRepresentation):
 
     def __init__(self, source, column_remapping):
         self.column_remapping = column_remapping.copy()
-        self.reverse_mapping = {v: k for (k, v) in self.column_remapping.items()}
+        self.reverse_mapping = {v: k for (k, v) in column_remapping.items()}
         new_cols = [k for k in column_remapping.keys()]
         orig_cols = [k for k in column_remapping.values()]
         unknown = set(orig_cols) - set(source.column_names)
