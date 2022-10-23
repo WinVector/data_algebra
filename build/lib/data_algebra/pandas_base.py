@@ -832,7 +832,11 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                 "op was supposed to be a data_algebra.data_ops.MapColumnsNode"
             )
         res = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
-        return res.rename(columns=op.column_remapping)
+        res = res.rename(columns=op.column_remapping)
+        if (op.column_deletions is not None) and (len(op.column_deletions) > 0):
+            column_selection = [c for c in res.columns if c not in op.column_deletions]
+            res = res[column_selection]
+        return res
 
     def rename_columns_step(self, op, *, data_map, narrow):
         """
@@ -880,7 +884,8 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         )
         if type_checks is not None:
             raise ValueError(f"join: incompatible column types: {type_checks}")
-        on = op.on
+        assert op.on_a == op.on_b  # TODO: relax this
+        on = op.on_a
         if on is None:
             on = []
         scratch_col = None  # extra column to prevent empty-on issues
@@ -901,8 +906,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         res = res.reset_index(drop=True)
         if scratch_col is not None:
             del res[scratch_col]
+        on_a_set = set(op.on_a)
         for c in common_cols:
-            if c not in op.on:
+            if c not in on_a_set:
                 is_null = res[c].isnull()
                 res.loc[is_null, c] = res.loc[is_null, c + "_tmp_right_col"]
                 res = res.drop(c + "_tmp_right_col", axis=1, inplace=False)

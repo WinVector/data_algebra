@@ -1544,12 +1544,12 @@ class DBModel:
         )
         view_name = "map_columns_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
-        unchanged_columns = subusing - set(
-            map_columns_node.column_remapping.values()
-        ).union(map_columns_node.column_remapping.keys())
+        unchanged_columns = subusing - (
+            set(map_columns_node.column_remapping.values()).union(map_columns_node.column_remapping.keys()).union(map_columns_node.column_deletions))
         terms = {
             ki: self.quote_identifier(vi)
             for (vi, ki) in map_columns_node.column_remapping.items()
+            if (vi is not None) and (ki is not None)
         }
         terms.update({vi: None for vi in unchanged_columns})
         near_sql = data_algebra.near_sql.NearSQLUnaryStep(
@@ -1584,9 +1584,8 @@ class DBModel:
         )
         view_name = "rename_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
-        unchanged_columns = subusing - set(rename_node.column_remapping.values()).union(
-            rename_node.column_remapping.keys()
-        )
+        unchanged_columns = subusing - (
+            set(rename_node.column_remapping.values()).union(rename_node.column_remapping.keys()))
         terms = {
             ki: self.quote_identifier(vi)
             for (ki, vi) in rename_node.column_remapping.items()
@@ -1642,7 +1641,8 @@ class DBModel:
             )
         if using is None:
             using = OrderedSet(join_node.column_names)
-        on_set = OrderedSet(join_node.on)
+        assert join_node.on_a == join_node.on_b  # TODO: relax this
+        on_set = OrderedSet(join_node.on_a)
         if len(using) < 1:
             raise ValueError("join must use or select at least one column")
         missing = using - set(join_node.column_names)
@@ -1704,17 +1704,17 @@ class DBModel:
             if ci not in common:
                 terms[ci] = None
         on_terms = []
-        if len(join_node.on) > 0:
+        if len(join_node.on_a) > 0:
             on_terms = ["ON " + self.on_start] + self._indent_and_sep_terms(
                 [
                     left_qqn
                     + "."
-                    + self.quote_identifier(c)
+                    + self.quote_identifier(c_a)
                     + " = "
                     + right_qqn
                     + "."
-                    + self.quote_identifier(c)
-                    for c in join_node.on
+                    + self.quote_identifier(c_b)
+                    for c_a, c_b in zip(join_node.on_a, join_node.on_b)
                 ],
                 sep=self.on_joiner,
                 sql_format_options=sql_format_options,

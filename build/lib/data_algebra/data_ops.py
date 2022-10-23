@@ -68,6 +68,46 @@ def _assert_tables_defs_consistent(tm1: Dict, tm2: Dict):
             raise ValueError("Table " + k + " has two incompatible representations")
 
 
+def _convert_on_clause_to_parallel_lists(on) -> Tuple[List[str], List[str]]:
+    on_a = []
+    on_b = []
+    if on is not None:
+        if isinstance(on, str):
+            on_a = [on]
+            on_b = [on]
+        elif isinstance(on, Iterable):
+            if isinstance(on, Dict):
+                on = list(on.items())
+            else:
+                on = list(on)
+            if len(on) > 0:
+                if isinstance(on[0], str):
+                    assert numpy.all([isinstance(v, str) for v in on])
+                    on_a = on
+                    on_b = on_a.copy()
+                else:
+                    assert numpy.all([isinstance(v, Tuple) and (len(v) == 2) for v in on])
+                    on_a = [v[0] for v in on]
+                    on_b = [v[1] for v in on]
+        else:
+            raise ValueError(f"unexpected on-argument type {type(on)}")
+    return on_a, on_b
+
+
+def _convert_parallel_lists_to_on_clause(on_a: List[str], on_b: List[str]):
+    assert isinstance(on_a, List)
+    assert numpy.all([isinstance(v, str) for v in on_a])
+    assert isinstance(on_b, List)
+    assert numpy.all([isinstance(v, str) for v in on_b])
+    assert len(on_a) == len(on_b)
+    if len(on_a) <= 0:
+        return []
+    elif on_a == on_b:
+        return on_a
+    else:
+        return [(v_a, v_b) for v_a, v_b in zip(on_a, on_b)]
+
+
 def _work_col_group_arg(arg, *, arg_name: str, columns: Iterable[str]):
     """convert column list to standard form"""
     if arg is None:
@@ -664,17 +704,17 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         self,
         b,
         *,
-        on: Optional[Iterable[str]] = None,
+        on = None,
         jointype: str,
         check_all_common_keys_in_equi_spec: bool = False,
-        by: Optional[Iterable[str]] = None,
+        by = None,
         check_all_common_keys_in_by: bool = False,
     ) -> "ViewRepresentation":
         """
         Join self (left) results with b (right).
 
         :param b: second or right table to join to.
-        :param on: list of join column names to enforce equality on.
+        :param on: column names to enforce equality on (list of column names, list of tuples, or dictionary)
         :param jointype: name of join type.
         :param check_all_common_keys_in_equi_spec: if True, raise if any non-equality key columns are common to tables.
         :param by: synonym for on, only set at most one of on or by (deprecated).
@@ -685,13 +725,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         assert (on is None) or (by is None)
         if by is not None:
             on = by
-        if on is None:
-            on = []
-        elif isinstance(on, str):
-            on = [on]
-        else:
-            on = list(on)
-        assert numpy.all([isinstance(c, str) for c in on])
+        on_a, on_b = _convert_on_clause_to_parallel_lists(on)
         assert isinstance(jointype, str)
         assert isinstance(check_all_common_keys_in_equi_spec, bool)
         assert isinstance(check_all_common_keys_in_by, bool)
@@ -703,7 +737,8 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         return NaturalJoinNode(
             a=self,
             b=b,
-            on=on,
+            on_a=on_a,
+            on_b=on_b,
             jointype=jointype,
             check_all_common_keys_in_equi_spec=check_all_common_keys_in_equi_spec,
         )
@@ -792,6 +827,8 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         """
         if isinstance(column_deletions, str):
             column_deletions = [column_deletions]
+        else:
+            column_deletions = list(column_deletions)
         if (column_deletions is None) or (len(column_deletions) < 1):
             return self
         if self.is_trivial_when_intermediate_():
@@ -2168,12 +2205,12 @@ class MapColumnsNode(ViewRepresentation):
     """
 
     column_remapping: Dict[str, str]
-    reverse_mapping: Dict[str, str]
+    column_deletions: List[str]
 
     def __init__(self, source, column_remapping):
-        self.column_remapping = column_remapping.copy()
-        self.reverse_mapping = {v: k for (k, v) in self.column_remapping.items()}
-        new_cols = [k for k in column_remapping.values()]
+        self.column_remapping = {k: v for (k, v) in column_remapping.items() if v is not None}
+        self.column_deletions = [k for (k, v) in column_remapping.items() if v is None]
+        new_cols = [v for (k, v) in column_remapping.items() if v is not None]
         orig_cols = [k for k in column_remapping.keys()]
         unknown = set(orig_cols) - set(source.column_names)
         if len(unknown) > 0:
@@ -2233,7 +2270,9 @@ class MapColumnsNode(ViewRepresentation):
     def _equiv_nodes(self, other):
         if not isinstance(other, MapColumnsNode):
             return False
-        if not self.column_remapping == other.column_remapping:
+        if not (self.column_remapping == other.column_remapping):
+            return False
+        if not (self.column_deletions == other.column_deletions):
             return False
         return True
 
@@ -2248,10 +2287,13 @@ class MapColumnsNode(ViewRepresentation):
             using_tuple = self.column_names
         else:
             using_tuple = tuple(using)
+        cols = [k for k in using_tuple if k ]
+        reverse_mapping = {v: k for k, v in self.column_remapping.items()}
+        rev_keys = set(reverse_mapping.keys())
         cols = [
-            (k if k not in self.reverse_mapping.keys() else self.reverse_mapping[k])
+            (k if k not in rev_keys else reverse_mapping[k])
             for k in using_tuple
-        ]
+        ] + self.column_deletions
         return [OrderedSet(cols)]
 
     def to_python_src_(self, *, indent=0, strict=True, print_sources=True):
@@ -2269,7 +2311,9 @@ class MapColumnsNode(ViewRepresentation):
                 + "\n"
                 + " " * (max(indent, 0) + 3)
             )
-        s = s + (".map_columns(" + self.column_remapping.__repr__() + ")")
+        column_remapping = self.column_remapping.copy()
+        column_remapping.update({k: None for k in self.column_deletions})
+        s = s + (".map_columns(" + column_remapping.__repr__() + ")")
         return s
 
     def to_near_sql_implementation_(
@@ -2302,7 +2346,7 @@ class RenameColumnsNode(ViewRepresentation):
 
     def __init__(self, source, column_remapping):
         self.column_remapping = column_remapping.copy()
-        self.reverse_mapping = {v: k for (k, v) in self.column_remapping.items()}
+        self.reverse_mapping = {v: k for (k, v) in column_remapping.items()}
         new_cols = [k for k in column_remapping.keys()]
         orig_cols = [k for k in column_remapping.values()]
         unknown = set(orig_cols) - set(source.column_names)
@@ -2427,7 +2471,8 @@ class NaturalJoinNode(ViewRepresentation):
     Class representation of .natural_join() method/step.
     """
 
-    on: List[str]
+    on_a: List[str]
+    on_b: List[str]
     jointype: str
 
     def __init__(
@@ -2435,7 +2480,8 @@ class NaturalJoinNode(ViewRepresentation):
         a,
         b,
         *,
-        on: Optional[Iterable[str]],
+        on_a: List[str],
+        on_b: List[str],
         jointype: str,
         check_all_common_keys_in_equi_spec: bool = False,
     ):
@@ -2443,14 +2489,15 @@ class NaturalJoinNode(ViewRepresentation):
         a_tables = a.get_tables()
         b_tables = b.get_tables()
         _assert_tables_defs_consistent(a_tables, b_tables)
-        if on is None:
-            on = []
-        elif isinstance(on, str):
-            on = [on]
-        else:
-            on = list(on)
-        assert isinstance(on, List)
-        assert numpy.all([isinstance(c, str) for c in on])
+        assert isinstance(on_a, List)
+        assert numpy.all([isinstance(v, str) for v in on_a])
+        assert isinstance(on_b, List)
+        assert numpy.all([isinstance(v, str) for v in on_b])
+        assert len(on_a) == len(on_b)
+        if on_a != on_b:  # TODO: eventually relax this
+            raise ValueError("different left/right on keys not implemented yet")
+        if len(on_a) != len(set(on_a)):  # TODO: eventually relax this
+            raise ValueError("duplicate column names in on")
         common_table_keys = set(a_tables.keys()).intersection(b_tables.keys())
         for k in common_table_keys:
             if not a_tables[k].same_table_description_(b_tables[k]):
@@ -2464,18 +2511,15 @@ class NaturalJoinNode(ViewRepresentation):
             if ci not in columns_seen:
                 column_names.append(ci)
                 columns_seen.add(ci)
-        on_set = set(on)
-        if len(on) != len(on_set):
-            raise ValueError("duplicate column names in on")
-        missing_left = on_set - set(a.column_names)
+        missing_left = set(on_a) - set(a.column_names)
         if len(missing_left) > 0:
             raise KeyError("left table missing join keys: " + str(missing_left))
-        missing_right = on_set - set(b.column_names)
+        missing_right = set(on_b) - set(b.column_names)
         if len(missing_right) > 0:
             raise KeyError("right table missing join keys: " + str(missing_right))
         if check_all_common_keys_in_equi_spec:
             missing_common = (
-                set(a.column_names).intersection(set(b.column_names)) - on_set
+                set(a.column_names).intersection(set(b.column_names)) - set(on_a).intersection(on_b)
             )
             if len(missing_common) > 0:
                 raise KeyError(
@@ -2498,9 +2542,10 @@ class NaturalJoinNode(ViewRepresentation):
             sources=[a, b],
             node_name="NaturalJoinNode",
         )
-        self.on = on
+        self.on_a = on_a
+        self.on_b = on_b
         self.jointype = data_algebra.expr_rep.standardize_join_type(jointype)
-        if (self.jointype == "CROSS") and (len(self.on) != 0):
+        if (self.jointype == "CROSS") and (len(self.on_a) != 0):
             raise ValueError("CROSS joins must have an empty 'on' list")
 
     def apply_to(self, a, *, target_table_key=None):
@@ -2515,13 +2560,15 @@ class NaturalJoinNode(ViewRepresentation):
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
         return new_sources[0].natural_join(
-            b=new_sources[1], on=self.on, jointype=self.jointype
+            b=new_sources[1], on=[(va, vb) for (va, vb) in zip(self.on_a, self.on_b)], jointype=self.jointype
         )
 
     def _equiv_nodes(self, other):
         if not isinstance(other, NaturalJoinNode):
             return False
-        if not self.on == other.on:
+        if not self.on_a == other.on_a:
+            return False
+        if not self.on_b == other.on_b:
             return False
         if not self.jointype == other.jointype:
             return False
@@ -2536,7 +2583,7 @@ class NaturalJoinNode(ViewRepresentation):
         """
         if using is None:
             return [OrderedSet(self.sources[i].column_names) for i in range(2)]
-        using = using.union(self.on)
+        using = using.union(self.on_a)  # TODO: generalize to when on_a != on_b
         return [
             ordered_intersect(self.sources[i].column_names, using) for i in range(2)
         ]
@@ -2565,8 +2612,9 @@ class NaturalJoinNode(ViewRepresentation):
             )
         else:
             s = s + " _1, "
+        on_arg = _convert_parallel_lists_to_on_clause(self.on_a, self.on_b)
         s = s + (
-            "on=" + self.on.__repr__() + ", jointype=" + self.jointype.__repr__() + ")"
+            "on=" + on_arg.__repr__() + ", jointype=" + self.jointype.__repr__() + ")"
         )
         return s
 
