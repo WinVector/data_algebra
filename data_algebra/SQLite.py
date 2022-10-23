@@ -440,12 +440,13 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         # this is an example how to tree-rewrite the operator platform before emitting SQL.
         assert join_node.node_name == "NaturalJoinNode"
         assert join_node.jointype == "FULL"
-        assert len(join_node.on) > 0  # could special case zero case later
+        assert len(join_node.on_a) > 0  # could special case zero case later
         if temp_id_source is None:
             temp_id_source = [0]
         if using is None:
             using = set(join_node.column_names)
-        join_columns = join_node.on
+        join_columns = join_node.on_a
+        assert join_node.on_a == join_node.on_b  # TODO: relax this
         left_descr = join_node.sources[0]
         right_descr = join_node.sources[1]
         ops_simulate = (

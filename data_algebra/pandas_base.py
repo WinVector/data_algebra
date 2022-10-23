@@ -884,7 +884,8 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         )
         if type_checks is not None:
             raise ValueError(f"join: incompatible column types: {type_checks}")
-        on = op.on
+        assert op.on_a == op.on_b  # TODO: relax this
+        on = op.on_a
         if on is None:
             on = []
         scratch_col = None  # extra column to prevent empty-on issues
@@ -905,8 +906,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         res = res.reset_index(drop=True)
         if scratch_col is not None:
             del res[scratch_col]
+        on_a_set = set(op.on_a)
         for c in common_cols:
-            if c not in op.on:
+            if c not in on_a_set:
                 is_null = res[c].isnull()
                 res.loc[is_null, c] = res.loc[is_null, c + "_tmp_right_col"]
                 res = res.drop(c + "_tmp_right_col", axis=1, inplace=False)
