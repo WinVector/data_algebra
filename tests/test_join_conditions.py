@@ -28,3 +28,34 @@ def test_join_conditions_on_back():
     expect2 = [('a', 'b'), ('b', 'a')]
     res2 = data_algebra.data_ops._convert_parallel_lists_to_on_clause(["a", "b"], ["b", "a"])
     assert res2 == expect1
+
+"""
+def test_join_conditions_on_join():
+    d1 = data_algebra.default_data_model.pd.DataFrame({
+        "x": [1, 2, 3],
+        "a": [4, 5, 6],
+    })
+    d2 = data_algebra.default_data_model.pd.DataFrame({
+        "y": [1, 2, 3],
+        "b": [7, 8, 9],
+    })
+    expect = data_algebra.default_data_model.pd.DataFrame({
+        "x": [1, 2, 3],
+        "y": [1, 2, 3],
+        "a": [4, 5, 6],
+        "b": [7, 8, 9],
+    })
+    ops = (
+        descr(d1=d1)
+            .natural_join(
+                descr(d2=d2),
+                on=[("x", "y")],
+                jointype="full",
+            )
+    )
+    res = ops.eval({"d1": d1, "d2": d2})
+    assert data_algebra.test_util.equivalent_frames(res, expect)
+    data_algebra.test_util.check_transform(
+        ops=ops, data={"d1": d1, "d2": d2}, expect=expect
+    )
+"""
