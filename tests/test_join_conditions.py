@@ -29,7 +29,7 @@ def test_join_conditions_on_back():
     res2 = data_algebra.data_ops._convert_parallel_lists_to_on_clause(["a", "b"], ["b", "a"])
     assert res2 == expect2
 
-"""
+
 def test_join_conditions_on_join():
     d1 = data_algebra.default_data_model.pd.DataFrame({
         "x": [1, 2, 3],
@@ -58,4 +58,3 @@ def test_join_conditions_on_join():
     data_algebra.test_util.check_transform(
         ops=ops, data={"d1": d1, "d2": d2}, expect=expect
     )
-"""
