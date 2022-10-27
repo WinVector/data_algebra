@@ -1641,15 +1641,13 @@ class DBModel:
             )
         if using is None:
             using = OrderedSet(join_node.column_names)
-        assert join_node.on_a == join_node.on_b  # TODO: relax this
-        on_set = OrderedSet(join_node.on_a)
         if len(using) < 1:
             raise ValueError("join must use or select at least one column")
         missing = using - set(join_node.column_names)
         if len(missing) > 0:
             raise KeyError("referred to unknown columns: " + str(missing))
         using_left, using_right = join_node.columns_used_from_sources(
-            using=using.union(on_set)
+            using=using.union(join_node.on_a).union(join_node.on_b)
         )
         sql_left = join_node.sources[0].to_near_sql_implementation_(
             db_model=self, using=using_left, temp_id_source=temp_id_source
