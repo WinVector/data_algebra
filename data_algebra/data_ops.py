@@ -2494,10 +2494,6 @@ class NaturalJoinNode(ViewRepresentation):
         assert isinstance(on_b, List)
         assert numpy.all([isinstance(v, str) for v in on_b])
         assert len(on_a) == len(on_b)
-        if on_a != on_b:  # TODO: eventually relax this
-            raise ValueError("different left/right on keys not implemented yet")
-        if len(on_a) != len(set(on_a)):  # TODO: eventually relax this
-            raise ValueError("duplicate column names in on")
         common_table_keys = set(a_tables.keys()).intersection(b_tables.keys())
         for k in common_table_keys:
             if not a_tables[k].same_table_description_(b_tables[k]):
@@ -2583,7 +2579,7 @@ class NaturalJoinNode(ViewRepresentation):
         """
         if using is None:
             return [OrderedSet(self.sources[i].column_names) for i in range(2)]
-        using = using.union(self.on_a)  # TODO: generalize to when on_a != on_b
+        using = using.union(self.on_a).union(self.on_b)
         return [
             ordered_intersect(self.sources[i].column_names, using) for i in range(2)
         ]

@@ -50,7 +50,7 @@ def test_join_conditions_on_join():
             .natural_join(
                 descr(d2=d2),
                 on=[("x", "y")],
-                jointype="full",
+                jointype="left",
             )
     )
     res = ops.eval({"d1": d1, "d2": d2})
