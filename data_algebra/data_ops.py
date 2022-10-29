@@ -80,21 +80,23 @@ def _convert_on_clause_to_parallel_lists(on) -> Tuple[List[str], List[str]]:
                 on = list(on.items())
             else:
                 on = list(on)
-            if len(on) > 0:
-                if isinstance(on[0], str):
-                    assert numpy.all([isinstance(v, str) for v in on])
-                    on_a = on
-                    on_b = on_a.copy()
+            for v in on :
+                if isinstance(v, str):
+                    on_a.append(v)
+                    on_b.append(v)
                 else:
-                    assert numpy.all([isinstance(v, Tuple) and (len(v) == 2) for v in on])
-                    on_a = [v[0] for v in on]
-                    on_b = [v[1] for v in on]
+                    v = list(v)
+                    assert len(v) == 2
+                    assert isinstance(v[0], str)
+                    assert isinstance(v[1], str)
+                    on_a.append(v[0])
+                    on_b.append(v[1])
         else:
             raise ValueError(f"unexpected on-argument type {type(on)}")
     return on_a, on_b
 
 
-def _convert_parallel_lists_to_on_clause(on_a: List[str], on_b: List[str]):
+def _convert_parallel_lists_to_on_clause(on_a: Iterable[str], on_b: Iterable[str]):
     assert isinstance(on_a, List)
     assert numpy.all([isinstance(v, str) for v in on_a])
     assert isinstance(on_b, List)
@@ -102,11 +104,14 @@ def _convert_parallel_lists_to_on_clause(on_a: List[str], on_b: List[str]):
     assert len(on_a) == len(on_b)
     if len(on_a) <= 0:
         return []
-    elif on_a == on_b:
-        return on_a
-    else:
-        return [(v_a, v_b) for v_a, v_b in zip(on_a, on_b)]
-
+    
+    def enc_i(v_a, v_b):
+        if v_a == v_b:
+            return v_a
+        return (v_a, v_b)
+    
+    return [enc_i(v_a, v_b) for v_a, v_b in zip(on_a, on_b)]
+ 
 
 def _work_col_group_arg(arg, *, arg_name: str, columns: Iterable[str]):
     """convert column list to standard form"""

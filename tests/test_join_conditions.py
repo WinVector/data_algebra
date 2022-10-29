@@ -28,6 +28,9 @@ def test_join_conditions_on_back():
     expect2 = [('a', 'b'), ('b', 'a')]
     res2 = data_algebra.data_ops._convert_parallel_lists_to_on_clause(["a", "b"], ["b", "a"])
     assert res2 == expect2
+    res3 = data_algebra.data_ops._convert_parallel_lists_to_on_clause(["a", "b"], ["b", "b"])
+    expect3 =  [('a', 'b'), 'b']
+    assert res3 == expect3
 
 
 def test_join_conditions_on_join():
