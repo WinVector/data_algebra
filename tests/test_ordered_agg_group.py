@@ -57,7 +57,7 @@ def test_ordered_agg_group():
 
     # d
 
-    # %%
+    
 
     diagram = data_algebra.default_data_model.pd.DataFrame(
         {
@@ -69,7 +69,7 @@ def test_ordered_agg_group():
 
     # diagram
 
-    # %%
+    
 
     record_map = RecordMap(
         blocks_in=RecordSpecification(control_table=diagram, record_keys=["ID"])
@@ -77,7 +77,7 @@ def test_ordered_agg_group():
 
     str(record_map)
 
-    # %%
+    
 
     ops = (
         describe_table(d, table_name="d")
@@ -91,7 +91,7 @@ def test_ordered_agg_group():
 
     assert data_algebra.test_util.equivalent_frames(expect, res1)
 
-    # %%
+    
 
     db_model = data_algebra.SQLite.SQLiteModel()
 
@@ -99,7 +99,7 @@ def test_ordered_agg_group():
 
     # print(sql)
 
-    # %%
+    
 
     con = sqlite3.connect(":memory:")
     db_model.prepare_connection(con)
@@ -110,7 +110,7 @@ def test_ordered_agg_group():
     # res_db
     assert data_algebra.test_util.equivalent_frames(expect, res_db)
 
-    # %%
+    
 
     # proves we could pass a lambda into agg (need to extend framework to allow this)
     r = d.groupby(["ID", "DATE"]).agg(

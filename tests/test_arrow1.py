@@ -37,7 +37,7 @@ def test_arrow1():
     # needs
     id_ops_b.columns_used()
 
-    # %%
+    
 
     # produced
     id_ops_b.column_names
@@ -75,12 +75,12 @@ def test_arrow1():
     a2 = data_algebra.arrow.DataOpArrow(ordered_ops, strict=True)
     # print(a2)
 
-    # %%
+    
 
     with pytest.raises(ValueError):
         a1 >> a2
 
-    # %%
+    
 
     cols2_too_large = list(id_ops_b.column_names) + ["q"]
     ordered_ops = TableDescription(
@@ -93,12 +93,12 @@ def test_arrow1():
     a2 = data_algebra.arrow.DataOpArrow(ordered_ops)
     # print(a2)
 
-    # %%
+    
 
     with pytest.raises(ValueError):
         a1 >> a2
 
-    # %%
+    
 
     ordered_ops = TableDescription(
         table_name="d2", column_names=id_ops_b.column_names
@@ -109,11 +109,11 @@ def test_arrow1():
     )
     a2 = data_algebra.arrow.DataOpArrow(ordered_ops)
 
-    # %%
+    
 
     a2.fit(a1.transform(d))
 
-    # %%
+    
 
     unordered_ops = TableDescription(
         table_name="d3", column_names=ordered_ops.column_names
@@ -132,30 +132,30 @@ def test_arrow1():
     a3 = data_algebra.arrow.DataOpArrow(unordered_ops)
     # print(a3)
 
-    # %%
+    
 
     a3.fit(a2.transform(a1.transform(d)))
 
-    # %%
+    
 
     f0 = (a3.apply_to(a2.apply_to(a1))).pipeline.__repr__()
     f1 = (a1 >> a2 >> a3).pipeline.__repr__()
 
     assert f1 == f0
 
-    # %%
+    
 
     f2 = ((a1 >> a2) >> a3).pipeline.__repr__()
 
     assert f2 == f1
 
-    # %%
+    
 
     f3 = (a1 >> (a2 >> a3)).pipeline.__repr__()
 
     assert f3 == f1
 
-    # %%
+    
 
     a1 >> (a2 >> a3)
 
