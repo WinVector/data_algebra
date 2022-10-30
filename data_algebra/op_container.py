@@ -78,15 +78,13 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         X,
         *,
         data_model=None,
-        narrow: bool = True,
-        check_incoming_data_constraints: bool = False
+        narrow: bool = True
     ):
         assert isinstance(self.ops, data_algebra.data_ops.ViewRepresentation)
         return self.ops.transform(
             X=X,
             data_model=data_model,
-            narrow=narrow,
-            check_incoming_data_constraints=check_incoming_data_constraints,
+            narrow=narrow
         )
 
     # noinspection PyPep8Naming
