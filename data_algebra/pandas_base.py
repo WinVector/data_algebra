@@ -401,7 +401,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
     def table_step(self, op, *, data_map: dict, narrow: bool):
         """
-        Return data frame from table description and data_map.
+        Return a copy of data frame from table description and data_map.
         """
         if op.node_name != "TableDescription":
             raise TypeError(
@@ -429,7 +429,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             raise ValueError("missing required columns: " + str(missing))
         # make an index-free copy of the data to isolate side-effects and not deal with indices
         res = df.loc[:, columns_using]
-        res = res.reset_index(drop=True, inplace=False)  # copy
+        res = res.reset_index(drop=True, inplace=False)  # copy and clear out indices
         return res
 
     def _sql_proxy_step(self, op, *, data_map: dict, narrow: bool):

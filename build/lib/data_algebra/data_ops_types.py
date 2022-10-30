@@ -34,8 +34,7 @@ class OperatorPlatform(abc.ABC):
         data_map,
         *,
         data_model=None,
-        narrow: bool = True,
-        check_incoming_data_constraints: bool = False
+        narrow: bool = True
     ):
         """
         Evaluate operators with respect to Pandas data frames.
@@ -43,7 +42,6 @@ class OperatorPlatform(abc.ABC):
         :param data_map: map from table names to data frames
         :param data_model: adaptor to data dialect (Pandas for now)
         :param narrow: logical, if True don't copy unexpected columns
-        :param check_incoming_data_constraints: logical, if True check incoming data meets constraints
         :return: table result
         """
 
@@ -54,8 +52,7 @@ class OperatorPlatform(abc.ABC):
         X,
         *,
         data_model=None,
-        narrow: bool = True,
-        check_incoming_data_constraints: bool = False
+        narrow: bool = True
     ):
         """
         apply self to data frame X, may or may not commute with composition
@@ -63,7 +60,6 @@ class OperatorPlatform(abc.ABC):
         :param X: input data frame
         :param data_model: implementation to use
         :param narrow: logical, if True don't copy unexpected columns
-        :param check_incoming_data_constraints: logical, if True check incoming data meets constraints
         :return: transformed data frame
         """
 
@@ -79,8 +75,7 @@ class OperatorPlatform(abc.ABC):
         return self.transform(
             X=X,
             data_model=data_model,
-            narrow=False,
-            check_incoming_data_constraints=True,
+            narrow=False
         )
 
     @abc.abstractmethod

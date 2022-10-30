@@ -468,8 +468,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         data_map,
         *,
         data_model=None,
-        narrow: bool = True,
-        check_incoming_data_constraints: bool = False,
+        narrow: bool = True
     ):
         """
         Evaluate operators with respect to Pandas data frames.
@@ -477,7 +476,6 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         :param data_map: map from table names to data frames
         :param data_model: adaptor to data dialect (Pandas for now)
         :param narrow: logical, if True don't copy unexpected columns
-        :param check_incoming_data_constraints: logical, if True check incoming data meets constraints
         :return: table result
         """
 
@@ -486,23 +484,17 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         if data_model is None:
             data_model = data_algebra.default_data_model
         assert isinstance(data_model, data_algebra.data_model.DataModel)
-
-        if (
-            check_incoming_data_constraints
-            and (data_map is not None)
-            and (len(data_map) > 0)
-        ):
-            self.columns_used()  # for table consistency check/raise
-            tables = self.get_tables()
-            self.check_constraints(
-                {k: x.columns for (k, x) in data_map.items()}, strict=not narrow
-            )
-            for k in tables.keys():
-                if k not in data_map.keys():
-                    raise ValueError("Required table " + k + " not in data_map")
-                else:
-                    if not data_model.is_appropriate_data_instance(data_map[k]):
-                        raise ValueError("data_map[" + k + "] was not a usable type")
+        self.columns_used()  # for table consistency check/raise
+        tables = self.get_tables()
+        self.check_constraints(
+            {k: x.columns for (k, x) in data_map.items()}, strict=not narrow
+        )
+        for k in tables.keys():
+            if k not in data_map.keys():
+                raise ValueError("Required table " + k + " not in data_map")
+            else:
+                if not data_model.is_appropriate_data_instance(data_map[k]):
+                    raise ValueError("data_map[" + k + "] was not a usable type")
         return data_model.eval(op=self, data_map=data_map, narrow=narrow)
 
     # noinspection PyPep8Naming
@@ -511,8 +503,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         X,
         *,
         data_model=None,
-        narrow: bool = True,
-        check_incoming_data_constraints: bool = False,
+        narrow: bool = True
     ):
         """
         Apply data transform to a table
@@ -520,7 +511,6 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         :param X: tale to apply to
         :param data_model: data model for Pandas execution
         :param narrow: logical, if True narrow number of result columns to specification
-        :param check_incoming_data_constraints: logical, if True check incoming data meets constraints
         :return: transformed data frame
         """
         if data_model is None:
@@ -540,8 +530,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         return self.eval(
             data_map=data_map,
             data_model=data_model,
-            narrow=narrow,
-            check_incoming_data_constraints=check_incoming_data_constraints,
+            narrow=narrow
         )
 
     # composition (used to eliminate intermediate order nodes)

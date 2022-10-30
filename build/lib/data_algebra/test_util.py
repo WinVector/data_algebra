@@ -330,7 +330,7 @@ def check_transform_on_handles(
         v = data[k]
         assert local_data_model.is_appropriate_data_instance(v)
     # try pandas path
-    res = ops.eval(data_map=data, check_incoming_data_constraints=True)
+    res = ops.eval(data_map=data)
     if not local_data_model.is_appropriate_data_instance(res):
         raise ValueError(
             "expected res to be local_data_model.pd.DataFrame, got: " + str(type(res))
@@ -352,7 +352,7 @@ def check_transform_on_handles(
         if not formats_to_self(ops):
             raise ValueError("ops did not round-trip format")
         ops_2 = re_parse(ops)
-        res_2 = ops_2.eval(data_map=data, check_incoming_data_constraints=True)
+        res_2 = ops_2.eval(data_map=data)
         if not local_data_model.is_appropriate_data_instance(res_2):
             raise ValueError(
                 "(reparse) expected res to be local_data_model.pd.DataFrame, got: "
@@ -368,9 +368,7 @@ def check_transform_on_handles(
         ):
             raise ValueError("(reparse) Pandas eval result did not match expect")
     if len(data) == 1:
-        res_t = ops.transform(
-            list(data.values())[0], check_incoming_data_constraints=True
-        )
+        res_t = ops.transform(list(data.values())[0])
         if not equivalent_frames(
             res_t,
             expect,
