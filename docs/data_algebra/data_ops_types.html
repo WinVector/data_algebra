@@ -181,7 +181,7 @@
 </span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a>
 </span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="kn">import</span> <span class="nn">abc</span>
-</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">NamedTuple</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">NamedTuple</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a>
 </span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="kn">import</span> <span class="nn">data_algebra.expr_rep</span>
 </span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="kn">import</span> <span class="nn">data_algebra.cdata</span>
@@ -209,15 +209,15 @@
 </span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 </span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span>
 </span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a>        <span class="bp">self</span><span class="p">,</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a>        <span class="n">data_map</span><span class="p">,</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a>        <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a>        <span class="o">*</span><span class="p">,</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a>        <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a>        <span class="n">data_model</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>        <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
 </span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>    <span class="p">):</span>
 </span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>        <span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a><span class="sd">        Evaluate operators with respect to Pandas data frames.</span>
 </span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a>
-</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a><span class="sd">        :param data_map: map from table names to data frames</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a><span class="sd">        :param data_map: map from table names to data frames or data sources</span>
 </span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a><span class="sd">        :param data_model: adaptor to data dialect (Pandas for now)</span>
 </span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="sd">        :param narrow: logical, if True don&#39;t copy unexpected columns</span>
 </span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="sd">        :return: table result</span>
@@ -702,15 +702,15 @@
 </span><span id="OperatorPlatform-32"><a href="#OperatorPlatform-32"><span class="linenos"> 32</span></a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 </span><span id="OperatorPlatform-33"><a href="#OperatorPlatform-33"><span class="linenos"> 33</span></a>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span>
 </span><span id="OperatorPlatform-34"><a href="#OperatorPlatform-34"><span class="linenos"> 34</span></a>        <span class="bp">self</span><span class="p">,</span>
-</span><span id="OperatorPlatform-35"><a href="#OperatorPlatform-35"><span class="linenos"> 35</span></a>        <span class="n">data_map</span><span class="p">,</span>
+</span><span id="OperatorPlatform-35"><a href="#OperatorPlatform-35"><span class="linenos"> 35</span></a>        <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="OperatorPlatform-36"><a href="#OperatorPlatform-36"><span class="linenos"> 36</span></a>        <span class="o">*</span><span class="p">,</span>
-</span><span id="OperatorPlatform-37"><a href="#OperatorPlatform-37"><span class="linenos"> 37</span></a>        <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="OperatorPlatform-37"><a href="#OperatorPlatform-37"><span class="linenos"> 37</span></a>        <span class="n">data_model</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="OperatorPlatform-38"><a href="#OperatorPlatform-38"><span class="linenos"> 38</span></a>        <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
 </span><span id="OperatorPlatform-39"><a href="#OperatorPlatform-39"><span class="linenos"> 39</span></a>    <span class="p">):</span>
 </span><span id="OperatorPlatform-40"><a href="#OperatorPlatform-40"><span class="linenos"> 40</span></a>        <span class="sd">&quot;&quot;&quot;</span>
 </span><span id="OperatorPlatform-41"><a href="#OperatorPlatform-41"><span class="linenos"> 41</span></a><span class="sd">        Evaluate operators with respect to Pandas data frames.</span>
 </span><span id="OperatorPlatform-42"><a href="#OperatorPlatform-42"><span class="linenos"> 42</span></a>
-</span><span id="OperatorPlatform-43"><a href="#OperatorPlatform-43"><span class="linenos"> 43</span></a><span class="sd">        :param data_map: map from table names to data frames</span>
+</span><span id="OperatorPlatform-43"><a href="#OperatorPlatform-43"><span class="linenos"> 43</span></a><span class="sd">        :param data_map: map from table names to data frames or data sources</span>
 </span><span id="OperatorPlatform-44"><a href="#OperatorPlatform-44"><span class="linenos"> 44</span></a><span class="sd">        :param data_model: adaptor to data dialect (Pandas for now)</span>
 </span><span id="OperatorPlatform-45"><a href="#OperatorPlatform-45"><span class="linenos"> 45</span></a><span class="sd">        :param narrow: logical, if True don&#39;t copy unexpected columns</span>
 </span><span id="OperatorPlatform-46"><a href="#OperatorPlatform-46"><span class="linenos"> 46</span></a><span class="sd">        :return: table result</span>
@@ -1079,7 +1079,7 @@
                     <div class="decorator">@abc.abstractmethod</div>
 
         <span class="def">def</span>
-        <span class="name">eval</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">data_map</span>, </span><span class="param"><span class="o">*</span>, </span><span class="param"><span class="n">data_model</span><span class="o">=</span><span class="kc">None</span>, </span><span class="param"><span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></span><span class="return-annotation">):</span></span>
+        <span class="name">eval</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>,</span><span class="param">	<span class="o">*</span>,</span><span class="param">	<span class="n">data_model</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="OperatorPlatform.eval-view-source"><span>View Source</span></label>
 
@@ -1088,15 +1088,15 @@
             <div class="pdoc-code codehilite"><pre><span></span><span id="OperatorPlatform.eval-32"><a href="#OperatorPlatform.eval-32"><span class="linenos">32</span></a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 </span><span id="OperatorPlatform.eval-33"><a href="#OperatorPlatform.eval-33"><span class="linenos">33</span></a>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span>
 </span><span id="OperatorPlatform.eval-34"><a href="#OperatorPlatform.eval-34"><span class="linenos">34</span></a>        <span class="bp">self</span><span class="p">,</span>
-</span><span id="OperatorPlatform.eval-35"><a href="#OperatorPlatform.eval-35"><span class="linenos">35</span></a>        <span class="n">data_map</span><span class="p">,</span>
+</span><span id="OperatorPlatform.eval-35"><a href="#OperatorPlatform.eval-35"><span class="linenos">35</span></a>        <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="OperatorPlatform.eval-36"><a href="#OperatorPlatform.eval-36"><span class="linenos">36</span></a>        <span class="o">*</span><span class="p">,</span>
-</span><span id="OperatorPlatform.eval-37"><a href="#OperatorPlatform.eval-37"><span class="linenos">37</span></a>        <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="OperatorPlatform.eval-37"><a href="#OperatorPlatform.eval-37"><span class="linenos">37</span></a>        <span class="n">data_model</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="OperatorPlatform.eval-38"><a href="#OperatorPlatform.eval-38"><span class="linenos">38</span></a>        <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
 </span><span id="OperatorPlatform.eval-39"><a href="#OperatorPlatform.eval-39"><span class="linenos">39</span></a>    <span class="p">):</span>
 </span><span id="OperatorPlatform.eval-40"><a href="#OperatorPlatform.eval-40"><span class="linenos">40</span></a>        <span class="sd">&quot;&quot;&quot;</span>
 </span><span id="OperatorPlatform.eval-41"><a href="#OperatorPlatform.eval-41"><span class="linenos">41</span></a><span class="sd">        Evaluate operators with respect to Pandas data frames.</span>
 </span><span id="OperatorPlatform.eval-42"><a href="#OperatorPlatform.eval-42"><span class="linenos">42</span></a>
-</span><span id="OperatorPlatform.eval-43"><a href="#OperatorPlatform.eval-43"><span class="linenos">43</span></a><span class="sd">        :param data_map: map from table names to data frames</span>
+</span><span id="OperatorPlatform.eval-43"><a href="#OperatorPlatform.eval-43"><span class="linenos">43</span></a><span class="sd">        :param data_map: map from table names to data frames or data sources</span>
 </span><span id="OperatorPlatform.eval-44"><a href="#OperatorPlatform.eval-44"><span class="linenos">44</span></a><span class="sd">        :param data_model: adaptor to data dialect (Pandas for now)</span>
 </span><span id="OperatorPlatform.eval-45"><a href="#OperatorPlatform.eval-45"><span class="linenos">45</span></a><span class="sd">        :param narrow: logical, if True don&#39;t copy unexpected columns</span>
 </span><span id="OperatorPlatform.eval-46"><a href="#OperatorPlatform.eval-46"><span class="linenos">46</span></a><span class="sd">        :return: table result</span>
@@ -1109,7 +1109,7 @@
 <h6 id="parameters">Parameters</h6>
 
 <ul>
-<li><strong>data_map</strong>:  map from table names to data frames</li>
+<li><strong>data_map</strong>:  map from table names to data frames or data sources</li>
 <li><strong>data_model</strong>:  adaptor to data dialect (Pandas for now)</li>
 <li><strong>narrow</strong>:  logical, if True don't copy unexpected columns</li>
 </ul>

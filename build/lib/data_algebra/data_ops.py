@@ -5,7 +5,7 @@ Realization of data operations.
 
 import abc
 import collections
-from typing import Iterable, Set, Dict, List, Optional, Tuple, Union
+from typing import Any, Iterable, Set, Dict, List, Optional, Tuple, Union
 import numbers
 import re
 
@@ -184,7 +184,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
 
     # convenience
 
-    def ex(self, *, data_model=None, narrow=True, allow_limited_tables=False):
+    def ex(self, *, data_model=None, narrow:bool = True, allow_limited_tables:bool = False):
         """
         Evaluate operators with respect to Pandas data frames already stored in the operator chain.
 
@@ -435,20 +435,20 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
 
     # Pandas realization
 
-    def check_constraints(self, data_model, *, strict=True):
+    def check_constraints(self, data_map, *, strict=True):
         """
         Check tables supplied meet data consistency constraints.
 
-        data_model: dictionary of column name lists.
+        data_map: dictionary of column name lists.
         """
         self.columns_used()  # for table consistency check/raise
         forbidden = self.forbidden_columns()
         tables = self.get_tables()
-        missing_tables = set(tables.keys()) - set(data_model.keys())
+        missing_tables = set(tables.keys()) - set(data_map.keys())
         if len(missing_tables) > 0:
             raise ValueError("missing required tables: " + str(missing_tables))
         for k in tables.keys():
-            have = set(data_model[k])
+            have = set(data_map[k])
             td = tables[k]
             missing = set(td.column_names) - have
             if len(missing) > 0:
@@ -465,7 +465,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
 
     def eval(
         self,
-        data_map,
+        data_map: Dict[str, Any],
         *,
         data_model=None,
         narrow: bool = True
@@ -473,28 +473,26 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         """
         Evaluate operators with respect to Pandas data frames.
 
-        :param data_map: map from table names to data frames
+        :param data_map: map from table names to data frames or data sources
         :param data_model: adaptor to data dialect (Pandas for now)
         :param narrow: logical, if True don't copy unexpected columns
         :return: table result
         """
-
-        if data_map is not None:
-            assert isinstance(data_map, dict)
+        assert isinstance(data_map, dict)
         if data_model is None:
             data_model = data_algebra.default_data_model
         assert isinstance(data_model, data_algebra.data_model.DataModel)
         self.columns_used()  # for table consistency check/raise
         tables = self.get_tables()
-        self.check_constraints(
-            {k: x.columns for (k, x) in data_map.items()}, strict=not narrow
-        )
         for k in tables.keys():
             if k not in data_map.keys():
                 raise ValueError("Required table " + k + " not in data_map")
             else:
                 if not data_model.is_appropriate_data_instance(data_map[k]):
                     raise ValueError("data_map[" + k + "] was not a usable type")
+        self.check_constraints(
+            {k: data_map[k].columns for k in tables.keys()}, strict=(not narrow)
+        )
         return data_model.eval(op=self, data_map=data_map, narrow=narrow)
 
     # noinspection PyPep8Naming
@@ -2992,7 +2990,7 @@ class SQLNode(ViewRepresentation):
         return near_sql
 
 
-def ex(d, *, data_model=None, narrow=True, allow_limited_tables=False):
+def ex(d, *, data_model=None, narrow: bool = True, allow_limited_tables: bool = False):
     """
     Evaluate operators with respect to Pandas data frames already stored in the operator chain.
 
