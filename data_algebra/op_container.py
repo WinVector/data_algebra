@@ -3,7 +3,7 @@ Redirecting container.
 """
 
 from types import SimpleNamespace
-from typing import Iterable, List, Optional, Set
+from typing import Any, Dict, Iterable, List, Optional, Set
 
 import data_algebra.data_ops_types
 import data_algebra.data_ops
@@ -104,7 +104,7 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         self.set(self.ops.__rshift__(other))
         return self
 
-    def eval(self, data_map, *, data_model=None, narrow=True):
+    def eval(self, data_map: Dict[str, Any], *, data_model=None, narrow=True):
         return self.ops.eval(data_map=data_map, data_model=data_model, narrow=narrow)
 
     def get_tables(self):

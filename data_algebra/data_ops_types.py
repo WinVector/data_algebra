@@ -3,7 +3,7 @@ Type defs for data operations.
 """
 
 import abc
-from typing import Dict, Iterable, List, Optional, Set, NamedTuple
+from typing import Any, Dict, Iterable, List, Optional, Set, NamedTuple
 
 import data_algebra.expr_rep
 import data_algebra.cdata
@@ -31,15 +31,15 @@ class OperatorPlatform(abc.ABC):
     @abc.abstractmethod
     def eval(
         self,
-        data_map,
+        data_map: Dict[str, Any],
         *,
-        data_model=None,
+        data_model = None,
         narrow: bool = True
     ):
         """
         Evaluate operators with respect to Pandas data frames.
 
-        :param data_map: map from table names to data frames
+        :param data_map: map from table names to data frames or data sources
         :param data_model: adaptor to data dialect (Pandas for now)
         :param narrow: logical, if True don't copy unexpected columns
         :return: table result

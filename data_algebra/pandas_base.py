@@ -3,7 +3,7 @@ Base class for adapters for Pandas-like APIs
 """
 
 from abc import ABC
-from typing import Callable, Dict, Optional
+from typing import Any, Callable, Dict, Optional
 import datetime
 import types
 import numbers
@@ -323,7 +323,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             "RenameColumnsNode": self.rename_columns_step,
             "SelectColumnsNode": self.select_columns_step,
             "SelectRowsNode": self.select_rows_step,
-            "SQLNode": self._sql_proxy_step,
+            "SQLNode": self.sql_proxy_step,
             "TableDescription": self.table_step,
         }
 
@@ -432,12 +432,14 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         res = res.reset_index(drop=True, inplace=False)  # copy and clear out indices
         return res
 
-    def _sql_proxy_step(self, op, *, data_map: dict, narrow: bool):
+    def sql_proxy_step(self, op, *, data_map: dict, narrow: bool):
         """
-        replace user sql with view from data map
+        execute SQL
         """
         assert op.node_name == "SQLNode"
-        return data_map[op.view_name].reset_index(drop=True, inplace=False)  # copy
+        db_handle = data_map[op.view_name]
+        res = db_handle.read_query("\n".join(op.sql))
+        return res
 
     def columns_to_frame_(self, cols, *, target_rows=0):
         """
@@ -519,16 +521,16 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             res[c] = transient_new_frame[c]
         return res
 
-    def eval(self, op, *, data_map: Optional[Dict] = None, narrow: bool = False):
+    def eval(self, op, *, data_map: Dict[str, Any], narrow: bool = False):
         """
         Implementation of Pandas evaluation of operators
 
         :param op: ViewRepresentation to evaluate
-        :param data_map: dictionary mapping table and view names to data frames
+        :param data_map: dictionary mapping table and view names to data frames or data sources
         :param narrow: if True narrow results to only columns anticipated
         :return: data frame result
         """
-        assert data_map is not None  # type hint/enforcement
+        assert isinstance(data_map, Dict)
         return self._eval_value_source(s=op, data_map=data_map, narrow=narrow)
 
     def _eval_value_source(self, s, *, data_map: dict, narrow: bool):
