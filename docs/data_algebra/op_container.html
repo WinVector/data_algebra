@@ -55,7 +55,7 @@
                                 <a class="function" href="#OpC.act_on">act_on</a>
                         </li>
                         <li>
-                                <a class="function" href="#OpC.apply_to">apply_to</a>
+                                <a class="function" href="#OpC.replace_leaves">replace_leaves</a>
                         </li>
                         <li>
                                 <a class="function" href="#OpC.eval">eval</a>
@@ -255,8 +255,8 @@
 </span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">act_on</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">))</span>
 </span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>        <span class="k">return</span> <span class="bp">self</span>
 </span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>    <span class="k">def</span> <span class="nf">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_table_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">apply_to</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">target_table_key</span><span class="o">=</span><span class="n">target_table_key</span><span class="p">))</span>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>    <span class="k">def</span> <span class="nf">replace_leaves</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">replacement_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">replace_leaves</span><span class="p">(</span><span class="n">replacement_map</span><span class="p">))</span>
 </span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>        <span class="k">return</span> <span class="bp">self</span>
 </span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>
 </span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>    <span class="k">def</span> <span class="fm">__rrshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>  <span class="c1"># override other &gt;&gt; self</span>
@@ -285,9 +285,9 @@
 </span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>
 </span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>    <span class="c1"># query generation</span>
 </span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>
-</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>    <span class="k">def</span> <span class="nf">to_near_sql_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">):</span>
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>    <span class="k">def</span> <span class="nf">to_near_sql_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">to_near_sql_implementation_</span><span class="p">(</span>
-</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>            <span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
+</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>            <span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
 </span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a>        <span class="p">)</span>
 </span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>
 </span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>    <span class="c1"># define builders for all non-initial ops types on base class</span>
@@ -525,8 +525,8 @@
 </span><span id="OpC-93"><a href="#OpC-93"><span class="linenos"> 93</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">act_on</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">))</span>
 </span><span id="OpC-94"><a href="#OpC-94"><span class="linenos"> 94</span></a>        <span class="k">return</span> <span class="bp">self</span>
 </span><span id="OpC-95"><a href="#OpC-95"><span class="linenos"> 95</span></a>
-</span><span id="OpC-96"><a href="#OpC-96"><span class="linenos"> 96</span></a>    <span class="k">def</span> <span class="nf">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_table_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="OpC-97"><a href="#OpC-97"><span class="linenos"> 97</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">apply_to</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">target_table_key</span><span class="o">=</span><span class="n">target_table_key</span><span class="p">))</span>
+</span><span id="OpC-96"><a href="#OpC-96"><span class="linenos"> 96</span></a>    <span class="k">def</span> <span class="nf">replace_leaves</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">replacement_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+</span><span id="OpC-97"><a href="#OpC-97"><span class="linenos"> 97</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">replace_leaves</span><span class="p">(</span><span class="n">replacement_map</span><span class="p">))</span>
 </span><span id="OpC-98"><a href="#OpC-98"><span class="linenos"> 98</span></a>        <span class="k">return</span> <span class="bp">self</span>
 </span><span id="OpC-99"><a href="#OpC-99"><span class="linenos"> 99</span></a>
 </span><span id="OpC-100"><a href="#OpC-100"><span class="linenos">100</span></a>    <span class="k">def</span> <span class="fm">__rrshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>  <span class="c1"># override other &gt;&gt; self</span>
@@ -555,9 +555,9 @@
 </span><span id="OpC-123"><a href="#OpC-123"><span class="linenos">123</span></a>
 </span><span id="OpC-124"><a href="#OpC-124"><span class="linenos">124</span></a>    <span class="c1"># query generation</span>
 </span><span id="OpC-125"><a href="#OpC-125"><span class="linenos">125</span></a>
-</span><span id="OpC-126"><a href="#OpC-126"><span class="linenos">126</span></a>    <span class="k">def</span> <span class="nf">to_near_sql_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">):</span>
+</span><span id="OpC-126"><a href="#OpC-126"><span class="linenos">126</span></a>    <span class="k">def</span> <span class="nf">to_near_sql_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span><span id="OpC-127"><a href="#OpC-127"><span class="linenos">127</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">to_near_sql_implementation_</span><span class="p">(</span>
-</span><span id="OpC-128"><a href="#OpC-128"><span class="linenos">128</span></a>            <span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
+</span><span id="OpC-128"><a href="#OpC-128"><span class="linenos">128</span></a>            <span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
 </span><span id="OpC-129"><a href="#OpC-129"><span class="linenos">129</span></a>        <span class="p">)</span>
 </span><span id="OpC-130"><a href="#OpC-130"><span class="linenos">130</span></a>
 </span><span id="OpC-131"><a href="#OpC-131"><span class="linenos">131</span></a>    <span class="c1"># define builders for all non-initial ops types on base class</span>
@@ -921,30 +921,30 @@
 
 
                             </div>
-                            <div id="OpC.apply_to" class="classattr">
-                                        <input id="OpC.apply_to-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+                            <div id="OpC.replace_leaves" class="classattr">
+                                        <input id="OpC.replace_leaves-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">apply_to</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">a</span>, </span><span class="param"><span class="o">*</span>, </span><span class="param"><span class="n">target_table_key</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
+        <span class="name">replace_leaves</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">replacement_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></span><span class="return-annotation">):</span></span>
 
-                <label class="view-source-button" for="OpC.apply_to-view-source"><span>View Source</span></label>
+                <label class="view-source-button" for="OpC.replace_leaves-view-source"><span>View Source</span></label>
 
     </div>
-    <a class="headerlink" href="#OpC.apply_to"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="OpC.apply_to-96"><a href="#OpC.apply_to-96"><span class="linenos">96</span></a>    <span class="k">def</span> <span class="nf">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_table_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="OpC.apply_to-97"><a href="#OpC.apply_to-97"><span class="linenos">97</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">apply_to</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">target_table_key</span><span class="o">=</span><span class="n">target_table_key</span><span class="p">))</span>
-</span><span id="OpC.apply_to-98"><a href="#OpC.apply_to-98"><span class="linenos">98</span></a>        <span class="k">return</span> <span class="bp">self</span>
+    <a class="headerlink" href="#OpC.replace_leaves"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="OpC.replace_leaves-96"><a href="#OpC.replace_leaves-96"><span class="linenos">96</span></a>    <span class="k">def</span> <span class="nf">replace_leaves</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">replacement_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+</span><span id="OpC.replace_leaves-97"><a href="#OpC.replace_leaves-97"><span class="linenos">97</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">replace_leaves</span><span class="p">(</span><span class="n">replacement_map</span><span class="p">))</span>
+</span><span id="OpC.replace_leaves-98"><a href="#OpC.replace_leaves-98"><span class="linenos">98</span></a>        <span class="k">return</span> <span class="bp">self</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>apply self to operator DAG a</p>
+            <div class="docstring"><p>Replace leaves of DAG</p>
 
 <h6 id="parameters">Parameters</h6>
 
 <ul>
-<li><strong>a</strong>:  operators to apply to</li>
-<li><strong>target_table_key</strong>:  table key to replace with self, None counts as "match all"</li>
+<li><strong>a</strong>:  operators to apply to
+:param replacement_map, table/sqlkeys mapped to replacement Operator platforms</li>
 </ul>
 
 <h6 id="returns">Returns</h6>
@@ -1030,17 +1030,7 @@ raise an exception if the values are not consistent.</p>
 </span></pre></div>
 
 
-            <div class="docstring"><p>other.apply_to(self)</p>
-
-<h6 id="parameters">Parameters</h6>
-
-<ul>
-<li><strong>other</strong>: </li>
-</ul>
-
-<h6 id="returns">Returns</h6>
-</div>
-
+    
 
                             </div>
                             <div id="OpC.columns_produced" class="classattr">
@@ -1069,15 +1059,15 @@ raise an exception if the values are not consistent.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">to_near_sql_implementation_</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">db_model</span>, </span><span class="param"><span class="o">*</span>, </span><span class="param"><span class="n">using</span>, </span><span class="param"><span class="n">temp_id_source</span></span><span class="return-annotation">):</span></span>
+        <span class="name">to_near_sql_implementation_</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">db_model</span>, </span><span class="param"><span class="o">*</span>, </span><span class="param"><span class="n">using</span>, </span><span class="param"><span class="n">temp_id_source</span>, </span><span class="param"><span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="OpC.to_near_sql_implementation_-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#OpC.to_near_sql_implementation_"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="OpC.to_near_sql_implementation_-126"><a href="#OpC.to_near_sql_implementation_-126"><span class="linenos">126</span></a>    <span class="k">def</span> <span class="nf">to_near_sql_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="OpC.to_near_sql_implementation_-126"><a href="#OpC.to_near_sql_implementation_-126"><span class="linenos">126</span></a>    <span class="k">def</span> <span class="nf">to_near_sql_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span><span id="OpC.to_near_sql_implementation_-127"><a href="#OpC.to_near_sql_implementation_-127"><span class="linenos">127</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">to_near_sql_implementation_</span><span class="p">(</span>
-</span><span id="OpC.to_near_sql_implementation_-128"><a href="#OpC.to_near_sql_implementation_-128"><span class="linenos">128</span></a>            <span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
+</span><span id="OpC.to_near_sql_implementation_-128"><a href="#OpC.to_near_sql_implementation_-128"><span class="linenos">128</span></a>            <span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
 </span><span id="OpC.to_near_sql_implementation_-129"><a href="#OpC.to_near_sql_implementation_-129"><span class="linenos">129</span></a>        <span class="p">)</span>
 </span></pre></div>
 

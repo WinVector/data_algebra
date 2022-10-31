@@ -1013,17 +1013,19 @@ class TableDescription(ViewRepresentation):
             forbidden = set()
         return {self.key: set(forbidden)}
 
-    def apply_to(self, a, *, target_table_key=None):
+    def replace_leaves(self, replacement_map: Dict[str, Any]):
         """
-        Apply self to operator DAG a. Basic OperatorPlatform, composable API.
+        Replace leaves of DAG
 
         :param a: operators to apply to
-        :param target_table_key: table key to replace with self, None counts as "match all"
+         :param replacement_map, table/sqlkeys mapped to replacement Operator platforms
         :return: new operator DAG
         """
-        if (target_table_key is None) or (target_table_key == self.key):
-            # replace table with a
-            return a
+        assert isinstance(replacement_map, dict)
+        try:
+            return replacement_map[self.key]
+        except KeyError:
+            pass
         # copy self
         r = TableDescription(
             table_name=self.table_name,
@@ -1374,16 +1376,17 @@ class ExtendNode(ViewRepresentation):
             self, column_names=column_names, sources=[source], node_name="ExtendNode"
         )
 
-    def apply_to(self, a, *, target_table_key=None):
+    def replace_leaves(self, replacement_map: Dict[str, Any]):
         """
-        Apply self to operator DAG a. Basic OperatorPlatform, composable API.
+        Replace leaves of DAG
 
         :param a: operators to apply to
-        :param target_table_key: table key to replace with self, None counts as "match all"
+         :param replacement_map, table/sqlkeys mapped to replacement Operator platforms
         :return: new operator DAG
         """
+        assert isinstance(replacement_map, dict)
         new_sources = [
-            s.apply_to(a, target_table_key=target_table_key) for s in self.sources
+            s.replace_leaves(replacement_map) for s in self.sources
         ]
         return new_sources[0].extend_parsed_(
             parsed_ops=self.ops,
@@ -1635,16 +1638,17 @@ class ProjectNode(ViewRepresentation):
                 MethodUse(k, is_project=True, is_windowed=False, is_ordered=False)
             )
 
-    def apply_to(self, a, *, target_table_key=None):
+    def replace_leaves(self, replacement_map: Dict[str, Any]):
         """
-        Apply self to operator DAG a. Basic OperatorPlatform, composable API.
+        Replace leaves of DAG
 
         :param a: operators to apply to
-        :param target_table_key: table key to replace with self, None counts as "match all"
+         :param replacement_map, table/sqlkeys mapped to replacement Operator platforms
         :return: new operator DAG
         """
+        assert isinstance(replacement_map, dict)
         new_sources = [
-            s.apply_to(a, target_table_key=target_table_key) for s in self.sources
+            s.replace_leaves(replacement_map) for s in self.sources
         ]
         return new_sources[0].project_parsed_(
             parsed_ops=self.ops, group_by=self.group_by
@@ -1773,16 +1777,17 @@ class SelectRowsNode(ViewRepresentation):
                 MethodUse(k, is_project=False, is_windowed=False, is_ordered=False)
             )
 
-    def apply_to(self, a, *, target_table_key=None):
+    def replace_leaves(self, replacement_map: Dict[str, Any]):
         """
-        Apply self to operator DAG a. Basic OperatorPlatform, composable API.
+        Replace leaves of DAG
 
         :param a: operators to apply to
-        :param target_table_key: table key to replace with self, None counts as "match all"
+         :param replacement_map, table/sqlkeys mapped to replacement Operator platforms
         :return: new operator DAG
         """
+        assert isinstance(replacement_map, dict)
         new_sources = [
-            s.apply_to(a, target_table_key=target_table_key) for s in self.sources
+            s.replace_leaves(replacement_map) for s in self.sources
         ]
         return new_sources[0].select_rows_parsed_(parsed_ops=self.ops)
 
@@ -1888,16 +1893,17 @@ class SelectColumnsNode(ViewRepresentation):
         forbidden = set(forbidden).intersection(self.column_selection)
         return self.sources[0].forbidden_columns(forbidden=forbidden)
 
-    def apply_to(self, a, *, target_table_key=None):
+    def replace_leaves(self, replacement_map: Dict[str, Any]):
         """
-        Apply self to operator DAG a. Basic OperatorPlatform, composable API.
+        Replace leaves of DAG
 
         :param a: operators to apply to
-        :param target_table_key: table key to replace with self, None counts as "match all"
+         :param replacement_map, table/sqlkeys mapped to replacement Operator platforms
         :return: new operator DAG
         """
+        assert isinstance(replacement_map, dict)
         new_sources = [
-            s.apply_to(a, target_table_key=target_table_key) for s in self.sources
+            s.replace_leaves(replacement_map) for s in self.sources
         ]
         return new_sources[0].select_columns(columns=self.column_selection)
 
@@ -2000,16 +2006,17 @@ class DropColumnsNode(ViewRepresentation):
         forbidden = set(forbidden) - set(self.column_deletions)
         return self.sources[0].forbidden_columns(forbidden=forbidden)
 
-    def apply_to(self, a, *, target_table_key=None):
+    def replace_leaves(self, replacement_map: Dict[str, Any]):
         """
-        Apply self to operator DAG a. Basic OperatorPlatform, composable API.
+        Replace leaves of DAG
 
         :param a: operators to apply to
-        :param target_table_key: table key to replace with self, None counts as "match all"
+         :param replacement_map, table/sqlkeys mapped to replacement Operator platforms
         :return: new operator DAG
         """
+        assert isinstance(replacement_map, dict)
         new_sources = [
-            s.apply_to(a, target_table_key=target_table_key) for s in self.sources
+            s.replace_leaves(replacement_map) for s in self.sources
         ]
         return new_sources[0].drop_columns(column_deletions=self.column_deletions)
 
@@ -2101,16 +2108,17 @@ class OrderRowsNode(ViewRepresentation):
             node_name="OrderRowsNode",
         )
 
-    def apply_to(self, a, *, target_table_key=None):
+    def replace_leaves(self, replacement_map: Dict[str, Any]):
         """
-        Apply self to operator DAG a. Basic OperatorPlatform, composable API.
+        Replace leaves of DAG
 
         :param a: operators to apply to
-        :param target_table_key: table key to replace with self, None counts as "match all"
+         :param replacement_map, table/sqlkeys mapped to replacement Operator platforms
         :return: new operator DAG
         """
+        assert isinstance(replacement_map, dict)
         new_sources = [
-            s.apply_to(a, target_table_key=target_table_key) for s in self.sources
+            s.replace_leaves(replacement_map) for s in self.sources
         ]
         return new_sources[0].order_rows(
             columns=self.order_columns, reverse=self.reverse, limit=self.limit
@@ -2246,16 +2254,17 @@ class MapColumnsNode(ViewRepresentation):
         new_forbidden.update(self.new_columns)
         return self.sources[0].forbidden_columns(forbidden=new_forbidden)
 
-    def apply_to(self, a, *, target_table_key=None):
+    def replace_leaves(self, replacement_map: Dict[str, Any]):
         """
-        Apply self to operator DAG a. Basic OperatorPlatform, composable API.
+        Replace leaves of DAG
 
         :param a: operators to apply to
-        :param target_table_key: table key to replace with self, None counts as "match all"
+         :param replacement_map, table/sqlkeys mapped to replacement Operator platforms
         :return: new operator DAG
         """
+        assert isinstance(replacement_map, dict)
         new_sources = [
-            s.apply_to(a, target_table_key=target_table_key) for s in self.sources
+            s.replace_leaves(replacement_map) for s in self.sources
         ]
         return new_sources[0].map_columns(column_remapping=self.column_remapping)
 
@@ -2383,16 +2392,17 @@ class RenameColumnsNode(ViewRepresentation):
         new_forbidden.update(self.new_columns)
         return self.sources[0].forbidden_columns(forbidden=new_forbidden)
 
-    def apply_to(self, a, *, target_table_key=None):
+    def replace_leaves(self, replacement_map: Dict[str, Any]):
         """
-        Apply self to operator DAG a. Basic OperatorPlatform, composable API.
+        Replace leaves of DAG
 
         :param a: operators to apply to
-        :param target_table_key: table key to replace with self, None counts as "match all"
+         :param replacement_map, table/sqlkeys mapped to replacement Operator platforms
         :return: new operator DAG
         """
+        assert isinstance(replacement_map, dict)
         new_sources = [
-            s.apply_to(a, target_table_key=target_table_key) for s in self.sources
+            s.replace_leaves(replacement_map) for s in self.sources
         ]
         return new_sources[0].rename_columns(column_remapping=self.column_remapping)
 
@@ -2536,16 +2546,17 @@ class NaturalJoinNode(ViewRepresentation):
         if (self.jointype == "CROSS") and (len(self.on_a) != 0):
             raise ValueError("CROSS joins must have an empty 'on' list")
 
-    def apply_to(self, a, *, target_table_key=None):
+    def replace_leaves(self, replacement_map: Dict[str, Any]):
         """
-        Apply self to operator DAG a. Basic OperatorPlatform, composable API.
+        Replace leaves of DAG
 
         :param a: operators to apply to
-        :param target_table_key: table key to replace with self, None counts as "match all"
+         :param replacement_map, table/sqlkeys mapped to replacement Operator platforms
         :return: new operator DAG
         """
+        assert isinstance(replacement_map, dict)
         new_sources = [
-            s.apply_to(a, target_table_key=target_table_key) for s in self.sources
+            s.replace_leaves(replacement_map) for s in self.sources
         ]
         return new_sources[0].natural_join(
             b=new_sources[1], on=[(va, vb) for (va, vb) in zip(self.on_a, self.on_b)], jointype=self.jointype
@@ -2663,16 +2674,17 @@ class ConcatRowsNode(ViewRepresentation):
         self.a_name = a_name
         self.b_name = b_name
 
-    def apply_to(self, a, *, target_table_key=None):
+    def replace_leaves(self, replacement_map: Dict[str, Any]):
         """
-        Apply self to operator DAG a. Basic OperatorPlatform, composable API.
+        Replace leaves of DAG
 
         :param a: operators to apply to
-        :param target_table_key: table key to replace with self, None counts as "match all"
+         :param replacement_map, table/sqlkeys mapped to replacement Operator platforms
         :return: new operator DAG
         """
+        assert isinstance(replacement_map, dict)
         new_sources = [
-            s.apply_to(a, target_table_key=target_table_key) for s in self.sources
+            s.replace_leaves(replacement_map) for s in self.sources
         ]
         return new_sources[0].concat_rows(
             b=new_sources[1],
@@ -2778,16 +2790,17 @@ class ConvertRecordsNode(ViewRepresentation):
             node_name="ConvertRecordsNode",
         )
 
-    def apply_to(self, a, *, target_table_key=None):
+    def replace_leaves(self, replacement_map: Dict[str, Any]):
         """
-        Apply self to operator DAG a. Basic OperatorPlatform, composable API.
+        Replace leaves of DAG
 
         :param a: operators to apply to
-        :param target_table_key: table key to replace with self, None counts as "match all"
+         :param replacement_map, table/sqlkeys mapped to replacement Operator platforms
         :return: new operator DAG
         """
+        assert isinstance(replacement_map, dict)
         new_sources = [
-            s.apply_to(a, target_table_key=target_table_key) for s in self.sources
+            s.replace_leaves(replacement_map) for s in self.sources
         ]
         return new_sources[0].convert_records(record_map=self.record_map)
 
@@ -2910,15 +2923,26 @@ class SQLNode(ViewRepresentation):
             node_name="SQLNode",
         )
 
-    def apply_to(self, a, *, target_table_key=None):
+    def replace_leaves(self, replacement_map: Dict[str, Any]):
         """
-        Apply self to operator DAG a. Basic OperatorPlatform, composable API.
+        Replace leaves of DAG
 
         :param a: operators to apply to
-        :param target_table_key: table key to replace with self, None counts as "match all"
+         :param replacement_map, table/sqlkeys mapped to replacement Operator platforms
         :return: new operator DAG
         """
-        return self
+        assert isinstance(replacement_map, dict)
+        try:
+            return replacement_map[self.view_name]
+        except KeyError:
+            pass
+        # copy self
+        r = SQLNode(
+            sql=self.sql.copy(),
+            column_names=self.column_names.copy(),
+            view_name=self.view_name
+        )
+        return r
 
     def _equiv_nodes(self, other):
         if not isinstance(other, SQLNode):

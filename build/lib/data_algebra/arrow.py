@@ -137,9 +137,7 @@ class DataOpArrow(Arrow):
                 raise ValueError("forbidden incoming columns: " + str(excess))
             if self.strict:
                 raise ValueError("extra incoming columns: " + str(excess))
-        new_pipeline = self.pipeline.apply_to(
-            b.pipeline, target_table_key=self.free_table_key
-        )
+        new_pipeline = self.pipeline.replace_leaves({self.free_table_key: b.pipeline})
         new_pipeline.get_tables()  # check tables are compatible
         res = DataOpArrow(
             pipeline=new_pipeline,

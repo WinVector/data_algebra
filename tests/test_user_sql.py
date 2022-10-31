@@ -10,7 +10,7 @@ def test_user_sql():
         {"g": ["a", "a", "b", "b"], "v1": [1, 2, 3, 4], "v2": [5, 6, 7, 8],}
     )
 
-    ops = SQLNode(
+    sql_node = SQLNode(
         sql="""
               SELECT
                 *,
@@ -20,7 +20,11 @@ def test_user_sql():
             """,
         column_names=["g", "v1", "v2", "v3"],
         view_name="derived_results",
-    ).extend({"v4": "v3 + v1"})
+    )
+    ops = (
+        sql_node
+            .extend({"v4": "v3 + v1"})
+    )
 
     expect = d1.copy()
     expect["v3"] = expect["v1"] * expect["v2"]
@@ -35,3 +39,10 @@ def test_user_sql():
     assert data_algebra.test_util.equivalent_frames(res_sqllite, expect)
     assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
 
+    # replace SQL with table
+    ops_table = ops.replace_leaves({"derived_results": TableDescription(table_name="derived_results", column_names=["g", "v1", "v2", "v3"])})
+    assert ops_table.sources[0].node_name == 'TableDescription'
+    # replace table with SQL
+    ops_sql = ops_table.replace_leaves({"derived_results": sql_node})
+    assert ops_sql.sources[0].node_name == 'SQLNode'
+    assert ops == ops_sql

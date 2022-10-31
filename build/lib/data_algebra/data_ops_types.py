@@ -79,49 +79,14 @@ class OperatorPlatform(abc.ABC):
         )
 
     @abc.abstractmethod
-    def apply_to(self, a, *, target_table_key=None):
+    def replace_leaves(self, replacement_map: Dict[str, Any]):
         """
-        apply self to operator DAG a
+        Replace leaves of DAG
 
         :param a: operators to apply to
-        :param target_table_key: table key to replace with self, None counts as "match all"
+        :param replacement_map, table/sqlkeys mapped to replacement Operator platforms
         :return: new operator DAG
         """
-
-    def __rrshift__(self, other):  # override other >> self
-        """
-        override other >> self
-        self.apply_to/act_on(other)
-
-        :param other:
-        :return:
-        """
-        if isinstance(other, OperatorPlatform):
-            return self.apply_to(other)
-        return self.act_on(other)
-
-    def __rshift__(self, other):  # override self >> other
-        """
-        override self >> other
-        other.apply_to(self)
-
-        :param other:
-        :return:
-        """
-        # can't use type >> type if only __rrshift__ is defined (must have __rshift__ in this case)
-        if isinstance(other, OperatorPlatform):
-            return other.apply_to(self)
-        raise TypeError("unexpected type: " + str(type(other)))
-
-    # composition
-    def add(self, other):
-        """
-        other.apply_to(self)
-
-        :param other:
-        :return:
-        """
-        return other.apply_to(self)
 
     # imitate a method
     def use(self, user_function, *args, **kwargs):
@@ -383,7 +348,7 @@ class OperatorPlatform(abc.ABC):
             cp = cp + [f for f in input_features if f not in cp_set]
         return cp
 
-    # noinspection PyUnusedLocal,PyMethodMayBeStatic
+    # noinspection PyMethodMayBeStatic
     def get_params(self, deep=False):
         """sklearn interface, noop"""
         return dict()
