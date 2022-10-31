@@ -257,6 +257,12 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
     def get_feature_names(self, input_features=None):
         return self.ops.get_feature_names(input_features=input_features)
 
+    def __str__(self) -> str:
+        return f"OpC({self.ops})"
+    
+    def __repr__(self) -> str:
+        return f"OpC({self.ops})"
+
 
 # pop 0343 context manager
 # https://www.python.org/dev/peps/pep-0343/#use-cases

@@ -420,20 +420,26 @@
 </span><span id="L-257"><a href="#L-257"><span class="linenos">257</span></a>    <span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span><span id="L-258"><a href="#L-258"><span class="linenos">258</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">get_feature_names</span><span class="p">(</span><span class="n">input_features</span><span class="o">=</span><span class="n">input_features</span><span class="p">)</span>
 </span><span id="L-259"><a href="#L-259"><span class="linenos">259</span></a>
-</span><span id="L-260"><a href="#L-260"><span class="linenos">260</span></a>
-</span><span id="L-261"><a href="#L-261"><span class="linenos">261</span></a><span class="c1"># pop 0343 context manager</span>
-</span><span id="L-262"><a href="#L-262"><span class="linenos">262</span></a><span class="c1"># https://www.python.org/dev/peps/pep-0343/#use-cases</span>
-</span><span id="L-263"><a href="#L-263"><span class="linenos">263</span></a><span class="k">class</span> <span class="nc">Pipeline</span><span class="p">:</span>
-</span><span id="L-264"><a href="#L-264"><span class="linenos">264</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-</span><span id="L-265"><a href="#L-265"><span class="linenos">265</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="n">OpC</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+</span><span id="L-260"><a href="#L-260"><span class="linenos">260</span></a>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-261"><a href="#L-261"><span class="linenos">261</span></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;OpC(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="si">}</span><span class="s2">)&quot;</span>
+</span><span id="L-262"><a href="#L-262"><span class="linenos">262</span></a>    
+</span><span id="L-263"><a href="#L-263"><span class="linenos">263</span></a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-264"><a href="#L-264"><span class="linenos">264</span></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;OpC(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="si">}</span><span class="s2">)&quot;</span>
+</span><span id="L-265"><a href="#L-265"><span class="linenos">265</span></a>
 </span><span id="L-266"><a href="#L-266"><span class="linenos">266</span></a>
-</span><span id="L-267"><a href="#L-267"><span class="linenos">267</span></a>    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-268"><a href="#L-268"><span class="linenos">268</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">column_namespace</span>
-</span><span id="L-269"><a href="#L-269"><span class="linenos">269</span></a>
-</span><span id="L-270"><a href="#L-270"><span class="linenos">270</span></a>    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-</span><span id="L-271"><a href="#L-271"><span class="linenos">271</span></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-</span><span id="L-272"><a href="#L-272"><span class="linenos">272</span></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">used_result</span>
-</span><span id="L-273"><a href="#L-273"><span class="linenos">273</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="L-267"><a href="#L-267"><span class="linenos">267</span></a><span class="c1"># pop 0343 context manager</span>
+</span><span id="L-268"><a href="#L-268"><span class="linenos">268</span></a><span class="c1"># https://www.python.org/dev/peps/pep-0343/#use-cases</span>
+</span><span id="L-269"><a href="#L-269"><span class="linenos">269</span></a><span class="k">class</span> <span class="nc">Pipeline</span><span class="p">:</span>
+</span><span id="L-270"><a href="#L-270"><span class="linenos">270</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+</span><span id="L-271"><a href="#L-271"><span class="linenos">271</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="n">OpC</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+</span><span id="L-272"><a href="#L-272"><span class="linenos">272</span></a>
+</span><span id="L-273"><a href="#L-273"><span class="linenos">273</span></a>    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-274"><a href="#L-274"><span class="linenos">274</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">column_namespace</span>
+</span><span id="L-275"><a href="#L-275"><span class="linenos">275</span></a>
+</span><span id="L-276"><a href="#L-276"><span class="linenos">276</span></a>    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+</span><span id="L-277"><a href="#L-277"><span class="linenos">277</span></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+</span><span id="L-278"><a href="#L-278"><span class="linenos">278</span></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">used_result</span>
+</span><span id="L-279"><a href="#L-279"><span class="linenos">279</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="kc">None</span>
 </span></pre></div>
 
 
@@ -689,6 +695,12 @@
 </span><span id="OpC-257"><a href="#OpC-257"><span class="linenos">257</span></a>
 </span><span id="OpC-258"><a href="#OpC-258"><span class="linenos">258</span></a>    <span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span><span id="OpC-259"><a href="#OpC-259"><span class="linenos">259</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">get_feature_names</span><span class="p">(</span><span class="n">input_features</span><span class="o">=</span><span class="n">input_features</span><span class="p">)</span>
+</span><span id="OpC-260"><a href="#OpC-260"><span class="linenos">260</span></a>
+</span><span id="OpC-261"><a href="#OpC-261"><span class="linenos">261</span></a>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="OpC-262"><a href="#OpC-262"><span class="linenos">262</span></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;OpC(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="si">}</span><span class="s2">)&quot;</span>
+</span><span id="OpC-263"><a href="#OpC-263"><span class="linenos">263</span></a>    
+</span><span id="OpC-264"><a href="#OpC-264"><span class="linenos">264</span></a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="OpC-265"><a href="#OpC-265"><span class="linenos">265</span></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;OpC(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="si">}</span><span class="s2">)&quot;</span>
 </span></pre></div>
 
 
@@ -1764,17 +1776,17 @@ direction as extend).</li>
 
     </div>
     <a class="headerlink" href="#Pipeline"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Pipeline-264"><a href="#Pipeline-264"><span class="linenos">264</span></a><span class="k">class</span> <span class="nc">Pipeline</span><span class="p">:</span>
-</span><span id="Pipeline-265"><a href="#Pipeline-265"><span class="linenos">265</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-</span><span id="Pipeline-266"><a href="#Pipeline-266"><span class="linenos">266</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="n">OpC</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
-</span><span id="Pipeline-267"><a href="#Pipeline-267"><span class="linenos">267</span></a>
-</span><span id="Pipeline-268"><a href="#Pipeline-268"><span class="linenos">268</span></a>    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="Pipeline-269"><a href="#Pipeline-269"><span class="linenos">269</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">column_namespace</span>
-</span><span id="Pipeline-270"><a href="#Pipeline-270"><span class="linenos">270</span></a>
-</span><span id="Pipeline-271"><a href="#Pipeline-271"><span class="linenos">271</span></a>    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-</span><span id="Pipeline-272"><a href="#Pipeline-272"><span class="linenos">272</span></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-</span><span id="Pipeline-273"><a href="#Pipeline-273"><span class="linenos">273</span></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">used_result</span>
-</span><span id="Pipeline-274"><a href="#Pipeline-274"><span class="linenos">274</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="kc">None</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Pipeline-270"><a href="#Pipeline-270"><span class="linenos">270</span></a><span class="k">class</span> <span class="nc">Pipeline</span><span class="p">:</span>
+</span><span id="Pipeline-271"><a href="#Pipeline-271"><span class="linenos">271</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+</span><span id="Pipeline-272"><a href="#Pipeline-272"><span class="linenos">272</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="n">OpC</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+</span><span id="Pipeline-273"><a href="#Pipeline-273"><span class="linenos">273</span></a>
+</span><span id="Pipeline-274"><a href="#Pipeline-274"><span class="linenos">274</span></a>    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Pipeline-275"><a href="#Pipeline-275"><span class="linenos">275</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">column_namespace</span>
+</span><span id="Pipeline-276"><a href="#Pipeline-276"><span class="linenos">276</span></a>
+</span><span id="Pipeline-277"><a href="#Pipeline-277"><span class="linenos">277</span></a>    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+</span><span id="Pipeline-278"><a href="#Pipeline-278"><span class="linenos">278</span></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+</span><span id="Pipeline-279"><a href="#Pipeline-279"><span class="linenos">279</span></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">used_result</span>
+</span><span id="Pipeline-280"><a href="#Pipeline-280"><span class="linenos">280</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="kc">None</span>
 </span></pre></div>
 
 
@@ -1790,8 +1802,8 @@ direction as extend).</li>
 
     </div>
     <a class="headerlink" href="#Pipeline.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Pipeline.__init__-265"><a href="#Pipeline.__init__-265"><span class="linenos">265</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-</span><span id="Pipeline.__init__-266"><a href="#Pipeline.__init__-266"><span class="linenos">266</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="n">OpC</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Pipeline.__init__-271"><a href="#Pipeline.__init__-271"><span class="linenos">271</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+</span><span id="Pipeline.__init__-272"><a href="#Pipeline.__init__-272"><span class="linenos">272</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="n">OpC</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 </span></pre></div>
 
 
