@@ -53,13 +53,6 @@ def test_calc_interface():
     assert data_algebra.test_util.equivalent_frames(res0, d_good)
     data_algebra.test_util.check_transform(ops=td, data=d_extra, expect=d_good)
 
-    # check that def composition can widen arrows
-    td_extra = describe_table(d_extra, "d_extra")
-    assert td.apply_to(td_extra) == td_extra
-    assert td_extra.apply_to(td) == td
-    assert (td >> td_extra) == td
-    assert (td_extra >> td) == td_extra
-
     res1 = ops.transform(d_good)
     assert data_algebra.test_util.equivalent_frames(res1, expect)
     data_algebra.test_util.check_transform(ops=ops, data=d_good, expect=expect)
@@ -94,25 +87,3 @@ def test_calc_interface():
     res_first = ops_first.transform(d_extra)
     expect_first = data_algebra.default_data_model.pd.DataFrame({"a": [1], "x": [1],})
     assert data_algebra.test_util.equivalent_frames(res_first, expect_first)
-
-    ops_widened = ops_first.apply_to(td_extra)
-    assert ops_widened == (td_extra >> ops_first)
-    res_widened = ops_widened.transform(d_extra)
-    expect_widened = data_algebra.default_data_model.pd.DataFrame(
-        {"a": [1], "b": [2], "x": [1],}
-    )
-    assert data_algebra.test_util.equivalent_frames(res_widened, expect_widened)
-
-    ops_strict = td.rename_columns({"b": "a"})
-
-    with pytest.raises(ValueError):
-        ops_strict.apply_to(td_extra)
-
-    new_ops = ops_strict.apply_to(td)
-    fmt_as_arrow(ops_strict)
-    fmt_as_arrow(new_ops)
-
-    assert data_algebra.test_util.equivalent_frames(new_ops.transform(d_good), expect)
-    assert data_algebra.test_util.equivalent_frames(new_ops.transform(d_extra), expect)
-    data_algebra.test_util.check_transform(ops=new_ops, data=d_good, expect=expect)
-    data_algebra.test_util.check_transform(ops=new_ops, data=d_extra, expect=expect)

@@ -92,8 +92,8 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         self.set(self.ops.act_on(X=X, data_model=data_model))
         return self
 
-    def apply_to(self, a, *, target_table_key=None):
-        self.set(self.ops.apply_to(a=a, target_table_key=target_table_key))
+    def replace_leaves(self, replacement_map: Dict[str, Any]):
+        self.set(self.ops.replace_leaves(replacement_map))
         return self
 
     def __rrshift__(self, other):  # override other >> self

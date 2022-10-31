@@ -172,23 +172,6 @@ def test_arrow1():
 
     assert data_algebra.test_util.equivalent_frames(r1, r2)
 
-    # check pipelines compose
-    p1 = a3.pipeline.apply_to(a2.pipeline.apply_to(a1.pipeline)).__repr__()
-
-    p2 = (a1.pipeline >> a2.pipeline >> a3.pipeline).__repr__()
-
-    assert p2 == p1
-
-    r1 = a3.transform(a2.pipeline.transform(a1.pipeline.transform(d)))
-
-    r2 = d >> (a1.pipeline >> a2.pipeline >> a3.pipeline)
-
-    assert data_algebra.test_util.equivalent_frames(r1, r2)
-
-    r3 = d >> a1.pipeline >> a2.pipeline >> a3.pipeline
-
-    assert data_algebra.test_util.equivalent_frames(r1, r3)
-
     # check identity relns
     ri = a1.cod()
     li = a1.dom()
