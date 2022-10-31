@@ -383,7 +383,7 @@ class OperatorPlatform(abc.ABC):
             cp = cp + [f for f in input_features if f not in cp_set]
         return cp
 
-    # noinspection PyUnusedLocal,PyMethodMayBeStatic
+    # noinspection PyMethodMayBeStatic
     def get_params(self, deep=False):
         """sklearn interface, noop"""
         return dict()
