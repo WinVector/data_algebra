@@ -15,3 +15,6 @@ the same transforms for Pandas DataFrames.
 `R`<https://www.r-project.org> versions of the system are available as 
 the `rquery`<https://github.com/WinVector/rquery> and `rqdatatable`<https://github.com/WinVector/rqdatatable> packages.
 """
+
+# import for easy access for package users
+from data_algebra.data_ops import TableDescription, SQLNode, describe_table, descr, data, ex
