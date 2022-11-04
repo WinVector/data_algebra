@@ -9,7 +9,7 @@ database specific SQL. The package also implements the same transforms for Panda
 A good introduction can be found [here](https://github.com/WinVector/data_algebra/blob/main/Examples/Introduction/data_algebra_Introduction.ipynb),
 and many worked examples are [here](https://github.com/WinVector/data_algebra/tree/main/Examples). A catalog of expression methods is found [here](https://github.com/WinVector/data_algebra/blob/main/Examples/Methods/op_catalog.csv). The pydoc documentation is [here](https://winvector.github.io/data_algebra/). And the [README](https://github.com/WinVector/data_algebra/blob/main/README.md) is a good place to check for news or updates.
 
-Currently the system is primarily adapted and testing for Pandas, Google BigQuery, PostgreSQL, SQLite, and Spark. Porting and extension is designed to be easy.
+Currently, the system is primarily adapted and testing for Pandas, Google BigQuery, PostgreSQL, SQLite, and Spark. Porting and extension is designed to be easy.
 
 [This](https://github.com/WinVector/data_algebra) is to be the [`Python`](https://www.python.org) equivalent of the [`R`](https://www.r-project.org) packages [`rquery`](https://github.com/WinVector/rquery/), [`rqdatatable`](https://github.com/WinVector/rqdatatable), and [`cdata`](https://CRAN.R-project.org/package=cdata).  This package supplies piped Codd-transform style notation that can perform data engineering in [`Pandas`](https://pandas.pydata.org) and generate [`SQL`](https://en.wikipedia.org/wiki/SQL) queries from the same specification.
 
@@ -20,7 +20,6 @@ Install `data_algebra` with `pip install data_algebra`
 # Announcement
 
 This article introduces the [`data_algebra`](https://github.com/WinVector/data_algebra) project: a data processing tool family available in `R` and `Python`.  These tools are designed to transform data either in-memory or on remote databases.  For an example (with video) of using `data_algebra` to re-arrange data layout please see [here](https://github.com/WinVector/data_algebra/blob/master/Examples/cdata/ranking_pivot_example.md). The key question is: what operators (or major steps) are supported by the data algebra, and what methods (operations on columns) are supported. The operators are documented [here](https://github.com/WinVector/data_algebra/blob/main/Examples/Introduction/data_algebra_Introduction.ipynb), and which methods can be used in which contexts is linsted [here](https://github.com/WinVector/data_algebra/blob/main/Examples/Methods/op_catalog.csv). Also, please check the [README](https://github.com/WinVector/data_algebra/blob/main/README.md) for news.
-
 
 In particular, we will discuss the `Python` implementation (also called `data_algebra`) and its relation to the mature `R` implementations (`rquery` and `rqdatatable`).
 
@@ -81,7 +80,7 @@ Let's start our `Python` example.  First we import the packages we are going to 
 
 ```python
 import pandas
-from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
+import data_algebra
 import data_algebra.BigQuery
 
 
@@ -91,7 +90,7 @@ data_algebra.__version__
 
 
 
-    '1.1.2'
+    '1.4.4'
 
 
 
@@ -115,6 +114,19 @@ d_local
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -176,7 +188,7 @@ db_handle = data_algebra.BigQuery.example_handle()
 print(db_handle)
 ```
 
-    BigQuery_DBHandle(db_model=BigQueryModel, conn=<google.cloud.bigquery.client.Client object at 0x7ff3390df2e0>)
+    BigQuery_DBHandle(db_model=BigQueryModel, conn=<google.cloud.bigquery.client.Client object at 0x7f9f10a152b0>)
 
 
 
@@ -196,6 +208,19 @@ remote_table_description.head
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -253,7 +278,7 @@ Normally one does not read data back from a database, but instead materializes r
 
 Now we continue our example by importing the `data_algebra` components we need.
 
-Now we use the `data_algebra` to define our processing pipeline: `ops`.  We are writing this pipeline using a [method chaining](https://en.wikipedia.org/wiki/Method_chaining) notation where we have placed `Python` method-dot at the end of lines using the `.\` notation.  This notation will look *very* much like a [pipe](https://en.wikipedia.org/wiki/Pipeline_(Unix)) to `R`/[`magrittr`](https://CRAN.R-project.org/package=magrittr) users.
+Now we use the `data_algebra` to define our processing pipeline: `ops`.  We are writing this pipeline using a [method chaining](https://en.wikipedia.org/wiki/Method_chaining) notation.  This notation will look *very* much like a [pipe](https://en.wikipedia.org/wiki/Pipeline_(Unix)) to `R`/[`magrittr`](https://CRAN.R-project.org/package=magrittr) users.
 
 
 
@@ -261,7 +286,7 @@ Now we use the `data_algebra` to define our processing pipeline: `ops`.  We are 
 scale = 0.237
 
 ops = (
-    data_algebra.data_ops.describe_table(d_local, 'd')
+    data_algebra.descr(d=d_local)
         .extend({'probability': f'(assessmentTotal * {scale}).exp()'})
         .extend({'total': 'probability.sum()'},
                 partition_by='subjectID')
@@ -280,8 +305,6 @@ ops = (
 We are deliberately writing a longer pipeline of simple steps, so we can use the same pipeline locally with Pandas, and (potentially) great scale with `PostgreSQL` or Apache `Spark`.  A more concise variation of this pipeline can be found in the R example [here](https://github.com/WinVector/rquery).
 
 The intent is: the user can build up very sophisticated processing pipelines using a small number of primitive steps.  The pipelines tend to be long, but can still be very efficient- as they are well suited for use with `Pandas` and with `SQL` query optimizers.  Most of the heavy lifting is performed by the  very powerful "window functions" (triggered by use of `partition_by` and `order_by`) available on the `extend()` step.  Multiple statements can be combined into extend steps, but only when they have the same window-structure, and don't create and use the same value name in the same statement (except for replacement, which is shown in this example).  Many conditions are checked and enforced during pipeline construction, making debugging very easy.
-
-The question is: what operators (or major steps) are supported by the data algebra, and what methods (operations on columns) are supported. The operators are documented [here](https://github.com/WinVector/data_algebra/blob/main/Examples/Introduction/data_algebra_Introduction.ipynb), and which methods can be used in which contexts is linsted [here](https://github.com/WinVector/data_algebra/blob/main/Examples/Methods/op_catalog.csv). Also, please check the [README](https://github.com/WinVector/data_algebra/blob/main/README.md) for news.
 
 For a more Pythonic way of writing the same pipeline we can show how the code would have been formatted by [`black`](https://github.com/psf/black).
 
@@ -347,7 +370,7 @@ print(sql)
 ```
 
     -- data_algebra SQL https://github.com/WinVector/data_algebra
-    --  dialect: BigQueryModel
+    --  dialect: BigQueryModel 1.4.4
     --       string quote: "
     --   identifier quote: `
     WITH
@@ -427,6 +450,19 @@ db_handle.read_query(sql)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -475,6 +511,19 @@ ops.eval({'d': d_local})
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -517,6 +566,19 @@ ops.transform(d_local)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
