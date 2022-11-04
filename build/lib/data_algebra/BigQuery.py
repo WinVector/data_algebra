@@ -249,20 +249,10 @@ class BigQuery_DBHandle(data_algebra.db_model.DBHandle):
             q = q.to_sql(self.db_model)
         else:
             q = str(q)
-
-        def open_regular():
-            """open regular"""
-            return lambda: open(res_name, "w")
-
-        def open_gzip():
-            """open gzipped"""
-            return lambda: gzip.open(res_name, "w")
-
         if res_name.endswith(".gz"):
-            op = open_gzip
+            op = lambda: gzip.open(res_name, "w", encoding="utf-8")
         else:
-            op = open_regular()
-
+            op = lambda: open(res_name, "w", encoding="utf-8")
         with op() as res:
             res_iter = self.conn.query(q).result().to_dataframe_iterable()
             is_first = True

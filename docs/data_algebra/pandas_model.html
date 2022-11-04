@@ -66,19 +66,21 @@
 </span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="sd">Adapter for Pandas API.</span>
 </span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a>
-</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a>
-</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="kn">from</span> <span class="nn">data_algebra.pandas_base</span> <span class="kn">import</span> <span class="n">PandasModelBase</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>
-</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="kn">from</span> <span class="nn">data_algebra.pandas_base</span> <span class="kn">import</span> <span class="n">PandasModelBase</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="k">class</span> <span class="nc">PandasModel</span><span class="p">(</span><span class="n">PandasModelBase</span><span class="p">):</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>    <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="sd">    Realize the data algebra over pandas.</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>        <span class="n">PandasModelBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pd</span><span class="o">=</span><span class="n">pd</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="o">=</span><span class="s2">&quot;pd&quot;</span><span class="p">)</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="k">class</span> <span class="nc">PandasModel</span><span class="p">(</span><span class="n">PandasModelBase</span><span class="p">):</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="sd">    Realize the data algebra over pandas.</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>        <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>        <span class="n">PandasModelBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pd</span><span class="o">=</span><span class="n">pd</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="o">=</span><span class="s2">&quot;pd&quot;</span><span class="p">)</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="c1"># set up what pandas supplier we are using</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="n">default_data_model</span> <span class="o">=</span> <span class="n">PandasModel</span><span class="p">()</span>
 </span></pre></div>
 
 
@@ -94,13 +96,14 @@
 
     </div>
     <a class="headerlink" href="#PandasModel"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModel-12"><a href="#PandasModel-12"><span class="linenos">12</span></a><span class="k">class</span> <span class="nc">PandasModel</span><span class="p">(</span><span class="n">PandasModelBase</span><span class="p">):</span>
-</span><span id="PandasModel-13"><a href="#PandasModel-13"><span class="linenos">13</span></a>    <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="PandasModel-14"><a href="#PandasModel-14"><span class="linenos">14</span></a><span class="sd">    Realize the data algebra over pandas.</span>
-</span><span id="PandasModel-15"><a href="#PandasModel-15"><span class="linenos">15</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="PandasModel-16"><a href="#PandasModel-16"><span class="linenos">16</span></a>
-</span><span id="PandasModel-17"><a href="#PandasModel-17"><span class="linenos">17</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="PandasModel-18"><a href="#PandasModel-18"><span class="linenos">18</span></a>        <span class="n">PandasModelBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pd</span><span class="o">=</span><span class="n">pd</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="o">=</span><span class="s2">&quot;pd&quot;</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModel-9"><a href="#PandasModel-9"><span class="linenos"> 9</span></a><span class="k">class</span> <span class="nc">PandasModel</span><span class="p">(</span><span class="n">PandasModelBase</span><span class="p">):</span>
+</span><span id="PandasModel-10"><a href="#PandasModel-10"><span class="linenos">10</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModel-11"><a href="#PandasModel-11"><span class="linenos">11</span></a><span class="sd">    Realize the data algebra over pandas.</span>
+</span><span id="PandasModel-12"><a href="#PandasModel-12"><span class="linenos">12</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="PandasModel-13"><a href="#PandasModel-13"><span class="linenos">13</span></a>
+</span><span id="PandasModel-14"><a href="#PandasModel-14"><span class="linenos">14</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="PandasModel-15"><a href="#PandasModel-15"><span class="linenos">15</span></a>        <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+</span><span id="PandasModel-16"><a href="#PandasModel-16"><span class="linenos">16</span></a>        <span class="n">PandasModelBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pd</span><span class="o">=</span><span class="n">pd</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="o">=</span><span class="s2">&quot;pd&quot;</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -118,8 +121,9 @@
 
     </div>
     <a class="headerlink" href="#PandasModel.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModel.__init__-17"><a href="#PandasModel.__init__-17"><span class="linenos">17</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="PandasModel.__init__-18"><a href="#PandasModel.__init__-18"><span class="linenos">18</span></a>        <span class="n">PandasModelBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pd</span><span class="o">=</span><span class="n">pd</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="o">=</span><span class="s2">&quot;pd&quot;</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModel.__init__-14"><a href="#PandasModel.__init__-14"><span class="linenos">14</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="PandasModel.__init__-15"><a href="#PandasModel.__init__-15"><span class="linenos">15</span></a>        <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+</span><span id="PandasModel.__init__-16"><a href="#PandasModel.__init__-16"><span class="linenos">16</span></a>        <span class="n">PandasModelBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pd</span><span class="o">=</span><span class="n">pd</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="o">=</span><span class="s2">&quot;pd&quot;</span><span class="p">)</span>
 </span></pre></div>
 
 

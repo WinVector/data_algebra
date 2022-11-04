@@ -101,11 +101,8 @@ the <code>rquery</code><a href="https://github.com/WinVector/rquery">https://git
 </span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="s2">the `rquery`&lt;https://github.com/WinVector/rquery&gt; and `rqdatatable`&lt;https://github.com/WinVector/rqdatatable&gt; packages.</span>
 </span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="s2">&quot;&quot;&quot;</span>
 </span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="kn">import</span> <span class="nn">data_algebra.pandas_model</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>
-</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="c1"># set up what pandas supplier we are using</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a><span class="n">default_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">pandas_model</span><span class="o">.</span><span class="n">PandasModel</span><span class="p">()</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="c1"># import for easy access for package users</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="kn">from</span> <span class="nn">data_algebra.data_ops</span> <span class="kn">import</span> <span class="n">TableDescription</span><span class="p">,</span> <span class="n">SQLNode</span><span class="p">,</span> <span class="n">describe_table</span><span class="p">,</span> <span class="n">descr</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ex</span>
 </span></pre></div>
 
 

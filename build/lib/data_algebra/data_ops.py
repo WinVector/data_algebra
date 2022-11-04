@@ -11,11 +11,10 @@ import re
 
 import numpy
 
-import data_algebra
+import data_algebra.pandas_model
 import data_algebra.expr_parse
 import data_algebra.flow_text
 import data_algebra.data_model
-import data_algebra.pandas_model
 import data_algebra.expr_rep
 from data_algebra.data_ops_types import MethodUse, OperatorPlatform
 import data_algebra.data_ops_utils
@@ -480,7 +479,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         """
         assert isinstance(data_map, dict)
         if data_model is None:
-            data_model = data_algebra.default_data_model
+            data_model = data_algebra.pandas_model.default_data_model
         assert isinstance(data_model, data_algebra.data_model.DataModel)
         self.columns_used()  # for table consistency check/raise
         tables = self.get_tables()
@@ -512,7 +511,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         :return: transformed data frame
         """
         if data_model is None:
-            data_model = data_algebra.default_data_model
+            data_model = data_algebra.pandas_model.default_data_model
         assert isinstance(data_model, data_algebra.data_model.DataModel)
         self.columns_used()  # for table consistency check/raise
         tables = self.get_tables()
