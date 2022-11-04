@@ -8,7 +8,7 @@ import data_algebra.util
 
 # https://github.com/WinVector/data_algebra/blob/master/Examples/WindowFunctions/WindowFunctions.ipynb
 def test_window2():
-    d = data_algebra.default_data_model.pd.DataFrame(
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {
             "g": [1, 2, 2, 3, 3, 3],
             "x": [1, 4, 5, 7, 8, 9],
@@ -39,7 +39,7 @@ def test_window2():
 
     res1 = ops.transform(d)
 
-    expect1 = data_algebra.default_data_model.pd.DataFrame(
+    expect1 = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {
             "g": [1, 2, 2, 3, 3, 3],
             "x": [1, 4, 5, 7, 8, 9],
@@ -62,7 +62,7 @@ def test_window2():
 
 
 def test_window2_k():
-    d = data_algebra.default_data_model.pd.DataFrame(
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"o": range(0, 10), "x": range(0, 10),}
     )
     ops = describe_table(d).extend(
@@ -76,7 +76,7 @@ def test_window2_k():
         order_by=["o"],
     )
 
-    expect = data_algebra.default_data_model.pd.DataFrame(
+    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {
             "o": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
             "x": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
@@ -92,7 +92,7 @@ def test_window2_k():
 
 
 def test_window2_kf():
-    d = data_algebra.default_data_model.pd.DataFrame(
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"o": range(0, 10), "x": range(0, 10),}
     )
     with pytest.raises(ValueError):

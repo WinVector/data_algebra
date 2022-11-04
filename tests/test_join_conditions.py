@@ -34,15 +34,15 @@ def test_join_conditions_on_back():
 
 
 def test_join_conditions_on_join():
-    d1 = data_algebra.default_data_model.pd.DataFrame({
+    d1 = data_algebra.pandas_model.default_data_model.pd.DataFrame({
         "x": [1, 2, 3],
         "a": [4, 5, 6],
     })
-    d2 = data_algebra.default_data_model.pd.DataFrame({
+    d2 = data_algebra.pandas_model.default_data_model.pd.DataFrame({
         "y": [1, 2, 3],
         "b": [7, 8, 9],
     })
-    expect = data_algebra.default_data_model.pd.DataFrame({
+    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame({
         "x": [1, 2, 3],
         "y": [1, 2, 3],
         "a": [4, 5, 6],

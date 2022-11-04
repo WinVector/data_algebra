@@ -8,13 +8,13 @@ import pytest
 
 
 def test_project0():
-    d = data_algebra.default_data_model.pd.DataFrame(
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"c": [1, 1, 1, 1], "g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4]}
     )
 
     ops = describe_table(d, "d").project(group_by=["c", "g"])
 
-    expect = data_algebra.default_data_model.pd.DataFrame(
+    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"c": [1, 1], "g": ["a", "b"]}
     )
 
@@ -22,13 +22,13 @@ def test_project0():
 
 
 def test_project_z():
-    d = data_algebra.default_data_model.pd.DataFrame(
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"c": [1, 1, 1, 1], "g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4]}
     )
 
     ops = describe_table(d, "d").project({"c": "c.max()"})
 
-    expect = data_algebra.default_data_model.pd.DataFrame({"c": [1]})
+    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame({"c": [1]})
 
     data_algebra.test_util.check_transform(
         ops=ops, data=d, expect=expect, empty_produces_empty=False
@@ -36,7 +36,7 @@ def test_project_z():
 
 
 def test_project_zz():
-    d = data_algebra.default_data_model.pd.DataFrame(
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"c": [1, 1, 1, 1], "g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4]}
     )
 
@@ -45,7 +45,7 @@ def test_project_zz():
 
 
 def test_project():
-    d = data_algebra.default_data_model.pd.DataFrame(
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"c": [1, 1, 1, 1], "g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4]}
     )
 
@@ -53,7 +53,7 @@ def test_project():
         {"ymax": "y.max()", "ymin": "y.min()"}, group_by=["c", "g"]
     )
 
-    expect = data_algebra.default_data_model.pd.DataFrame(
+    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"c": [1, 1], "g": ["a", "b"], "ymax": [3, 4], "ymin": [1, 2]}
     )
 
@@ -61,7 +61,7 @@ def test_project():
 
 
 def test_project_catch_nonagg():
-    d = data_algebra.default_data_model.pd.DataFrame(
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"c": [1, 1, 1, 1], "g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4]}
     )
 

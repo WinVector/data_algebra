@@ -15,9 +15,3 @@ the same transforms for Pandas DataFrames.
 `R`<https://www.r-project.org> versions of the system are available as 
 the `rquery`<https://github.com/WinVector/rquery> and `rqdatatable`<https://github.com/WinVector/rqdatatable> packages.
 """
-
-import data_algebra.pandas_model
-
-
-# set up what pandas supplier we are using
-default_data_model = data_algebra.pandas_model.PandasModel()

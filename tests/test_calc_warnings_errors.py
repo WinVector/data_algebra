@@ -5,7 +5,7 @@ from data_algebra.data_ops import *
 
 
 def test_calc_warnings_errors():
-    d = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2, 3], "y": [4, 5, 6]})
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame({"x": [1, 2, 3], "y": [4, 5, 6]})
 
     with pytest.raises(ValueError):
         describe_table(d).extend({"x": "x+1", "y": "x+2"})

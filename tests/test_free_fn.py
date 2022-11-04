@@ -15,7 +15,7 @@ import pytest
 
 def test_free_fn():
     # show unknown fns are not allowed, unless registered
-    d = data_algebra.default_data_model.pd.DataFrame({"b": [-1, 2]})
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame({"b": [-1, 2]})
 
     # fn wasn't defined, so definition should raise error
     with pytest.raises(KeyError):
@@ -24,7 +24,7 @@ def test_free_fn():
         )
 
     # define the fn and try again
-    data_algebra.default_data_model.user_fun_map[
+    data_algebra.pandas_model.default_data_model.user_fun_map[
         "FUNCTION_WE_DONT_KNOW_ABOUT"
     ] = numpy.abs
 
@@ -36,9 +36,9 @@ def test_free_fn():
     assert data_algebra.test_util.formats_to_self(ops)
 
     res_pandas = ops.transform(d)
-    del data_algebra.default_data_model.user_fun_map["FUNCTION_WE_DONT_KNOW_ABOUT"]
+    del data_algebra.pandas_model.default_data_model.user_fun_map["FUNCTION_WE_DONT_KNOW_ABOUT"]
 
-    expect = data_algebra.default_data_model.pd.DataFrame({"b": [-1, 2], "r": [1, 2]})
+    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame({"b": [-1, 2], "r": [1, 2]})
 
     assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
 

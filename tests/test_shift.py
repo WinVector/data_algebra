@@ -6,7 +6,7 @@ import pytest
 
 
 def test_shift():
-    pd = data_algebra.default_data_model.pd
+    pd = data_algebra.pandas_model.default_data_model.pd
     d = pd.DataFrame({
         'x': [1, 2, 3, 4, 5],
         'v': ['a', 'b', 'c', 'd', 'e'],
@@ -38,7 +38,7 @@ def test_shift():
 
 
 def test_shift_assert_on_0():
-    pd = data_algebra.default_data_model.pd
+    pd = data_algebra.pandas_model.default_data_model.pd
     d = pd.DataFrame({
         'x': [1, 2, 3, 4, 5],
         'v': ['a', 'b', 'c', 'd', 'e'],

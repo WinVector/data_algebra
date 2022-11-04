@@ -1,6 +1,7 @@
-import data_algebra
 
-pd = data_algebra.default_data_model.pd
+import data_algebra.pandas_model
+
+pd = data_algebra.pandas_model.default_data_model.pd
 
 
 methods_table = pd.DataFrame(

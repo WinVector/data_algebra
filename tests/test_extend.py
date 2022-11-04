@@ -9,7 +9,7 @@ import pytest
 
 
 def test_extend_0():
-    d = data_algebra.default_data_model.pd.DataFrame(
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"c": [1, 1, 1, 1], "g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4]}
     )
 
@@ -23,7 +23,7 @@ def test_extend_0():
 
 
 def test_extend_p():
-    d = data_algebra.default_data_model.pd.DataFrame(
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"c": [1, 1, 1, 1], "g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4]}
     )
 
@@ -32,14 +32,14 @@ def test_extend_p():
     assert formats_to_self(ops)
 
     res = ops.transform(d)
-    expect = data_algebra.default_data_model.pd.DataFrame(
+    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4], "c": [3, 4, 3, 4],}
     )
     assert data_algebra.test_util.equivalent_frames(expect, res)
 
 
 def test_extend_p0():
-    d = data_algebra.default_data_model.pd.DataFrame(
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"c": [1, 1, 1, 1], "g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4]}
     )
 
@@ -48,14 +48,14 @@ def test_extend_p0():
     assert formats_to_self(ops)
 
     res = ops.transform(d)
-    expect = data_algebra.default_data_model.pd.DataFrame(
+    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4], "c": [4, 4, 4, 4],}
     )
     assert data_algebra.test_util.equivalent_frames(expect, res)
 
 
 def test_extend_shrink_1():
-    d = data_algebra.default_data_model.pd.DataFrame(
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"c": [1, 1, 1, 1], "g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4]}
     )
 
@@ -67,7 +67,7 @@ def test_extend_shrink_1():
     )  # check does combine nodes in this case
 
     res = ops.transform(d)
-    expect = data_algebra.default_data_model.pd.DataFrame(
+    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {
             "g": ["a", "b", "a", "b"],
             "y": [1, 2, 3, 4],
@@ -95,7 +95,7 @@ def test_extend_shrink_1():
 
 
 def test_extend_shrink_2():
-    d = data_algebra.default_data_model.pd.DataFrame(
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"c": [1, 1, 1, 1], "g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4]}
     )
 
@@ -107,7 +107,7 @@ def test_extend_shrink_2():
     )  # check doesn't combine nodes in this case
 
     res = ops.transform(d)
-    expect = data_algebra.default_data_model.pd.DataFrame(
+    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {
             "g": ["a", "b", "a", "b"],
             "y": [1, 2, 3, 4],
@@ -119,7 +119,7 @@ def test_extend_shrink_2():
 
 
 def test_extend_catch_nonagg():
-    d = data_algebra.default_data_model.pd.DataFrame(
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"c": [1, 1, 1, 1], "g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4]}
     )
 

@@ -9,7 +9,7 @@ import data_algebra.BigQuery
 
 
 def test_eval_cache_hash():
-    pd = data_algebra.default_data_model.pd
+    pd = data_algebra.pandas_model.default_data_model.pd
     d1 = pd.DataFrame({'x': [1]})
     d2 = pd.DataFrame({'x': []})
     h1 = data_algebra.eval_cache.hash_data_frame(d1)
@@ -21,7 +21,7 @@ def test_eval_cache_hash():
 
 
 def test_eval_cache_mk_cache_key():
-    pd = data_algebra.default_data_model.pd
+    pd = data_algebra.pandas_model.default_data_model.pd
     d1 = pd.DataFrame({'x': [1]})
     k1 = data_algebra.eval_cache.make_cache_key(
         db_model=data_algebra.SQLite.SQLiteModel(),
@@ -38,7 +38,7 @@ def test_eval_cache_mk_cache_key():
 
 
 def test_eval_cache_ResultCache():
-    pd = data_algebra.default_data_model.pd
+    pd = data_algebra.pandas_model.default_data_model.pd
     d1 = pd.DataFrame({'x': [1]})
     k1 = data_algebra.eval_cache.make_cache_key(
         db_model=data_algebra.SQLite.SQLiteModel(),

@@ -10,7 +10,7 @@ import data_algebra.BigQuery
 
 
 def test_any_project_value():
-    pd = data_algebra.default_data_model.pd
+    pd = data_algebra.pandas_model.default_data_model.pd
     d = pd.DataFrame({
         'x': [.1, .1, .3, .4],
         'g': ['a', 'a', 'b', 'ccc'],
@@ -38,7 +38,7 @@ def test_any_project_value():
 
 
 def test_any_project_logical():
-    pd = data_algebra.default_data_model.pd
+    pd = data_algebra.pandas_model.default_data_model.pd
     d = pd.DataFrame({
         'a': [False, False],
         'b': [False, True],

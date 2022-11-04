@@ -12,7 +12,7 @@ import pytest
 
 
 def test_db_handle_services_to_csv():
-    pd = data_algebra.default_data_model.pd
+    pd = data_algebra.pandas_model.default_data_model.pd
     db_handles = data_algebra.test_util.get_test_dbs()
     d = pd.DataFrame({'x': [1.0, 2.0], 'y': ['a', 'b']})
     td = descr(d=d)
@@ -33,7 +33,7 @@ def test_db_handle_services_to_csv():
 
 
 def test_db_handle_servies_bq_desribe():
-    pd = data_algebra.default_data_model.pd
+    pd = data_algebra.pandas_model.default_data_model.pd
     d = pd.DataFrame({'x': [1.0, 2.0], 'y': ['a', 'b']})
     td = descr(d=d)
     if data_algebra.test_util.test_BigQuery:

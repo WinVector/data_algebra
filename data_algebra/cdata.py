@@ -7,8 +7,7 @@ import re
 from typing import Iterable, List, Optional
 
 import numpy
-
-import data_algebra
+import data_algebra.pandas_model
 import data_algebra.util
 
 
@@ -36,7 +35,7 @@ class RecordSpecification:
         :param local_data_model: data.frame data model
         """
         if local_data_model is None:
-            local_data_model = data_algebra.default_data_model
+            local_data_model = data_algebra.pandas_model.default_data_model
         control_table = control_table.reset_index(inplace=False, drop=True)
         if control_table.shape[0] < 1:
             raise ValueError("control table should have at least 1 row")
@@ -194,7 +193,7 @@ def blocks_to_rowrecs(data, *, blocks_in: RecordSpecification, local_data_model=
     if len(ck) != len(set(ck)):
         raise ValueError("blocks_in can not have duplicate content keys")
     if local_data_model is None:
-        local_data_model = data_algebra.default_data_model
+        local_data_model = data_algebra.pandas_model.default_data_model
     data = data.reset_index(drop=True)
     missing_cols = set(blocks_in.control_table_keys).union(blocks_in.record_keys) - set(
         data.columns
@@ -281,7 +280,7 @@ def rowrecs_to_blocks(
     """
     assert isinstance(blocks_out, RecordSpecification)
     if local_data_model is None:
-        local_data_model = data_algebra.default_data_model
+        local_data_model = data_algebra.pandas_model.default_data_model
     data = data.reset_index(drop=True)
     missing_cols = set(blocks_out.record_keys) - set(data.columns)
     if len(missing_cols) > 0:
@@ -431,7 +430,7 @@ class RecordMap:
         :return: example result data frame.
         """
         if local_data_model is None:
-            local_data_model = data_algebra.default_data_model
+            local_data_model = data_algebra.pandas_model.default_data_model
         if self.blocks_in is not None:
             example = self.blocks_in.control_table.copy()
             nrow = example.shape[0]
@@ -461,7 +460,7 @@ class RecordMap:
         if len(unknown) > 0:
             raise ValueError("missing required columns: " + str(unknown))
         if local_data_model is None:
-            local_data_model = data_algebra.default_data_model
+            local_data_model = data_algebra.pandas_model.default_data_model
         X = X.reset_index(drop=True)
         if self.blocks_in is not None:
             X = blocks_to_rowrecs(
@@ -651,7 +650,7 @@ def pivot_blocks_to_rowrecs(
     """
 
     if local_data_model is None:
-        local_data_model = data_algebra.default_data_model
+        local_data_model = data_algebra.pandas_model.default_data_model
     control_table = local_data_model.data_frame(
         {
             attribute_key_column: record_value_columns,
@@ -687,7 +686,7 @@ def pivot_rowrecs_to_blocks(
     """
 
     if local_data_model is None:
-        local_data_model = data_algebra.default_data_model
+        local_data_model = data_algebra.pandas_model.default_data_model
     control_table = local_data_model.data_frame(
         {
             attribute_key_column: record_value_columns,
@@ -730,7 +729,7 @@ def pivot_specification(
     assert len(known_cols) == len(set(known_cols))
     record_map = RecordMap(
         blocks_in=RecordSpecification(
-            control_table=data_algebra.pandas_model.pd.DataFrame(
+            control_table=data_algebra.pandas_model.default_data_model.pd.DataFrame(
                 {
                     col_name_key: value_cols,
                     col_value_key: value_cols,
@@ -770,7 +769,7 @@ def unpivot_specification(
     assert len(known_cols) == len(set(known_cols))
     record_map = RecordMap(
         blocks_out=RecordSpecification(
-            control_table=data_algebra.pandas_model.pd.DataFrame(
+            control_table=data_algebra.pandas_model.default_data_model.pd.DataFrame(
                 {
                     col_name_key: value_cols,
                     col_value_key: value_cols,

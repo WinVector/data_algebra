@@ -5,7 +5,7 @@ import data_algebra.MySQL
 
 
 def test_sql_extend_shortening_1():
-    d = data_algebra.default_data_model.pd.DataFrame(
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"x": [1, 2, 3, 4, 5], "g": ["a", "b", "b", "a", "a"], "o": [5, 4, 3, 2, 1],}
     )
 
@@ -29,7 +29,7 @@ def test_sql_extend_shortening_1():
     assert isinstance(sql, str)
     assert sql.lower().count("select") == 1
 
-    expect = data_algebra.default_data_model.pd.DataFrame(
+    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {
             "x": [1, 2, 3, 4, 5],
             "g": ["a", "b", "b", "a", "a"],
@@ -62,7 +62,7 @@ def test_sql_extend_shortening_1():
 
 
 def test_ops_extend_shortening_1():
-    d = data_algebra.default_data_model.pd.DataFrame(
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"x": [1, 2, 3, 4, 5], "g": ["a", "b", "b", "a", "a"], "o": [5, 4, 3, 2, 1],}
     )
 
@@ -77,7 +77,7 @@ def test_ops_extend_shortening_1():
     assert isinstance(ops, data_algebra.data_ops.ExtendNode)
     assert isinstance(ops.sources[0], data_algebra.data_ops.TableDescription)
 
-    expect = data_algebra.default_data_model.pd.DataFrame(
+    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {
             "x": [1, 2, 3, 4, 5],
             "g": ["a", "b", "b", "a", "a"],

@@ -13,7 +13,7 @@ import data_algebra.solutions
 
 
 def test_rank_to_average():
-    pd = data_algebra.default_data_model.pd
+    pd = data_algebra.pandas_model.default_data_model.pd
     d = pd.DataFrame({
         'v': [1, 1, 2, 2, 3, 3],
         'g': ['a', 'a', 'a', 'b', 'b', 'b'],

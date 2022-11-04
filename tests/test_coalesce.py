@@ -5,7 +5,7 @@ import data_algebra.util
 
 
 def test_coalesce_one():
-    d = data_algebra.default_data_model.pd.DataFrame(
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {
             "a": ["a", "b", None, None],
             "b": ["c", None, "d", None],
@@ -16,7 +16,7 @@ def test_coalesce_one():
 
     ops = describe_table(d, table_name="d").extend({"z": "x %?% y", "c": "a %?% b"})
 
-    expect = data_algebra.default_data_model.pd.DataFrame(
+    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {
             "a": ["a", "b", None, None],
             "b": ["c", None, "d", None],

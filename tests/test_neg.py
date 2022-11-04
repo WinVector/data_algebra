@@ -5,7 +5,7 @@ from data_algebra.data_ops import *
 
 
 def test_neg():
-    d_local = data_algebra.default_data_model.pd.DataFrame(
+    d_local = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {
             "subjectID": [1, 1, 2, 2],
             "surveyCategory": [
@@ -22,7 +22,7 @@ def test_neg():
         table_name="d", column_names=["subjectID", "surveyCategory", "assessmentTotal"]
     ).extend({"v": "-assessmentTotal"})
 
-    expect = data_algebra.default_data_model.pd.DataFrame(
+    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {
             "subjectID": [1, 1, 2, 2],
             "surveyCategory": [

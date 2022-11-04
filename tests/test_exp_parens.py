@@ -7,7 +7,7 @@ from data_algebra.data_ops import *
 
 
 def test_exp_parens():
-    d_local = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2, 3]})
+    d_local = data_algebra.pandas_model.default_data_model.pd.DataFrame({"x": [1, 2, 3]})
     ops = data(d_local).extend({"p": "(x+1).exp()"})
     ops_str = str(ops)
     assert "((" not in ops_str

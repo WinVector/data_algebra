@@ -7,17 +7,17 @@ import pytest
 
 
 def test_join_variations_1():
-    d1 = data_algebra.default_data_model.pd.DataFrame(
+    d1 = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"a": [1, 1, 2], "b": ["x", "x", "y"], "z": [4, 5, 6],}
     )
-    d2 = data_algebra.default_data_model.pd.DataFrame(
+    d2 = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"a": [1, 1, 2], "b": ["x", "y", "y"], "q": [7, 8, 9],}
     )
 
     ops1 = describe_table(d1, table_name="d1").natural_join(
         b=describe_table(d2, table_name="d2"), by=["a"], jointype="inner",
     )
-    expect1 = data_algebra.default_data_model.pd.DataFrame(
+    expect1 = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {
             "a": [1, 1, 1, 1, 2],
             "b": ["x", "x", "x", "x", "y"],
@@ -32,7 +32,7 @@ def test_join_variations_1():
     ops2 = describe_table(d1, table_name="d1").natural_join(
         b=describe_table(d2, table_name="d2"), by=["a", "b"], jointype="inner",
     )
-    expect2 = data_algebra.default_data_model.pd.DataFrame(
+    expect2 = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"a": [1, 1, 2], "b": ["x", "x", "y"], "z": [4, 5, 6], "q": [7, 7, 9],}
     )
     data_algebra.test_util.check_transform(

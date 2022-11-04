@@ -5,7 +5,7 @@ import data_algebra.util
 
 
 def test_complex_expr_arith():
-    d = data_algebra.default_data_model.pd.DataFrame(
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {
             "a": [
                 0.3822317761382147,
@@ -118,7 +118,7 @@ def test_complex_expr_arith():
         }
     )
     ops = describe_table(d, table_name="d").extend({"res": "a*b*c + u*v*w + x*y*z"})
-    expect = data_algebra.default_data_model.pd.DataFrame(
+    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {
             "a": [
                 0.3822317761382147,
@@ -246,7 +246,7 @@ def test_complex_expr_arith():
 
 
 def test_complex_expr_logic():
-    d = data_algebra.default_data_model.pd.DataFrame(
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {
             "a": [True, True, False, True, False, False, True, False, False, True],
             "b": [True, True, True, False, False, True, True, True, False, True],
@@ -260,7 +260,7 @@ def test_complex_expr_logic():
         }
     )
     ops = describe_table(d, table_name="d").extend({"res": "a and b and c or u and v and w or x and y and z"})
-    expect = data_algebra.default_data_model.pd.DataFrame(
+    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {
             "a": [True, True, False, True, False, False, True, False, False, True],
             "b": [True, True, True, False, False, True, True, True, False, True],
@@ -278,7 +278,7 @@ def test_complex_expr_logic():
 
 
 def test_complex_expr_arith_minus():
-    d = data_algebra.default_data_model.pd.DataFrame(
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {
             "a": [
                 0.3822317761382147,
@@ -341,7 +341,7 @@ def test_complex_expr_arith_minus():
 
 
 def test_complex_expr_arith_minus_2():
-    d = data_algebra.default_data_model.pd.DataFrame(
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {
             "a": [
                 0.3822317761382147,

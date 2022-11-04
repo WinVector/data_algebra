@@ -74,7 +74,7 @@ class SQLiteDFModel(data_algebra.data_model.DataModel):
 
 
 def test_data_model_isolation():
-    pd = data_algebra.default_data_model.pd
+    pd = data_algebra.pandas_model.default_data_model.pd
     sql_df_model = SQLiteDFModel()
     t0 = sql_df_model.data_frame(pd.DataFrame({'x': [1, 2, 3]}))
     ops = (

@@ -11,12 +11,12 @@ import data_algebra.util
 
 
 def test_join_opt_1():
-    d1 = data_algebra.default_data_model.pd.DataFrame(
+    d1 = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"x": [1, 2, 3, 4], "y": [5, 6, 7, 8], "z": [9, 10, None, None]}
     )
     td1 = describe_table(d1, table_name="d1")
 
-    d2 = data_algebra.default_data_model.pd.DataFrame(
+    d2 = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"x": [1, 2, 3, 4], "y": [5, 6, 7, 8], "z": [90, None, 110, None]}
     )
     td2 = describe_table(d2, table_name="d2")
@@ -45,7 +45,7 @@ def test_join_opt_1():
 
     ops_list = [ops_sel, ops_drop, ops_sel_2, ops_drop_2]
 
-    expect = data_algebra.default_data_model.pd.DataFrame(
+    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"x": [1, 2, 3, 4], "y": [5, 6, 7, 8], "z": [9, 10, 110, None]}
     )
 

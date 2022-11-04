@@ -6,7 +6,7 @@ import data_algebra.MySQL
 
 def test_use_1():
     # some example data
-    d = data_algebra.default_data_model.pd.DataFrame(
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {
             "ID": [1, 1, 2, 3, 4, 4, 4, 4, 5, 5, 6],
             "OP": ["A", "B", "A", "D", "C", "A", "D", "B", "A", "B", "B"],
@@ -28,11 +28,11 @@ def test_use_1():
 def test_use_2():
     # https://github.com/WinVector/data_algebra/blob/main/Examples/Macros/use.ipynb
     # some example data
-    d1 = data_algebra.default_data_model.pd.DataFrame(
+    d1 = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"ID": [2, 3, 7, 7], "OP": ["A", "B", "B", "D"],}
     )
 
-    d2 = data_algebra.default_data_model.pd.DataFrame(
+    d2 = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {
             "ID": [1, 1, 2, 3, 4, 2, 4, 4, 5, 5, 6],
             "OP": ["A", "B", "A", "D", "C", "A", "D", "B", "A", "B", "B"],
@@ -63,7 +63,7 @@ def test_use_2():
     count_cols = [c for c in ops.column_names if c.startswith("count_")]
     ops = ops.extend({f"{c}": f"{c}.coalesce_0()" for c in count_cols}).order_rows(keys)
 
-    expect = data_algebra.default_data_model.pd.DataFrame(
+    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {
             "ID": [1, 2, 3, 4, 5, 6, 7],
             "count_d1": [0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 2.0],

@@ -7,8 +7,8 @@ from typing import Any, List, Optional, Set, Union
 
 import numpy
 
-import data_algebra
 import data_algebra.util
+import data_algebra.pandas_model
 
 
 # for some ideas in capturing expressions in Python see:
@@ -1333,14 +1333,14 @@ def _can_find_method_by_name(op):
     # first check chosen mappings
     try:
         # noinspection PyUnusedLocal
-        check_val = data_algebra.default_data_model.user_fun_map[op]  # for KeyError
+        check_val = data_algebra.pandas_model.default_data_model.user_fun_map[op]  # for KeyError
         return True
     except KeyError:
         pass
     # check chosen mappings
     try:
         # noinspection PyUnusedLocal
-        check_val = data_algebra.default_data_model.impl_map[op]  # for KeyError
+        check_val = data_algebra.pandas_model.default_data_model.impl_map[op]  # for KeyError
         return True
     except KeyError:
         pass
@@ -1454,13 +1454,13 @@ class Expression(Term):
         # check user fns
         # first check chosen mappings
         try:
-            method_to_call = data_algebra.default_data_model.user_fun_map[self.op]
+            method_to_call = data_algebra.pandas_model.default_data_model.user_fun_map[self.op]
             return method_to_call(*args)
         except KeyError:
             pass
         # check chosen mappings
         try:
-            method_to_call = data_algebra.default_data_model.impl_map[self.op]
+            method_to_call = data_algebra.pandas_model.default_data_model.impl_map[self.op]
             return method_to_call(*args)
         except KeyError:
             pass

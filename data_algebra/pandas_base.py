@@ -3,7 +3,7 @@ Base class for adapters for Pandas-like APIs
 """
 
 from abc import ABC
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Dict
 import datetime
 import types
 import numbers
@@ -27,52 +27,6 @@ def _negate_or_subtract(*args):
     if len(args) == 2:
         return numpy.subtract(args[0], args[1])
     raise ValueError("unexpected number of arguments in _negate_or_subtract")
-
-
-def _calc_date_diff(x0, x1):
-    # x is a pandas Series or list of datetime.date compatible types
-    x0 = data_algebra.default_data_model.pd.Series(x0)
-    x1 = data_algebra.default_data_model.pd.Series(x1)
-    x0_dates = data_algebra.default_data_model.pd.to_datetime(x0).dt.date.copy()
-    x1_dates = data_algebra.default_data_model.pd.to_datetime(x1).dt.date.copy()
-    deltas = [(x0_dates[i] - x1_dates[i]).days for i in range(len(x0_dates))]
-    return deltas
-
-
-def _calc_base_Sunday(x):
-    # x is a pandas Series or list of datetime.date compatible types
-    x = data_algebra.default_data_model.pd.Series(x)
-    x_dates = data_algebra.default_data_model.pd.to_datetime(x).dt.date.copy()
-    res = [xi - datetime.timedelta(days=(xi.weekday() + 1) % 7) for xi in x_dates]
-    return res
-
-
-def _calc_week_of_Year(x):
-    # x is a pandas Series or list of datetime.date compatible types
-    # TODO: better impl
-    # Note was getting inconsistent results on vectorized methods
-    x = data_algebra.default_data_model.pd.Series(x)
-    x_dates = data_algebra.default_data_model.pd.to_datetime(x).dt.date.copy()
-    cur_dates = [datetime.date(dti.year, dti.month, dti.day) for dti in x_dates]
-    base_dates = [datetime.date(dti.year, 1, 1) for dti in x_dates]
-    base_dates = _calc_base_Sunday(base_dates)
-    deltas = [(cur_dates[i] - base_dates[i]).days for i in range(len(cur_dates))]
-    res = [di // 7 for di in deltas]
-    res = numpy.maximum(res, 1)
-    return res
-
-
-def _coalesce(a, b):
-    a_is_series = isinstance(a, data_algebra.default_data_model.pd.Series)
-    b_is_series = isinstance(b, data_algebra.default_data_model.pd.Series)
-    if (not a_is_series) and (not b_is_series):
-        raise ValueError("at least one argument must be a Pandas series")
-    if not a_is_series:
-        a = data_algebra.default_data_model.pd.Series(numpy.array([a] * len(b)))
-    if not b_is_series:
-        b = data_algebra.default_data_model.pd.Series(numpy.array([b] * len(a)))
-    res = a.combine_first(b)
-    return res
 
 
 def _type_safe_equal(a, b):
@@ -106,35 +60,6 @@ def _type_safe_is_in(a, b):
         if not data_algebra.util.compatible_types([type_a, type_b]):
             raise TypeError(f"can't check for an {type_a} in a set of {type_b}'s")
     return numpy.isin(a, b)
-
-
-def _map_v(a, value_map, default_value=None):
-    """Map values to values."""
-    if len(value_map) > 0:
-        type_a = data_algebra.util.guess_carried_scalar_type(a)
-        type_k = {
-            data_algebra.util.map_type_to_canonical(type(v)) for v in value_map.keys()
-        }
-        if not data_algebra.util.compatible_types(type_k):
-            raise TypeError(f"multiple types in dictionary keys: {type_k} in mapv()")
-        type_k = list(type_k)[0]
-        if not data_algebra.util.compatible_types([type_a, type_k]):
-            raise TypeError(f"can't map {type_a} from a dict of {type_k}'s in mapv()")
-        type_v = {
-            data_algebra.util.map_type_to_canonical(type(v)) for v in value_map.values()
-        }
-        if not data_algebra.util.compatible_types(type_v):
-            raise TypeError(f"multiple types in dictionary values: {type_v} in mapv()")
-        type_v = list(type_v)[0]
-        if default_value is not None:
-            type_d = data_algebra.util.guess_carried_scalar_type(default_value)
-            if not data_algebra.util.compatible_types([type_d, type_v]):
-                raise TypeError(f"default is {type_d} for {type_v} values in mapv()'s")
-    # https://pandas.pydata.org/docs/reference/api/pandas.Series.map.html
-    a = data_algebra.default_data_model.pd.Series(a)
-    a = a.map(value_map, na_action="ignore")
-    a[data_algebra.default_data_model.bad_column_positions(a)] = default_value
-    return numpy.array(a.values)
 
 
 def _k_and(*args):
@@ -176,120 +101,6 @@ def _where_expr(*args):
     return numpy.where(cond, a, b)
 
 
-def _if_else_expr(*args):
-    """
-    if_else(cond, a, b) returns a for positions where cond is True, b when cond is False, None otherwise.
-    """
-    assert len(args) == 3
-    cond = args[0]
-    a = args[1]
-    b = args[2]
-    res = numpy.where(cond, a, b)
-    bad_posns = data_algebra.default_data_model.bad_column_positions(cond)
-    if numpy.any(bad_posns):
-        res[bad_posns] = None
-    return res
-
-
-def populate_impl_map(data_model) -> Dict[str, Callable]:
-    """
-    Map symbols to implementations.
-    """
-    impl_map = {
-        "==": _type_safe_equal,
-        "=": _type_safe_equal,
-        "!=": _type_safe_not_equal,
-        "<>": _type_safe_not_equal,
-        "<": numpy.less,  # already checks types
-        "<=": numpy.less_equal,  # already checks types
-        ">": numpy.greater,  # already checks types
-        ">=": numpy.greater_equal,  # already checks types
-        "+": _k_add,
-        "-": _negate_or_subtract,
-        "neg": numpy.negative,
-        "*": _k_mul,
-        "/": numpy.divide,
-        "//": numpy.floor_divide,
-        "%/%": numpy.divide,
-        "%": numpy.mod,
-        "**": numpy.power,
-        "and": _k_and,
-        "&": numpy.bitwise_and,
-        "or": _k_or,
-        "|": _k_or,
-        "xor": numpy.logical_xor,
-        "^": numpy.logical_xor,
-        "not": numpy.bitwise_or,
-        "where": _where_expr,
-        "if_else": _if_else_expr,
-        "is_nan": data_model.isnan,
-        "is_inf": data_model.isinf,
-        "is_null": data_model.isnull,
-        "is_bad": data_model.bad_column_positions,
-        "is_in": _type_safe_is_in,
-        "concat": lambda a, b: numpy.char.add(
-            numpy.asarray(a, dtype=str), numpy.asarray(b, dtype=str)
-        ),
-        "coalesce": lambda a, b: _coalesce(a, b),  # assuming Pandas series
-        "connected_components": lambda a, b: data_algebra.connected_components.connected_components(
-            a, b
-        ),
-        "co_equalizer": lambda a, b: data_algebra.connected_components.connected_components(
-            a, b
-        ),
-        "mapv": _map_v,
-        # additonal fns
-        # x is a pandas Series
-        "as_int64": lambda x: x.astype("int64").copy(),
-        "as_str": lambda x: x.astype("str").copy(),
-        "trimstr": lambda x, start, stop: x.str.slice(start=start, stop=stop),
-        "datetime_to_date": lambda x: x.dt.date.copy(),
-        "parse_datetime": lambda x, format: data_algebra.default_data_model.pd.to_datetime(
-            x, format=format
-        ),
-        "parse_date": lambda x, format: data_algebra.default_data_model.pd.to_datetime(
-            x, format=format
-        ).dt.date.copy(),
-        "format_datetime": lambda x, format: x.dt.strftime(date_format=format),
-        "format_date": lambda x, format: data_algebra.default_data_model.pd.to_datetime(
-            x
-        ).dt.strftime(date_format=format),
-        "dayofweek": lambda x: 1
-        + (
-            (
-                data_algebra.default_data_model.pd.to_datetime(x).dt.dayofweek.astype(
-                    "int64"
-                )
-                + 1
-            )
-            % 7
-        ),
-        "dayofyear": lambda x: data_algebra.default_data_model.pd.to_datetime(x)
-        .dt.dayofyear.astype("int64")
-        .copy(),
-        "weekofyear": _calc_week_of_Year,
-        "dayofmonth": lambda x: data_algebra.default_data_model.pd.to_datetime(x)
-        .dt.day.astype("int64")
-        .copy(),
-        "month": lambda x: data_algebra.default_data_model.pd.to_datetime(x)
-        .dt.month.astype("int64")
-        .copy(),
-        "quarter": lambda x: data_algebra.default_data_model.pd.to_datetime(x)
-        .dt.quarter.astype("int64")
-        .copy(),
-        "year": lambda x: data_algebra.default_data_model.pd.to_datetime(x)
-        .dt.year.astype("int64")
-        .copy(),
-        "timestamp_diff": lambda c1, c2: [
-            data_algebra.default_data_model.pd.Timedelta(c1[i] - c2[i]).total_seconds()
-            for i in range(len(c1))
-        ],
-        "date_diff": _calc_date_diff,
-        "base_Sunday": _calc_base_Sunday,
-    }
-    return impl_map
-
-
 # base class for Pandas-like API realization
 class PandasModelBase(data_algebra.data_model.DataModel, ABC):
     """
@@ -308,7 +119,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             self, presentation_model_name=presentation_model_name
         )
         self.pd = pd
-        self.impl_map = populate_impl_map(data_model=self)
+        self.impl_map = self._populate_impl_map()
         self.transform_op_map = {"any_value": "first"}
         self.user_fun_map = dict()
         self._method_dispatch_table = {
@@ -326,6 +137,190 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             "SQLNode": self.sql_proxy_step,
             "TableDescription": self.table_step,
         }
+
+    # implementations
+    
+    def _calc_date_diff(self, x0, x1):
+        # x is a pandas Series or list of datetime.date compatible types
+        x0 = self.pd.Series(x0)
+        x1 = self.pd.Series(x1)
+        x0_dates = self.pd.to_datetime(x0).dt.date.copy()
+        x1_dates = self.pd.to_datetime(x1).dt.date.copy()
+        deltas = [(x0_dates[i] - x1_dates[i]).days for i in range(len(x0_dates))]
+        return deltas
+
+    def _calc_base_Sunday(self, x):
+        # x is a pandas Series or list of datetime.date compatible types
+        x = self.pd.Series(x)
+        x_dates = self.pd.to_datetime(x).dt.date.copy()
+        res = [xi - datetime.timedelta(days=(xi.weekday() + 1) % 7) for xi in x_dates]
+        return res
+
+    def _calc_week_of_Year(self, x):
+        # x is a pandas Series or list of datetime.date compatible types
+        # TODO: better impl
+        # Note was getting inconsistent results on vectorized methods
+        x = self.pd.Series(x)
+        x_dates = self.pd.to_datetime(x).dt.date.copy()
+        cur_dates = [datetime.date(dti.year, dti.month, dti.day) for dti in x_dates]
+        base_dates = [datetime.date(dti.year, 1, 1) for dti in x_dates]
+        base_dates = self._calc_base_Sunday(base_dates)
+        deltas = [(cur_dates[i] - base_dates[i]).days for i in range(len(cur_dates))]
+        res = [di // 7 for di in deltas]
+        res = numpy.maximum(res, 1)
+        return res
+
+    def _coalesce(self, a, b):
+        a_is_series = isinstance(a, self.pd.Series)
+        b_is_series = isinstance(b, self.pd.Series)
+        if (not a_is_series) and (not b_is_series):
+            raise ValueError("at least one argument must be a Pandas series")
+        if not a_is_series:
+            a = self.pd.Series(numpy.array([a] * len(b)))
+        if not b_is_series:
+            b = self.pd.Series(numpy.array([b] * len(a)))
+        res = a.combine_first(b)
+        return res
+
+    def _map_v(self, a, value_map, default_value=None):
+        """Map values to values."""
+        if len(value_map) > 0:
+            type_a = data_algebra.util.guess_carried_scalar_type(a)
+            type_k = {
+                data_algebra.util.map_type_to_canonical(type(v)) for v in value_map.keys()
+            }
+            if not data_algebra.util.compatible_types(type_k):
+                raise TypeError(f"multiple types in dictionary keys: {type_k} in mapv()")
+            type_k = list(type_k)[0]
+            if not data_algebra.util.compatible_types([type_a, type_k]):
+                raise TypeError(f"can't map {type_a} from a dict of {type_k}'s in mapv()")
+            type_v = {
+                data_algebra.util.map_type_to_canonical(type(v)) for v in value_map.values()
+            }
+            if not data_algebra.util.compatible_types(type_v):
+                raise TypeError(f"multiple types in dictionary values: {type_v} in mapv()")
+            type_v = list(type_v)[0]
+            if default_value is not None:
+                type_d = data_algebra.util.guess_carried_scalar_type(default_value)
+                if not data_algebra.util.compatible_types([type_d, type_v]):
+                    raise TypeError(f"default is {type_d} for {type_v} values in mapv()'s")
+        # https://pandas.pydata.org/docs/reference/api/pandas.Series.map.html
+        a = self.pd.Series(a)
+        a = a.map(value_map, na_action="ignore")
+        a[self.bad_column_positions(a)] = default_value
+        return numpy.array(a.values)
+
+    def _if_else_expr(self, *args):
+        """
+        if_else(cond, a, b) returns a for positions where cond is True, b when cond is False, None otherwise.
+        """
+        assert len(args) == 3
+        cond = args[0]
+        a = args[1]
+        b = args[2]
+        res = numpy.where(cond, a, b)
+        bad_posns = self.bad_column_positions(cond)
+        if numpy.any(bad_posns):
+            res[bad_posns] = None
+        return res
+
+    def _populate_impl_map(self) -> Dict[str, Callable]:
+        """
+        Map symbols to implementations.
+        """
+        impl_map = {
+            "==": _type_safe_equal,
+            "=": _type_safe_equal,
+            "!=": _type_safe_not_equal,
+            "<>": _type_safe_not_equal,
+            "<": numpy.less,  # already checks types
+            "<=": numpy.less_equal,  # already checks types
+            ">": numpy.greater,  # already checks types
+            ">=": numpy.greater_equal,  # already checks types
+            "+": _k_add,
+            "-": _negate_or_subtract,
+            "neg": numpy.negative,
+            "*": _k_mul,
+            "/": numpy.divide,
+            "//": numpy.floor_divide,
+            "%/%": numpy.divide,
+            "%": numpy.mod,
+            "**": numpy.power,
+            "and": _k_and,
+            "&": numpy.bitwise_and,
+            "or": _k_or,
+            "|": _k_or,
+            "xor": numpy.logical_xor,
+            "^": numpy.logical_xor,
+            "not": numpy.bitwise_or,
+            "where": _where_expr,
+            "if_else": lambda *args: self._if_else_expr(*args),
+            "is_nan": self.isnan,
+            "is_inf": self.isinf,
+            "is_null": self.isnull,
+            "is_bad": self.bad_column_positions,
+            "is_in": _type_safe_is_in,
+            "concat": lambda a, b: numpy.char.add(
+                numpy.asarray(a, dtype=str), numpy.asarray(b, dtype=str)
+            ),
+            "coalesce": lambda a, b: self._coalesce(a, b),  # assuming Pandas series
+            "connected_components": lambda a, b: data_algebra.connected_components.connected_components(
+                a, b
+            ),
+            "co_equalizer": lambda a, b: data_algebra.connected_components.connected_components(
+                a, b
+            ),
+            "mapv": lambda a, value_map, default_value=None: self._map_v(a, value_map, default_value),
+            # additonal fns
+            # x is a pandas Series
+            "as_int64": lambda x: x.astype("int64").copy(),
+            "as_str": lambda x: x.astype("str").copy(),
+            "trimstr": lambda x, start, stop: x.str.slice(start=start, stop=stop),
+            "datetime_to_date": lambda x: x.dt.date.copy(),
+            "parse_datetime": lambda x, format: self.pd.to_datetime(
+                x, format=format
+            ),
+            "parse_date": lambda x, format: self.pd.to_datetime(
+                x, format=format
+            ).dt.date.copy(),
+            "format_datetime": lambda x, format: x.dt.strftime(date_format=format),
+            "format_date": lambda x, format: self.pd.to_datetime(
+                x
+            ).dt.strftime(date_format=format),
+            "dayofweek": lambda x: 1
+            + (
+                (
+                    self.pd.to_datetime(x).dt.dayofweek.astype(
+                        "int64"
+                    )
+                    + 1
+                )
+                % 7
+            ),
+            "dayofyear": lambda x: self.pd.to_datetime(x)
+            .dt.dayofyear.astype("int64")
+            .copy(),
+            "weekofyear": lambda x: self._calc_week_of_Year(x),
+            "dayofmonth": lambda x: self.pd.to_datetime(x)
+            .dt.day.astype("int64")
+            .copy(),
+            "month": lambda x: self.pd.to_datetime(x)
+            .dt.month.astype("int64")
+            .copy(),
+            "quarter": lambda x: self.pd.to_datetime(x)
+            .dt.quarter.astype("int64")
+            .copy(),
+            "year": lambda x: self.pd.to_datetime(x)
+            .dt.year.astype("int64")
+            .copy(),
+            "timestamp_diff": lambda c1, c2: [
+                self.pd.Timedelta(c1[i] - c2[i]).total_seconds()
+                for i in range(len(c1))
+            ],
+            "date_diff": lambda x0, x1: self._calc_date_diff(x0, x1),
+            "base_Sunday": lambda x: self._calc_base_Sunday(x),
+        }
+        return impl_map
 
     # utils
 

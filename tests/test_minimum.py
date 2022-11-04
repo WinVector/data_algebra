@@ -4,7 +4,7 @@ import data_algebra.test_util
 
 
 def test_minimum_1():
-    d = data_algebra.default_data_model.pd.DataFrame(
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"x": [1, 2, 3, 4, 5, 6], "g": [1, 1, 1, 2, 2, 2],}
     )
 
@@ -14,7 +14,7 @@ def test_minimum_1():
         .extend({"xl": "x.minimum(x_g_max - 1)"})
     )
 
-    expect = data_algebra.default_data_model.pd.DataFrame(
+    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {
             "x": [1, 2, 3, 4, 5, 6],
             "g": [1, 1, 1, 2, 2, 2],

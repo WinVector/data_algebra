@@ -1,6 +1,3 @@
-import numpy
-
-import pytest
 
 import data_algebra
 from data_algebra.data_ops import *
@@ -9,7 +6,7 @@ import data_algebra.SQLite
 
 
 def test_with_query_example_1():
-    d = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2, 3]})
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame({"x": [1, 2, 3]})
     ops = (
         describe_table(d, table_name="d")
         .extend({"z": "x + 1"})
@@ -19,7 +16,7 @@ def test_with_query_example_1():
 
     res_pandas = ops.transform(d)
 
-    expect = data_algebra.default_data_model.pd.DataFrame(
+    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"x": [1, 2, 3], "z": [2, 3, 4], "q": [4, 5, 6], "h": [7, 8, 9]}
     )
 
@@ -29,11 +26,11 @@ def test_with_query_example_1():
 
 
 def test_with_query_example_2():
-    d1 = data_algebra.default_data_model.pd.DataFrame(
+    d1 = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"k": [1, 2, 3], "x": [5, 10, 15],}
     )
 
-    d2 = data_algebra.default_data_model.pd.DataFrame(
+    d2 = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"k": [1, 2, 3], "y": [-3, 2, 1],}
     )
 
@@ -50,7 +47,7 @@ def test_with_query_example_2():
 
     res_pandas = ops.eval({"d1": d1, "d2": d2})
 
-    expect = data_algebra.default_data_model.pd.DataFrame(
+    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {
             "k": [1, 2, 3],
             "x": [5, 10, 15],

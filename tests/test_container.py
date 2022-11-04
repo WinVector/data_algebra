@@ -10,7 +10,7 @@ import data_algebra.MySQL
 
 
 def test_container_1():
-    d = data_algebra.default_data_model.pd.DataFrame(
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {
             "subjectID": [1, 1, 2, 2],
             "surveyCategory": [
@@ -50,7 +50,7 @@ def test_container_1():
     assert isinstance(sql, str)
     # print(sql)
 
-    expect = data_algebra.default_data_model.pd.DataFrame(
+    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {
             "subjectID": [1, 2],
             "diagnosis": ["withdrawal behavior", "positive re-framing"],
@@ -65,7 +65,7 @@ def test_container_1():
 
 
 def test_container_2():
-    d = data_algebra.default_data_model.pd.DataFrame(
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {
             "subjectID": [1, 1, 2, 2],
             "surveyCategory": [
@@ -100,7 +100,7 @@ def test_container_2():
             .ex()
         )
 
-    expect = data_algebra.default_data_model.pd.DataFrame(
+    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {
             "subjectID": [1, 2],
             "diagnosis": ["withdrawal behavior", "positive re-framing"],
@@ -113,7 +113,7 @@ def test_container_2():
 
 
 def test_container_2():
-    d = data_algebra.default_data_model.pd.DataFrame(
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {
             "subjectID": [1, 1, 2, 2],
             "surveyCategory": [

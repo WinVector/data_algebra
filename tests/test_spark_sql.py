@@ -20,7 +20,7 @@ def test_spark_sql():
 
 
 def test_spark_sql_insert():
-    pd = data_algebra.default_data_model.pd
+    pd = data_algebra.pandas_model.default_data_model.pd
     d = pd.DataFrame({
         'id': [1, 2, 3, 4],
         'x': [1.0, None, numpy.nan, numpy.inf],

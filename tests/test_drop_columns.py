@@ -5,10 +5,10 @@ from data_algebra.data_ops import *
 
 
 def test_drop_columns():
-    d = data_algebra.default_data_model.pd.DataFrame({"x": [1], "y": [2]})
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame({"x": [1], "y": [2]})
 
     ops = describe_table(d, "d").drop_columns(["x"])
 
-    expect = data_algebra.default_data_model.pd.DataFrame({"y": [2]})
+    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame({"y": [2]})
 
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
