@@ -6,6 +6,7 @@ lark
 google.cloud
 pyarrow
 google-cloud-bigquery
+db_dtypes
 
 [MySQL]
 sqlalchemy
