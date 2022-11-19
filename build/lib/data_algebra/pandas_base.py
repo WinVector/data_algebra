@@ -3,7 +3,7 @@ Base class for adapters for Pandas-like APIs
 """
 
 from abc import ABC
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, List, Optional
 import datetime
 import types
 import numbers
@@ -19,6 +19,47 @@ import data_algebra.connected_components
 
 
 # TODO: possibly import dask, Nvidia Rapids, modin, datatable versions
+
+
+def none_mark_scalar_or_length(v) -> Optional[int]:
+    """
+    Test if item is a scalar (returning None) if it is, else length of object.
+
+    :param v: value to test
+    :return: None if value is a scalar, else length.
+    """
+    # get some of the obvious types, and str (as str doesn't throw on len)
+    if isinstance(v, (type(None), str, int, float)):
+        return None  # obvious scalar
+    # len() throws on scalars other than str
+    try:
+        return len(v)
+    except TypeError:
+        return None  # len() failed, probably a scalar
+
+        
+def promote_scalar_to_array(vi, *, target_len: int) -> List:
+    """
+    Convert a scalar into a vector. Pass a non-trivial array through.
+
+    :param vi: value to promote to scalar
+    :target_len: length for vector
+    :return: list
+    """
+    assert isinstance(target_len, int)
+    assert target_len >= 0
+    if target_len <= 0:
+        return []
+    len_v = none_mark_scalar_or_length(vi)
+    # noinspection PyBroadException
+    if len_v is None:
+        return [vi] * target_len  # scalar
+    if len_v == target_len:
+        return vi
+    if len_v == 1:
+        return [vi[0]] * target_len  # TODO: see if we can eliminate this one
+    else:
+        raise ValueError("incompatible column lengths")
 
 
 def _negate_or_subtract(*args):
@@ -436,9 +477,10 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         res = db_handle.read_query("\n".join(op.sql))
         return res
 
-    def columns_to_frame_(self, cols, *, target_rows=0):
+    def columns_to_frame_(self, cols: Dict[str, Any], *, target_rows: Optional[int] = None):
         """
         Convert a dictionary of column names to series-like objects and scalars into a Pandas data frame.
+        Deal with special cases, such as some columns coming in as scalars (often from Panda aggregation).
 
         :param cols: dictionary mapping column names to columns
         :param target_rows: number of rows we are shooting for
@@ -446,46 +488,37 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         """
         # noinspection PyUnresolvedReferences
         assert isinstance(cols, dict)
+        assert isinstance(target_rows, (int, type(None)))
+        if target_rows is not None:
+            assert target_rows >= 0
         if len(cols) < 1:
-            return self.pd.DataFrame(cols)
-        for k, v in cols.items():
-            try:
-                target_rows = max(target_rows, len(v))
-            except TypeError:
-                target_rows = max(target_rows, 1)  # scalar
+            # all scalars, so nothing carrying index information
+            if target_rows is not None:
+                return self.pd.DataFrame({}, index=range(target_rows)).reset_index(drop=True, inplace=False)
+            else:
+                return self.pd.DataFrame({})
+        was_all_scalars = True
+        for v in cols.values():
+            ln = none_mark_scalar_or_length(v)
+            if ln is not None:
+                was_all_scalars = False
+                if target_rows is None:
+                    target_rows = ln
+                else:
+                    assert target_rows == ln
+        if was_all_scalars:
+            if target_rows is None:
+                target_rows = 1
+            # all scalars, so nothing carrying index information
+            promoted_cols = {k: promote_scalar_to_array(v, target_len=target_rows) for (k, v) in cols.items()}
+            return self.pd.DataFrame(promoted_cols, index=range(target_rows)).reset_index(drop=True, inplace=False)
+        assert target_rows is not None
         if target_rows < 1:
-            # noinspection PyBroadException
-            try:
-                res = self.pd.DataFrame(cols)
-                if res.shape[0] > 0:
-                    res = res.loc[[False] * res.shape[0], :].reset_index(
-                        drop=True, inplace=False
-                    )
-            except Exception:
-                res = self.pd.DataFrame({k: [] for k in cols.keys()})
-            return res
-
+            # no rows, so presuming no index information (shouldn't have come from an aggregation)
+            return self.pd.DataFrame({k: [] for k in cols.keys()})
         # agg can return scalars, which then can't be made into a self.pd.DataFrame
-        def promote_scalar(vi, *, target_len):
-            """
-            Convert a scalar into a vector.
-            """
-            # noinspection PyBroadException
-            try:
-                len_v = len(vi)
-                if len_v != target_len:
-                    if len_v == 0:
-                        return [None] * target_len
-                    elif len_v == 1:
-                        return [vi[0]] * target_len
-                    else:
-                        raise ValueError("incompatible column lengths")
-            except Exception:
-                return [vi] * target_len  # scalar
-            return vi
-
-        cols = {k: promote_scalar(v, target_len=target_rows) for (k, v) in cols.items()}
-        return self.pd.DataFrame(cols)
+        promoted_cols = {k: promote_scalar_to_array(v, target_len=target_rows) for (k, v) in cols.items()}
+        return self.pd.DataFrame(promoted_cols)
 
     def add_data_frame_columns_to_data_frame_(self, res, transient_new_frame):
         """
@@ -542,6 +575,15 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         """
         if op.node_name != "ExtendNode":
             raise TypeError("op was supposed to be a data_algebra.data_ops.ExtendNode")
+        res = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
+        if res.shape[0] <= 0:
+            # special case out no-row frame
+            incoming_col_set = set(res.columns)
+            v_dict = {k: [] for k in res.columns}
+            for k in op.ops.keys():
+                if k not in incoming_col_set:
+                    v_dict[k] = []
+            return self.pd.DataFrame(v_dict)
         window_situation = (
             op.windowed_situation
             or (len(op.partition_by) > 0)
@@ -549,7 +591,6 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         )
         if window_situation:
             op.check_extend_window_fns_()
-        res = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
         if not window_situation:
             with warnings.catch_warnings():
                 warnings.simplefilter(
@@ -569,7 +610,6 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                     col_list = col_list + [c]
                     col_set.add(c)
             order_cols = [c for c in col_list]  # must be partition by followed by order
-
             for (k, opk) in op.ops.items():
                 # assumes all args are column names or values, enforce this earlier
                 if len(opk.args) > 0:
@@ -751,10 +791,15 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         # agg can return scalars, which then can't be made into a self.pd.DataFrame
         res = self.columns_to_frame_(cols)
         res = res.reset_index(
-            drop=len(op.group_by) < 1
+            drop=(len(op.group_by) < 1) or (res.shape[0] <= 0)
         )  # grouping variables in the index
         missing_group_cols = set(op.group_by) - set(res.columns)
-        assert len(missing_group_cols) <= 0
+        if res.shape[0] > 0:
+            if len(missing_group_cols) != 0:
+                raise ValueError("Missing column groups")
+        else:
+            for g in missing_group_cols:
+                res[g] = []
         if "_data_table_temp_col" in res.columns:
             res = res.drop("_data_table_temp_col", axis=1, inplace=False)
         # double check shape is what we expect
@@ -873,6 +918,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             )
         left = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
         right = self._eval_value_source(op.sources[1], data_map=data_map, narrow=narrow)
+        if (left.shape[0] == 0) and (right.shape[0] == 0):
+            # pandas seems to not like this case
+            return self.pd.DataFrame({k: [] for k in op.columns_produced()})
         common_cols = set([c for c in left.columns]).intersection(
             [c for c in right.columns]
         )

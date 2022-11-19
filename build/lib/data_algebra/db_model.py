@@ -844,7 +844,7 @@ class DBModel:
 
     def prepare_connection(self, conn):
         """
-        Do any augmentation or preperation of a database connection. Example: adding stored procedures.
+        Do any augmentation or preparation of a database connection. Example: adding stored procedures.
         """
         pass
 
@@ -854,7 +854,7 @@ class DBModel:
     def execute(self, conn, q):
         """
 
-        :param conn: database connectionex
+        :param conn: database connection
         :param q: sql query
         """
         if isinstance(q, data_algebra.data_ops.ViewRepresentation):

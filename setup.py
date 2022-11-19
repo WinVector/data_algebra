@@ -41,7 +41,7 @@ setuptools.setup(
                 'google.cloud', 'pyarrow', 'google-cloud-bigquery',
                 'sqlalchemy', 'psycopg2',
                 'pymysql',
-                'pyspark',
+                'pyspark'
                 ],
     },
     platforms=['any'],
@@ -56,6 +56,8 @@ setuptools.setup(
           'Programming Language :: Python :: 3.7',
           'Programming Language :: Python :: 3.8',
           'Programming Language :: Python :: 3.9',
+          'Programming Language :: Python :: 3.10',
+          'Programming Language :: Python :: 3.11',
           'License :: OSI Approved :: BSD License',
     ],
     long_description=LONG_DESCRIPTION,

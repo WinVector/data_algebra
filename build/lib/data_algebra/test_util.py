@@ -390,7 +390,8 @@ def check_transform_on_handles(
         }
         empty_res = ops.eval(empty_map)
         assert local_data_model.is_appropriate_data_instance(empty_res)
-        assert set(empty_res.columns) == set(res.columns)
+        if set(empty_res.columns) != set(res.columns):
+            raise Exception("columns mismatch")
         if empty_produces_empty:
             assert empty_res.shape[0] == 0
         else:

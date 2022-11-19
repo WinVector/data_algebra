@@ -83,7 +83,6 @@ def _sqlite_remainder_expr(dbmodel, expression):
         + ")"
     )
 
-
 def _sqlite_logical_or_expr(dbmodel, expression):
     """
     Return SQL or.
@@ -110,6 +109,8 @@ SQLite_formatters = {
     "is_inf": _sqlite_is_inf_expr,
     "rand": _sqlite_RAND_expr,
     "remainder": _sqlite_remainder_expr,
+    "%": _sqlite_remainder_expr,
+    "mod": _sqlite_remainder_expr,
     "logical_or": _sqlite_logical_or_expr,
     "logical_and": _sqlite_logical_and_expr,
 }
@@ -318,6 +319,8 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         """
         Insert user functions into db.
         """
+        # # https://stackoverflow.com/questions/52416482/load-sqlite3-extension-in-python3-sqlite
+        # conn.enable_load_extension(True)
         # https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.create_function
         conn.create_function("is_bad", 1, _check_scalar_bad)
         conn.create_function("is_nan", 1, _check_scalar_nan)
