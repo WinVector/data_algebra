@@ -918,6 +918,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             )
         left = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
         right = self._eval_value_source(op.sources[1], data_map=data_map, narrow=narrow)
+        if (left.shape[0] == 0) and (right.shape[0] == 0):
+            # pandas seems to not like this case
+            return self.pd.DataFrame({k: [] for k in op.columns_produced()})
         common_cols = set([c for c in left.columns]).intersection(
             [c for c in right.columns]
         )
