@@ -22,7 +22,7 @@ class SQLiteDFModel(data_algebra.data_model.DataModel):
 
     def data_frame(self, arg=None) -> data_algebra.data_ops.TableDescription:
         """
-        Build a new emtpy data frame. Inserts table as a side effect.
+        Build a new empty data frame. Inserts table as a side effect.
 
         :param arg: optional argument passed to constructor.
         :return: data frame
