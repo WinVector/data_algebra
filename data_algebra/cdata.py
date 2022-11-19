@@ -333,7 +333,10 @@ def rowrecs_to_blocks(
                     nvals = numpy.asarray(dtemp[dcol])
                     if len(nvals) < 1:
                         nvals = [None] * numpy.sum(want)
-                    res.loc[want, vk] = nvals
+                    if numpy.all(want):
+                        res[vk] = nvals  # get around Pandas future warning
+                    else:
+                        res.loc[want, vk] = nvals
     # see about promoting composite columns to numeric
     for vk in set(value_keys):
         converted = local_data_model.to_numeric(res[vk], errors="coerce")
@@ -343,7 +346,7 @@ def rowrecs_to_blocks(
             res[vk] = converted
     if data.shape[0] < 1:
         # empty input produces emtpy output (with different column structure)
-        res = res.iloc[range(0), :].reset_index(drop=True)
+        res = res.iloc[range(0), :].reset_index(inplace=False, drop=True)
     if data.shape[0] <= 0:
         res = res.loc[range(0), :]
         res = res.reset_index(inplace=False, drop=True)
