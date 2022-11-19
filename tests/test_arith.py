@@ -21,7 +21,7 @@ def test_arith_1():
             "e": "x + y / 2",
             "f": "x*x + y*y",
             "g": "(x*x + y*y).sqrt()",
-            # 'h': 'x*x == y**2',  # TODO: get power working in SQLlite
+            'h': 'x*x == y**2',
         }
     )
 
@@ -33,6 +33,6 @@ def test_arith_1():
     expect["e"] = expect.x + (expect.y / 2)
     expect["f"] = (expect.x * expect.x) + (expect.y * expect.y)
     expect["g"] = numpy.sqrt(((expect.x * expect.x) + (expect.y * expect.y)))
-    # expect['h'] = expect.x == expect.y
+    expect['h'] = (expect.x * expect.x) == (expect.y)**2
 
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
