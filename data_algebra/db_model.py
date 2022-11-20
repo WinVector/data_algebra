@@ -928,6 +928,10 @@ class DBModel:
         # it refers to sqlite_master
         # this behavior seems to change if sqlalchemy is active
         # n.b. sqlalchemy tries to insert values on %
+        if d.shape[1] < 1:
+            # deal with no columns case
+            d = d.copy()
+            d["_index"] = range(d.shape[0])
         d.to_sql(name=table_name, con=conn, index=False)
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal

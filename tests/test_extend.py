@@ -2,9 +2,8 @@ import data_algebra
 import data_algebra.test_util
 import data_algebra.util
 from data_algebra.data_ops import *
-import data_algebra.PostgreSQL
 from data_algebra.test_util import formats_to_self
-
+import data_algebra.SQLite
 import pytest
 
 
@@ -143,7 +142,6 @@ def test_extend_catch_nonagg():
     d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"c": [1, 1, 1, 1], "g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4]}
     )
-
     with pytest.raises(ValueError):
         ops = describe_table(d, "d").extend({"y": "y"}, partition_by=["c", "g"])
 
@@ -162,8 +160,11 @@ def test_extend_empty_no_rows():
         "q": [],
         })
     assert data_algebra.test_util.equivalent_frames(res, expect)
-    # data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)  # not us, sqlalchemy can't insert no-columns
-
+    with data_algebra.SQLite.example_handle() as hdl:
+        hdl.insert_table(d, table_name="d")
+        res_sql = hdl.read_query(ops)
+    assert data_algebra.test_util.equivalent_frames(res_sql, expect)
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
 
 
 def test_extend_empty_with_rows():
@@ -180,4 +181,8 @@ def test_extend_empty_with_rows():
         "q": ["1.2", "1.2", "1.2"],
         })
     assert data_algebra.test_util.equivalent_frames(res, expect)
-    # data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)  # not us, sqlalchemy can't insert no-columns
+    with data_algebra.SQLite.example_handle() as hdl:
+        hdl.insert_table(d, table_name="d")
+        res_sql = hdl.read_query(ops)
+    assert data_algebra.test_util.equivalent_frames(res_sql, expect)
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
