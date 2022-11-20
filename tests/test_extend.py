@@ -8,6 +8,20 @@ from data_algebra.test_util import formats_to_self
 import pytest
 
 
+
+def test_extend_0():
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+        {"x": [1, 2, 3]}
+    )
+    ops = describe_table(d, "d").extend({"x": "x + 1"})
+    res = ops.transform(d)
+    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+        {"x": [2, 3, 4]}
+    )
+    assert data_algebra.test_util.equivalent_frames(res, expect)
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+
+
 def test_extend_0():
     d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"c": [1, 1, 1, 1], "g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4]}
