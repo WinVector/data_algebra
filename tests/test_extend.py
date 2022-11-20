@@ -9,15 +9,22 @@ import pytest
 
 
 
-def test_extend_0():
+def test_extend_0v():
     d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
         {"x": [1, 2, 3]}
     )
-    ops = describe_table(d, "d").extend({"x": "x + 1"})
+    ops = describe_table(d, "d").extend({
+        "x": "x + 1",
+        "y": 1.2,
+        "z": "1.2",
+        "q": "'1.2'"})
     res = ops.transform(d)
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
-        {"x": [2, 3, 4]}
-    )
+    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame({
+        "x": [2, 3, 4],
+        "y": [1.2, 1.2, 1.2],
+        "z": [1.2, 1.2, 1.2],
+        "q": ["1.2", "1.2", "1.2"],
+        })
     assert data_algebra.test_util.equivalent_frames(res, expect)
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
 
@@ -139,3 +146,38 @@ def test_extend_catch_nonagg():
 
     with pytest.raises(ValueError):
         ops = describe_table(d, "d").extend({"y": "y"}, partition_by=["c", "g"])
+
+
+def test_extend_empty_no_rows():
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame({})
+    ops = data_algebra.descr(d=d).extend({
+        "y": 1.2,
+        "z": "1.2",
+        "q": "'1.2'"
+    })
+    res = ops.transform(d)
+    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame({
+        "y": [],
+        "z": [],
+        "q": [],
+        })
+    assert data_algebra.test_util.equivalent_frames(res, expect)
+    # data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)  # TODO: add this to test
+
+
+
+def test_extend_empty_with_rows():
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame({}, index=range(3))
+    ops = data_algebra.descr(d=d).extend({
+        "y": 1.2,
+        "z": "1.2",
+        "q": "'1.2'"
+    })
+    res = ops.transform(d)
+    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame({
+        "y": [1.2, 1.2, 1.2],
+        "z": [1.2, 1.2, 1.2],
+        "q": ["1.2", "1.2", "1.2"],
+        })
+    assert data_algebra.test_util.equivalent_frames(res, expect)
+    # data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)  # TODO: add this to test
