@@ -54,12 +54,8 @@ def promote_scalar_to_array(vi, *, target_len: int) -> List:
     # noinspection PyBroadException
     if len_v is None:
         return [vi] * target_len  # scalar
-    if len_v == target_len:
-        return vi
-    if len_v == 1:
-        return [vi[0]] * target_len  # TODO: see if we can eliminate this one
-    else:
-        raise ValueError("incompatible column lengths")
+    assert len_v == target_len
+    return vi
 
 
 def _negate_or_subtract(*args):
