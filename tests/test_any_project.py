@@ -77,3 +77,22 @@ def test_any_project_logical():
         data=d,
         expect=expect,
         valid_for_empty = False)
+
+
+def test_any_project_scalar_produced():
+    # On Python 3.10.8
+    # Pandas 1.5.1
+    # on 2022-11-20
+    # the following creates scalars during the project, needing the 
+    # promote_scalar_to_array() treatment
+    pd = data_algebra.pandas_model.default_data_model.pd
+    d = pd.DataFrame({'a': [False, False]})
+    ops = (
+        descr(d=d)
+            .project({'any_a': 'a.any()'})
+        )
+    res = ops.transform(d)
+    expect = pd.DataFrame({
+        'any_a': [False]
+    })
+    assert data_algebra.test_util.equivalent_frames(res, expect)
