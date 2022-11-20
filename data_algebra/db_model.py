@@ -927,6 +927,7 @@ class DBModel:
         # Note: the Pandas to_sql() method appears to have SQLite hard-wired into it
         # it refers to sqlite_master
         # this behavior seems to change if sqlalchemy is active
+        # n.b. sqlalchemy tries to insert values on %
         d.to_sql(name=table_name, con=conn, index=False)
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal

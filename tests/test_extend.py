@@ -162,7 +162,7 @@ def test_extend_empty_no_rows():
         "q": [],
         })
     assert data_algebra.test_util.equivalent_frames(res, expect)
-    # data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)  # TODO: add this to test
+    # data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)  # not us, sqlalchemy can't insert no-columns
 
 
 
@@ -180,4 +180,4 @@ def test_extend_empty_with_rows():
         "q": ["1.2", "1.2", "1.2"],
         })
     assert data_algebra.test_util.equivalent_frames(res, expect)
-    # data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)  # TODO: add this to test
+    # data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)  # not us, sqlalchemy can't insert no-columns
