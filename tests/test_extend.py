@@ -198,3 +198,9 @@ def test_extend_empty_with_rows():
             res_sql = hdl.read_query(ops)
         assert data_algebra.test_util.equivalent_frames(res_sql, expect)
         data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+
+
+def test_extend_empty_decl_throws():
+    d = data_algebra.pandas_model.default_data_model.pd.DataFrame({})
+    with pytest.raises(AssertionError):
+        data_algebra.descr(d=d)
