@@ -151,7 +151,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         assert not isinstance(sources, OperatorPlatform)
         if not isinstance(column_names, tuple):
             column_names = tuple(column_names)
-        assert len(column_names) >= 0
+        assert len(column_names) > 0
         for v in column_names:
             assert isinstance(v, str)
         assert len(column_names) == len(set(column_names))

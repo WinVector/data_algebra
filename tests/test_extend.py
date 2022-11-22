@@ -147,42 +147,54 @@ def test_extend_catch_nonagg():
 
 
 def test_extend_empty_no_rows():
+    # if no-column data frames are allowed, get them right
     d = data_algebra.pandas_model.default_data_model.pd.DataFrame({})
-    ops = data_algebra.descr(d=d).extend({
-        "y": 1.2,
-        "z": "1.2",
-        "q": "'1.2'"
-    })
-    res = ops.transform(d)
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame({
-        "y": [],
-        "z": [],
-        "q": [],
+    try:
+        data_algebra.descr(d=d)
+    except AssertionError:
+        d = None
+    if d is not None:
+        ops = data_algebra.descr(d=d).extend({
+            "y": 1.2,
+            "z": "1.2",
+            "q": "'1.2'"
         })
-    assert data_algebra.test_util.equivalent_frames(res, expect)
-    with data_algebra.SQLite.example_handle() as hdl:
-        hdl.insert_table(d, table_name="d")
-        res_sql = hdl.read_query(ops)
-    assert data_algebra.test_util.equivalent_frames(res_sql, expect)
-    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+        res = ops.transform(d)
+        expect = data_algebra.pandas_model.default_data_model.pd.DataFrame({
+            "y": [],
+            "z": [],
+            "q": [],
+            })
+        assert data_algebra.test_util.equivalent_frames(res, expect)
+        with data_algebra.SQLite.example_handle() as hdl:
+            hdl.insert_table(d, table_name="d")
+            res_sql = hdl.read_query(ops)
+        assert data_algebra.test_util.equivalent_frames(res_sql, expect)
+        data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
 
 
 def test_extend_empty_with_rows():
+    # if no-column data frames are allowed, get them right
     d = data_algebra.pandas_model.default_data_model.pd.DataFrame({}, index=range(3))
-    ops = data_algebra.descr(d=d).extend({
-        "y": 1.2,
-        "z": "1.2",
-        "q": "'1.2'"
-    })
-    res = ops.transform(d)
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame({
-        "y": [1.2, 1.2, 1.2],
-        "z": [1.2, 1.2, 1.2],
-        "q": ["1.2", "1.2", "1.2"],
+    try:
+        data_algebra.descr(d=d)
+    except AssertionError:
+        d = None
+    if d is not None:
+        ops = data_algebra.descr(d=d).extend({
+            "y": 1.2,
+            "z": "1.2",
+            "q": "'1.2'"
         })
-    assert data_algebra.test_util.equivalent_frames(res, expect)
-    with data_algebra.SQLite.example_handle() as hdl:
-        hdl.insert_table(d, table_name="d")
-        res_sql = hdl.read_query(ops)
-    assert data_algebra.test_util.equivalent_frames(res_sql, expect)
-    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+        res = ops.transform(d)
+        expect = data_algebra.pandas_model.default_data_model.pd.DataFrame({
+            "y": [1.2, 1.2, 1.2],
+            "z": [1.2, 1.2, 1.2],
+            "q": ["1.2", "1.2", "1.2"],
+            })
+        assert data_algebra.test_util.equivalent_frames(res, expect)
+        with data_algebra.SQLite.example_handle() as hdl:
+            hdl.insert_table(d, table_name="d")
+            res_sql = hdl.read_query(ops)
+        assert data_algebra.test_util.equivalent_frames(res_sql, expect)
+        data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
