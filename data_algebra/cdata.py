@@ -213,7 +213,7 @@ def blocks_to_rowrecs(data, *, blocks_in: RecordSpecification, local_data_model=
     dtemp["FALSE_AGG_KEY"] = 1
     if len(blocks_in.record_keys) > 0:
         ideal = dtemp[blocks_in.record_keys + ["FALSE_AGG_KEY"]].copy()
-        res = ideal.groupby(blocks_in.record_keys)["FALSE_AGG_KEY"].agg("sum")
+        res = ideal.groupby(blocks_in.record_keys, observed=True)["FALSE_AGG_KEY"].agg("sum")
         ideal = local_data_model.data_frame(res).reset_index(drop=False)
         ideal["FALSE_AGG_KEY"] = 1
         ctemp = blocks_in.control_table[blocks_in.control_table_keys].copy()
@@ -231,9 +231,9 @@ def blocks_to_rowrecs(data, *, blocks_in: RecordSpecification, local_data_model=
     dtemp = dtemp.reset_index(drop=True)
     # start building up result frame
     if len(blocks_in.record_keys) > 0:
-        res = dtemp.groupby(blocks_in.record_keys)["FALSE_AGG_KEY"].agg("sum")
+        res = dtemp.groupby(blocks_in.record_keys, observed=True)["FALSE_AGG_KEY"].agg("sum")
     else:
-        res = dtemp.groupby("FALSE_AGG_KEY")["FALSE_AGG_KEY"].agg("sum")
+        res = dtemp.groupby("FALSE_AGG_KEY", observed=True)["FALSE_AGG_KEY"].agg("sum")
     res = local_data_model.data_frame(res).reset_index(drop=False)
     res.sort_values(by=blocks_in.record_keys, inplace=True)
     res = local_data_model.data_frame(res).reset_index(drop=True)
