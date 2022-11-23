@@ -59,7 +59,7 @@ def table_is_keyed_by_columns(table, column_names: Iterable[str]) -> bool:
         return True
     if len(column_names) < 1:
         return False
-    counts = table.groupby(column_names).size()
+    counts = table.groupby(column_names, observed=True).size()
     return max(counts) <= 1
 
 

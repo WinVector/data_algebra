@@ -634,11 +634,11 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                 ).reset_index(drop=True)
             subframe[standin_name] = 1
             if len(op.partition_by) > 0:
-                opframe = subframe.groupby(op.partition_by)
+                opframe = subframe.groupby(op.partition_by, observed=True)
                 #  Groupby preserves the order of rows within each group.
                 # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.groupby.html
             else:
-                opframe = subframe.groupby([standin_name])
+                opframe = subframe.groupby([standin_name], observed=True)
             # perform calculations
             for (k, opk) in op.ops.items():
                 # work on a slice of the data frame
@@ -753,7 +753,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                     )
         res["_data_table_temp_col"] = 1
         if len(op.group_by) > 0:
-            res = res.groupby(op.group_by)
+            res = res.groupby(op.group_by, observed=True)
         if len(op.ops) > 0:
             cols = {}
             for k, opk in op.ops.items():
