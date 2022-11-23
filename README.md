@@ -6,8 +6,9 @@ The primary purpose of the package is to support an easy to
 compose and maintain grammar of data processing steps that in turn can be used to generate
 database specific SQL. The package also implements the same transforms for Pandas DataFrames.
 
-A good introduction can be found [here](https://github.com/WinVector/data_algebra/blob/main/Examples/Introduction/data_algebra_Introduction.ipynb),
-and many worked examples are [here](https://github.com/WinVector/data_algebra/tree/main/Examples). A catalog of expression methods is found [here](https://github.com/WinVector/data_algebra/blob/main/Examples/Methods/op_catalog.csv). The pydoc documentation is [here](https://winvector.github.io/data_algebra/). And the [README](https://github.com/WinVector/data_algebra/blob/main/README.md) is a good place to check for news or updates.
+The package is [available on PyPi](https://pypi.org/project/data-algebra/), and can be installed with `pip install data_algebra`.
+
+A good introduction can be found [here](https://github.com/WinVector/data_algebra/blob/main/Examples/Introduction/data_algebra_Introduction.ipynb), and many worked examples are [here](https://github.com/WinVector/data_algebra/tree/main/Examples). A catalog of expression methods is found [here](https://github.com/WinVector/data_algebra/blob/main/Examples/Methods/op_catalog.csv). The pydoc documentation is [here](https://winvector.github.io/data_algebra/). And the [README](https://github.com/WinVector/data_algebra/blob/main/README.md) is a good place to check for news or updates.
 
 Currently, the system is primarily adapted and testing for Pandas, Google BigQuery, PostgreSQL, SQLite, and Spark. Porting and extension is designed to be easy.
 
