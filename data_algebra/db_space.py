@@ -81,8 +81,7 @@ class DBSpace(data_algebra.data_space.DataSpace):
         if return_data_model is None:
             return_data_model = data_algebra.pandas_model.default_data_model
         assert key in self.known_keys
-        tn = self.db_handle.db_model.quote_table_name(key)
-        d = self.db_handle.read_query(f"SELECT * FROM {tn}")
+        d = self.db_handle.read_table(key)
         d = return_data_model.data_frame(d)
         return d
 
@@ -112,9 +111,7 @@ class DBSpace(data_algebra.data_space.DataSpace):
             if key in self.known_keys:
                 self.db_handle.drop_table(key)
         self.known_keys.add(key)
-        tn = self.db_handle.db_model.quote_table_name(key)
-        self.db_handle.execute(f"CREATE TABLE {tn} AS {self.db_handle.to_sql(ops)}")
-        return self.describe(key)
+        return self.db_handle.create_table(table_name=key, q=ops)
 
     def describe(self, key: str) -> data_algebra.data_ops.TableDescription:
         """
