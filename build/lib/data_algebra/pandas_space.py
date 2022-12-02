@@ -1,6 +1,4 @@
 
-
-
 from typing import Optional, Set
 import data_algebra.data_model
 import data_algebra.data_ops
@@ -120,3 +118,5 @@ class PandasSpace(data_algebra.data_space.DataSpace):
         d = self.data_map[key]
         return data_algebra.data_ops.describe_table(d, table_name=key)
 
+    def close(self) -> None:
+        self.data_map = None
