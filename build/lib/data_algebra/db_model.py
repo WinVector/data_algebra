@@ -2338,9 +2338,34 @@ class DBHandle:
 
     def read_query(self, q):
         """
-        Return results of query as a Pandas table.
+        Return results of query as a Pandas data frame.
         """
         return self.db_model.read_query(conn=self.conn, q=q)
+    
+    def read_table(self, table_name:str):
+        """
+        Return table as a Pandas data frame.
+
+        :param table_name: table to read
+        """
+        tn = self.db_model.quote_table_name(table_name)
+        return self.read_query(f"SELECT * FROM {tn}")
+    
+    def create_table(self, *, table_name:str, q):
+        """
+        Create table from query.
+
+        :param table_name: table to create
+        :param q: query
+        :return: table description
+        """
+        tn = self.db_model.quote_table_name(table_name)
+        if isinstance(q, data_algebra.data_ops.ViewRepresentation):
+            q = q.to_sql(db_model=self.db_model)
+        else:
+            q = str(q)
+        self.execute(f"CREATE TABLE {tn} AS {q}")
+        return self.describe_table(table_name)
 
     def describe_table(
         self, table_name: str, *, qualifiers=None, row_limit: Optional[int] = 7
