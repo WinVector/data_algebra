@@ -2333,7 +2333,6 @@ class DBHandle:
     def __enter__(self):
         return self
 
-    # noinspection PyShadowingBuiltins
     def __exit__(self, type, value, traceback):
         self.close()
 

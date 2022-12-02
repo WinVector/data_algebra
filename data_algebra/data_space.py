@@ -24,6 +24,14 @@ class DataSpace(abc.ABC):
         """
     
     @abc.abstractmethod
+    def remove(self, key: str) -> None:
+        """
+        Remove value from data space.
+
+        :param key: key to remove
+        """
+    
+    @abc.abstractmethod
     def keys(self) -> Set[str]:
         """
         Return keys
@@ -66,3 +74,13 @@ class DataSpace(abc.ABC):
         :param key: key
         :return: data description
         """
+
+    def close(self) -> None:
+        pass
+
+    # context management
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self.close()
