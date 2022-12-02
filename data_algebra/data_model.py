@@ -9,7 +9,7 @@ from typing import Dict, Optional
 
 class DataModel(abc.ABC):
     """
-    Interface for realizing the data algebra as a sequence of steps over a Pandas like object.
+    Interface for realizing the data algebra as a sequence of steps over Pandas like objects.
     """
 
     presentation_model_name: str
