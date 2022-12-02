@@ -90,7 +90,6 @@ class DBSpace(data_algebra.data_space.DataSpace):
         self, 
         ops: data_algebra.data_ops.ViewRepresentation, 
         *, 
-        narrow: bool = False,
         key: Optional[str] = None,
         allow_overwrite: bool = False,
         ) -> data_algebra.data_ops.TableDescription:
@@ -98,7 +97,6 @@ class DBSpace(data_algebra.data_space.DataSpace):
         Execute ops in data space, saving result as a side effect and returning a reference.
 
         :param ops: data algebra operator dag.
-        :param narrow: if True strictly narrow columns (ignored).
         :param key: name for result
         :param allow_overwrite: if True allow table replacement
         :return: data key
@@ -108,7 +106,6 @@ class DBSpace(data_algebra.data_space.DataSpace):
             key = f"da_temp_{self.n_tmp}"
         assert isinstance(key, str)
         assert isinstance(allow_overwrite, bool)
-        assert isinstance(narrow, bool)
         if not allow_overwrite:
             assert key not in self.known_keys
         else:

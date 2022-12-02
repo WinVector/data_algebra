@@ -52,7 +52,6 @@ class DataSpace(abc.ABC):
         self, 
         ops: data_algebra.data_ops.ViewRepresentation, 
         *, 
-        narrow: bool = False,
         key: Optional[str] = None,
         allow_overwrite: bool = False,
         ) -> data_algebra.data_ops.TableDescription:
@@ -60,7 +59,6 @@ class DataSpace(abc.ABC):
         Execute ops in data space, saving result as a side effect and returning a reference.
 
         :param ops: data algebra operator dag.
-        :param narrow: if True strictly narrow columns.
         :param key: name for result
         :param allow_overwrite: if True allow table replacement
         :return: data key
