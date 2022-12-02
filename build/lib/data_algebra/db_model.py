@@ -2333,7 +2333,6 @@ class DBHandle:
     def __enter__(self):
         return self
 
-    # noinspection PyShadowingBuiltins
     def __exit__(self, type, value, traceback):
         self.close()
 
@@ -2371,7 +2370,7 @@ class DBHandle:
         """
         self.db_model.drop_table(self.conn, table_name)
 
-    def insert_table(self, d, *, table_name: str, allow_overwrite: bool = False):
+    def insert_table(self, d, *, table_name: str, allow_overwrite: bool = False) -> data_algebra.data_ops.TableDescription:
         """
         Insert a table into the database.
         """
