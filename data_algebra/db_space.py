@@ -1,6 +1,4 @@
 
-
-
 from typing import Optional, Set
 import data_algebra.data_model
 import data_algebra.data_ops
@@ -129,6 +127,7 @@ class DBSpace(data_algebra.data_space.DataSpace):
         if self.drop_tables_on_close:
             for key in self.keys():
                 self.remove(key)
-            if self.close_handle:
-                self.db_handle.close()
-            self.db_handle = None
+        if self.close_handle:
+            self.db_handle.close()
+        self.db_handle = None
+        self.known_keys = None
