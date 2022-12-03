@@ -1464,8 +1464,8 @@ class DBModel:
         )
         # /limit columns
         subsql.terms = {
-            k: v
-            for k, v in subsql.terms.items()
+            k: subsql.terms[k]
+            for k in using
             if k not in drop_columns_node.column_deletions
         }
         return subsql
