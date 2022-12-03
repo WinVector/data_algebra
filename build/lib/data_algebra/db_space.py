@@ -29,16 +29,31 @@ class DBSpace(data_algebra.data_space.DataSpace):
         assert isinstance(db_handle, data_algebra.db_model.DBHandle)
         self.db_handle = db_handle
         self.n_tmp = 0
-        self.known_keys = set()
+        self.description_map = dict()
+        self.eligable_for_auto_drop_list = set()
+    
+    def model_table(self, key: str, *, eligible_for_auto_drop: bool = False) -> data_algebra.data_ops.TableDescription:
+        """
+        Insert existing table record into data space model.
 
-    def insert(self, *, key: Optional[str] = None, value, allow_overwrite: bool = True) -> str:
+        :param key: table name and key.
+        :return: table description
+        """
+        assert isinstance(key, str)
+        descr = self.db_handle.describe_table(key)
+        self.description_map[key] = descr
+        if eligible_for_auto_drop:
+            self.eligable_for_auto_drop_list.add(key)
+        return descr
+
+    def insert(self, *, key: Optional[str] = None, value, allow_overwrite: bool = True) -> data_algebra.data_ops.TableDescription:
         """
         Insert value into data space for key.
 
         :param key: key
         :param value: data
         :param allow_overwrite: if True, allow table replacement
-        :return: None
+        :return: table description
         """
         if key is None:
             self.n_tmp = self.n_tmp + 1
@@ -46,10 +61,9 @@ class DBSpace(data_algebra.data_space.DataSpace):
         assert isinstance(key, str)
         assert isinstance(allow_overwrite, bool)
         if not allow_overwrite:
-            assert key not in self.known_keys
-        self.known_keys.add(key)
+            assert key not in self.description_map.keys()
         self.db_handle.insert_table(value, table_name=key, allow_overwrite=allow_overwrite)
-        return key
+        return self.model_table(key, eligible_for_auto_drop=True)
     
     def remove(self, key: str) -> None:
         """
@@ -58,14 +72,16 @@ class DBSpace(data_algebra.data_space.DataSpace):
         :param key: key to remove
         """
         assert isinstance(key, str)
-        self.known_keys.remove(key)
+        del self.description_map[key]
+        if key in self.eligable_for_auto_drop_list:
+            self.eligable_for_auto_drop_list.remove(key)
         self.db_handle.drop_table(key)
     
     def keys(self) -> Set[str]:
         """
         Return keys
         """
-        return self.known_keys.copy()
+        return set(self.description_map.keys())
     
     def retrieve(self, key: str, *, return_data_model: Optional[data_algebra.data_model.DataModel] = None):
         """
@@ -78,7 +94,7 @@ class DBSpace(data_algebra.data_space.DataSpace):
         assert isinstance(key, str)
         if return_data_model is None:
             return_data_model = data_algebra.pandas_model.default_data_model
-        assert key in self.known_keys
+        descr = self.description_map[key]  # force check table is known
         d = self.db_handle.read_table(key)
         d = return_data_model.data_frame(d)
         return d
@@ -103,13 +119,13 @@ class DBSpace(data_algebra.data_space.DataSpace):
             key = f"da_temp_{self.n_tmp}"
         assert isinstance(key, str)
         assert isinstance(allow_overwrite, bool)
-        if not allow_overwrite:
-            assert key not in self.known_keys
-        else:
-            if key in self.known_keys:
-                self.db_handle.drop_table(key)
-        self.known_keys.add(key)
-        return self.db_handle.create_table(table_name=key, q=ops)
+        if key in self.description_map.keys():
+            assert allow_overwrite
+            self.remove(key)
+        descr = self.db_handle.create_table(table_name=key, q=ops)
+        self.description_map[key] = descr
+        self.eligable_for_auto_drop_list.add(key)
+        return descr
 
     def describe(self, key: str) -> data_algebra.data_ops.TableDescription:
         """
@@ -119,15 +135,14 @@ class DBSpace(data_algebra.data_space.DataSpace):
         :return: data description
         """
         assert isinstance(key, str)
-        assert key in self.known_keys
-        descr = self.db_handle.describe_table(key)
-        return descr
+        return self.description_map[key]
 
     def close(self) -> None:
         if self.drop_tables_on_close:
-            for key in self.keys():
+            key_list = list(self.eligable_for_auto_drop_list)
+            for key in key_list:
                 self.remove(key)
         if self.close_handle:
             self.db_handle.close()
         self.db_handle = None
-        self.known_keys = None
+        self.description_map = None

@@ -13,14 +13,14 @@ class DataSpace(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def insert(self, *, key: Optional[str] = None, value, allow_overwrite: bool = True) -> str:
+    def insert(self, *, key: Optional[str] = None, value, allow_overwrite: bool = True) -> data_algebra.data_ops.TableDescription:
         """
         Insert value into data space for key.
 
         :param key: key
         :param value: data
         :param allow_overwrite: if True, allow table replacement
-        :return: None
+        :return: table description
         """
     
     @abc.abstractmethod

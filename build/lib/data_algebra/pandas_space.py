@@ -32,14 +32,14 @@ class PandasSpace(data_algebra.data_space.DataSpace):
         self.data_map = dict()
         self.n_tmp = 0
 
-    def insert(self, *, key: Optional[str] = None, value, allow_overwrite: bool = True) -> str:
+    def insert(self, *, key: Optional[str] = None, value, allow_overwrite: bool = True) -> data_algebra.data_ops.TableDescription:
         """
         Insert value into data space for key.
 
         :param key: key
         :param value: data
         :param allow_overwrite: if True, allow table replacement
-        :return: None
+        :return: table description
         """
         if key is None:
             self.n_tmp = self.n_tmp + 1
@@ -50,7 +50,7 @@ class PandasSpace(data_algebra.data_space.DataSpace):
         if not allow_overwrite:
             assert key not in self.data_map.keys()
         self.data_map[key] = value
-        return key
+        return self.describe(key)
     
     def remove(self, key: str) -> None:
         """
