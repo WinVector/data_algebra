@@ -29,4 +29,4 @@ dependencies:
     - google.cloud
     - google-cloud-bigquery
     - db_dtypes
-
+    - polars
