@@ -1,6 +1,8 @@
 
 """
 Adapter to use Polars ( https://www.pola.rs ) in the data algebra.
+
+Note: not implemented yet.
 """
 
 from typing import Any, Callable, Dict, List, Optional
@@ -20,7 +22,7 @@ import data_algebra.connected_components
 import polars as pl
 
 
-class PolarsModel(abc.ABC):
+class PolarsModel(data_algebra.data_model.DataModel):
     """
     Interface for realizing the data algebra as a sequence of steps over Polars https://www.pola.rs .
     """
@@ -32,9 +34,6 @@ class PolarsModel(abc.ABC):
             self, presentation_model_name="Polars"
         )
 
-    # helper functions
-
-    @abc.abstractmethod
     def data_frame(self, arg=None):
         """
         Build a new data frame.
@@ -46,7 +45,6 @@ class PolarsModel(abc.ABC):
             return pl.DataFrame()
         return pl.DataFrame(arg)
 
-    @abc.abstractmethod
     def is_appropriate_data_instance(self, df) -> bool:
         """
         Check if df is our type of data frame.
@@ -55,7 +53,6 @@ class PolarsModel(abc.ABC):
 
     # evaluate
 
-    @abc.abstractmethod
     def eval(self, op, *, data_map: Optional[Dict], narrow: bool = False):
         """
         Implementation of Pandas evaluation of operators
@@ -68,4 +65,4 @@ class PolarsModel(abc.ABC):
         assert isinstance(data_map, Dict)
         assert isinstance(narrow, bool)
         assert isinstance(op, data_algebra.data_ops_types.OperatorPlatform)
-
+        raise ValueError("not implemented, yet")  # TODO: implement
