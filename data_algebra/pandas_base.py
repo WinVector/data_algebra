@@ -594,7 +594,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                 warnings.simplefilter(
                     "ignore"
                 )  # out of range things like arccosh were warning
-                new_cols = {k: opk.evaluate(res) for k, opk in op.ops.items()}
+                new_cols = {k: opk.act_on(res) for k, opk in op.ops.items()}
             new_frame = self.columns_to_frame_(new_cols, target_rows=res.shape[0])
             res = self.add_data_frame_columns_to_data_frame_(res, new_frame)
         else:
@@ -816,7 +816,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         res = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
         if res.shape[0] < 1:
             return res
-        selection = op.expr.evaluate(res)
+        selection = op.expr.act_on(res)
         res = res.loc[selection, :].reset_index(drop=True, inplace=False)
         return res
 

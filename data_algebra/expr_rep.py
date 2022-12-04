@@ -178,9 +178,9 @@ class PreTerm(abc.ABC):
     # eval
 
     @abc.abstractmethod
-    def evaluate(self, data_frame):
+    def act_on(self, data_frame):
         """
-        Evaluate expression, taking data from data_frame.
+        Apply expression to argument.
         """
 
     # emitters
@@ -1073,9 +1073,9 @@ class Value(Term):
         """
         return self
 
-    def evaluate(self, data_frame):
+    def act_on(self, data_frame):
         """
-        Evaluate expression, taking data from data_frame.
+        Apply expression to argument.
         """
         return self.value
 
@@ -1133,15 +1133,15 @@ class ListTerm(PreTerm):
         new_list = [ai.replace_view(view) for ai in self.value]
         return ListTerm(new_list)
 
-    def evaluate(self, data_frame):
+    def act_on(self, data_frame):
         """
-        Evaluate expression, taking data from data_frame.
+        Apply expression to argument.
         """
         res = [None] * len(self.value)
         for i in range(len(self.value)):
             vi = self.value[i]
             if isinstance(vi, PreTerm):
-                vi = vi.evaluate(data_frame)
+                vi = vi.act_on(data_frame)
             res[i] = vi
         return res
 
@@ -1207,9 +1207,9 @@ class DictTerm(PreTerm):
         """
         return DictTerm(self.value)
 
-    def evaluate(self, data_frame):
+    def act_on(self, data_frame):
         """
-        Evaluate expression, taking data from data_frame.
+        Apply expression to argument.
         """
         return self.value.copy()
 
@@ -1267,9 +1267,9 @@ class ColumnReference(Term):
         #         )
         Term.__init__(self)
 
-    def evaluate(self, data_frame):
+    def act_on(self, data_frame):
         """
-        Evaluate expression, taking data from data_frame.
+        Apply expression to argument.
         """
         return data_frame[self.column_name]
 
@@ -1446,11 +1446,11 @@ class Expression(Term):
         """
         methods_seen.add(self.op)
 
-    def evaluate(self, data_frame):
+    def act_on(self, data_frame):
         """
-        Evaluate expression, taking data from data_frame.
+        Apply expression to argument.
         """
-        args = [ai.evaluate(data_frame) for ai in self.args]
+        args = [ai.act_on(data_frame) for ai in self.args]
         # check user fns
         # first check chosen mappings
         try:

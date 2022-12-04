@@ -23,6 +23,18 @@ def test_polars_1():
         assert res.frame_equal(expect)
 
 
+def test_polars_1b():
+    if have_polars:
+        d = pl.DataFrame({"x": range(100),  "y": range(100)})
+        ops = (
+            data_algebra.descr(d=d)
+                .drop_columns(["y"])
+        )
+        res = ops.transform(d)
+        expect = pl.DataFrame({"x": range(100)})
+        assert res.frame_equal(expect)
+
+
 def test_polars_2():
     if have_polars:
         # from Examples/DupRows.ipynb
