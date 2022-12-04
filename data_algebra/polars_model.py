@@ -250,6 +250,41 @@ class PolarsModel(data_algebra.data_model.DataModel):
             df = df.lazy()
         df = df.select(op.columns_produced())
         return df
+    
+    # expression helpers
+    
+    def act_on_literal(self, *, arg, value):
+        """
+        Action for a literal/constant in an expression.
+
+        :param arg: item we are acting on
+        :param value: literal value being supplied
+        :return: arg acted on
+        """
+        raise ValueError("not implemented yet")  # TODO: implement
+    
+    def act_on_column_name(self, *, arg, value):
+        """
+        Action for a column name.
+
+        :param arg: item we are acting on
+        :param value: column name
+        :return: arg acted on
+        """
+        raise ValueError("not implemented yet")  # TODO: implement
+    
+    def act_on_expression(self, *, arg, values: List, op: str):
+        """
+        Action for a column name.
+
+        :param arg: item we are acting on
+        :param values: list of values to work on
+        :param op: name of operator to apply
+        :return: arg acted on
+        """
+        assert isinstance(values, List)
+        assert isinstance(op, str)
+        raise ValueError("not implemented yet")  # TODO: implement
 
 
 def _register_polars_model():

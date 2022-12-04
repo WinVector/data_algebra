@@ -594,7 +594,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                 warnings.simplefilter(
                     "ignore"
                 )  # out of range things like arccosh were warning
-                new_cols = {k: opk.act_on(res) for k, opk in op.ops.items()}
+                new_cols = {k: opk.act_on(res, data_model=self) for k, opk in op.ops.items()}
             new_frame = self.columns_to_frame_(new_cols, target_rows=res.shape[0])
             res = self.add_data_frame_columns_to_data_frame_(res, new_frame)
         else:
@@ -816,7 +816,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         res = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
         if res.shape[0] < 1:
             return res
-        selection = op.expr.act_on(res)
+        selection = op.expr.act_on(res, data_model=self)
         res = res.loc[selection, :].reset_index(drop=True, inplace=False)
         return res
 
@@ -999,3 +999,72 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             )
         res = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
         return op.record_map.transform(res, local_data_model=self)
+
+    # expression helpers
+    
+    def act_on_literal(self, *, arg, value):
+        """
+        Action for a literal/constant in an expression.
+
+        :param arg: item we are acting on
+        :param value: literal value being supplied
+        :return: arg acted on
+        """
+        return value
+    
+    def act_on_column_name(self, *, arg, value):
+        """
+        Action for a column name.
+
+        :param arg: item we are acting on
+        :param value: column name
+        :return: arg acted on
+        """
+        return arg[value]
+    
+    def act_on_expression(self, *, arg, values: List, op: str):
+        """
+        Action for a column name.
+
+        :param arg: item we are acting on
+        :param values: list of values to work on
+        :param op: name of operator to apply
+        :return: arg acted on
+        """
+        assert isinstance(values, List)
+        assert isinstance(op, str)
+        # check user fns
+        # first check chosen mappings
+        try:
+            method_to_call = self.user_fun_map[op]
+            return method_to_call(*values)
+        except KeyError:
+            pass
+        # check chosen mappings
+        try:
+            method_to_call = self.impl_map[op]
+            return method_to_call(*values)
+        except KeyError:
+            pass
+        # special zero argument functions
+        if len(values) == 0:
+            if op == "_uniform":
+                return numpy.random.uniform(size=arg.shape[0])
+            else:
+                KeyError(f"zero-argument function {op} not found")
+        # now see if argument (usually Pandas) can do this
+        # doubt we hit in this, as most exposed methods are window methods
+        try:
+            method = getattr(values[0], op)
+            if callable(method):
+                return method(*values[1:])
+        except AttributeError:
+            pass
+        # now see if numpy can do this
+        try:
+            fn = numpy.__dict__[op]
+            if callable(fn):
+                return fn(*values)
+        except KeyError:
+            pass
+        raise KeyError(f"function {op} not found")
