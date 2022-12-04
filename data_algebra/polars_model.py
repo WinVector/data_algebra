@@ -135,6 +135,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
         """
         if op.node_name != "ExtendNode":
             raise TypeError("op was supposed to be a data_algebra.data_ops.ExtendNode")
+        res = self._compose_polars_ops(op.sources[0], data_map=data_map)
         raise ValueError("not implemented yet")  # TODO: implement
     
     def _map_columns_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
@@ -165,6 +166,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.OrderRowsNode"
             )
+        res = self._compose_polars_ops(op.sources[0], data_map=data_map)
         raise ValueError("not implemented yet")  # TODO: implement
 
     def _project_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
@@ -173,6 +175,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
         """
         if op.node_name != "ProjectNode":
             raise TypeError("op was supposed to be a data_algebra.data_ops.ProjectNode")
+        res = self._compose_polars_ops(op.sources[0], data_map=data_map)
         raise ValueError("not implemented yet")  # TODO: implement
 
     def _map_columns_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
@@ -183,6 +186,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.MapColumnsNode"
             )
+        res = self._compose_polars_ops(op.sources[0], data_map=data_map)
         raise ValueError("not implemented yet")  # TODO: implement
 
     def _rename_columns_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
@@ -193,6 +197,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.RenameColumnsNode"
             )
+        res = self._compose_polars_ops(op.sources[0], data_map=data_map)
         raise ValueError("not implemented yet")  # TODO: implement
 
     def _select_columns_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
@@ -215,6 +220,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.SelectRowsNode"
             )
+        res = self._compose_polars_ops(op.sources[0], data_map=data_map)
         raise ValueError("not implemented yet")  # TODO: implement
 
     def _sql_proxy_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
