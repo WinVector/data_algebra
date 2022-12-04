@@ -126,7 +126,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
         Execute a drop columns step, returning a data frame.
         """
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
-        res = res.with_columns(op.columns_produced())
+        res = res.select(op.columns_produced())
         return res
     
     def _extend_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
@@ -204,7 +204,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 "op was supposed to be a data_algebra.data_ops.SelectColumnsNode"
             )
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
-        res = res.with_columns(op.columns_produced())
+        res = res.select(op.columns_produced())
         return res
 
     def _select_rows_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
@@ -242,7 +242,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
             )
         if self.use_lazy_eval:
             df = df.lazy()
-        df = df.with_columns(op.columns_produced())
+        df = df.select(op.columns_produced())
         return df
 
 

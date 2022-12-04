@@ -66,18 +66,16 @@ class DataModelSpace(data_algebra.data_space.DataSpace):
         """
         return set(self.data_map.keys())
     
-    def retrieve(self, key: str, *, return_data_model: Optional[data_algebra.data_model.DataModel] = None):
+    def retrieve(self, key: str):
         """
         Retrieve a table value from the DataSpace.
 
         :param key: key
-        :param return_data_model: data model for return type
         :return: data value
         """
         assert isinstance(key, str)
-        if return_data_model is None:
-            return_data_model = self.data_model
-        return return_data_model.data_frame(self.data_map[key])
+        res = self.data_map[key]
+        return res
 
     def execute(
         self, 

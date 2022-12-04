@@ -38,12 +38,11 @@ class DataSpace(abc.ABC):
         """
     
     @abc.abstractmethod
-    def retrieve(self, key: str, *, return_data_model: Optional[data_algebra.data_model.DataModel] = None):
+    def retrieve(self, key: str):
         """
         Retrieve a table value from the DataSpace.
 
         :param key: key
-        :param return_data_model: data model for return type
         :return: data value
         """
 
