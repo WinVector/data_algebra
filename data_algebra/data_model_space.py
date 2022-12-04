@@ -3,12 +3,11 @@ from typing import Optional, Set
 import data_algebra.data_model
 import data_algebra.data_ops
 import data_algebra.data_space
-import data_algebra.pandas_model
 
 
-class PandasSpace(data_algebra.data_space.DataSpace):
+class DataModelSpace(data_algebra.data_space.DataSpace):
     """
-    A data space as a map of mapped pandas data frames.
+    A data space as a map of mapped data_model data frames.
     """
     def __init__(
         self, 
@@ -17,7 +16,7 @@ class PandasSpace(data_algebra.data_space.DataSpace):
         narrow: bool = False,
         ) -> None:
         """
-        Build an isolated execution space. Good for enforcing different Pandas adaptors or alternatives.
+        Build an isolated execution space. Good for enforcing different data model adaptors or alternatives.
 
         :param data_model: execution model
         :param narrow: if True strictly narrow columns.
@@ -25,7 +24,7 @@ class PandasSpace(data_algebra.data_space.DataSpace):
         super().__init__()
         assert isinstance(narrow, bool)
         if data_model is None:
-            data_model = data_algebra.pandas_model.default_data_model
+            data_model = data_algebra.data_model.data_model_type_map["default_data_model"]
         assert isinstance(data_model, data_algebra.data_model.DataModel)
         self.data_model = data_model
         self.narrow = narrow
@@ -77,7 +76,7 @@ class PandasSpace(data_algebra.data_space.DataSpace):
         """
         assert isinstance(key, str)
         if return_data_model is None:
-            return_data_model = data_algebra.pandas_model.default_data_model
+            return_data_model = self.data_model
         return return_data_model.data_frame(self.data_map[key])
 
     def execute(

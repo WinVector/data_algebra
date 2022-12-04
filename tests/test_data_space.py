@@ -3,7 +3,7 @@
 
 import data_algebra
 import data_algebra.test_util
-import data_algebra.pandas_space
+import data_algebra.data_model_space
 import data_algebra.db_space
 
 
@@ -11,7 +11,7 @@ def test_pandas_data_space_1():
     dm = data_algebra.pandas_model.default_data_model
     pd = dm.pd
     t0 = dm.data_frame({'x': [1, 2, 3]})
-    with data_algebra.pandas_space.PandasSpace(dm) as ds:
+    with data_algebra.data_model_space.DataModelSpace(dm) as ds:
         ds.insert(key="t0", value=t0)
         ops = (
             data_algebra.descr(t0=t0)
