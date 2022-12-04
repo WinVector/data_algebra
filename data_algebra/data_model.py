@@ -7,6 +7,10 @@ import abc
 from typing import Any, Dict
 
 
+# map type name strings to data models
+data_model_type_map = dict()
+
+
 class DataModel(abc.ABC):
     """
     Interface for realizing the data algebra as a sequence of steps over Pandas like objects.

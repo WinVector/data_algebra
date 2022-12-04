@@ -455,8 +455,8 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         # check all columns we expect are present
         columns_using = op.column_names
         if not narrow:
-            columns_using = [c for c in df.columns]
-        missing = set(columns_using) - set([c for c in df.columns])
+            columns_using = list(df.columns)
+        missing = set(columns_using) - set(df.columns)
         if len(missing) > 0:
             raise ValueError("missing required columns: " + str(missing))
         # make an index-free copy of the data to isolate side-effects and not deal with indices

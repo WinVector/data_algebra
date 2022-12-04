@@ -33,7 +33,7 @@ class OperatorPlatform(abc.ABC):
         self,
         data_map: Dict[str, Any],
         *,
-        data_model = None,
+        data_model=None,
         narrow: bool = True
     ):
         """

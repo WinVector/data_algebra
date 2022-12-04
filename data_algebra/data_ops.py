@@ -183,7 +183,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
 
     # convenience
 
-    def ex(self, *, data_model=None, narrow:bool = True, allow_limited_tables:bool = False):
+    def ex(self, *, data_model=None, narrow: bool = True, allow_limited_tables: bool = False):
         """
         Evaluate operators with respect to Pandas data frames already stored in the operator chain.
 
@@ -192,6 +192,8 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         :param allow_limited_tables: logical, if True allow execution on non-complete tables
         :return: table result
         """
+        assert isinstance(narrow, bool)
+        assert isinstance(allow_limited_tables, bool)
         tables = self.get_tables()
         data_map = dict()
         for tv in tables.values():
@@ -478,17 +480,18 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         :return: table result
         """
         assert isinstance(data_map, dict)
-        if data_model is None:
-            data_model = data_algebra.pandas_model.default_data_model
-        assert isinstance(data_model, data_algebra.data_model.DataModel)
         self.columns_used()  # for table consistency check/raise
         tables = self.get_tables()
-        for k in tables.keys():
-            if k not in data_map.keys():
-                raise ValueError("Required table " + k + " not in data_map")
-            else:
-                if not data_model.is_appropriate_data_instance(data_map[k]):
-                    raise ValueError("data_map[" + k + "] was not a usable type")
+        if len(tables) > 0:
+            for k in tables.keys():
+                v = data_map[k]
+                if data_model is None:
+                    data_model = data_algebra.data_model.data_model_type_map[str(type(v))]
+                if not data_model.is_appropriate_data_instance(v):
+                    raise ValueError(f"data_map[{k}] type {type(v)} not appropriate for data model {data_model}")
+        else:
+            data_model = data_algebra.data_model.data_model_type_map["default_data_model"]
+        assert isinstance(data_model, data_algebra.data_model.DataModel)
         self.check_constraints(
             {k: data_map[k].columns for k in tables.keys()}, strict=(not narrow)
         )
@@ -510,9 +513,6 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         :param narrow: logical, if True narrow number of result columns to specification
         :return: transformed data frame
         """
-        if data_model is None:
-            data_model = data_algebra.pandas_model.default_data_model
-        assert isinstance(data_model, data_algebra.data_model.DataModel)
         self.columns_used()  # for table consistency check/raise
         tables = self.get_tables()
         if len(tables) != 1:
@@ -520,9 +520,6 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
                 "transform(DataFrame) can only be applied to ops-dags with only one table def"
             )
         k = [k for k in tables.keys()][0]
-        # noinspection PyUnresolvedReferences
-        if not data_model.is_appropriate_data_instance(X):
-            raise TypeError("can not apply transform() to type " + str(type(X)))
         data_map = {k: X}
         return self.eval(
             data_map=data_map,
@@ -1139,7 +1136,7 @@ class TableDescription(ViewRepresentation):
 
 def describe_table(
     d,
-    table_name=None,
+    table_name: Optional[str] = None,
     *,
     qualifiers=None,
     sql_meta=None,
@@ -1148,7 +1145,7 @@ def describe_table(
     keep_all=False,
 ) -> TableDescription:
     """
-    :param d: pandas table to describe
+    :param d: data table table to describe
     :param table_name: name of table
     :param qualifiers: optional, able qualifiers
     :param sql_meta: optional, sql meta information map
@@ -1159,19 +1156,21 @@ def describe_table(
     """
     assert not isinstance(d, OperatorPlatform)
     assert not isinstance(d, ViewRepresentation)
-    column_names = [c for c in d.columns]
+    assert isinstance(keep_sample, bool)
+    assert isinstance(keep_all, bool)
+    assert isinstance(table_name, (str, type(None)))  # TODO: see if we can change this to never None
+    # confirm our data model is loaded
+    data_model = data_algebra.data_model.data_model_type_map[str(type(d))]
+    assert data_model.is_appropriate_data_instance(d)
+    column_names = list(d.columns)
     head = None
     nrows = d.shape[0]
-    if keep_all or (row_limit is None):
-        row_limit = None
-        head = d.copy()
-        head.reset_index(drop=True, inplace=True)
-    elif keep_sample:
-        if nrows > row_limit:
-            head = d.iloc[range(row_limit), :].copy()
+    if keep_sample or keep_all:
+        if keep_all or (row_limit is None) or (row_limit >= nrows):
+            row_limit = None
+            head = d
         else:
-            head = d.copy()
-        head.reset_index(drop=True, inplace=True)
+            head = d.head(row_limit)
     return TableDescription(
         table_name=table_name,
         column_names=column_names,

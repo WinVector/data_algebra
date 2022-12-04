@@ -16,5 +16,7 @@ the same transforms for Pandas DataFrames.
 the `rquery`<https://github.com/WinVector/rquery> and `rqdatatable`<https://github.com/WinVector/rqdatatable> packages.
 """
 
+# cause default Pandas model to register
+import data_algebra.pandas_model
 # import for easy access for package users
 from data_algebra.data_ops import TableDescription, SQLNode, describe_table, descr, data, ex
