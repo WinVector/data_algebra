@@ -12,6 +12,9 @@ db_dtypes
 sqlalchemy
 pymysql
 
+[Polars]
+polars
+
 [PostgreSQL]
 sqlalchemy
 psycopg2
@@ -28,6 +31,7 @@ sqlalchemy
 psycopg2
 pymysql
 pyspark
+polars
 
 [pretty_python]
 black

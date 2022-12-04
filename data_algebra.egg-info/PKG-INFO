@@ -23,6 +23,7 @@ Provides-Extra: BigQuery
 Provides-Extra: PostgreSQL
 Provides-Extra: MySQL
 Provides-Extra: Spark
+Provides-Extra: Polars
 Provides-Extra: all
 License-File: LICENSE
 

@@ -4,7 +4,7 @@ Interface for realizing the data algebra as a sequence of steps over an object.
 
 
 import abc
-from typing import Dict, Optional
+from typing import Any, Dict
 
 
 class DataModel(abc.ABC):
@@ -23,7 +23,7 @@ class DataModel(abc.ABC):
     @abc.abstractmethod
     def data_frame(self, arg=None):
         """
-        Build a new emtpy data frame.
+        Build a new data frame.
 
         :param arg: optional argument passed to constructor.
         :return: data frame
@@ -38,7 +38,7 @@ class DataModel(abc.ABC):
     # evaluate
 
     @abc.abstractmethod
-    def eval(self, op, *, data_map: Optional[Dict] = None, narrow: bool = False):
+    def eval(self, op, *, data_map: Dict[str, Any], narrow: bool = False):
         """
         Implementation of Pandas evaluation of operators
 

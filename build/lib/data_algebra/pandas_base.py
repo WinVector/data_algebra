@@ -555,6 +555,8 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         :return: data frame result
         """
         assert isinstance(data_map, Dict)
+        assert isinstance(narrow, bool)
+        assert isinstance(op, data_algebra.data_ops_types.OperatorPlatform)
         return self._eval_value_source(s=op, data_map=data_map, narrow=narrow)
 
     def _eval_value_source(self, s, *, data_map: dict, narrow: bool):
