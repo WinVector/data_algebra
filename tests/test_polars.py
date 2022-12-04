@@ -34,6 +34,19 @@ def test_polars_1b():
         expect = pl.DataFrame({"x": range(100)})
         assert res.frame_equal(expect)
 
+"""
+def test_polars_1c():
+    if have_polars:
+        d = pl.DataFrame({"x": range(100),  "y": range(100)})
+        ops = (
+            data_algebra.descr(d=d)
+                .select_rows("x > 1")
+        )
+        res = ops.transform(d)
+        expect = pl.DataFrame({"x": range(100)})
+        assert res.frame_equal(expect)
+"""
+    
 
 def test_polars_2():
     if have_polars:

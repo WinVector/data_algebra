@@ -261,7 +261,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
         :param value: literal value being supplied
         :return: arg acted on
         """
-        raise ValueError("not implemented yet")  # TODO: implement
+        return pl.lit(value)
     
     def act_on_column_name(self, *, arg, value):
         """
@@ -271,7 +271,8 @@ class PolarsModel(data_algebra.data_model.DataModel):
         :param value: column name
         :return: arg acted on
         """
-        raise ValueError("not implemented yet")  # TODO: implement
+        assert isinstance(value, str)
+        return pl.col(value)
     
     def act_on_expression(self, *, arg, values: List, op: str):
         """

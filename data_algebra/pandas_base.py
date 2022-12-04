@@ -160,19 +160,19 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         self.transform_op_map = {"any_value": "first"}
         self.user_fun_map = dict()
         self._method_dispatch_table = {
-            "ConcatRowsNode": self.concat_rows_step,
-            "ConvertRecordsNode": self.convert_records_step,
-            "DropColumnsNode": self.drop_columns_step,
-            "ExtendNode": self.extend_step,
-            "NaturalJoinNode": self.natural_join_step,
-            "OrderRowsNode": self.order_rows_step,
-            "ProjectNode": self.project_step,
-            "MapColumnsNode": self.map_columns_step,
-            "RenameColumnsNode": self.rename_columns_step,
-            "SelectColumnsNode": self.select_columns_step,
-            "SelectRowsNode": self.select_rows_step,
-            "SQLNode": self.sql_proxy_step,
-            "TableDescription": self.table_step,
+            "ConcatRowsNode": self._concat_rows_step,
+            "ConvertRecordsNode": self._convert_records_step,
+            "DropColumnsNode": self._drop_columns_step,
+            "ExtendNode": self._extend_step,
+            "NaturalJoinNode": self._natural_join_step,
+            "OrderRowsNode": self._order_rows_step,
+            "ProjectNode": self._project_step,
+            "MapColumnsNode": self._map_columns_step,
+            "RenameColumnsNode": self._rename_columns_step,
+            "SelectColumnsNode": self._select_columns_step,
+            "SelectRowsNode": self._select_rows_step,
+            "SQLNode": self._sql_proxy_step,
+            "TableDescription": self._table_step,
         }
 
     # implementations
@@ -431,7 +431,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
     # bigger stuff
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
-    def table_step(self, op, *, data_map: dict, narrow: bool):
+    def _table_step(self, op, *, data_map: dict, narrow: bool):
         """
         Return a copy of data frame from table description and data_map.
         """
@@ -464,7 +464,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         res = res.reset_index(drop=True, inplace=False)  # copy and clear out indices
         return res
 
-    def sql_proxy_step(self, op, *, data_map: dict, narrow: bool):
+    def _sql_proxy_step(self, op, *, data_map: dict, narrow: bool):
         """
         execute SQL
         """
@@ -567,7 +567,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             op=s, data_map=data_map, narrow=narrow
         )
 
-    def extend_step(self, op, *, data_map, narrow):
+    def _extend_step(self, op, *, data_map, narrow):
         """
         Execute an extend step, returning a data frame.
         """
@@ -717,7 +717,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             res = self.add_data_frame_columns_to_data_frame_(res, subframe)
         return res
 
-    def project_step(self, op, *, data_map, narrow):
+    def _project_step(self, op, *, data_map, narrow):
         """
         Execute a project step, returning a data frame.
         """
@@ -805,7 +805,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             raise ValueError("result wasn't keyed by group_by columns")
         return res
 
-    def select_rows_step(self, op, *, data_map, narrow):
+    def _select_rows_step(self, op, *, data_map, narrow):
         """
         Execute a select rows step, returning a data frame.
         """
@@ -820,7 +820,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         res = res.loc[selection, :].reset_index(drop=True, inplace=False)
         return res
 
-    def select_columns_step(self, op, *, data_map, narrow):
+    def _select_columns_step(self, op, *, data_map, narrow):
         """
         Execute a select columns step, returning a data frame.
         """
@@ -831,7 +831,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         res = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
         return res[op.column_selection]
 
-    def drop_columns_step(self, op, *, data_map, narrow):
+    def _drop_columns_step(self, op, *, data_map, narrow):
         """
         Execute a drop columns step, returning a data frame.
         """
@@ -843,7 +843,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         column_selection = [c for c in res.columns if c not in op.column_deletions]
         return res[column_selection]
 
-    def order_rows_step(self, op, *, data_map, narrow):
+    def _order_rows_step(self, op, *, data_map, narrow):
         """
         Execute an order rows step, returning a data frame.
         """
@@ -863,7 +863,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             res = res.iloc[range(op.limit), :].reset_index(drop=True)
         return res
 
-    def map_columns_step(self, op, *, data_map, narrow):
+    def _map_columns_step(self, op, *, data_map, narrow):
         """
         Execute a map columns step, returning a data frame.
         """
@@ -878,7 +878,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             res = res[column_selection]
         return res
 
-    def rename_columns_step(self, op, *, data_map, narrow):
+    def _rename_columns_step(self, op, *, data_map, narrow):
         """
         Execute a rename columns step, returning a data frame.
         """
@@ -906,7 +906,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             pass
         return jointype
 
-    def natural_join_step(self, op, *, data_map, narrow):
+    def _natural_join_step(self, op, *, data_map, narrow):
         """
         Execute a natural join step, returning a data frame.
         """
@@ -958,7 +958,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         res = res.reset_index(drop=True)
         return res
 
-    def concat_rows_step(self, op, *, data_map, narrow):
+    def _concat_rows_step(self, op, *, data_map, narrow):
         """
         Execute a concat rows step, returning a data frame.
         """
@@ -989,7 +989,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         res = res.reset_index(drop=True)
         return res
 
-    def convert_records_step(self, op, *, data_map, narrow):
+    def _convert_records_step(self, op, *, data_map, narrow):
         """
         Execute record conversion step, returning a data frame.
         """
