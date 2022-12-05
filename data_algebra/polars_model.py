@@ -26,7 +26,11 @@ def _populate_expr_impl_map() -> Dict[str, Callable]:
         "<=": lambda a, b: a <= b,
         "<": lambda a, b: a < b,  
         ">=": lambda a, b: a >= b,
-        ">": lambda a, b: a > b,  
+        ">": lambda a, b: a > b, 
+        "!=": lambda a, b: a != b,
+        "not": lambda x: x == False,
+        "~": lambda x: x == False,
+        "!": lambda x: x == False,
         # TODO: fill in more
     }
     return impl_map
