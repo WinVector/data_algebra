@@ -44,9 +44,9 @@ def test_calc_interface():
     td = TableDescription(table_name="d", column_names=["a"])
     ops = td.rename_columns({"b": "a"})
 
-    d_good = data_algebra.pandas_model.default_data_model.pd.DataFrame({"a": [1]})
-    d_extra = data_algebra.pandas_model.default_data_model.pd.DataFrame({"a": [1], "b": [2]})
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame({"b": [1]})
+    d_good = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"a": [1]})
+    d_extra = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"a": [1], "b": [2]})
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"b": [1]})
 
     # check that table-defs narrow data
     res0 = td.transform(d_extra)
@@ -85,5 +85,5 @@ def test_calc_interface():
 
     ops_first = td.extend({"x": 1})
     res_first = ops_first.transform(d_extra)
-    expect_first = data_algebra.pandas_model.default_data_model.pd.DataFrame({"a": [1], "x": [1],})
+    expect_first = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"a": [1], "x": [1],})
     assert data_algebra.test_util.equivalent_frames(res_first, expect_first)

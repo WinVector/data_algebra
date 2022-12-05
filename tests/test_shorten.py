@@ -4,7 +4,7 @@ from data_algebra.data_ops import *
 
 
 def test_shorten():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "x_s": ["s_03", "s_04", "s_02", "s_01", "s_03", "s_01"],
             "x_n": ["n_13", "n_48", "n_77", "n_29", "n_91", "n_93"],

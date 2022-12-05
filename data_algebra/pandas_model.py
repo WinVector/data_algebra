@@ -16,8 +16,10 @@ class PandasModel(PandasModelBase):
         PandasModelBase.__init__(self, pd=pd, presentation_model_name="pd")
 
 
-# set up what pandas supplier we are using
-# TODO: switch more model choices to the data_algebra.data_model.data_model_type_map
-default_data_model = PandasModel()
-data_algebra.data_model.data_model_type_map["default_data_model"] = default_data_model
-data_algebra.data_model.data_model_type_map[str(type(default_data_model.data_frame()))] = default_data_model
+def _register_pandas_model():
+    # set up what pandas supplier we are using
+    default_data_model = PandasModel()
+    data_algebra.data_model.data_model_type_map["default_data_model"] = default_data_model
+    data_algebra.data_model.data_model_type_map[str(type(default_data_model.data_frame()))] = default_data_model
+
+_register_pandas_model()

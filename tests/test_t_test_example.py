@@ -17,7 +17,7 @@ def test_t_test_example():
     # choose our simulated number of observations
     n_obs = 1000
 
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "group": numpy.random.choice(["a", "b", "c"], size=n_obs, replace=True),
             "value": numpy.random.normal(0, 1, size=n_obs),
@@ -55,7 +55,7 @@ def test_t_test_example():
             data_algebra.cdata.RecordMap(
                 blocks_in=data_algebra.cdata.RecordSpecification(
                     record_keys=["group"],
-                    control_table=data_algebra.pandas_model.default_data_model.pd.DataFrame(
+                    control_table=data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
                         {
                             "sensor": ["s1", "s2"],
                             "group_sensor_mean": [
@@ -89,7 +89,7 @@ def test_t_test_example():
         .order_rows(["group"])
     )
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "group": ["a", "b", "c"],
             "mean_diff": [
@@ -128,7 +128,7 @@ def test_t_test_example():
             data_algebra.cdata.RecordMap(
                 blocks_in=data_algebra.cdata.RecordSpecification(
                     record_keys=["group"],
-                    control_table=data_algebra.pandas_model.default_data_model.pd.DataFrame(
+                    control_table=data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
                         {
                             "sensor": ["s1", "s2"],
                             "group_sensor_mean": [
@@ -173,7 +173,7 @@ def test_t_test_example_2():
     numpy.random.seed(1999)
     # choose our simulated number of observations
     n_obs = 1000
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame({
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
         'group': numpy.random.choice(['a', 'b', 'c'], size=n_obs, replace=True),
         'value': numpy.random.normal(0, 1, size=n_obs),
         'sensor': numpy.random.choice(['s1', 's2'], size=n_obs, replace=True),
@@ -191,14 +191,14 @@ def test_t_test_example_2():
         v_s1 = d_sub.loc[d_sub['sensor'] == 's1', 'value']
         v_s2 = d_sub.loc[d_sub['sensor'] == 's2', 'value']
         res_g = scipy.stats.ttest_ind(v_s1, v_s2, equal_var=False)
-        return data_algebra.pandas_model.default_data_model.pd.DataFrame({
+        return data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
             'group': [g],
             't': [res_g.statistic],
             'significance': [res_g.pvalue],
         })
 
     group_stats = [f(g) for g in groups]
-    group_stats = data_algebra.pandas_model.default_data_model.pd.concat(group_stats).reset_index(inplace=False, drop=True)
+    group_stats = data_algebra.data_model.data_model_type_map["default_data_model"].pd.concat(group_stats).reset_index(inplace=False, drop=True)
     # define our operators
     td = descr(d=d)
     ops_var = (
@@ -214,20 +214,20 @@ def test_t_test_example_2():
             {'group_sensor_est_var': 'group_sensor_var / group_sensor_n'})
     )
     # cdata steps
-    a = data_algebra.pandas_model.default_data_model.pd.DataFrame({
+    a = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
         'group': ['a', 'a'],
         'sensor': ['s1', 's2'],
         'group_sensor_mean': [-0.103881, 0.018839],
         'group_sensor_est_var': [0.007211, 0.004606],
     })
-    b = data_algebra.pandas_model.default_data_model.pd.DataFrame({
+    b = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
         'group': ['a'],
         'group_sensor_mean_s1': [-0.103881],
         'group_sensor_mean_s2': [0.018839],
         'group_sensor_est_var_s1': [0.007211],
         'group_sensor_est_var_s2': [0.004606],
     })
-    record_in = data_algebra.pandas_model.default_data_model.pd.DataFrame({
+    record_in = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
         'sensor': ['s1', 's2'],
         'group_sensor_mean': ['group_sensor_mean_s1', 'group_sensor_mean_s2'],
         'group_sensor_est_var': ['group_sensor_est_var_s1', 'group_sensor_est_var_s2'],

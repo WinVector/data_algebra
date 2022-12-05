@@ -8,7 +8,7 @@ from data_algebra.data_ops import *
 
 
 def test_strat_example():
-    prepared_stratified = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    prepared_stratified = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "y": [1.0, 0.0, 0.0, 1.0, 0.0, 0.0],
             "g": [0.0, 0.0, 0.0, 1.0, 1.0, 1.0],
@@ -20,7 +20,7 @@ def test_strat_example():
         {"sum": "y.sum()", "mean": "y.mean()", "size": "_size()",}, group_by=["g"]
     )
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "g": [0, 1],
             "sum": [1, 1],
@@ -35,7 +35,7 @@ def test_strat_example():
 
 
 def test_strat_example_size():
-    prepared_stratified = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    prepared_stratified = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"y": [1, 0, 0, 1, 0, 0], "g": [0, 0, 0, 1, 1, 1], "x": [1, 2, 3, 4, 5, 6]}
     )
 
@@ -43,7 +43,7 @@ def test_strat_example_size():
         {"size": "_size()",}, group_by=["g"]
     )
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"g": [0, 1], "size": [3, 3],}
     )
 

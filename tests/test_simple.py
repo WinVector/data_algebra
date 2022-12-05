@@ -7,43 +7,43 @@ from data_algebra.data_ops import *
 
 
 def test_can_convert_v_to_numeric():
-    data_model = data_algebra.pandas_model.default_data_model
+    data_model = data_algebra.data_model.data_model_type_map["default_data_model"]
     assert data_model.can_convert_col_to_numeric(0)
     assert data_model.can_convert_col_to_numeric(1.0)
     assert not data_model.can_convert_col_to_numeric("hi")
     assert data_model.can_convert_col_to_numeric(numpy.asarray([1, 2]))
     assert data_model.can_convert_col_to_numeric(
-        data_algebra.pandas_model.default_data_model.pd.DataFrame({"x": [1, 2]})["x"]
+        data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"x": [1, 2]})["x"]
     )
     assert data_model.can_convert_col_to_numeric(
-        data_algebra.pandas_model.default_data_model.pd.DataFrame({"x": [1, numpy.nan]})["x"]
+        data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"x": [1, numpy.nan]})["x"]
     )
     assert not data_model.can_convert_col_to_numeric(
-        data_algebra.pandas_model.default_data_model.pd.DataFrame({"x": ["a", "b"]})["x"]
+        data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"x": ["a", "b"]})["x"]
     )
     assert not data_model.can_convert_col_to_numeric(
-        data_algebra.pandas_model.default_data_model.pd.DataFrame({"x": ["a", numpy.nan]})["x"]
+        data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"x": ["a", numpy.nan]})["x"]
     )
     assert not data_model.can_convert_col_to_numeric(
-        data_algebra.pandas_model.default_data_model.pd.DataFrame({"x": [1, "a"]})["x"]
+        data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"x": [1, "a"]})["x"]
     )
 
 
 def test_equiv():
-    d1 = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d1 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"x": [1, 2], "y": [3, numpy.nan]}
     )
-    d1b = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d1b = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"x": [2, 1], "y": [numpy.nan, 3]}
     )
-    d1c = data_algebra.pandas_model.default_data_model.pd.DataFrame({"x": [1, 2], "y": [3, 4.0001]})
-    d1d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d1c = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"x": [1, 2], "y": [3, 4.0001]})
+    d1d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"x": [1, 2], "y": [3.0001, numpy.nan]}
     )
-    d2 = data_algebra.pandas_model.default_data_model.pd.DataFrame({"x": [1, 2], "z": ["a", "b"]})
-    d3 = data_algebra.pandas_model.default_data_model.pd.DataFrame({"x": [1, 2], "y": ["a", "b"]})
-    d4 = data_algebra.pandas_model.default_data_model.pd.DataFrame({"x": [1, 2]})
-    d5 = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d2 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"x": [1, 2], "z": ["a", "b"]})
+    d3 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"x": [1, 2], "y": ["a", "b"]})
+    d4 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"x": [1, 2]})
+    d5 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"x": [1, 2, 0], "y": [3, numpy.nan, 0]}
     )
     assert data_algebra.test_util.equivalent_frames(d1, d1)
@@ -73,11 +73,11 @@ def test_simple():
         {"z": f"1/({q}) + x"}
     )
 
-    d_local = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d_local = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"x": [1.0, 2.0], "y": [3.0, 4.0]}
     )
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"x": [1.0, 2.0], "y": [3.0, 4.0], "z": [1.25, 2.25]}
     )
 
@@ -85,7 +85,7 @@ def test_simple():
 
 
 def test_pandas_to_example():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "record_id": [1, 1, 1, 2, 2, 2],
             "column_label": [
@@ -102,5 +102,5 @@ def test_pandas_to_example():
         }
     )
     d_str = data_algebra.util.pandas_to_example_str(d)
-    d_back = eval(d_str, globals(), {"pd": data_algebra.pandas_model.default_data_model.pd})
+    d_back = eval(d_str, globals(), {"pd": data_algebra.data_model.data_model_type_map["default_data_model"].pd})
     assert data_algebra.test_util.equivalent_frames(d, d_back)

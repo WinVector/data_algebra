@@ -7,14 +7,14 @@ from data_algebra.data_ops import *
 
 
 def test_ref_detect_1():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "x": numpy.asanyarray(["a", "b"]),
             "x_coded": numpy.asanyarray([1, 2]),
             "idx": range(2),
         }
     )
-    d2 = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d2 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "x": numpy.asanyarray(["a", "b"]),
             "x_coded": numpy.asanyarray([1, 2]),
@@ -40,14 +40,14 @@ def test_ref_detect_1():
 
 
 def test_ref_detect_2():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "x": numpy.asanyarray(["a", "b"]),
             "x_coded": numpy.asanyarray([1, 2]),
             "idx": range(2),
         }
     )
-    d2 = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d2 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "x": numpy.asanyarray(["a", "b"]),
             "x_coded": numpy.asanyarray([1, 2]),

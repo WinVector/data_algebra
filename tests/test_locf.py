@@ -10,7 +10,7 @@ import data_algebra.solutions
 
 
 def test_locf():
-    pd = data_algebra.pandas_model.default_data_model.pd
+    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
     d = pd.DataFrame({
         'v': [1., numpy.nan, 3., numpy.nan, 2., numpy.nan],
         'g': ['a', 'a', 'a', 'b', 'b', 'b'],

@@ -9,7 +9,7 @@ from data_algebra.cdata import *
 def test_scatter_example():
     meas_vars = ["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"]
     pairs = [(a, b) for a in meas_vars for b in meas_vars]
-    control_table = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    control_table = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"v1": [p[0] for p in pairs], "v2": [p[1] for p in pairs]}
     )
     control_table["value_1"] = control_table["v1"]
@@ -23,7 +23,7 @@ def test_scatter_example():
     )
 
     str = format(record_map)
-    iris_small = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    iris_small = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "iris_id": [1, 100],
             "Sepal.Length": [5.1, 5.7],
@@ -34,7 +34,7 @@ def test_scatter_example():
         }
     )
     res = record_map.transform(iris_small)
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "iris_id": [
                 1,

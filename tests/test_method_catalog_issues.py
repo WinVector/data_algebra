@@ -6,7 +6,7 @@ import data_algebra.SQLite
 import data_algebra.BigQuery
 import data_algebra.PostgreSQL
 import data_algebra.MySQL
-import data_algebra.pandas_model
+import data_algebra.data_model
 
 import data_algebra.test_util
 
@@ -14,7 +14,7 @@ import data_algebra.test_util
 def mk_example():
     datetime_format = "%Y-%m-%d %H:%M:%S"
     date_format = "%Y-%m-%d"
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame({
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
         'row_id': [0, 1, 2, 3],
         'a': [False, False, True, True],
         'b': [False, True, False, True],
@@ -26,20 +26,20 @@ def mk_example():
         's2': ['z', 'q', '11', 'b'],
         "str_datetime_col": ["2000-01-01 12:13:21", "2020-04-05 14:03:00", "2000-01-01 12:13:21", "2020-04-05 14:03:00"],
         "str_date_col": ["2000-03-01", "2020-04-05", "2000-03-01", "2020-04-05"],
-        "datetime_col_0": data_algebra.pandas_model.default_data_model.pd.to_datetime(
-            data_algebra.pandas_model.default_data_model.pd.Series(["2010-01-01 12:13:21", "2030-04-05 14:03:00", "2010-01-01 12:13:21", "2030-04-05 14:03:00"]),
+        "datetime_col_0": data_algebra.data_model.data_model_type_map["default_data_model"].pd.to_datetime(
+            data_algebra.data_model.data_model_type_map["default_data_model"].pd.Series(["2010-01-01 12:13:21", "2030-04-05 14:03:00", "2010-01-01 12:13:21", "2030-04-05 14:03:00"]),
             format=datetime_format,
         ),
-        "datetime_col_1": data_algebra.pandas_model.default_data_model.pd.to_datetime(
-            data_algebra.pandas_model.default_data_model.pd.Series(["2010-01-01 12:11:21", "2030-04-06 14:03:00", "2010-01-01 12:11:21", "2030-04-06 14:03:00"]),
+        "datetime_col_1": data_algebra.data_model.data_model_type_map["default_data_model"].pd.to_datetime(
+            data_algebra.data_model.data_model_type_map["default_data_model"].pd.Series(["2010-01-01 12:11:21", "2030-04-06 14:03:00", "2010-01-01 12:11:21", "2030-04-06 14:03:00"]),
             format=date_format,
         ),
-        "date_col_0": data_algebra.pandas_model.default_data_model.pd.to_datetime(
-            data_algebra.pandas_model.default_data_model.pd.Series(["2000-01-02", "2035-04-05", "2000-01-02", "2035-04-05"]),
+        "date_col_0": data_algebra.data_model.data_model_type_map["default_data_model"].pd.to_datetime(
+            data_algebra.data_model.data_model_type_map["default_data_model"].pd.Series(["2000-01-02", "2035-04-05", "2000-01-02", "2035-04-05"]),
             format=date_format
         ).dt.date,
-        "date_col_1": data_algebra.pandas_model.default_data_model.pd.to_datetime(
-            data_algebra.pandas_model.default_data_model.pd.Series(["2000-01-02", "2035-05-05", "2000-01-02", "2035-05-05"]),
+        "date_col_1": data_algebra.data_model.data_model_type_map["default_data_model"].pd.to_datetime(
+            data_algebra.data_model.data_model_type_map["default_data_model"].pd.Series(["2000-01-02", "2035-05-05", "2000-01-02", "2035-05-05"]),
             format=date_format
         ).dt.date,
     })

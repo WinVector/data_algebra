@@ -11,7 +11,7 @@ import data_algebra.SQLite
 
 
 def test_dag_elim():
-    pd = data_algebra.pandas_model.default_data_model.pd
+    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
     d = pd.DataFrame({
         'x': [1, 2, 3],
     })
@@ -50,7 +50,7 @@ def test_dag_elim():
 # some variations that could trigger an earlier bug
 
 def test_dag_elim_bee():
-    pd = data_algebra.pandas_model.default_data_model.pd
+    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
     d = pd.DataFrame({
         'x': [1, 2, 3],
     })
@@ -74,7 +74,7 @@ def test_dag_elim_bee():
 
 
 def test_dag_elim_bet():
-    pd = data_algebra.pandas_model.default_data_model.pd
+    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
     d = pd.DataFrame({
         'x': [1, 2, 3],
     })
@@ -95,7 +95,7 @@ def test_dag_elim_bet():
 
 
 def test_dag_elim_bte():
-    pd = data_algebra.pandas_model.default_data_model.pd
+    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
     d = pd.DataFrame({
         'x': [1, 2, 3],
     })
@@ -118,7 +118,7 @@ def test_dag_elim_bte():
 
 
 def test_dag_elim_btt():
-    pd = data_algebra.pandas_model.default_data_model.pd
+    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
     d = pd.DataFrame({
         'x': [1, 2, 3],
     })
@@ -138,7 +138,7 @@ def test_dag_elim_btt():
 
 def test_dag_elim_bttf():
     # test work around or fix
-    pd = data_algebra.pandas_model.default_data_model.pd
+    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
     d = pd.DataFrame({
         'x': [1, 2, 3],
     })
@@ -159,7 +159,7 @@ def test_dag_elim_bttf():
 
 
 def test_dag_elim_bttb():
-    pd = data_algebra.pandas_model.default_data_model.pd
+    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
     d = pd.DataFrame({
         'x': [1, 2, 3],
     })
@@ -184,7 +184,7 @@ def test_dag_elim_bttb():
 
 
 def test_dag_elim_uee():
-    pd = data_algebra.pandas_model.default_data_model.pd
+    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
     d = pd.DataFrame({
         'x': [1, 2, 3],
         'y': [1, 2, 3],
@@ -214,7 +214,7 @@ def test_dag_elim_uee():
 
 
 def test_dag_elim_uet():
-    pd = data_algebra.pandas_model.default_data_model.pd
+    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
     d = pd.DataFrame({
         'x': [1, 2, 3],
         'y': [1, 2, 3],
@@ -235,7 +235,7 @@ def test_dag_elim_uet():
 
 
 def test_dag_elim_ute():
-    pd = data_algebra.pandas_model.default_data_model.pd
+    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
     d = pd.DataFrame({
         'x': [1, 2, 3],
         'y': [1, 2, 3],
@@ -258,7 +258,7 @@ def test_dag_elim_ute():
 
 
 def test_dag_elim_utt():
-    pd = data_algebra.pandas_model.default_data_model.pd
+    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
     d = pd.DataFrame({
         'x': [1, 2, 3],
         'y': [1, 2, 3],

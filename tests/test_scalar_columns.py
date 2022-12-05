@@ -6,7 +6,7 @@ import data_algebra.test_util
 
 
 def test_scalar_columns():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame({"x": [1, 2, 3, 4]})
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"x": [1, 2, 3, 4]})
 
     ops = describe_table(d, table_name="d").extend(
         {

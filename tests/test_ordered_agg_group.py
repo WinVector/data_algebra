@@ -9,7 +9,7 @@ import data_algebra.SQLite
 
 
 def test_ordered_agg_group():
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "ID": [1, 2, 3, 4, 5, 6],
             "DATE1": [
@@ -35,7 +35,7 @@ def test_ordered_agg_group():
         }
     )
 
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "ID": [1, 1, 2, 3, 4, 4, 4, 4, 5, 5, 6],
             "OP": ["A", "B", "A", "D", "C", "A", "D", "B", "A", "B", "B"],
@@ -59,7 +59,7 @@ def test_ordered_agg_group():
 
     
 
-    diagram = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    diagram = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "rank": [1, 2, 3],
             "DATE": ["DATE1", "DATE2", "DATE3"],
@@ -105,7 +105,7 @@ def test_ordered_agg_group():
     db_model.prepare_connection(con)
     d.to_sql("d", con, if_exists="replace")
 
-    res_db = data_algebra.pandas_model.default_data_model.pd.read_sql_query(sql, con)
+    res_db = data_algebra.data_model.data_model_type_map["default_data_model"].pd.read_sql_query(sql, con)
 
     # res_db
     assert data_algebra.test_util.equivalent_frames(expect, res_db)
@@ -128,7 +128,7 @@ def test_ordered_agg_group():
 
     res_ag = ops2.transform(r)
 
-    expect_ag = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect_ag = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "ID": [1, 2, 3, 4, 5, 6],
             "DATE1": [

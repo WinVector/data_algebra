@@ -16,11 +16,11 @@ def test_null_bad():
         .drop_columns(["x"])
     )
 
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"x": [1, numpy.nan, math.inf, -math.inf, None, 0]}
     )
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "x_is_null": [False, True, False, False, True, False],
             "x_is_bad": [False, True, True, True, True, False],
@@ -42,7 +42,7 @@ def test_null_bad():
 def test_null_bad_no_compare():
     # similar in intent to not allowing None in sets in this grammar
     # Null/None/NaN should be checked by a method, not an expression
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"x": [1, numpy.nan, math.inf, -math.inf, None, 0]}
     )
 

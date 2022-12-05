@@ -7,7 +7,7 @@ import data_algebra.SQLite
 
 
 def test_extend_order_1():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {("x_" + str(i)): range(i * 20, i * 20 + 5) for i in range(10)}
     )
 

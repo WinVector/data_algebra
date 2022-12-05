@@ -7,7 +7,7 @@ import data_algebra.db_space
 
 def test_dup_detection_example_1():
     # from Examples/DupRows.ipynb
-    pd = data_algebra.pandas_model.default_data_model.pd
+    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
     rng = np.random.default_rng(2022)
 
     def generate_example(*, n_columns: int = 5, n_rows: int = 10):

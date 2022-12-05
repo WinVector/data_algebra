@@ -7,7 +7,7 @@ from data_algebra.solutions import replicate_rows_query
 
 def test_replicate_rows_query():
     # get a pandas namespace
-    pd = data_algebra.pandas_model.default_data_model.pd
+    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
     d = pd.DataFrame({
         'key': ['a', 'b', 'c'],
         'n': [1, 2, 3],

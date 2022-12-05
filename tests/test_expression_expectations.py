@@ -32,7 +32,7 @@ def test_expression_expectations_1():
     u_results = expectation_map['u_results']
 
     for op, op_class, exp, ops, expect in expectations:
-        if data_algebra.pandas_model.default_data_model.is_appropriate_data_instance(expect):
+        if data_algebra.data_model.data_model_type_map["default_data_model"].is_appropriate_data_instance(expect):
             res = ops.transform(d)
             assert data_algebra.test_util.equivalent_frames(res, expect)
         if do_super_expensive_rechecks:
@@ -55,7 +55,7 @@ def test_expression_expectations_1():
     for op, op_class, exp, ops, expect in u_results:
         # re-run, but don't check value
         res = ops.transform(d)
-        assert data_algebra.pandas_model.default_data_model.is_appropriate_data_instance(res)
+        assert data_algebra.data_model.data_model_type_map["default_data_model"].is_appropriate_data_instance(res)
 
 
 def test_expression_expectations_direct():
@@ -72,7 +72,7 @@ def test_expression_expectations_direct():
     for h in db_handles:
         h.insert_table(d, table_name='d', allow_overwrite=True)
     for op, op_class, exp, ops, expect in expectations:
-        if data_algebra.pandas_model.default_data_model.is_appropriate_data_instance(expect):
+        if data_algebra.data_model.data_model_type_map["default_data_model"].is_appropriate_data_instance(expect):
             res = ops.transform(d)
             assert data_algebra.test_util.equivalent_frames(res, expect)
             matching = methods_table.loc[methods_table['expression'] == exp, :]
@@ -84,9 +84,9 @@ def test_expression_expectations_direct():
                         res_db = h.read_query(ops)
                         assert data_algebra.test_util.equivalent_frames(res_db, expect)
     for op, op_class, exp, ops, expect in u_results:
-        if data_algebra.pandas_model.default_data_model.is_appropriate_data_instance(expect):
+        if data_algebra.data_model.data_model_type_map["default_data_model"].is_appropriate_data_instance(expect):
             res = ops.transform(d)
-            assert data_algebra.pandas_model.default_data_model.is_appropriate_data_instance(res)
+            assert data_algebra.data_model.data_model_type_map["default_data_model"].is_appropriate_data_instance(res)
             matching = methods_table.loc[methods_table['expression'] == exp, :]
             if matching.shape[0] == 1:
                 to_test = {c for c in matching.columns if 'Model' in c}
@@ -94,7 +94,7 @@ def test_expression_expectations_direct():
                     model_name = str(h.db_model)
                     if (model_name in to_test) and (matching[model_name].values[0] == 'y'):
                         res_db = h.read_query(ops)
-                        assert data_algebra.pandas_model.default_data_model.is_appropriate_data_instance(res_db)
+                        assert data_algebra.data_model.data_model_type_map["default_data_model"].is_appropriate_data_instance(res_db)
     for h in db_handles:
         h.drop_table('d')
         h.close()

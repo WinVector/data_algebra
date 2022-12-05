@@ -7,7 +7,7 @@ import numpy
 
 def test_uniform_1():
     # some example data
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "ID": range(20),
         }
@@ -29,7 +29,7 @@ def test_uniform_1():
             .extend({'r': '_uniform()'})
             .extend({'r': '0 * r'})
     )
-    expect =  data_algebra.pandas_model.default_data_model.pd.DataFrame({
+    expect =  data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
             "ID": range(20),
             'r': 0.0
         })
@@ -38,7 +38,7 @@ def test_uniform_1():
 
 def test_uniform_2():
     # some example data
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "ID": range(10000),
         }

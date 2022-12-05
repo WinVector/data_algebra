@@ -9,20 +9,20 @@ import pytest
 
 
 def test_idiom_count_empty_frame_a():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame({"group": [], "val": [],})
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"group": [], "val": [],})
     table_name = "pytest_temp_d"
 
     ops = describe_table(d, table_name=table_name).project({"count": "(1).sum()"})
 
     res = ops.transform(d)
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame({"count": [0],})
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"count": [0],})
 
     assert data_algebra.test_util.equivalent_frames(res, expect)
 
 
 def test_idiom_count_empty_frame_b():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame({"group": [], "val": [],})
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"group": [], "val": [],})
     table_name = "pytest_temp_d"
 
     ops = (
@@ -33,13 +33,13 @@ def test_idiom_count_empty_frame_b():
 
     res = ops.transform(d)
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame({"count": [0],})
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"count": [0],})
 
     assert data_algebra.test_util.equivalent_frames(res, expect)
 
 
 def test_idiom_extend_one_count():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"group": ["a", "a", "b", "b"], "val": [1, 2, 3, 4],}
     )
     table_name = "pytest_temp_d"
@@ -50,7 +50,7 @@ def test_idiom_extend_one_count():
         .project({"count": "one.sum()"})
     )
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame({"count": [4]})
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"count": [4]})
 
     data_algebra.test_util.check_transform(
         ops=ops, data=d, expect=expect, empty_produces_empty=False
@@ -58,14 +58,14 @@ def test_idiom_extend_one_count():
 
 
 def test_idiom_extend_special_count():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"group": ["a", "a", "b", "b"], "val": [1, 2, 3, 4],}
     )
     table_name = "pytest_temp_d"
 
     ops = describe_table(d, table_name=table_name).project({"count": "_count()"})
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame({"count": [4]})
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"count": [4]})
 
     with pytest.warns(UserWarning):
         data_algebra.test_util.check_transform(
@@ -75,7 +75,7 @@ def test_idiom_extend_special_count():
 
 # previously forbidden
 def test_idiom_forbidden_extend_test_trinary():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"group": ["a", "a", "b", "b"], "val": [1, 2, 3, 4],}
     )
     table_name = "pytest_temp_d"
@@ -86,7 +86,7 @@ def test_idiom_forbidden_extend_test_trinary():
         }
     )
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "group": ["a", "a", "b", "b"],
             "val": [1, 2, 3, 4],
@@ -98,7 +98,7 @@ def test_idiom_forbidden_extend_test_trinary():
 
 
 def test_idiom_extend_test_trinary():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"group": ["a", "a", "b", "b"], "val": [1, 2, 3, 4],}
     )
     table_name = "pytest_temp_d"
@@ -114,7 +114,7 @@ def test_idiom_extend_test_trinary():
     assert isinstance(sql, str)
     # print(sql)
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "group": ["a", "a", "b", "b"],
             "val": [1, 2, 3, 4],
@@ -126,7 +126,7 @@ def test_idiom_extend_test_trinary():
 
 
 def test_idiom_extend_test_trinary_2():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"group": ["a", "a", "b", "b"], "val": [1, 2, 3, 4],}
     )
     table_name = "pytest_temp_d"
@@ -140,7 +140,7 @@ def test_idiom_extend_test_trinary_2():
     assert isinstance(sql, str)
     # print(sql)
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "group": ["a", "a", "b", "b"],
             "val": [1, 2, 3, 4],
@@ -152,10 +152,10 @@ def test_idiom_extend_test_trinary_2():
 
 
 def test_idiom_simulate_cross_join():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame({"x": [1, 2, 3, 4],})
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"x": [1, 2, 3, 4],})
     table_name_d = "pytest_temp_d"
 
-    e = data_algebra.pandas_model.default_data_model.pd.DataFrame({"y": ["a", "b", "c"],})
+    e = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"y": ["a", "b", "c"],})
     table_name_e = "pytest_temp_e"
 
     ops = (
@@ -177,7 +177,7 @@ def test_idiom_simulate_cross_join():
         .drop_columns(["one"])
     )
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "x": [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4],
             "y": ["a", "b", "c", "a", "b", "c", "a", "b", "c", "a", "b", "c"],
@@ -190,10 +190,10 @@ def test_idiom_simulate_cross_join():
 
 
 def test_idiom_simulate_cross_join_select():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame({"x": [1, 2, 3, 4],})
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"x": [1, 2, 3, 4],})
     table_name_d = "pytest_temp_d"
 
-    e = data_algebra.pandas_model.default_data_model.pd.DataFrame({"y": ["a", "b", "c"],})
+    e = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"y": ["a", "b", "c"],})
     table_name_e = "pytest_temp_e"
 
     ops = (
@@ -215,7 +215,7 @@ def test_idiom_simulate_cross_join_select():
         .select_columns(["x", "y"])
     )
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "x": [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4],
             "y": ["a", "b", "c", "a", "b", "c", "a", "b", "c", "a", "b", "c"],
@@ -228,17 +228,17 @@ def test_idiom_simulate_cross_join_select():
 
 
 def test_idiom_cross_join():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame({"x": [1, 2, 3, 4],})
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"x": [1, 2, 3, 4],})
     table_name_d = "pytest_temp_d"
 
-    e = data_algebra.pandas_model.default_data_model.pd.DataFrame({"y": ["a", "b", "c"],})
+    e = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"y": ["a", "b", "c"],})
     table_name_e = "pytest_temp_e"
 
     ops = describe_table(d, table_name=table_name_d).natural_join(
         b=describe_table(e, table_name=table_name_e), by=[], jointype="cross"
     )
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "x": [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4],
             "y": ["a", "b", "c", "a", "b", "c", "a", "b", "c", "a", "b", "c"],
@@ -252,7 +252,7 @@ def test_idiom_cross_join():
 
 # Note: switching away from _row_number and _count
 def test_idiom_row_number():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"i": [1, 3, 2, 4, 5], "g": [1, 2, 2, 1, 1],}
     )
     table_name_d = "pytest_temp_d"
@@ -265,7 +265,7 @@ def test_idiom_row_number():
         .order_rows(["i"])
     )
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"i": [1, 2, 3, 4, 5], "g": [1, 2, 2, 1, 1], "n": [1, 1, 2, 2, 3],}
     )
 
@@ -274,7 +274,7 @@ def test_idiom_row_number():
 
 # Note: switching away from _row_number and _count
 def test_idiom_row_number_2():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"i": [1, 3, 2, 4, 5], "g": [1, 2, 2, 1, 1],}
     )
     table_name_d = "pytest_temp_d"
@@ -285,7 +285,7 @@ def test_idiom_row_number_2():
         .order_rows(["i"])
     )
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"i": [1, 2, 3, 4, 5], "g": [1, 2, 2, 1, 1], "n": [1, 1, 2, 2, 3],}
     )
 
@@ -294,7 +294,7 @@ def test_idiom_row_number_2():
 
 # Note: switching away from _row_number and _count
 def test_idiom_row_number_3():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"i": [1, 3, 2, 4, 5], "g": [1, 2, 2, 1, 1],}
     )
     table_name_d = "pytest_temp_d"
@@ -305,7 +305,7 @@ def test_idiom_row_number_3():
         .order_rows(["i"])
     )
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"i": [1, 2, 3, 4, 5], "g": [1, 2, 2, 1, 1], "n": [1, 1, 2, 2, 3],}
     )
 
@@ -313,7 +313,7 @@ def test_idiom_row_number_3():
 
 
 def test_idiom_sum_cumsum():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"i": [1, 2, 3, 4, 5], "o": [1, 1, 1, 1, 1], "g": [1, 2, 2, 1, 1],}
     )
     table_name_d = "pytest_temp_d"
@@ -341,7 +341,7 @@ def test_idiom_sum_cumsum():
         .order_rows(["i"])
     )
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "i": [1, 2, 3, 4, 5],
             "o": [1, 1, 1, 1, 1],
@@ -356,7 +356,7 @@ def test_idiom_sum_cumsum():
 
 
 def test_idiom_project_sum():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"i": [1, 2, 3, 4, 5], "g": [1, 2, 2, 1, 1],}
     )
     table_name_d = "pytest_temp_d"
@@ -367,20 +367,20 @@ def test_idiom_project_sum():
         .order_rows(["g"])
     )
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame({"g": [1, 2], "s": [3, 2],})
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"g": [1, 2], "s": [3, 2],})
 
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
 
 
 def test_idiom_concat_op():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"x": ["a", "b", "c"], "y": ["1", "2", "3"],}
     )
     table_name_d = "pytest_temp_d"
 
     ops = describe_table(d, table_name=table_name_d).extend({"z": "x %+% y %+% + x"})
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"x": ["a", "b", "c"], "y": ["1", "2", "3"], "z": ["a1a", "b2b", "c3c"]}
     )
 
@@ -388,14 +388,14 @@ def test_idiom_concat_op():
 
 
 def test_idiom_coalesce_op():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"x": ["a", "b", None, None], "y": ["1", None, "3", None],}
     )
     table_name_d = "pytest_temp_d"
 
     ops = describe_table(d, table_name=table_name_d).extend({"z": "x %?% y"})
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "x": ["a", "b", None, None],
             "y": ["1", None, "3", None],

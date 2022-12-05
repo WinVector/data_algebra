@@ -11,7 +11,7 @@ def test_one_row_cdata_convert():
     # https://github.com/WinVector/data_algebra/blob/main/Examples/GettingStarted/solving_problems_using_data_algebra.ipynb
     # Note: in converting to row recs we currently prefer no table for the single row case, but
     # making sure this case works on all code paths.
-    a = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    a = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "group": ["a", "a"],
             "sensor": ["s1", "s2"],
@@ -19,7 +19,7 @@ def test_one_row_cdata_convert():
             "group_sensor_est_var": [0.006761, 0.004844],
         }
     )
-    b = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    b = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "group": ["a"],
             "group_sensor_mean_s1": [-0.103881],
@@ -28,7 +28,7 @@ def test_one_row_cdata_convert():
             "group_sensor_est_var_s2": [0.004844],
         }
     )
-    record_in = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    record_in = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "sensor": ["s1", "s2"],
             "group_sensor_mean": ["group_sensor_mean_s1", "group_sensor_mean_s2"],
@@ -38,7 +38,7 @@ def test_one_row_cdata_convert():
             ],
         }
     )
-    record_out = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    record_out = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "group_sensor_mean_s1": ["group_sensor_mean_s1"],
             "group_sensor_mean_s2": ["group_sensor_mean_s2"],

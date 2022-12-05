@@ -10,7 +10,7 @@ import data_algebra.BigQuery
 
 
 def test_braid():
-    pd = data_algebra.pandas_model.default_data_model.pd
+    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
     d_state = pd.DataFrame({
         't': [1, 3, 5],
         'state': ['a', 'b', 'c'],

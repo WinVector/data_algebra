@@ -23,7 +23,7 @@ def test_small_cdata_example_debug():
     """,
         )
     )
-    iris_orig = data_algebra.pandas_model.default_data_model.pd.read_csv(buf)
+    iris_orig = data_algebra.data_model.data_model_type_map["default_data_model"].pd.read_csv(buf)
 
     buf = io.StringIO(
         re.sub(
@@ -46,12 +46,12 @@ def test_small_cdata_example_debug():
     """,
         )
     )
-    iris_blocks_orig = data_algebra.pandas_model.default_data_model.pd.read_csv(buf)
+    iris_blocks_orig = data_algebra.data_model.data_model_type_map["default_data_model"].pd.read_csv(buf)
 
     iris_blocks = iris_blocks_orig.copy()
     iris = iris_orig.copy()
 
-    control_table = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    control_table = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "Part": ["Sepal", "Sepal", "Petal", "Petal"],
             "Measure": ["Length", "Width", "Length", "Width"],
@@ -99,7 +99,7 @@ def test_cdata1():
     """,
         )
     )
-    iris_orig = data_algebra.pandas_model.default_data_model.pd.read_csv(buf)
+    iris_orig = data_algebra.data_model.data_model_type_map["default_data_model"].pd.read_csv(buf)
 
     buf = io.StringIO(
         re.sub(
@@ -122,7 +122,7 @@ def test_cdata1():
     """,
         )
     )
-    iris_blocks_orig = data_algebra.pandas_model.default_data_model.pd.read_csv(buf)
+    iris_blocks_orig = data_algebra.data_model.data_model_type_map["default_data_model"].pd.read_csv(buf)
 
     iris_blocks = iris_blocks_orig.copy()
     iris = iris_orig.copy()
@@ -134,7 +134,7 @@ def test_cdata1():
     # from:
     #   https://github.com/WinVector/cdata/blob/master/vignettes/control_table_keys.Rmd
 
-    control_table = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    control_table = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "Part": ["Sepal", "Sepal", "Petal", "Petal"],
             "Measure": ["Length", "Width", "Length", "Width"],
@@ -229,7 +229,7 @@ def test_cdata1():
 
 def test_cdata_explode():
     # from https://github.com/WinVector/cdata/blob/master/README.Rmd
-    control = data_algebra.pandas_model.default_data_model.pd.read_csv(
+    control = data_algebra.data_model.data_model_type_map["default_data_model"].pd.read_csv(
         io.StringIO(
             re.sub(
                 "[ \\t]+",
@@ -256,7 +256,7 @@ def test_cdata_explode():
             )
         )
     )
-    iris = data_algebra.pandas_model.default_data_model.pd.read_csv(
+    iris = data_algebra.data_model.data_model_type_map["default_data_model"].pd.read_csv(
         io.StringIO(
             re.sub(
                 "[ \\t]+",
@@ -273,7 +273,7 @@ def test_cdata_explode():
             )
         )
     )
-    expect = data_algebra.pandas_model.default_data_model.pd.read_csv(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.read_csv(
         io.StringIO(
             re.sub(
                 "[ \\t]+",
@@ -390,7 +390,7 @@ def test_cdata_explode():
 
 
 def test_cdata_query_details():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"measure_1": [1, 2], "measure_2": [3, 4], "rec": ["a", "b"]}
     )
     td = describe_table(d, table_name="d")
@@ -404,7 +404,7 @@ def test_cdata_query_details():
         )
     )
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "rec": ["a", "a", "b", "b"],
             "measurement": ["measure_1", "measure_2", "measure_1", "measure_2"],

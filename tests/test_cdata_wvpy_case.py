@@ -28,12 +28,12 @@ threshold,count,fraction,precision,true_positive_rate,false_positive_rate,true_n
     """,
         )
     )
-    to_plot = data_algebra.pandas_model.default_data_model.pd.read_csv(buf)
+    to_plot = data_algebra.data_model.data_model_type_map["default_data_model"].pd.read_csv(buf)
 
     plotvars = ["sensitivity", "specificity"]
     reshaper = RecordMap(
         blocks_out=RecordSpecification(
-            data_algebra.pandas_model.default_data_model.pd.DataFrame(
+            data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
                 {"measure": plotvars, "value": plotvars}
             ),
             control_table_keys=["measure"],
@@ -41,7 +41,7 @@ threshold,count,fraction,precision,true_positive_rate,false_positive_rate,true_n
         )
     )
     prtlong = reshaper.transform(to_plot)
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "threshold": [
                 0.999999,
@@ -114,7 +114,7 @@ threshold,count,fraction,precision,true_positive_rate,false_positive_rate,true_n
     plotvars = ["sensitivity"]
     reshaper = RecordMap(
         blocks_out=RecordSpecification(
-            data_algebra.pandas_model.default_data_model.pd.DataFrame(
+            data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
                 {"measure": plotvars, "value": plotvars}
             ),
             control_table_keys=["measure"],
@@ -122,7 +122,7 @@ threshold,count,fraction,precision,true_positive_rate,false_positive_rate,true_n
         )
     )
     prtlong = reshaper.transform(to_plot)
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "threshold": [0.999999, 1.0, 2.0, 3.0, 4.0, 5.0, 5.000001],
             "measure": [

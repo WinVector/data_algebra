@@ -5,7 +5,7 @@ import data_algebra.util
 
 
 def test_join_multi_key():
-    d1 = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d1 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "a": ["a", "b", "zz", "zz"],
             "b": ["c", "zz", "d", "zz"],
@@ -13,7 +13,7 @@ def test_join_multi_key():
         }
     )
 
-    d2 = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d2 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "a": ["a", "b", "zz", "zz"],
             "b": ["c", "zz", "d", "zz"],
@@ -27,7 +27,7 @@ def test_join_multi_key():
 
     res_pandas = ops.eval({"d1": d1, "d2": d2})
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "a": ["a", "b", "zz", "zz"],
             "b": ["c", "zz", "d", "zz"],

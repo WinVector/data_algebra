@@ -5,7 +5,7 @@ from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
 
 
 def test_readme_example_1():
-    d_local = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d_local = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "subjectID": [1, 1, 2, 2],
             "surveyCategory": [
@@ -38,7 +38,7 @@ def test_readme_example_1():
         .rename_columns({"diagnosis": "surveyCategory"})
     )
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "subjectID": [1, 2],
             "diagnosis": ["withdrawal behavior", "positive re-framing"],

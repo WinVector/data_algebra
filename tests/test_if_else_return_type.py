@@ -8,7 +8,7 @@ import data_algebra.SQLite
 
 
 def test_if_else_return_type():
-    pd = data_algebra.pandas_model.default_data_model.pd
+    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
     d = pd.DataFrame({
         'x': [True, False, None],
     })

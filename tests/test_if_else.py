@@ -12,7 +12,7 @@ import pytest
 
 
 def test_if_else():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"a": [True, False], "b": [1, 2], "c": [3, 4]}
     )
 
@@ -20,7 +20,7 @@ def test_if_else():
         {"d": "a.if_else(b, c)"}
     )
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"a": [True, False], "b": [1, 2], "c": [3, 4], "d": [1, 4],}
     )
 
@@ -28,7 +28,7 @@ def test_if_else():
 
 
 def test_if_else_2():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "group": ["A", "B", None, "A", None, "C"],
             "c1": [1, 2, 3, 4, 5, 6],
@@ -63,7 +63,7 @@ def test_if_else_2():
         .select_columns(["choice_fixed", "rc", "not_c_1"])
     )
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "choice_fixed": [1, 0, 0, 1, 0, 0],
             "rc": [1, -2, -3, 4, -5, -6],
@@ -75,7 +75,7 @@ def test_if_else_2():
 
 
 def test_maximum_1():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"a": [1, 2, 3, 5], "b": [-1, 3, -7, 6],}
     )
 
@@ -83,7 +83,7 @@ def test_maximum_1():
         {"c": "a.maximum(b)", "d": "a.minimum(b)"}
     )
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"a": [1, 2, 3, 5], "b": [-1, 3, -7, 6],}
     )
     expect["c"] = numpy.maximum(expect.a, expect.b)
@@ -93,7 +93,7 @@ def test_maximum_1():
 
 
 def test_if_else_complex():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"a": [-4.0, 2.0], "b": [1.0, 2.0], "c": [3.0, 4.0]}
     )
 
@@ -101,7 +101,7 @@ def test_if_else_complex():
         {"d": "((a + 2).sign() > 0).if_else(b+1, c-2)"}
     )
 
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"a": [-4.0, 2.0], "b": [1.0, 2.0], "c": [3.0, 4.0], "d": [1.0, 3.0]}
     )
 
@@ -109,7 +109,7 @@ def test_if_else_complex():
 
 
 def test_if_else_where():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame({
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
         "a": [True, False, None],
         "x": ['x0', 'x1', 'x2'],
     })
@@ -122,7 +122,7 @@ def test_if_else_where():
             })
     )
     res_pandas = ops.transform(d)
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame({
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
         "a": [True, False, None],
         "x": ['x0', 'x1', 'x2'],
         'r_e': ['x0', 'y', None],

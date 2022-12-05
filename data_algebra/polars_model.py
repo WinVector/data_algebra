@@ -307,5 +307,4 @@ def _register_polars_model():
     default_Polars_model = PolarsModel()
     data_algebra.data_model.data_model_type_map[str(type(default_Polars_model.data_frame()))] = default_Polars_model
 
-
 _register_polars_model()

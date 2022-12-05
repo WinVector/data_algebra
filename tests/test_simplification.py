@@ -16,11 +16,11 @@ def test_simplification_1():
         .extend({"x": 5})
         .select_columns(["x", "sum23", "col3"])
     )
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"col1": [1, 2], "col2": [3, 4], "col3": [4, 5]}
     )
     res = ops.transform(d)
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"x": [5, 5], "sum23": [7, 9], "col3": [4, 5],}
     )
     assert data_algebra.test_util.equivalent_frames(res, expect)
@@ -30,7 +30,7 @@ def test_simplification_1():
 
 
 def test_simplification_2():
-    d2 = data_algebra.pandas_model.default_data_model.pd.DataFrame({"col1": [0, 1], "col2": [1, 0],})
+    d2 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"col1": [0, 1], "col2": [1, 0],})
 
     ops2 = (
         describe_table(d2, table_name="d2")

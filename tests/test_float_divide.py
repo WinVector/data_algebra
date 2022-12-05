@@ -12,7 +12,7 @@ import data_algebra.SparkSQL
 
 def test_float_divide_needed():
     # need %/% as databases often use integer arithmetic
-    pd = data_algebra.pandas_model.default_data_model.pd
+    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
     d = pd.DataFrame({
         'a': [1, 1, 1],
         'b': [1, 2, 0]
@@ -32,7 +32,7 @@ def test_float_divide_needed():
 
 
 def test_is_inf():
-    pd = data_algebra.pandas_model.default_data_model.pd
+    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
     d = pd.DataFrame({
         'a': [1.0, numpy.inf, numpy.nan, None, 0.0, -1.0, -numpy.inf],
     })
@@ -70,7 +70,7 @@ def test_is_inf():
 
 
 def test_float_divide_works():
-    pd = data_algebra.pandas_model.default_data_model.pd
+    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
     d = pd.DataFrame({
         'a': [1, 1, 1, 0],
         'b': [1, 2, 0, 0],

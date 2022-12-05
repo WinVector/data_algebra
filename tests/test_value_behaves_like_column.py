@@ -6,7 +6,7 @@ import data_algebra.util
 
 
 def test_value_behaves_like_column_extend():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame({
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
             'ID': [1, 1, 2, 3, 4, 4, 4, 4, 5, 5, 6],
             'one': 1,
         })
@@ -19,7 +19,7 @@ def test_value_behaves_like_column_extend():
                 },
                 partition_by=['ID']
             ))
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame({
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
         'ID': [1, 1, 2, 3, 4, 4, 4, 4, 5, 5, 6],
         'one': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
         'sum_1': [2, 2, 1, 1, 4, 4, 4, 4, 2, 2, 1],
@@ -32,7 +32,7 @@ def test_value_behaves_like_column_extend():
 
 
 def test_value_behaves_like_column_extend2a():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame({
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
             'ID': [1, 1, 2, 3, 4, 4, 4, 4, 5, 5, 6],
             'one': 1,
         })
@@ -50,7 +50,7 @@ def test_value_behaves_like_column_extend2a():
 
 
 def test_value_behaves_like_column_extend2():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame({
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
             'ID': [1, 1, 2, 3, 4, 4, 4, 4, 5, 5, 6],
             'one': 1,
         })
@@ -65,7 +65,7 @@ def test_value_behaves_like_column_extend2():
                 partition_by=['ID'],
                 order_by=['order'],
             ))
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame({
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
         'ID': [1, 1, 2, 3, 4, 4, 4, 4, 5, 5, 6],
         'one': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
         'order': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -79,7 +79,7 @@ def test_value_behaves_like_column_extend2():
 
 
 def test_value_behaves_like_column_project():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame({
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
             'ID': [1, 1, 2, 3, 4, 4, 4, 4, 5, 5, 6],
             'one': 1,
         })
@@ -92,7 +92,7 @@ def test_value_behaves_like_column_project():
                 },
                 group_by=['ID']
             ))
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame({
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
         'ID': [1, 2, 3, 4, 5, 6],
         'sum_1': [2, 1, 1, 4, 2, 1],
         'sum_one': [2, 1, 1, 4, 2, 1],

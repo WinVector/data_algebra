@@ -21,10 +21,10 @@ def test_compare_data_frames():
     # choose our simulated number of observations
     n_obs = 100
     symbols = list(string.ascii_lowercase)
-    d1 = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d1 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"group": numpy.random.choice(symbols, size=n_obs, replace=True),}
     )
-    d2 = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d2 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"group": numpy.random.choice(symbols, size=n_obs, replace=True),}
     )
     # which columns we consider to be row keys
@@ -50,7 +50,7 @@ def test_compare_data_frames():
         .select_rows("(d1_count <= 0) or (d2_count <= 0)")
         .order_rows(grouping_columns)
     )
-    expect = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {"group": ["u", "w"], "d1_count": [0.0, 4.0], "d2_count": [3.0, 0.0],}
     )
     assert data_algebra.test_util.equivalent_frames(res, expect)

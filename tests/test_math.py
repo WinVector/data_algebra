@@ -9,7 +9,7 @@ import data_algebra.util
 
 
 def test_math():
-    d = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "g": [1, 2, 2, 3, 3, 3],
             "x": [1, 4, 5, 7, 8, 9],
@@ -22,7 +22,7 @@ def test_math():
         {"v_exp": "v.exp()", "v_sin": "v.sin()", "g_plus_x": "g+x", "g_pow": "g**x",}
     )
 
-    expect1 = data_algebra.pandas_model.default_data_model.pd.DataFrame(
+    expect1 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
         {
             "g": [1, 2, 2, 3, 3, 3],
             "x": [1, 4, 5, 7, 8, 9],
