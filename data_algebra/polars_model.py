@@ -298,7 +298,8 @@ class PolarsModel(data_algebra.data_model.DataModel):
         assert isinstance(values, List)
         assert isinstance(op, data_algebra.expr_rep.Expression)
         f = self._expr_impl_map[op.op]
-        return f(values[0], values[1])   # TODO: generalize (esp arity)
+        res = f(*values)
+        return res
 
 
 def _register_polars_model():
