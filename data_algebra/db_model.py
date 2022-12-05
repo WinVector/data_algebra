@@ -9,8 +9,7 @@ from collections import OrderedDict
 from typing import List, Optional
 from typing import Dict, Set, Tuple
 
-import pandas.io.sql
-
+import data_algebra
 import data_algebra.data_model
 import data_algebra.near_sql
 import data_algebra.expr_rep
@@ -19,7 +18,6 @@ import data_algebra.data_ops_types
 import data_algebra.data_ops
 from data_algebra.OrderedSet import OrderedSet
 import data_algebra.op_catalog
-
 from data_algebra.sql_format_options import SQLFormatOptions
 
 # The db_model can be a bit tricky as SQL is represented a few ways depending
@@ -862,7 +860,7 @@ class DBModel:
         else:
             q = str(q)
         assert isinstance(q, str)
-        pandas.io.sql.execute(q, conn)
+        data_algebra.data_model.data_model_type_map["default_data_model"].pd.io.sql.execute(q, conn)
 
     def read_query(self, conn, q):
         """
@@ -876,7 +874,7 @@ class DBModel:
         else:
             q = str(q)
         assert isinstance(q, str)
-        r = pandas.io.sql.read_sql(q, conn)
+        r = data_algebra.data_model.data_model_type_map["default_data_model"].pd.io.sql.read_sql(q, conn)
         r = self.local_data_model.pd.DataFrame(r)
         r = r.reset_index(drop=True)
         return r
