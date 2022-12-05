@@ -3,7 +3,6 @@ from typing import Optional, Set
 import data_algebra.data_model
 import data_algebra.data_ops
 import data_algebra.data_space
-import data_algebra.pandas_model
 import data_algebra.db_model
 import data_algebra.SQLite
 

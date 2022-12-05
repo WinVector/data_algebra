@@ -11,7 +11,6 @@ import re
 
 import numpy
 
-import data_algebra.pandas_model
 import data_algebra.expr_parse
 import data_algebra.flow_text
 import data_algebra.data_model

@@ -5,7 +5,7 @@ data algebra solutions to common data processing problems
 from typing import Any, Dict, Iterable, Optional, Tuple
 
 import numpy
-import data_algebra.pandas_model
+import data_algebra.data_model
 from data_algebra.data_ops import descr, TableDescription, ViewRepresentation
 from data_algebra.cdata import (
     pivot_specification,
@@ -224,7 +224,7 @@ def xicor_score_variables_plan(
     assert isinstance(n_rep, int)
     record_map = RecordMap(
         blocks_out=RecordSpecification(
-            control_table=data_algebra.pandas_model.default_data_model.pd.DataFrame(
+            control_table=data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
                 {
                     "variable_name": x_vars,
                     "x": x_vars,
@@ -235,7 +235,7 @@ def xicor_score_variables_plan(
             control_table_keys=["variable_name"],
         )
     )
-    rep_frame = data_algebra.pandas_model.default_data_model.pd.DataFrame({"rep": range(n_rep)})
+    rep_frame = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"rep": range(n_rep)})
     grouped_calc = (
         xicor_query(
             d.convert_records(
@@ -523,7 +523,7 @@ def replicate_rows_query(
     assert power_key_colname != count_column_name
     assert power_key_colname not in d.column_names
     # get a pandas namespace
-    pd = data_algebra.pandas_model.default_data_model.pd
+    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
     # build powers of 2 until max_count is met or exceeded
     powers = list(range(int(numpy.ceil(numpy.log(max_count) / numpy.log(2))) + 1))
     # replicate each power the number of times it specifies
