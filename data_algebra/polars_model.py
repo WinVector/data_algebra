@@ -7,8 +7,9 @@ Note: not implemented yet.
 
 from typing import Any, Callable, Dict, List, Optional
 
-import data_algebra.util
+import data_algebra
 import data_algebra.data_model
+import data_algebra.util
 import data_algebra.expr_rep
 import data_algebra.data_ops_types
 import data_algebra.connected_components
@@ -302,9 +303,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
         return res
 
 
-def _register_polars_model():
+def register_polars_model():
     # register data model
     default_Polars_model = PolarsModel()
     data_algebra.data_model.data_model_type_map[str(type(default_Polars_model.data_frame()))] = default_Polars_model
-
-_register_polars_model()
