@@ -11,7 +11,7 @@ from typing import Dict, Set, Tuple
 
 import pandas.io.sql
 
-import data_algebra.pandas_model
+import data_algebra.data_model
 import data_algebra.near_sql
 import data_algebra.expr_rep
 import data_algebra.util
@@ -796,7 +796,7 @@ class DBModel:
         union_all_term_end: str = ")",
     ):
         if local_data_model is None:
-            local_data_model = data_algebra.pandas_model.default_data_model
+            local_data_model = data_algebra.data_model.data_model_type_map["default_data_model"]
         self.local_data_model = local_data_model
         if sql_formatters is None:
             sql_formatters = {}

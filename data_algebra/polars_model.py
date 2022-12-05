@@ -6,12 +6,6 @@ Note: not implemented yet.
 """
 
 from typing import Any, Callable, Dict, List, Optional
-import datetime
-import types
-import numbers
-import warnings
-
-import numpy
 
 import data_algebra.util
 import data_algebra.data_model
@@ -20,6 +14,21 @@ import data_algebra.data_ops_types
 import data_algebra.connected_components
 
 import polars as pl
+
+
+def _populate_expr_impl_map() -> Dict[str, Callable]:
+    """
+    Map symbols to implementations.
+    """
+    impl_map = {
+        "==": lambda a, b: a == b,
+        "<=": lambda a, b: a <= b,
+        "<": lambda a, b: a < b,  
+        ">=": lambda a, b: a >= b,
+        ">": lambda a, b: a > b,  
+        # TODO: fill in more
+    }
+    return impl_map
 
 
 class PolarsModel(data_algebra.data_model.DataModel):
@@ -32,6 +41,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
     use_lazy_eval: bool
     presentation_model_name: str
     _method_dispatch_table: Dict[str, Callable]
+    _expr_impl_map: Dict[str, Callable]
 
     def __init__(self, *, use_lazy_eval: bool = True):
         data_algebra.data_model.DataModel.__init__(
@@ -54,6 +64,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
             "SQLNode": self._sql_proxy_step,
             "TableDescription": self._table_step,
         }
+        self._expr_impl_map = _populate_expr_impl_map()
 
     def data_frame(self, arg=None):
         """
@@ -221,7 +232,9 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 "op was supposed to be a data_algebra.data_ops.SelectRowsNode"
             )
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
-        raise ValueError("not implemented yet")  # TODO: implement
+        selection = op.expr.act_on(res, data_model=self)
+        res = res.filter(selection)
+        return res
 
     def _sql_proxy_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
         """
@@ -253,13 +266,12 @@ class PolarsModel(data_algebra.data_model.DataModel):
     
     # expression helpers
     
-    def act_on_literal(self, *, arg, value):
+    def act_on_literal(self, *, value):
         """
         Action for a literal/constant in an expression.
 
-        :param arg: item we are acting on
         :param value: literal value being supplied
-        :return: arg acted on
+        :return: converted result
         """
         return pl.lit(value)
     
@@ -274,18 +286,19 @@ class PolarsModel(data_algebra.data_model.DataModel):
         assert isinstance(value, str)
         return pl.col(value)
     
-    def act_on_expression(self, *, arg, values: List, op: str):
+    def act_on_expression(self, *, arg, values: List, op):
         """
         Action for a column name.
 
         :param arg: item we are acting on
         :param values: list of values to work on
-        :param op: name of operator to apply
+        :param op: perator to apply
         :return: arg acted on
         """
         assert isinstance(values, List)
-        assert isinstance(op, str)
-        raise ValueError("not implemented yet")  # TODO: implement
+        assert isinstance(op, data_algebra.expr_rep.Expression)
+        f = self._expr_impl_map[op.op]
+        return f(values[0], values[1])   # TODO: generalize (esp arity)
 
 
 def _register_polars_model():

@@ -1002,13 +1002,12 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
 
     # expression helpers
     
-    def act_on_literal(self, *, arg, value):
+    def act_on_literal(self, *, value):
         """
         Action for a literal/constant in an expression.
 
-        :param arg: item we are acting on
         :param value: literal value being supplied
-        :return: arg acted on
+        :return: converted result
         """
         return value
     
@@ -1022,49 +1021,50 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         """
         return arg[value]
     
-    def act_on_expression(self, *, arg, values: List, op: str):
+    def act_on_expression(self, *, arg, values: List, op):
         """
         Action for a column name.
 
         :param arg: item we are acting on
         :param values: list of values to work on
-        :param op: name of operator to apply
+        :param op: operator to apply
         :return: arg acted on
         """
         assert isinstance(values, List)
-        assert isinstance(op, str)
+        assert isinstance(op, data_algebra.expr_rep.Expression)
+        op_name = op.op
         # check user fns
         # first check chosen mappings
         try:
-            method_to_call = self.user_fun_map[op]
+            method_to_call = self.user_fun_map[op_name]
             return method_to_call(*values)
         except KeyError:
             pass
         # check chosen mappings
         try:
-            method_to_call = self.impl_map[op]
+            method_to_call = self.impl_map[op_name]
             return method_to_call(*values)
         except KeyError:
             pass
         # special zero argument functions
         if len(values) == 0:
-            if op == "_uniform":
+            if op_name == "_uniform":
                 return numpy.random.uniform(size=arg.shape[0])
             else:
-                KeyError(f"zero-argument function {op} not found")
+                KeyError(f"zero-argument function {op_name} not found")
         # now see if argument (usually Pandas) can do this
         # doubt we hit in this, as most exposed methods are window methods
         try:
-            method = getattr(values[0], op)
+            method = getattr(values[0], op_name)
             if callable(method):
                 return method(*values[1:])
         except AttributeError:
             pass
         # now see if numpy can do this
         try:
-            fn = numpy.__dict__[op]
+            fn = numpy.__dict__[op_name]
             if callable(fn):
                 return fn(*values)
         except KeyError:
             pass
-        raise KeyError(f"function {op} not found")
+        raise KeyError(f"function {op_name} not found")

@@ -5,11 +5,8 @@ Represent data processing expressions.
 import abc
 from typing import Any, List, Optional, Set, Union
 
-import numpy
-
 import data_algebra.util
 import data_algebra.data_model
-import data_algebra.pandas_model
 
 
 # for some ideas in capturing expressions in Python see:
@@ -1079,7 +1076,7 @@ class Value(Term):
         Apply expression to argument.
         """
         assert isinstance(data_model, data_algebra.data_model.DataModel)
-        return data_model.act_on_literal(arg=arg, value=self.value)
+        return data_model.act_on_literal(value=self.value)
 
     def to_python(self, *, want_inline_parens: bool = False) -> PythonText:
         """
@@ -1146,7 +1143,7 @@ class ListTerm(PreTerm):
             if isinstance(vi, PreTerm):
                 vi = vi.act_on(arg, data_model=data_model)
             else:
-                vi = data_model.act_on_literal(arg=arg, value=vi)  # TODO: think if arg should be here
+                vi = data_model.act_on_literal(value=vi)
             res[i] = vi
         return res
 
@@ -1217,7 +1214,7 @@ class DictTerm(PreTerm):
         Apply expression to argument.
         """
         assert isinstance(data_model, data_algebra.data_model.DataModel)
-        return data_model.act_on_literal(arg=arg, value=self.value.copy())
+        return data_model.act_on_literal(value=self.value.copy())
 
     def to_python(self, *, want_inline_parens: bool = False) -> PythonText:
         """
@@ -1338,16 +1335,17 @@ def _can_find_method_by_name(op):
         return True
     # check user fns
     # first check chosen mappings
+    data_model = data_algebra.data_model.data_model_type_map["default_data_model"]  # just use default for checking defs
     try:
         # noinspection PyUnusedLocal
-        check_val = data_algebra.pandas_model.default_data_model.user_fun_map[op]  # for KeyError
+        check_val = data_model.user_fun_map[op]  # for KeyError
         return True
     except KeyError:
         pass
     # check chosen mappings
     try:
         # noinspection PyUnusedLocal
-        check_val = data_algebra.pandas_model.default_data_model.impl_map[op]  # for KeyError
+        check_val = data_model.impl_map[op]  # for KeyError
         return True
     except KeyError:
         pass
@@ -1459,7 +1457,7 @@ class Expression(Term):
         """
         assert isinstance(data_model, data_algebra.data_model.DataModel)
         args = [ai.act_on(arg, data_model=data_model) for ai in self.args]
-        res = data_model.act_on_expression(arg=arg, values=args, op=self.op)
+        res = data_model.act_on_expression(arg=arg, values=args, op=self)
         return res
 
     def to_python(self, *, want_inline_parens: bool = False) -> PythonText:

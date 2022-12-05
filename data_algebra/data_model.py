@@ -55,13 +55,12 @@ class DataModel(abc.ABC):
     # expression helpers
 
     @abc.abstractmethod
-    def act_on_literal(self, *, arg, value):
+    def act_on_literal(self, *, value):
         """
         Action for a literal/constant in an expression.
 
-        :param arg: item we are acting on
         :param value: literal value being supplied
-        :return: arg acted on
+        :return: converted result
         """
     
     @abc.abstractmethod
@@ -71,7 +70,7 @@ class DataModel(abc.ABC):
 
         :param arg: item we are acting on
         :param value: column name
-        :return: arg acted on
+        :return: converted result
         """
     
     @abc.abstractmethod
@@ -80,7 +79,7 @@ class DataModel(abc.ABC):
         Action for a column name.
 
         :param arg: item we are acting on
-        :param values: list of values to work on
-        :param op: name of operator to apply
-        :return: arg acted on
+        :param values: op arguments already converted
+        :param op: operator to apply
+        :return: converted result
         """
