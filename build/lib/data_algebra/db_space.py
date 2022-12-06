@@ -3,7 +3,6 @@ from typing import Optional, Set
 import data_algebra.data_model
 import data_algebra.data_ops
 import data_algebra.data_space
-import data_algebra.pandas_model
 import data_algebra.db_model
 import data_algebra.SQLite
 
@@ -83,20 +82,16 @@ class DBSpace(data_algebra.data_space.DataSpace):
         """
         return set(self.description_map.keys())
     
-    def retrieve(self, key: str, *, return_data_model: Optional[data_algebra.data_model.DataModel] = None):
+    def retrieve(self, key: str):
         """
         Retrieve a table value from the DataSpace.
 
         :param key: key
-        :param return_data_model: data model for return type
         :return: data value
         """
         assert isinstance(key, str)
-        if return_data_model is None:
-            return_data_model = data_algebra.pandas_model.default_data_model
         descr = self.description_map[key]  # force check table is known
         d = self.db_handle.read_table(key)
-        d = return_data_model.data_frame(d)
         return d
 
     def execute(

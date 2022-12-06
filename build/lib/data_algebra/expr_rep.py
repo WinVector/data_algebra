@@ -5,10 +5,8 @@ Represent data processing expressions.
 import abc
 from typing import Any, List, Optional, Set, Union
 
-import numpy
-
 import data_algebra.util
-import data_algebra.pandas_model
+import data_algebra.data_model
 
 
 # for some ideas in capturing expressions in Python see:
@@ -178,9 +176,9 @@ class PreTerm(abc.ABC):
     # eval
 
     @abc.abstractmethod
-    def evaluate(self, data_frame):
+    def act_on(self, arg, *, data_model: data_algebra.data_model.DataModel):
         """
-        Evaluate expression, taking data from data_frame.
+        Apply expression to argument.
         """
 
     # emitters
@@ -1073,11 +1071,12 @@ class Value(Term):
         """
         return self
 
-    def evaluate(self, data_frame):
+    def act_on(self, arg, *, data_model: data_algebra.data_model.DataModel):
         """
-        Evaluate expression, taking data from data_frame.
+        Apply expression to argument.
         """
-        return self.value
+        assert isinstance(data_model, data_algebra.data_model.DataModel)
+        return data_model.act_on_literal(value=self.value)
 
     def to_python(self, *, want_inline_parens: bool = False) -> PythonText:
         """
@@ -1133,15 +1132,18 @@ class ListTerm(PreTerm):
         new_list = [ai.replace_view(view) for ai in self.value]
         return ListTerm(new_list)
 
-    def evaluate(self, data_frame):
+    def act_on(self, arg, *, data_model: data_algebra.data_model.DataModel):
         """
-        Evaluate expression, taking data from data_frame.
+        Apply expression to argument.
         """
+        assert isinstance(data_model, data_algebra.data_model.DataModel)
         res = [None] * len(self.value)
         for i in range(len(self.value)):
             vi = self.value[i]
             if isinstance(vi, PreTerm):
-                vi = vi.evaluate(data_frame)
+                vi = vi.act_on(arg, data_model=data_model)
+            else:
+                vi = data_model.act_on_literal(value=vi)
             res[i] = vi
         return res
 
@@ -1207,11 +1209,12 @@ class DictTerm(PreTerm):
         """
         return DictTerm(self.value)
 
-    def evaluate(self, data_frame):
+    def act_on(self, arg, *, data_model: data_algebra.data_model.DataModel):
         """
-        Evaluate expression, taking data from data_frame.
+        Apply expression to argument.
         """
-        return self.value.copy()
+        assert isinstance(data_model, data_algebra.data_model.DataModel)
+        return data_model.act_on_literal(value=self.value.copy())
 
     def to_python(self, *, want_inline_parens: bool = False) -> PythonText:
         """
@@ -1267,11 +1270,12 @@ class ColumnReference(Term):
         #         )
         Term.__init__(self)
 
-    def evaluate(self, data_frame):
+    def act_on(self, arg, *, data_model: data_algebra.data_model.DataModel):
         """
-        Evaluate expression, taking data from data_frame.
+        Apply expression to argument.
         """
-        return data_frame[self.column_name]
+        assert isinstance(data_model, data_algebra.data_model.DataModel)
+        return data_model.act_on_column_name(arg=arg, value=self.column_name)
 
     def is_equal(self, other):
         """
@@ -1331,16 +1335,17 @@ def _can_find_method_by_name(op):
         return True
     # check user fns
     # first check chosen mappings
+    data_model = data_algebra.data_model.data_model_type_map["default_data_model"]  # just use default for checking defs
     try:
         # noinspection PyUnusedLocal
-        check_val = data_algebra.pandas_model.default_data_model.user_fun_map[op]  # for KeyError
+        check_val = data_model.user_fun_map[op]  # for KeyError
         return True
     except KeyError:
         pass
     # check chosen mappings
     try:
         # noinspection PyUnusedLocal
-        check_val = data_algebra.pandas_model.default_data_model.impl_map[op]  # for KeyError
+        check_val = data_model.impl_map[op]  # for KeyError
         return True
     except KeyError:
         pass
@@ -1446,46 +1451,14 @@ class Expression(Term):
         """
         methods_seen.add(self.op)
 
-    def evaluate(self, data_frame):
+    def act_on(self, arg, *, data_model: data_algebra.data_model.DataModel):
         """
-        Evaluate expression, taking data from data_frame.
+        Apply expression to argument.
         """
-        args = [ai.evaluate(data_frame) for ai in self.args]
-        # check user fns
-        # first check chosen mappings
-        try:
-            method_to_call = data_algebra.pandas_model.default_data_model.user_fun_map[self.op]
-            return method_to_call(*args)
-        except KeyError:
-            pass
-        # check chosen mappings
-        try:
-            method_to_call = data_algebra.pandas_model.default_data_model.impl_map[self.op]
-            return method_to_call(*args)
-        except KeyError:
-            pass
-        # special zero argument functions
-        if len(args) == 0:
-            if self.op == "_uniform":
-                return numpy.random.uniform(size=data_frame.shape[0])
-            else:
-                KeyError(f"zero-argument function {self.op} not found")
-        # now see if argument (usually Pandas) can do this
-        # doubt we hit in this, as most exposed methods are window methods
-        try:
-            method = getattr(args[0], self.op)
-            if callable(method):
-                return method(*args[1:])
-        except AttributeError:
-            pass
-        # new see if numpy can do this
-        try:
-            fn = numpy.__dict__[self.op]
-            if callable(fn):
-                return fn(*args)
-        except KeyError:
-            pass
-        raise KeyError(f"function {self.op} not found")
+        assert isinstance(data_model, data_algebra.data_model.DataModel)
+        args = [ai.act_on(arg, data_model=data_model) for ai in self.args]
+        res = data_model.act_on_expression(arg=arg, values=args, op=self)
+        return res
 
     def to_python(self, *, want_inline_parens: bool = False) -> PythonText:
         """

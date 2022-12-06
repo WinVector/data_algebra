@@ -12,6 +12,7 @@ data_algebra/arrow.py
 data_algebra/cdata.py
 data_algebra/connected_components.py
 data_algebra/data_model.py
+data_algebra/data_model_space.py
 data_algebra/data_ops.py
 data_algebra/data_ops_types.py
 data_algebra/data_ops_utils.py
@@ -27,7 +28,6 @@ data_algebra/op_catalog.py
 data_algebra/op_container.py
 data_algebra/pandas_base.py
 data_algebra/pandas_model.py
-data_algebra/pandas_space.py
 data_algebra/parse_by_lark.py
 data_algebra/polars_model.py
 data_algebra/python3_lark.py

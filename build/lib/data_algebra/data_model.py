@@ -4,7 +4,11 @@ Interface for realizing the data algebra as a sequence of steps over an object.
 
 
 import abc
-from typing import Any, Dict
+from typing import Any, Dict, List
+
+
+# map type name strings to data models
+data_model_type_map = dict()
 
 
 class DataModel(abc.ABC):
@@ -18,7 +22,7 @@ class DataModel(abc.ABC):
         assert isinstance(presentation_model_name, str)
         self.presentation_model_name = presentation_model_name
 
-    # helper functions
+    # data frame helpers
 
     @abc.abstractmethod
     def data_frame(self, arg=None):
@@ -46,4 +50,36 @@ class DataModel(abc.ABC):
         :param data_map: dictionary mapping table and view names to data frames
         :param narrow: if True narrow results to only columns anticipated
         :return: data frame result
+        """
+    
+    # expression helpers
+
+    @abc.abstractmethod
+    def act_on_literal(self, *, value):
+        """
+        Action for a literal/constant in an expression.
+
+        :param value: literal value being supplied
+        :return: converted result
+        """
+    
+    @abc.abstractmethod
+    def act_on_column_name(self, *, arg, value):
+        """
+        Action for a column name.
+
+        :param arg: item we are acting on
+        :param value: column name
+        :return: converted result
+        """
+    
+    @abc.abstractmethod
+    def act_on_expression(self, *, arg, values: List, op: str):
+        """
+        Action for a column name.
+
+        :param arg: item we are acting on
+        :param values: op arguments already converted
+        :param op: operator to apply
+        :return: converted result
         """
