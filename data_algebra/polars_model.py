@@ -166,14 +166,12 @@ class PolarsModel(data_algebra.data_model.DataModel):
         assert len(op.order_by) == 0  # TODO: implement non-zero version of this
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
         partition_by = op.partition_by
-        introduced_temp_columns = False
+        temp_v_columns = []
         # see if we need to make partition non-empty
         if len(partition_by) <= 0:
-            introduced_temp_columns = True
             v_name = f"_da_extend_temp_partition_column"
             partition_by = [v_name]
-            res = res.with_column(pl.lit(1).alias(v_name))
-        temp_v_columns = []
+            temp_v_columns.append(pl.lit(1).alias(v_name))
         produced_columns = []
         for k, opk in op.ops.items():
             if op.windowed_situation:
@@ -183,7 +181,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 assert isinstance(opk.args[0], (data_algebra.expr_rep.Value, data_algebra.expr_rep.ColumnReference))
                 if isinstance(opk.args[0], data_algebra.expr_rep.Value):
                     # promote value to column for uniformity of API
-                    v_name = f"_da_extend_temp_v_column"
+                    v_name = f"_da_extend_temp_v_column_{len(temp_v_columns)}"
                     temp_v_columns.append(pl.lit(opk.args[0].value).alias(v_name))
                     opk = data_algebra.expr_rep.Expression(
                         op=opk.op, 
@@ -198,13 +196,12 @@ class PolarsModel(data_algebra.data_model.DataModel):
             if op.windowed_situation:
                 fld_k = fld_k.over(partition_by)
             produced_columns.append(fld_k.alias(k))
-        if len(temp_v_columns) > 0:
-            introduced_temp_columns = True
-            res = res.with_columns(temp_v_columns)
         if len(produced_columns) > 0:
-            res = res.with_columns(produced_columns)
-        if introduced_temp_columns:
-            res = res.select(op.columns_produced())
+            if len(temp_v_columns) > 0:
+                res = res.with_columns(temp_v_columns)
+            res = res.with_columns(produced_columns)  
+            if len(temp_v_columns) > 0:
+                res = res.select(op.columns_produced())
         return res
     
     def _map_columns_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
