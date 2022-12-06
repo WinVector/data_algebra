@@ -5,7 +5,9 @@ Adapter to use Polars ( https://www.pola.rs ) in the data algebra.
 Note: not implemented yet.
 """
 
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List
+
+import polars as pl
 
 import data_algebra
 import data_algebra.data_model
@@ -14,7 +16,16 @@ import data_algebra.expr_rep
 import data_algebra.data_ops_types
 import data_algebra.connected_components
 
-import polars as pl
+
+class PolarsTerm:
+    """
+    Class to carry Polars term and annotations.
+    """
+    def __init__(self, *, polars_term, is_literal: bool) -> None:
+        assert isinstance(is_literal, bool)
+        assert polars_term is not None
+        self.polars_term = polars_term
+        self.is_literal = is_literal
 
 
 def _populate_expr_impl_map() -> Dict[str, Callable]:
@@ -160,7 +171,9 @@ class PolarsModel(data_algebra.data_model.DataModel):
         assert len(op.order_by) == 0  # TODO: implement non-zero version of this
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
         for k, opk in op.ops.items():
-            fld_k = opk.act_on(res, data_model=self)
+            fld_k_container = opk.act_on(res, data_model=self)  # PolarsTerm
+            assert isinstance(fld_k_container, PolarsTerm)
+            fld_k = fld_k_container.polars_term
             if window_situation:
                 fld_k = fld_k.over(op.partition_by)
             res = res.with_column(fld_k.alias(k))
@@ -249,8 +262,9 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 "op was supposed to be a data_algebra.data_ops.SelectRowsNode"
             )
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
-        selection = op.expr.act_on(res, data_model=self)
-        res = res.filter(selection)
+        selection = op.expr.act_on(res, data_model=self)  # PolarsTerm
+        assert isinstance(selection, PolarsTerm)
+        res = res.filter(selection.polars_term)
         return res
 
     def _sql_proxy_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
@@ -290,7 +304,8 @@ class PolarsModel(data_algebra.data_model.DataModel):
         :param value: literal value being supplied
         :return: converted result
         """
-        return pl.lit(value)
+        assert not isinstance(value, PolarsTerm)
+        return PolarsTerm(polars_term=pl.lit(value), is_literal=True)
     
     def act_on_column_name(self, *, arg, value):
         """
@@ -301,7 +316,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
         :return: arg acted on
         """
         assert isinstance(value, str)
-        return pl.col(value)
+        return PolarsTerm(polars_term=pl.col(value), is_literal=False)
     
     def act_on_expression(self, *, arg, values: List, op):
         """
@@ -309,14 +324,17 @@ class PolarsModel(data_algebra.data_model.DataModel):
 
         :param arg: item we are acting on
         :param values: list of values to work on
-        :param op: perator to apply
+        :param op: operator to apply
         :return: arg acted on
         """
         assert isinstance(values, List)
         assert isinstance(op, data_algebra.expr_rep.Expression)
+        for v in values:
+            assert isinstance(v, PolarsTerm)
         f = self._expr_impl_map[op.op]
-        res = f(*values)
-        return res
+        # TODO: promote values to columns for at least unary operators
+        res = f(*[v.polars_term for v in values])
+        return PolarsTerm(polars_term=res, is_literal=False)
 
 
 def register_polars_model():
