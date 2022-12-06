@@ -165,13 +165,16 @@ class PolarsModel(data_algebra.data_model.DataModel):
             raise TypeError("op was supposed to be a data_algebra.data_ops.ExtendNode")
         assert len(op.order_by) == 0  # TODO: implement non-zero version of this
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
+        produced_columns = []
         for k, opk in op.ops.items():
             fld_k_container = opk.act_on(res, data_model=self)  # PolarsTerm
             assert isinstance(fld_k_container, PolarsTerm)
             fld_k = fld_k_container.polars_term
             if op.windowed_situation:
                 fld_k = fld_k.over(op.partition_by)
-            res = res.with_column(fld_k.alias(k))
+            produced_columns.append(fld_k.alias(k))
+        if len(produced_columns) > 0:
+            res = res.with_columns(produced_columns)
         return res
     
     def _map_columns_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
