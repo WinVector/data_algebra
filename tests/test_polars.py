@@ -1,11 +1,11 @@
 
 import numpy as np
 import data_algebra
+import data_algebra.data_model
 
 have_polars = False
 try:
     import polars as pl
-    import data_algebra.polars_model
     have_polars = True
 except ModuleNotFoundError:
     pass
@@ -59,12 +59,16 @@ def test_polars_2():
             })
         
         rng = np.random.default_rng(2022)
-        d = generate_example(n_columns=2, n_rows=100)
+        d = generate_example(n_columns=3, n_rows=20)
         ops = (
             data_algebra.descr(d=d)
-                .extend({"count": "(1).sum()"}, partition_by=d.columns)
+                .extend({"count": 1})
+                .extend({"count": "count.sum()"}, partition_by=d.columns)
                 .select_rows("count > 1")
                 .drop_columns(["count"])
         )
-        # res = ops.transform(d)
-        # TODO: take test further
+        res_polars = ops.transform(d)
+        res_pandas = ops.transform(d.to_pandas())
+        assert isinstance(res_polars, pl.DataFrame)
+        assert isinstance(res_pandas, data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame)
+        assert res_polars.shape == res_pandas.shape

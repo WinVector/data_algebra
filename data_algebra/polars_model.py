@@ -31,6 +31,7 @@ def _populate_expr_impl_map() -> Dict[str, Callable]:
         "not": lambda x: x == False,
         "~": lambda x: x == False,
         "!": lambda x: x == False,
+        "sum": lambda x: x.sum(),
         # TODO: fill in more
     }
     return impl_map
@@ -151,8 +152,19 @@ class PolarsModel(data_algebra.data_model.DataModel):
         """
         if op.node_name != "ExtendNode":
             raise TypeError("op was supposed to be a data_algebra.data_ops.ExtendNode")
+        window_situation = (
+            op.windowed_situation
+            or (len(op.partition_by) > 0)
+            or (len(op.order_by) > 0)
+        )
+        assert len(op.order_by) == 0  # TODO: implement non-zero version of this
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
-        raise ValueError("not implemented yet")  # TODO: implement
+        for k, opk in op.ops.items():
+            fld_k = opk.act_on(res, data_model=self)
+            if window_situation:
+                fld_k = fld_k.over(op.partition_by)
+            res = res.with_column(fld_k.alias(k))
+        return res
     
     def _map_columns_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
         """
