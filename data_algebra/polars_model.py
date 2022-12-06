@@ -170,16 +170,37 @@ class PolarsModel(data_algebra.data_model.DataModel):
         # see if we need to make partition non-empty
         if len(partition_by) <= 0:
             introduced_temp_columns = True
-            partition_by = ["_da_temp_partition_column"]
-            res = res.with_column(pl.lit(1).alias("_da_temp_partition_column"))
+            v_name = f"_da_extend_temp_partition_column"
+            partition_by = [v_name]
+            res = res.with_column(pl.lit(1).alias(v_name))
+        temp_v_columns = []
         produced_columns = []
         for k, opk in op.ops.items():
+            if op.windowed_situation:
+                # enforce is a simple v.f() expression
+                assert isinstance(opk, data_algebra.expr_rep.Expression)
+                assert len(opk.args) == 1
+                assert isinstance(opk.args[0], (data_algebra.expr_rep.Value, data_algebra.expr_rep.ColumnReference))
+                if isinstance(opk.args[0], data_algebra.expr_rep.Value):
+                    # promote value to column for uniformity of API
+                    v_name = f"_da_extend_temp_v_column"
+                    temp_v_columns.append(pl.lit(opk.args[0].value).alias(v_name))
+                    opk = data_algebra.expr_rep.Expression(
+                        op=opk.op, 
+                        args=[data_algebra.expr_rep.ColumnReference(view=None, column_name=v_name)], 
+                        params=opk.params, 
+                        inline=opk.inline, 
+                        method=opk.method,
+                    )
             fld_k_container = opk.act_on(res, data_model=self)  # PolarsTerm
             assert isinstance(fld_k_container, PolarsTerm)
             fld_k = fld_k_container.polars_term
             if op.windowed_situation:
                 fld_k = fld_k.over(partition_by)
             produced_columns.append(fld_k.alias(k))
+        if len(temp_v_columns) > 0:
+            introduced_temp_columns = True
+            res = res.with_columns(temp_v_columns)
         if len(produced_columns) > 0:
             res = res.with_columns(produced_columns)
         if introduced_temp_columns:
