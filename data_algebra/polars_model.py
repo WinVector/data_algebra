@@ -28,11 +28,14 @@ class PolarsTerm:
         self.is_literal = is_literal
 
 
-def _populate_expr_impl_map() -> Dict[str, Callable]:
+def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
     """
     Map symbols to implementations.
     """
-    impl_map = {
+    impl_map_1 = {
+        "sum": lambda x: x.sum(),
+    }
+    impl_map_2 = {
         "==": lambda a, b: a == b,
         "<=": lambda a, b: a <= b,
         "<": lambda a, b: a < b,  
@@ -42,9 +45,12 @@ def _populate_expr_impl_map() -> Dict[str, Callable]:
         "not": lambda x: x == False,
         "~": lambda x: x == False,
         "!": lambda x: x == False,
-        "sum": lambda x: x.sum(),
-        # TODO: fill in more
     }
+    impl_map = {
+        1: impl_map_1,
+        2: impl_map_2,
+    }
+    # TODO: fill in more
     return impl_map
 
 
@@ -58,7 +64,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
     use_lazy_eval: bool
     presentation_model_name: str
     _method_dispatch_table: Dict[str, Callable]
-    _expr_impl_map: Dict[str, Callable]
+    _expr_impl_map: Dict[int, Dict[str, Callable]]
 
     def __init__(self, *, use_lazy_eval: bool = True):
         data_algebra.data_model.DataModel.__init__(
@@ -356,8 +362,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
         assert isinstance(op, data_algebra.expr_rep.Expression)
         for v in values:
             assert isinstance(v, PolarsTerm)
-        f = self._expr_impl_map[op.op]
-        # TODO: promote values to columns for at least unary operators
+        f = self._expr_impl_map[len(values)][op.op]
         res = f(*[v.polars_term for v in values])
         return PolarsTerm(polars_term=res, is_literal=False)
 
