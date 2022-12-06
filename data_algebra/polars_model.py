@@ -32,10 +32,111 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
     """
     Map symbols to implementations.
     """
+    impl_map_0 = {
+        "count": lambda : None,  # TODO: implement
+        "_count": lambda : None,  # TODO: implement
+        "ngroup": lambda : None,  # TODO: implement
+        "_ngroup": lambda : None,  # TODO: implement
+        "row_number": lambda : None,  # TODO: implement
+        "_row_number": lambda : None,  # TODO: implement
+        "size": lambda : None,  # TODO: implement
+        "_size": lambda : None,  # TODO: implement
+        "uniform": lambda : None,  # TODO: implement
+        "_uniform": lambda : None,  # TODO: implement
+    }
     impl_map_1 = {
+        "-": lambda x: 0 - x,
+        "abs": lambda x: x.abs(),
+        "all": lambda x: x.all(),
+        "any": lambda x: x.any(),
+        "any_value": lambda x: x.any_value(),
+        "arccos": lambda x: x.arccos(),
+        "arccosh": lambda x: x.arccosh(),
+        "arcsin": lambda x: x.arcsin(),
+        "arcsinh": lambda x: x.arcsinh(),
+        "arctan": lambda x: x.arctan(),
+        "arctan2": lambda x: x.arctan2(),
+        "arctanh": lambda x: x.arctanh(),
+        "as_int64": lambda x: x.as_int64(),
+        "as_str": lambda x: x.as_str(),
+        "base_Sunday": lambda x: x.base_Sunday(),
+        "bfill": lambda x: x.bfill(),
+        "ceil": lambda x: x.ceil(),
+        "coalesce": lambda x: x.coalesce(0),
+        "coalesce0": lambda x: x.coalesce(0),
+        "cos": lambda x: x.cos(),
+        "cosh": lambda x: x.cosh(),
+        "count": lambda x: x.count(),
+        "cumcount": lambda x: x.cumcount(),
+        "cummax": lambda x: x.cummax(),
+        "cummin": lambda x: x.cummin(),
+        "cumprod": lambda x: x.cumprod(),
+        "cumsum": lambda x: x.cumsum(),
+        "datetime_to_date": lambda x: x.datetime_to_date(),
+        "dayofmonth": lambda x: x.dayofmonth(),
+        "dayofweek": lambda x: x.dayofweek(),
+        "dayofyear": lambda x: x.dayofyear(),
+        "exp": lambda x: x.exp(),
+        "expm1": lambda x: x.expm1(),
+        "ffill": lambda x: x.ffill(),
+        "first": lambda x: x.first(),
+        "floor": lambda x: x.floor(),
+        "format_date": lambda x: x.format_date(),
+        "format_datetime": lambda x: x.format_datetime(),
+        "is_bad": lambda x: x.is_bad(),
+        "is_inf": lambda x: x.is_inf(),
+        "is_nan": lambda x: x.is_nan(),
+        "is_null": lambda x: x.is_null(),
+        "last": lambda x: x.last(),
+        "log": lambda x: x.log(),
+        "log10": lambda x: x.log10(),
+        "log1p": lambda x: x.log1p(),
+        "max": lambda x: x.max(),
+        "mean": lambda x: x.mean(),
+        "median": lambda x: x.median(),
+        "min": lambda x: x.min(),
+        "month": lambda x: x.month(),
+        "nunique": lambda x: x.nunique(),
+        "parse_date": lambda x: x.parse_date(),
+        "parse_datetime": lambda x: x.parse_datetime(),
+        "quarter": lambda x: x.quarter(),
+        "rank": lambda x: x.rank(),
+        "round": lambda x: x.round(),
+        "shift": lambda x: x.shift(),
+        "sign": lambda x: x.sign(),
+        "sin": lambda x: x.sin(),
+        "sinh": lambda x: x.sinh(),
+        "size": lambda x: x.size(),
+        "sqrt": lambda x: x.sqrt(),
+        "std": lambda x: x.std(),
         "sum": lambda x: x.sum(),
+        "tanh": lambda x: x.tanh(),
+        "var": lambda x: x.var(),
+        "weekofyear": lambda x: x.weekofyear(),
     }
     impl_map_2 = {
+        "*": lambda a, b: a * b,
+        "**": lambda a, b: a ** b,
+        "/": lambda a, b: a / b,
+        "//": lambda a, b: a // b,
+        "%": lambda a, b: a % b,
+        "%/%": lambda a, b: a // b,
+        "+": lambda a, b: a + b,
+        "-": lambda a, b: a - b,
+        "and": lambda a, b: a and b,
+        "around": lambda a, b: a.around(b),
+        "coalesce": lambda a, b: a.coalesce(b),
+        "concat": lambda a, b: a.concat(b),
+        "date_diff": lambda a, b: a.date_diff(b),
+        "fmax": lambda a, b: a.fmax(b),
+        "fmin": lambda a, b: a.fmin(b),
+        "is_in": lambda a, b: a.is_in(b),
+        "maximum": lambda a, b: a.maximum(b),
+        "minimum": lambda a, b: a.minimum(b),
+        "mod": lambda a, b: a.mod(b),
+        "or": lambda a, b: a or b,
+        "remainder": lambda a, b: a.remainder(b),
+        "timestamp_diff": lambda a, b: a.timestamp_diff(b),
         "==": lambda a, b: a == b,
         "<=": lambda a, b: a <= b,
         "<": lambda a, b: a < b,  
@@ -46,9 +147,17 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "~": lambda x: x == False,
         "!": lambda x: x == False,
     }
+    impl_map_3 = {
+        "if_else": lambda a, b, c: a.if_else(b, c), 
+        "mapv": lambda a, b, c: a.mapv(b, c),
+        "trimstr": lambda a, b, c: a.trimstr(b, c),
+        "where": lambda a, b, c: a.where(b, c),
+    }
     impl_map = {
+        0: impl_map_0,
         1: impl_map_1,
         2: impl_map_2,
+        3: impl_map_3,
     }
     # TODO: fill in more
     return impl_map
@@ -363,6 +472,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
         for v in values:
             assert isinstance(v, PolarsTerm)
         f = self._expr_impl_map[len(values)][op.op]
+        assert f is not None
         res = f(*[v.polars_term for v in values])
         return PolarsTerm(polars_term=res, is_literal=False)
 
