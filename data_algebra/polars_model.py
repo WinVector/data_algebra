@@ -163,18 +163,13 @@ class PolarsModel(data_algebra.data_model.DataModel):
         """
         if op.node_name != "ExtendNode":
             raise TypeError("op was supposed to be a data_algebra.data_ops.ExtendNode")
-        window_situation = (
-            op.windowed_situation
-            or (len(op.partition_by) > 0)
-            or (len(op.order_by) > 0)
-        )
         assert len(op.order_by) == 0  # TODO: implement non-zero version of this
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
         for k, opk in op.ops.items():
             fld_k_container = opk.act_on(res, data_model=self)  # PolarsTerm
             assert isinstance(fld_k_container, PolarsTerm)
             fld_k = fld_k_container.polars_term
-            if window_situation:
+            if op.windowed_situation:
                 fld_k = fld_k.over(op.partition_by)
             res = res.with_column(fld_k.alias(k))
         return res
