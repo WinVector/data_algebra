@@ -5,7 +5,9 @@ Adapter to use Polars ( https://www.pola.rs ) in the data algebra.
 Note: not implemented yet.
 """
 
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List
+
+import polars as pl
 
 import data_algebra
 import data_algebra.data_model
@@ -14,14 +16,127 @@ import data_algebra.expr_rep
 import data_algebra.data_ops_types
 import data_algebra.connected_components
 
-import polars as pl
+
+class PolarsTerm:
+    """
+    Class to carry Polars term and annotations.
+    """
+    def __init__(self, *, polars_term, is_literal: bool) -> None:
+        assert isinstance(is_literal, bool)
+        assert polars_term is not None
+        self.polars_term = polars_term
+        self.is_literal = is_literal
 
 
-def _populate_expr_impl_map() -> Dict[str, Callable]:
+def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
     """
     Map symbols to implementations.
     """
-    impl_map = {
+    impl_map_0 = {
+        "count": lambda : None,  # TODO: implement
+        "_count": lambda : None,  # TODO: implement
+        "ngroup": lambda : None,  # TODO: implement
+        "_ngroup": lambda : None,  # TODO: implement
+        "row_number": lambda : None,  # TODO: implement
+        "_row_number": lambda : None,  # TODO: implement
+        "size": lambda : None,  # TODO: implement
+        "_size": lambda : None,  # TODO: implement
+        "uniform": lambda : None,  # TODO: implement
+        "_uniform": lambda : None,  # TODO: implement
+    }
+    impl_map_1 = {
+        "-": lambda x: 0 - x,
+        "abs": lambda x: x.abs(),
+        "all": lambda x: x.all(),
+        "any": lambda x: x.any(),
+        "any_value": lambda x: x.any_value(),
+        "arccos": lambda x: x.arccos(),
+        "arccosh": lambda x: x.arccosh(),
+        "arcsin": lambda x: x.arcsin(),
+        "arcsinh": lambda x: x.arcsinh(),
+        "arctan": lambda x: x.arctan(),
+        "arctan2": lambda x: x.arctan2(),
+        "arctanh": lambda x: x.arctanh(),
+        "as_int64": lambda x: x.as_int64(),
+        "as_str": lambda x: x.as_str(),
+        "base_Sunday": lambda x: x.base_Sunday(),
+        "bfill": lambda x: x.bfill(),
+        "ceil": lambda x: x.ceil(),
+        "coalesce": lambda x: x.coalesce(0),
+        "coalesce0": lambda x: x.coalesce(0),
+        "cos": lambda x: x.cos(),
+        "cosh": lambda x: x.cosh(),
+        "count": lambda x: x.count(),
+        "cumcount": lambda x: x.cumcount(),
+        "cummax": lambda x: x.cummax(),
+        "cummin": lambda x: x.cummin(),
+        "cumprod": lambda x: x.cumprod(),
+        "cumsum": lambda x: x.cumsum(),
+        "datetime_to_date": lambda x: x.datetime_to_date(),
+        "dayofmonth": lambda x: x.dayofmonth(),
+        "dayofweek": lambda x: x.dayofweek(),
+        "dayofyear": lambda x: x.dayofyear(),
+        "exp": lambda x: x.exp(),
+        "expm1": lambda x: x.expm1(),
+        "ffill": lambda x: x.ffill(),
+        "first": lambda x: x.first(),
+        "floor": lambda x: x.floor(),
+        "format_date": lambda x: x.format_date(),
+        "format_datetime": lambda x: x.format_datetime(),
+        "is_bad": lambda x: x.is_bad(),
+        "is_inf": lambda x: x.is_inf(),
+        "is_nan": lambda x: x.is_nan(),
+        "is_null": lambda x: x.is_null(),
+        "last": lambda x: x.last(),
+        "log": lambda x: x.log(),
+        "log10": lambda x: x.log10(),
+        "log1p": lambda x: x.log1p(),
+        "max": lambda x: x.max(),
+        "mean": lambda x: x.mean(),
+        "median": lambda x: x.median(),
+        "min": lambda x: x.min(),
+        "month": lambda x: x.month(),
+        "nunique": lambda x: x.nunique(),
+        "parse_date": lambda x: x.parse_date(),
+        "parse_datetime": lambda x: x.parse_datetime(),
+        "quarter": lambda x: x.quarter(),
+        "rank": lambda x: x.rank(),
+        "round": lambda x: x.round(),
+        "shift": lambda x: x.shift(),
+        "sign": lambda x: x.sign(),
+        "sin": lambda x: x.sin(),
+        "sinh": lambda x: x.sinh(),
+        "size": lambda x: x.size(),
+        "sqrt": lambda x: x.sqrt(),
+        "std": lambda x: x.std(),
+        "sum": lambda x: x.sum(),
+        "tanh": lambda x: x.tanh(),
+        "var": lambda x: x.var(),
+        "weekofyear": lambda x: x.weekofyear(),
+    }
+    impl_map_2 = {
+        "*": lambda a, b: a * b,
+        "**": lambda a, b: a ** b,
+        "/": lambda a, b: a / b,
+        "//": lambda a, b: a // b,
+        "%": lambda a, b: a % b,
+        "%/%": lambda a, b: a // b,
+        "+": lambda a, b: a + b,
+        "-": lambda a, b: a - b,
+        "and": lambda a, b: a and b,
+        "around": lambda a, b: a.around(b),
+        "coalesce": lambda a, b: a.coalesce(b),
+        "concat": lambda a, b: a.concat(b),
+        "date_diff": lambda a, b: a.date_diff(b),
+        "fmax": lambda a, b: a.fmax(b),
+        "fmin": lambda a, b: a.fmin(b),
+        "is_in": lambda a, b: a.is_in(b),
+        "maximum": lambda a, b: a.maximum(b),
+        "minimum": lambda a, b: a.minimum(b),
+        "mod": lambda a, b: a.mod(b),
+        "or": lambda a, b: a or b,
+        "remainder": lambda a, b: a.remainder(b),
+        "timestamp_diff": lambda a, b: a.timestamp_diff(b),
         "==": lambda a, b: a == b,
         "<=": lambda a, b: a <= b,
         "<": lambda a, b: a < b,  
@@ -31,8 +146,20 @@ def _populate_expr_impl_map() -> Dict[str, Callable]:
         "not": lambda x: x == False,
         "~": lambda x: x == False,
         "!": lambda x: x == False,
-        # TODO: fill in more
     }
+    impl_map_3 = {
+        "if_else": lambda a, b, c: a.if_else(b, c), 
+        "mapv": lambda a, b, c: a.mapv(b, c),
+        "trimstr": lambda a, b, c: a.trimstr(b, c),
+        "where": lambda a, b, c: a.where(b, c),
+    }
+    impl_map = {
+        0: impl_map_0,
+        1: impl_map_1,
+        2: impl_map_2,
+        3: impl_map_3,
+    }
+    # TODO: fill in more
     return impl_map
 
 
@@ -46,7 +173,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
     use_lazy_eval: bool
     presentation_model_name: str
     _method_dispatch_table: Dict[str, Callable]
-    _expr_impl_map: Dict[str, Callable]
+    _expr_impl_map: Dict[int, Dict[str, Callable]]
 
     def __init__(self, *, use_lazy_eval: bool = True):
         data_algebra.data_model.DataModel.__init__(
@@ -151,8 +278,46 @@ class PolarsModel(data_algebra.data_model.DataModel):
         """
         if op.node_name != "ExtendNode":
             raise TypeError("op was supposed to be a data_algebra.data_ops.ExtendNode")
+        assert len(op.order_by) == 0  # TODO: implement non-zero version of this
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
-        raise ValueError("not implemented yet")  # TODO: implement
+        partition_by = op.partition_by
+        temp_v_columns = []
+        # see if we need to make partition non-empty
+        if len(partition_by) <= 0:
+            v_name = f"_da_extend_temp_partition_column"
+            partition_by = [v_name]
+            temp_v_columns.append(pl.lit(1).alias(v_name))
+        produced_columns = []
+        for k, opk in op.ops.items():
+            if op.windowed_situation:
+                # enforce is a simple v.f() expression
+                assert isinstance(opk, data_algebra.expr_rep.Expression)
+                assert len(opk.args) == 1
+                assert isinstance(opk.args[0], (data_algebra.expr_rep.Value, data_algebra.expr_rep.ColumnReference))
+                if isinstance(opk.args[0], data_algebra.expr_rep.Value):
+                    # promote value to column for uniformity of API
+                    v_name = f"_da_extend_temp_v_column_{len(temp_v_columns)}"
+                    temp_v_columns.append(pl.lit(opk.args[0].value).alias(v_name))
+                    opk = data_algebra.expr_rep.Expression(
+                        op=opk.op, 
+                        args=[data_algebra.expr_rep.ColumnReference(view=None, column_name=v_name)], 
+                        params=opk.params, 
+                        inline=opk.inline, 
+                        method=opk.method,
+                    )
+            fld_k_container = opk.act_on(res, data_model=self)  # PolarsTerm
+            assert isinstance(fld_k_container, PolarsTerm)
+            fld_k = fld_k_container.polars_term
+            if op.windowed_situation:
+                fld_k = fld_k.over(partition_by)
+            produced_columns.append(fld_k.alias(k))
+        if len(produced_columns) > 0:
+            if len(temp_v_columns) > 0:
+                res = res.with_columns(temp_v_columns)
+            res = res.with_columns(produced_columns)  
+            if len(temp_v_columns) > 0:
+                res = res.select(op.columns_produced())
+        return res
     
     def _map_columns_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
         """
@@ -237,8 +402,9 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 "op was supposed to be a data_algebra.data_ops.SelectRowsNode"
             )
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
-        selection = op.expr.act_on(res, data_model=self)
-        res = res.filter(selection)
+        selection = op.expr.act_on(res, data_model=self)  # PolarsTerm
+        assert isinstance(selection, PolarsTerm)
+        res = res.filter(selection.polars_term)
         return res
 
     def _sql_proxy_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
@@ -278,7 +444,8 @@ class PolarsModel(data_algebra.data_model.DataModel):
         :param value: literal value being supplied
         :return: converted result
         """
-        return pl.lit(value)
+        assert not isinstance(value, PolarsTerm)
+        return PolarsTerm(polars_term=pl.lit(value), is_literal=True)
     
     def act_on_column_name(self, *, arg, value):
         """
@@ -289,7 +456,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
         :return: arg acted on
         """
         assert isinstance(value, str)
-        return pl.col(value)
+        return PolarsTerm(polars_term=pl.col(value), is_literal=False)
     
     def act_on_expression(self, *, arg, values: List, op):
         """
@@ -297,14 +464,17 @@ class PolarsModel(data_algebra.data_model.DataModel):
 
         :param arg: item we are acting on
         :param values: list of values to work on
-        :param op: perator to apply
+        :param op: operator to apply
         :return: arg acted on
         """
         assert isinstance(values, List)
         assert isinstance(op, data_algebra.expr_rep.Expression)
-        f = self._expr_impl_map[op.op]
-        res = f(*values)
-        return res
+        for v in values:
+            assert isinstance(v, PolarsTerm)
+        f = self._expr_impl_map[len(values)][op.op]
+        assert f is not None
+        res = f(*[v.polars_term for v in values])
+        return PolarsTerm(polars_term=res, is_literal=False)
 
 
 def register_polars_model():

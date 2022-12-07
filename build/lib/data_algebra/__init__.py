@@ -27,12 +27,12 @@ from data_algebra.data_ops import TableDescription, SQLNode, describe_table, des
 def _register_data_models():
     import data_algebra.pandas_model
     data_algebra.pandas_model.register_pandas_model()
+    assert isinstance(data_algebra.data_model.data_model_type_map["default_data_model"], data_algebra.pandas_model.PandasModel)
     try:
         import data_algebra.polars_model
         data_algebra.polars_model.register_polars_model()
     except ModuleNotFoundError:
         pass
 
-_register_data_models()
-
-assert isinstance(data_algebra.data_model.data_model_type_map["default_data_model"], data_algebra.pandas_model.PandasModel)
+if len(data_algebra.data_model.data_model_type_map) <= 0:
+    _register_data_models()
