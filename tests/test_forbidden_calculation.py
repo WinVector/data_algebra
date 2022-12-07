@@ -56,11 +56,14 @@ def test_calc_interface():
     assert data_algebra.test_util.equivalent_frames(res1, expect)
     data_algebra.test_util.check_transform(ops=ops, data=d_good, expect=expect)
 
+    # act on interface should be strict
     with pytest.raises(ValueError):
         ops.act_on(d_extra)
 
-    with pytest.raises(ValueError):
-        ops.transform(d_extra)
+    # allowed through normal path
+    res2 = ops.transform(d_extra)
+    assert data_algebra.test_util.equivalent_frames(res2, expect)
+    data_algebra.test_util.check_transform(ops=ops, data=d_extra, expect=expect)
 
     conn = sqlite3.connect(":memory:")
     db_model = data_algebra.SQLite.SQLiteModel()

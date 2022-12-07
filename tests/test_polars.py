@@ -128,6 +128,3 @@ def test_polars_2e():
         assert np.max(res_pandas["count"]) == np.min(res_pandas["count"])
         assert np.max(res_pandas["count"]) == res_pandas.shape[0]
         assert data_algebra.test_util.equivalent_frames(res_polars.to_pandas(), res_pandas)
-
-
-test_polars_2e()  # TODO: remove

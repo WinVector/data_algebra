@@ -201,7 +201,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             if not allow_limited_tables:
                 assert tv.nrows == tv.head.shape[0]
             data_map[tv.table_name] = tv.head
-        return self.eval(data_map=data_map, data_model=data_model)
+        return self.eval(data_map=data_map, data_model=data_model, strict=True)
 
     # characterization
 
@@ -466,15 +466,18 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         data_map: Dict[str, Any],
         *,
         data_model=None,
+        strict: bool = False,
     ):
         """
         Evaluate operators with respect to Pandas data frames.
 
         :param data_map: map from table names to data frames or data sources
         :param data_model: adaptor to data dialect (Pandas for now)
+        :param strict: if True, throw on unexpected columns
         :return: table result
         """
         assert isinstance(data_map, dict)
+        assert isinstance(strict, bool)
         self.columns_used()  # for table consistency check/raise
         tables = self.get_tables()
         if len(tables) > 0:
@@ -488,7 +491,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             data_model = data_algebra.data_model.data_model_type_map["default_data_model"]
         assert isinstance(data_model, data_algebra.data_model.DataModel)
         self.check_constraints(
-            {k: data_map[k].columns for k in tables.keys()}, strict=True
+            {k: data_map[k].columns for k in tables.keys()}, strict=strict
         )
         return data_model.eval(op=self, data_map=data_map)
 
@@ -498,14 +501,17 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         X,
         *,
         data_model=None,
+        strict: bool = False,
     ):
         """
         Apply data transform to a table
 
         :param X: tale to apply to
         :param data_model: data model for Pandas execution
+        :param strict: if True, throw on unexpected columns
         :return: transformed data frame
         """
+        assert isinstance(strict, bool)
         self.columns_used()  # for table consistency check/raise
         tables = self.get_tables()
         if len(tables) != 1:
@@ -516,7 +522,8 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         data_map = {k: X}
         return self.eval(
             data_map=data_map,
-            data_model=data_model
+            data_model=data_model,
+            strict=strict,
         )
 
     # composition (used to eliminate intermediate order nodes)

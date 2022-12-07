@@ -33,13 +33,15 @@ class OperatorPlatform(abc.ABC):
         self,
         data_map: Dict[str, Any],
         *,
-        data_model=None
+        data_model=None,
+        strict: bool = False,
     ):
         """
         Evaluate operators with respect to Pandas data frames.
 
         :param data_map: map from table names to data frames or data sources
         :param data_model: adaptor to data dialect (Pandas for now)
+        :param strict: if True, throw on unexpected columns
         :return: table result
         """
 
@@ -49,13 +51,15 @@ class OperatorPlatform(abc.ABC):
         self,
         X,
         *,
-        data_model=None
+        data_model=None,
+        strict: bool = False,
     ):
         """
         apply self to data frame X, may or may not commute with composition
 
         :param X: input data frame
         :param data_model: implementation to use
+        :param strict: if True, throw on unexpected columns
         :return: transformed data frame
         """
 
@@ -70,7 +74,8 @@ class OperatorPlatform(abc.ABC):
         """
         return self.transform(
             X=X,
-            data_model=data_model
+            data_model=data_model,
+            strict=True
         )
 
     @abc.abstractmethod
