@@ -248,6 +248,8 @@ class PolarsModel(data_algebra.data_model.DataModel):
         res = self._method_dispatch_table[op.node_name](op=op, data_map=data_map)
         return res
 
+    # operator step realizations
+
     def _concat_rows_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
         """
         Execute a concat rows step, returning a data frame.
@@ -312,22 +314,20 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 fld_k = fld_k.over(partition_by)
             produced_columns.append(fld_k.alias(k))
         if len(produced_columns) > 0:
+            if len(op.order_by) > 0:
+                order_cols = list(partition_by)
+                partition_set = set(partition_by)
+                for c in op.order_by:
+                    if c not in partition_set:
+                        order_cols.append(c)
+                reversed_cols = [True if ci in set(op.reverse) else False for ci in op.order_columns]
+                res = res.sort(by=op.order_columns, reversed=reversed_cols)
             if len(temp_v_columns) > 0:
                 res = res.with_columns(temp_v_columns)
             res = res.with_columns(produced_columns)  
             if len(temp_v_columns) > 0:
                 res = res.select(op.columns_produced())
         return res
-    
-    def _map_columns_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
-        """
-        Execute a map columns step, returning a data frame.
-        """
-        if op.node_name != "MapColumnsNode":
-            raise TypeError(
-                "op was supposed to be a data_algebra.data_ops.MapColumnsNode"
-            )
-        raise ValueError("not implemented yet")  # TODO: implement
     
     def _natural_join_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
         """
@@ -348,7 +348,11 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 "op was supposed to be a data_algebra.data_ops.OrderRowsNode"
             )
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
-        raise ValueError("not implemented yet")  # TODO: implement
+        reversed_cols = [True if ci in set(op.reverse) else False for ci in op.order_columns]
+        res = res.sort(by=op.order_columns, reversed=reversed_cols)
+        if op.limit is not None:
+            res = res.head(op.limit)
+        return res
 
     def _project_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
         """
@@ -357,7 +361,40 @@ class PolarsModel(data_algebra.data_model.DataModel):
         if op.node_name != "ProjectNode":
             raise TypeError("op was supposed to be a data_algebra.data_ops.ProjectNode")
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
-        raise ValueError("not implemented yet")  # TODO: implement
+        group_by = op.group_by
+        temp_v_columns = []
+        # see if we need to make group_by non-empty
+        if len(group_by) <= 0:
+            v_name = f"_da_project_temp_group_by_column"
+            group_by = [v_name]
+            temp_v_columns.append(pl.lit(1).alias(v_name))
+        produced_columns = []
+        for k, opk in op.ops.items():
+            # enforce is a simple v.f() expression
+            assert isinstance(opk, data_algebra.expr_rep.Expression)
+            assert len(opk.args) == 1
+            assert isinstance(opk.args[0], (data_algebra.expr_rep.Value, data_algebra.expr_rep.ColumnReference))
+            if isinstance(opk.args[0], data_algebra.expr_rep.Value):
+                # promote value to column for uniformity of API
+                v_name = f"_da_project_temp_v_column_{len(temp_v_columns)}"
+                temp_v_columns.append(pl.lit(opk.args[0].value).alias(v_name))
+                opk = data_algebra.expr_rep.Expression(
+                    op=opk.op, 
+                    args=[data_algebra.expr_rep.ColumnReference(view=None, column_name=v_name)], 
+                    params=opk.params, 
+                    inline=opk.inline, 
+                    method=opk.method,
+                )
+            fld_k_container = opk.act_on(res, data_model=self)  # PolarsTerm
+            assert isinstance(fld_k_container, PolarsTerm)
+            fld_k = fld_k_container.polars_term
+            produced_columns.append(fld_k.alias(k))
+        if len(temp_v_columns) > 0:
+            res = res.with_columns(temp_v_columns)
+        res = res.group_by(op.group_by).agg(produced_columns)
+        if len(temp_v_columns) > 0:
+            res = res.select(op.columns_produced())
+        return res
 
     def _map_columns_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
         """
@@ -368,7 +405,11 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 "op was supposed to be a data_algebra.data_ops.MapColumnsNode"
             )
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
-        raise ValueError("not implemented yet")  # TODO: implement
+        res = res.rename(columns=op.column_remapping)
+        if (op.column_deletions is not None) and (len(op.column_deletions) > 0):
+            column_selection = [c for c in res.columns if c not in op.column_deletions]
+            res = res.select(column_selection)
+        return res
 
     def _rename_columns_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
         """
@@ -379,7 +420,8 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 "op was supposed to be a data_algebra.data_ops.RenameColumnsNode"
             )
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
-        raise ValueError("not implemented yet")  # TODO: implement
+        res = res.rename(columns=op.reverse_mapping)
+        return res
 
     def _select_columns_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
         """

@@ -605,7 +605,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             col_set = set(col_list)
             for c in op.order_by:
                 if c not in col_set:
-                    col_list = col_list + [c]
+                    col_list.append(c)
                     col_set.add(c)
             order_cols = [c for c in col_list]  # must be partition by followed by order
             for (k, opk) in op.ops.items():
@@ -614,7 +614,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                     if isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference):
                         value_name = opk.args[0].column_name
                         if value_name not in col_set:
-                            col_list = col_list + [value_name]
+                            col_list.append(value_name)
                             col_set.add(value_name)
                     elif isinstance(opk.args[0], data_algebra.expr_rep.Value):
                         key = str(opk.args[0].value)
@@ -684,7 +684,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                     if isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference):
                         value_name = opk.args[0].column_name
                         if value_name not in set(col_list):
-                            col_list = col_list + [value_name]
+                            col_list.append(value_name)
                         transform_op = opk.op
                         try:
                             transform_op = self.transform_op_map[transform_op]
