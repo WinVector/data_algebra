@@ -12,22 +12,17 @@ class DataModelSpace(data_algebra.data_space.DataSpace):
     def __init__(
         self, 
         data_model: Optional[data_algebra.data_model.DataModel] = None,
-        *,
-        narrow: bool = False,
         ) -> None:
         """
         Build an isolated execution space. Good for enforcing different data model adaptors or alternatives.
 
         :param data_model: execution model
-        :param narrow: if True strictly narrow columns.
         """
         super().__init__()
-        assert isinstance(narrow, bool)
         if data_model is None:
             data_model = data_algebra.data_model.data_model_type_map["default_data_model"]
         assert isinstance(data_model, data_algebra.data_model.DataModel)
         self.data_model = data_model
-        self.narrow = narrow
         self.data_map = dict()
         self.n_tmp = 0
 
@@ -99,7 +94,7 @@ class DataModelSpace(data_algebra.data_space.DataSpace):
         assert isinstance(allow_overwrite, bool)
         if not allow_overwrite:
             assert key not in self.data_map.keys()
-        value = ops.eval(data_map=self.data_map, data_model=self.data_model, narrow=self.narrow)
+        value = ops.eval(data_map=self.data_map, data_model=self.data_model)
         assert self.data_model.is_appropriate_data_instance(value)
         self.data_map[key] = value
         return data_algebra.data_ops.describe_table(value, table_name=key)

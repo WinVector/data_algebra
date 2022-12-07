@@ -34,14 +34,14 @@ class OperatorPlatform(abc.ABC):
         data_map: Dict[str, Any],
         *,
         data_model=None,
-        narrow: bool = True
+        strict: bool = False,
     ):
         """
         Evaluate operators with respect to Pandas data frames.
 
         :param data_map: map from table names to data frames or data sources
         :param data_model: adaptor to data dialect (Pandas for now)
-        :param narrow: logical, if True don't copy unexpected columns
+        :param strict: if True, throw on unexpected columns
         :return: table result
         """
 
@@ -52,14 +52,14 @@ class OperatorPlatform(abc.ABC):
         X,
         *,
         data_model=None,
-        narrow: bool = True
+        strict: bool = False,
     ):
         """
         apply self to data frame X, may or may not commute with composition
 
         :param X: input data frame
         :param data_model: implementation to use
-        :param narrow: logical, if True don't copy unexpected columns
+        :param strict: if True, throw on unexpected columns
         :return: transformed data frame
         """
 
@@ -75,7 +75,7 @@ class OperatorPlatform(abc.ABC):
         return self.transform(
             X=X,
             data_model=data_model,
-            narrow=False
+            strict=True
         )
 
     @abc.abstractmethod
@@ -103,12 +103,11 @@ class OperatorPlatform(abc.ABC):
     # convenience
 
     @abc.abstractmethod
-    def ex(self, *, data_model=None, narrow=True, allow_limited_tables=False):
+    def ex(self, *, data_model=None, allow_limited_tables=False):
         """
         Evaluate operators with respect to Pandas data frames already stored in the operator chain.
 
         :param data_model: adaptor to data dialect (Pandas for now)
-        :param narrow: logical, if True don't copy unexpected columns
         :param allow_limited_tables: logical, if True allow execution on non-complete tables
         :return: table result
         """
