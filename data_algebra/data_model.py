@@ -42,13 +42,12 @@ class DataModel(abc.ABC):
     # evaluate
 
     @abc.abstractmethod
-    def eval(self, op, *, data_map: Dict[str, Any], narrow: bool = False):
+    def eval(self, op, *, data_map: Dict[str, Any]):
         """
         Implementation of Pandas evaluation of operators
 
         :param op: ViewRepresentation to evaluate
         :param data_map: dictionary mapping table and view names to data frames
-        :param narrow: if True narrow results to only columns anticipated
         :return: data frame result
         """
     

@@ -431,7 +431,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
     # bigger stuff
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
-    def _table_step(self, op, *, data_map: dict, narrow: bool):
+    def _table_step(self, op, *, data_map: dict):
         """
         Return a copy of data frame from table description and data_map.
         """
@@ -454,8 +454,6 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                 )
         # check all columns we expect are present
         columns_using = op.column_names
-        if not narrow:
-            columns_using = list(df.columns)
         missing = set(columns_using) - set(df.columns)
         if len(missing) > 0:
             raise ValueError("missing required columns: " + str(missing))
@@ -464,7 +462,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         res = res.reset_index(drop=True, inplace=False)  # copy and clear out indices
         return res
 
-    def _sql_proxy_step(self, op, *, data_map: dict, narrow: bool):
+    def _sql_proxy_step(self, op, *, data_map: dict):
         """
         execute SQL
         """
@@ -545,35 +543,33 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             res[c] = transient_new_frame[c]
         return res
 
-    def eval(self, op, *, data_map: Dict[str, Any], narrow: bool = False):
+    def eval(self, op, *, data_map: Dict[str, Any]):
         """
         Implementation of Pandas evaluation of operators
 
         :param op: ViewRepresentation to evaluate
         :param data_map: dictionary mapping table and view names to data frames or data sources
-        :param narrow: if True narrow results to only columns anticipated
         :return: data frame result
         """
         assert isinstance(data_map, Dict)
-        assert isinstance(narrow, bool)
         assert isinstance(op, data_algebra.data_ops_types.OperatorPlatform)
-        return self._eval_value_source(s=op, data_map=data_map, narrow=narrow)
+        return self._eval_value_source(s=op, data_map=data_map)
 
-    def _eval_value_source(self, s, *, data_map: dict, narrow: bool):
+    def _eval_value_source(self, s, *, data_map: dict):
         """
         Evaluate an incoming (or value source) node.
         """
         return self._method_dispatch_table[s.node_name](
-            op=s, data_map=data_map, narrow=narrow
+            op=s, data_map=data_map
         )
 
-    def _extend_step(self, op, *, data_map, narrow):
+    def _extend_step(self, op, *, data_map):
         """
         Execute an extend step, returning a data frame.
         """
         if op.node_name != "ExtendNode":
             raise TypeError("op was supposed to be a data_algebra.data_ops.ExtendNode")
-        res = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
+        res = self._eval_value_source(op.sources[0], data_map=data_map)
         if res.shape[0] <= 0:
             # special case out no-row frame
             incoming_col_set = set(res.columns)
@@ -717,7 +713,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             res = self.add_data_frame_columns_to_data_frame_(res, subframe)
         return res
 
-    def _project_step(self, op, *, data_map, narrow):
+    def _project_step(self, op, *, data_map):
         """
         Execute a project step, returning a data frame.
         """
@@ -729,7 +725,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         # try the following tutorial:
         # https://www.shanelynn.ie/summarising-aggregation-and-grouping-data-in-python-pandas/
         data_algebra_temp_cols = {}
-        res = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
+        res = self._eval_value_source(op.sources[0], data_map=data_map)
         for (k, opk) in op.ops.items():
             if len(opk.args) > 1:
                 raise ValueError(
@@ -805,7 +801,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             raise ValueError("result wasn't keyed by group_by columns")
         return res
 
-    def _select_rows_step(self, op, *, data_map, narrow):
+    def _select_rows_step(self, op, *, data_map):
         """
         Execute a select rows step, returning a data frame.
         """
@@ -813,14 +809,14 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.SelectRowsNode"
             )
-        res = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
+        res = self._eval_value_source(op.sources[0], data_map=data_map)
         if res.shape[0] < 1:
             return res
         selection = op.expr.act_on(res, data_model=self)
         res = res.loc[selection, :].reset_index(drop=True, inplace=False)
         return res
 
-    def _select_columns_step(self, op, *, data_map, narrow):
+    def _select_columns_step(self, op, *, data_map):
         """
         Execute a select columns step, returning a data frame.
         """
@@ -828,10 +824,10 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.SelectColumnsNode"
             )
-        res = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
+        res = self._eval_value_source(op.sources[0], data_map=data_map)
         return res[op.column_selection]
 
-    def _drop_columns_step(self, op, *, data_map, narrow):
+    def _drop_columns_step(self, op, *, data_map):
         """
         Execute a drop columns step, returning a data frame.
         """
@@ -839,11 +835,11 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.DropColumnsNode"
             )
-        res = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
+        res = self._eval_value_source(op.sources[0], data_map=data_map)
         column_selection = [c for c in res.columns if c not in op.column_deletions]
         return res[column_selection]
 
-    def _order_rows_step(self, op, *, data_map, narrow):
+    def _order_rows_step(self, op, *, data_map):
         """
         Execute an order rows step, returning a data frame.
         """
@@ -851,7 +847,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.OrderRowsNode"
             )
-        res = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
+        res = self._eval_value_source(op.sources[0], data_map=data_map)
         if res.shape[0] > 1:
             ascending = [
                 False if ci in set(op.reverse) else True for ci in op.order_columns
@@ -863,7 +859,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             res = res.iloc[range(op.limit), :].reset_index(drop=True)
         return res
 
-    def _map_columns_step(self, op, *, data_map, narrow):
+    def _map_columns_step(self, op, *, data_map):
         """
         Execute a map columns step, returning a data frame.
         """
@@ -871,14 +867,14 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.MapColumnsNode"
             )
-        res = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
+        res = self._eval_value_source(op.sources[0], data_map=data_map)
         res = res.rename(columns=op.column_remapping)
         if (op.column_deletions is not None) and (len(op.column_deletions) > 0):
             column_selection = [c for c in res.columns if c not in op.column_deletions]
             res = res[column_selection]
         return res
 
-    def _rename_columns_step(self, op, *, data_map, narrow):
+    def _rename_columns_step(self, op, *, data_map):
         """
         Execute a rename columns step, returning a data frame.
         """
@@ -886,7 +882,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.RenameColumnsNode"
             )
-        res = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
+        res = self._eval_value_source(op.sources[0], data_map=data_map)
         return res.rename(columns=op.reverse_mapping)
 
     # noinspection PyMethodMayBeStatic
@@ -906,7 +902,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             pass
         return jointype
 
-    def _natural_join_step(self, op, *, data_map, narrow):
+    def _natural_join_step(self, op, *, data_map):
         """
         Execute a natural join step, returning a data frame.
         """
@@ -914,8 +910,8 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.NaturalJoinNode"
             )
-        left = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
-        right = self._eval_value_source(op.sources[1], data_map=data_map, narrow=narrow)
+        left = self._eval_value_source(op.sources[0], data_map=data_map)
+        right = self._eval_value_source(op.sources[1], data_map=data_map)
         if (left.shape[0] == 0) and (right.shape[0] == 0):
             # pandas seems to not like this case
             return self.pd.DataFrame({k: [] for k in op.columns_produced()})
@@ -958,7 +954,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         res = res.reset_index(drop=True)
         return res
 
-    def _concat_rows_step(self, op, *, data_map, narrow):
+    def _concat_rows_step(self, op, *, data_map):
         """
         Execute a concat rows step, returning a data frame.
         """
@@ -966,8 +962,8 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.ConcatRowsNode"
             )
-        left = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
-        right = self._eval_value_source(op.sources[1], data_map=data_map, narrow=narrow)
+        left = self._eval_value_source(op.sources[0], data_map=data_map)
+        right = self._eval_value_source(op.sources[1], data_map=data_map)
         if op.id_column is not None:
             if left.shape[0] > 0:
                 left[op.id_column] = op.a_name
@@ -989,7 +985,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         res = res.reset_index(drop=True)
         return res
 
-    def _convert_records_step(self, op, *, data_map, narrow):
+    def _convert_records_step(self, op, *, data_map):
         """
         Execute record conversion step, returning a data frame.
         """
@@ -997,7 +993,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.ConvertRecordsNode"
             )
-        res = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
+        res = self._eval_value_source(op.sources[0], data_map=data_map)
         return op.record_map.transform(res, local_data_model=self)
 
     # expression helpers

@@ -5,7 +5,6 @@ import pytest
 import data_algebra
 from data_algebra.data_ops import *
 import data_algebra.test_util
-from data_algebra.arrow import fmt_as_arrow
 
 
 def test_forbidden_calculation():
@@ -60,7 +59,8 @@ def test_calc_interface():
     with pytest.raises(ValueError):
         ops.act_on(d_extra)
 
-    ops.transform(d_extra)
+    with pytest.raises(ValueError):
+        ops.transform(d_extra)
 
     conn = sqlite3.connect(":memory:")
     db_model = data_algebra.SQLite.SQLiteModel()

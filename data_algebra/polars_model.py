@@ -217,17 +217,15 @@ class PolarsModel(data_algebra.data_model.DataModel):
 
     # evaluate
 
-    def eval(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any], narrow: bool = True) -> pl.DataFrame:
+    def eval(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]) -> pl.DataFrame:
         """
         Implementation of Polars evaluation of data algebra operators
 
         :param op: ViewRepresentation to evaluate
         :param data_map: dictionary mapping table and view names to data frames
-        :param narrow: ignored, always narrows to anticipated columns
         :return: data frame result
         """
         assert isinstance(data_map, Dict)
-        assert isinstance(narrow, bool)
         assert isinstance(op, data_algebra.data_ops_types.OperatorPlatform)
         res = self._compose_polars_ops(op=op, data_map=data_map)
         if self.use_lazy_eval:

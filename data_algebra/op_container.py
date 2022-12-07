@@ -52,12 +52,11 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         self.ops = None
         return res
 
-    def ex(self, *, data_model=None, narrow=True, allow_limited_tables=False):
+    def ex(self, *, data_model=None, allow_limited_tables=False):
         """
         Evaluate operators with respect to Pandas data frames already stored in the operator chain.
 
         :param data_model: adaptor to data dialect (Pandas for now)
-        :param narrow: logical, if True don't copy unexpected columns
         :param allow_limited_tables: logical, if True allow execution on non-complete tables
         :return: table result
         """
@@ -66,7 +65,6 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         self.used_result = True
         res = self.ops.ex(
             data_model=data_model,
-            narrow=narrow,
             allow_limited_tables=allow_limited_tables,
         )
         self.ops = None
@@ -77,14 +75,12 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         self,
         X,
         *,
-        data_model=None,
-        narrow: bool = True
+        data_model=None
     ):
         assert isinstance(self.ops, data_algebra.data_ops.ViewRepresentation)
         return self.ops.transform(
             X=X,
-            data_model=data_model,
-            narrow=narrow
+            data_model=data_model
         )
 
     # noinspection PyPep8Naming
@@ -104,8 +100,8 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         self.set(self.ops.__rshift__(other))
         return self
 
-    def eval(self, data_map: Dict[str, Any], *, data_model=None, narrow=True):
-        return self.ops.eval(data_map=data_map, data_model=data_model, narrow=narrow)
+    def eval(self, data_map: Dict[str, Any], *, data_model=None,):
+        return self.ops.eval(data_map=data_map, data_model=data_model)
 
     def get_tables(self):
         return self.ops.get_tables()

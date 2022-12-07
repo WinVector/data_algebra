@@ -182,16 +182,14 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
 
     # convenience
 
-    def ex(self, *, data_model=None, narrow: bool = True, allow_limited_tables: bool = False):
+    def ex(self, *, data_model=None, allow_limited_tables: bool = False):
         """
         Evaluate operators with respect to Pandas data frames already stored in the operator chain.
 
         :param data_model: adaptor to data dialect (Pandas for now)
-        :param narrow: logical, if True don't copy unexpected columns
         :param allow_limited_tables: logical, if True allow execution on non-complete tables
         :return: table result
         """
-        assert isinstance(narrow, bool)
         assert isinstance(allow_limited_tables, bool)
         tables = self.get_tables()
         data_map = dict()
@@ -203,7 +201,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             if not allow_limited_tables:
                 assert tv.nrows == tv.head.shape[0]
             data_map[tv.table_name] = tv.head
-        return self.eval(data_map=data_map, data_model=data_model, narrow=narrow)
+        return self.eval(data_map=data_map, data_model=data_model)
 
     # characterization
 
@@ -468,14 +466,12 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         data_map: Dict[str, Any],
         *,
         data_model=None,
-        narrow: bool = True
     ):
         """
         Evaluate operators with respect to Pandas data frames.
 
         :param data_map: map from table names to data frames or data sources
         :param data_model: adaptor to data dialect (Pandas for now)
-        :param narrow: logical, if True don't copy unexpected columns
         :return: table result
         """
         assert isinstance(data_map, dict)
@@ -492,9 +488,9 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             data_model = data_algebra.data_model.data_model_type_map["default_data_model"]
         assert isinstance(data_model, data_algebra.data_model.DataModel)
         self.check_constraints(
-            {k: data_map[k].columns for k in tables.keys()}, strict=(not narrow)
+            {k: data_map[k].columns for k in tables.keys()}, strict=True
         )
-        return data_model.eval(op=self, data_map=data_map, narrow=narrow)
+        return data_model.eval(op=self, data_map=data_map)
 
     # noinspection PyPep8Naming
     def transform(
@@ -502,14 +498,12 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         X,
         *,
         data_model=None,
-        narrow: bool = True
     ):
         """
         Apply data transform to a table
 
         :param X: tale to apply to
         :param data_model: data model for Pandas execution
-        :param narrow: logical, if True narrow number of result columns to specification
         :return: transformed data frame
         """
         self.columns_used()  # for table consistency check/raise
@@ -522,8 +516,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         data_map = {k: X}
         return self.eval(
             data_map=data_map,
-            data_model=data_model,
-            narrow=narrow
+            data_model=data_model
         )
 
     # composition (used to eliminate intermediate order nodes)
@@ -2852,8 +2845,6 @@ class ConvertRecordsNode(ViewRepresentation):
         """
         if temp_id_source is None:
             temp_id_source = [0]
-        # TODO: narrow to what we are using
-        # TODO: use nearsql instead of strings / lists of strings
         near_sql = self.sources[0].to_near_sql_implementation_(
             db_model=db_model,
             using=None,
@@ -3011,16 +3002,15 @@ class SQLNode(ViewRepresentation):
         return near_sql
 
 
-def ex(d, *, data_model=None, narrow: bool = True, allow_limited_tables: bool = False):
+def ex(d, *, data_model=None, allow_limited_tables: bool = False):
     """
     Evaluate operators with respect to Pandas data frames already stored in the operator chain.
 
     :param d: data algebra pipeline or OpC container to evaluate.
     :param data_model: adaptor to data dialect (Pandas for now)
-    :param narrow: logical, if True don't copy unexpected columns
     :param allow_limited_tables: logical, if True allow execution on non-complete tables
     :return: table result
     """
     return d.ex(
-        data_model=data_model, narrow=narrow, allow_limited_tables=allow_limited_tables
+        data_model=data_model, allow_limited_tables=allow_limited_tables
     )
