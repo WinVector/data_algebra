@@ -20,6 +20,7 @@ import data_algebra.data_model
 import data_algebra.data_ops
 # import for easy access for package users
 from data_algebra.data_ops import TableDescription, SQLNode, describe_table, descr, data, ex
+from data_algebra.expr_rep import lit, col
 
 
 # ready our data models

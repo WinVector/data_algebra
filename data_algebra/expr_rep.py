@@ -1092,6 +1092,11 @@ class Value(Term):
         return Value(-self.value)
 
 
+def lit(x):
+    """Represent a value"""
+    return Value(x)
+
+
 class ListTerm(PreTerm):
     """
     Class to hold a collection.
@@ -1252,11 +1257,12 @@ def enc_value(value):
 
 class ColumnReference(Term):
     """class to represent referring to a column"""
+    # TODO: move view out of this class?
 
     view: Optional[Any]
     column_name: str
 
-    def __init__(self, view, column_name):
+    def __init__(self, view, column_name):  # TODO: args by name, view last
         self.view = view
         self.column_name = column_name
         assert isinstance(column_name, str)
@@ -1318,6 +1324,12 @@ class ColumnReference(Term):
         :return:
         """
         columns_seen.add(self.column_name)
+
+
+def col(nm: str):
+    """represent a column or value"""
+    assert isinstance(nm, str)
+    return ColumnReference(view=None, column_name=nm)
 
 
 # noinspection SpellCheckingInspection

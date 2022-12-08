@@ -258,7 +258,9 @@ class PolarsModel(data_algebra.data_model.DataModel):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.ConcatRowsNode"
             )
-        raise ValueError("not implemented yet")  # TODO: implement
+        inputs = [self._compose_polars_ops(s, data_map=data_map) for s in op.sources]
+        res = pl.concat(inputs, how="vertical")
+        return res
     
     def _convert_records_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
         """
@@ -337,7 +339,17 @@ class PolarsModel(data_algebra.data_model.DataModel):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.NaturalJoinNode"
             )
-        raise ValueError("not implemented yet")  # TODO: implement
+        # TODO: coalesce common columns not in on, and corner cases
+        inputs = [self._compose_polars_ops(s, data_map=data_map) for s in op.sources]
+        assert len(inputs) == 2
+        assert op.on_a == op.on_b  # TODO: relax this
+        on = op.on_a
+        res = inputs[0].join(
+            inputs[1],
+            on=on,
+            how=op.jointype,
+        )
+        return res
     
     def _order_rows_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
         """
