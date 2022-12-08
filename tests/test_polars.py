@@ -21,7 +21,7 @@ def test_polars_1():
         )
         res = ops.transform(d)
         expect = pl.DataFrame({"x": range(100)})
-        assert res.frame_equal(expect)
+        assert data_algebra.test_util.equivalent_frames(res.to_pandas(), expect.to_pandas())
 
 
 def test_polars_1b():
@@ -33,7 +33,7 @@ def test_polars_1b():
         )
         res = ops.transform(d)
         expect = pl.DataFrame({"x": range(100)})
-        assert res.frame_equal(expect)
+        assert data_algebra.test_util.equivalent_frames(res.to_pandas(), expect.to_pandas())
 
 
 def test_polars_1c():
@@ -45,7 +45,7 @@ def test_polars_1c():
         )
         res = ops.transform(d)
         expect = pl.DataFrame({"x": range(50),  "y": range(50)})
-        assert res.frame_equal(expect)
+        assert data_algebra.test_util.equivalent_frames(res.to_pandas(), expect.to_pandas())
     
 
 def test_polars_2():
@@ -139,4 +139,4 @@ def test_polars_group_by():
         )
         res = ops.transform(d)
         expect = pl.DataFrame({"y": ["a", "b"], "x": [1.5, 3.0]})
-        assert res.frame_equal(expect)
+        assert data_algebra.test_util.equivalent_frames(res.to_pandas(), expect.to_pandas())
