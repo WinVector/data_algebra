@@ -71,7 +71,7 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "cummax": lambda x: x.cummax(),
         "cummin": lambda x: x.cummin(),
         "cumprod": lambda x: x.cumprod(),
-        "cumsum": lambda x: x.cumsum(),
+        "cumsum": lambda x: pl.cumsum(x),  # https://stackoverflow.com/a/73950822/6901725 , but not working yet
         "datetime_to_date": lambda x: x.datetime_to_date(),
         "dayofmonth": lambda x: x.dayofmonth(),
         "dayofweek": lambda x: x.dayofweek(),
@@ -120,10 +120,11 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "/": lambda a, b: a / b,
         "//": lambda a, b: a // b,
         "%": lambda a, b: a % b,
-        "%/%": lambda a, b: a // b,
+        "%/%": lambda a, b: a / b,
         "+": lambda a, b: a + b,
         "-": lambda a, b: a - b,
-        "and": lambda a, b: a and b,
+        "&": lambda a, b: a & b,
+        "and": lambda a, b: a & b,
         "around": lambda a, b: a.around(b),
         "coalesce": lambda a, b: a.coalesce(b),
         "concat": lambda a, b: a.concat(b),
@@ -133,8 +134,9 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "is_in": lambda a, b: a.is_in(b),
         "maximum": lambda a, b: a.maximum(b),
         "minimum": lambda a, b: a.minimum(b),
-        "mod": lambda a, b: a.mod(b),
-        "or": lambda a, b: a or b,
+        "mod": lambda a, b: a % b,
+        "|": lambda a, b: a | b,
+        "or": lambda a, b: a | b,
         "remainder": lambda a, b: a.remainder(b),
         "timestamp_diff": lambda a, b: a.timestamp_diff(b),
         "==": lambda a, b: a == b,
@@ -319,7 +321,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
                     if c not in partition_set:
                         order_cols.append(c)
                 reversed_cols = [True if ci in set(op.reverse) else False for ci in op.order_columns]
-                res = res.sort(by=op.order_columns, reversed=reversed_cols)
+                res = res.sort(by=op.order_columns, reverse=reversed_cols)
             if len(temp_v_columns) > 0:
                 res = res.with_columns(temp_v_columns)
             res = res.with_columns(produced_columns)  
@@ -347,7 +349,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
             )
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
         reversed_cols = [True if ci in set(op.reverse) else False for ci in op.order_columns]
-        res = res.sort(by=op.order_columns, reversed=reversed_cols)
+        res = res.sort(by=op.order_columns, reverse=reversed_cols)
         if op.limit is not None:
             res = res.head(op.limit)
         return res
@@ -389,7 +391,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
             produced_columns.append(fld_k.alias(k))
         if len(temp_v_columns) > 0:
             res = res.with_columns(temp_v_columns)
-        res = res.group_by(op.group_by).agg(produced_columns)
+        res = res.groupby(group_by).agg(produced_columns)
         if len(temp_v_columns) > 0:
             res = res.select(op.columns_produced())
         return res
