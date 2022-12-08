@@ -128,3 +128,15 @@ def test_polars_2e():
         assert np.max(res_pandas["count"]) == np.min(res_pandas["count"])
         assert np.max(res_pandas["count"]) == res_pandas.shape[0]
         assert data_algebra.test_util.equivalent_frames(res_polars.to_pandas(), res_pandas)
+
+
+def test_polars_group_by():
+    if have_polars:
+        d = pl.DataFrame({"x": [1, 2, 3],  "y": ['a', 'a', 'b']})
+        ops = (
+            data_algebra.descr(d=d)
+                .project({"x": "x.mean()"}, group_by=["y"])
+        )
+        res = ops.transform(d)
+        expect = pl.DataFrame({"y": ["a", "b"], "x": [1.5, 3.0]})
+        assert res.frame_equal(expect)

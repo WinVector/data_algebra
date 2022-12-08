@@ -17,20 +17,17 @@ import data_algebra.BigQuery
 def test_expression_expectations_1():
     dir_path = os.path.dirname(os.path.realpath(__file__))
     # https://github.com/WinVector/data_algebra/blob/main/Examples/Methods/data_algebra_catalog.ipynb
-
     do_super_expensive_rechecks = True
     too_expensive_to_include_in_rechecks = [
         str(data_algebra.SparkSQL.SparkSQLModel()),
         str(data_algebra.BigQuery.BigQueryModel()),
     ]
-
     expectation_path = os.path.join(dir_path, "expr_expectations.pkl.gz")
     with gzip.open(expectation_path, 'rb') as in_f:
         expectation_map = pickle.load(in_f)
     d = expectation_map['d']
     expectations = expectation_map['expectations']
     u_results = expectation_map['u_results']
-
     for op, op_class, exp, ops, expect in expectations:
         if data_algebra.data_model.data_model_type_map["default_data_model"].is_appropriate_data_instance(expect):
             res = ops.transform(d)
