@@ -171,7 +171,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         """
         res = collections.OrderedDict()
         for ci in self.column_names:
-            res[ci] = data_algebra.expr_rep.ColumnReference(self, ci)
+            res[ci] = data_algebra.expr_rep.ColumnReference(ci)
         return res
 
     def merged_rep_id(self) -> str:

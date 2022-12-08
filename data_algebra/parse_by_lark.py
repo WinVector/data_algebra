@@ -64,7 +64,7 @@ def _walk_lark_tree(op, *, data_def=None) -> data_algebra.expr_rep.Term:
     Walk a lark parse tree and return our own representation.
 
     :param op: lark parse tree
-    :param data_def: dictionary of data_algebra.expr_rep.ColumnReference
+    :param data_def: dictionary of data_algebra.expr_rep.ColumnReference objects
     :return: Term tree.
     """
     if data_def is None:

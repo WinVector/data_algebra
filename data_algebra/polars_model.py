@@ -304,7 +304,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
                     temp_v_columns.append(pl.lit(opk.args[0].value).alias(v_name))
                     opk = data_algebra.expr_rep.Expression(
                         op=opk.op, 
-                        args=[data_algebra.expr_rep.ColumnReference(view=None, column_name=v_name)], 
+                        args=[data_algebra.expr_rep.ColumnReference(column_name=v_name)], 
                         params=opk.params, 
                         inline=opk.inline, 
                         method=opk.method,
@@ -392,7 +392,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 temp_v_columns.append(pl.lit(opk.args[0].value).alias(v_name))
                 opk = data_algebra.expr_rep.Expression(
                     op=opk.op, 
-                    args=[data_algebra.expr_rep.ColumnReference(view=None, column_name=v_name)], 
+                    args=[data_algebra.expr_rep.ColumnReference(column_name=v_name)], 
                     params=opk.params, 
                     inline=opk.inline, 
                     method=opk.method,
