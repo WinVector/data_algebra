@@ -92,14 +92,6 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         self.set(self.ops.replace_leaves(replacement_map))
         return self
 
-    def __rrshift__(self, other):  # override other >> self
-        self.set(self.ops.__rrshift__(other))
-        return self
-
-    def __rshift__(self, other):  # override self >> other
-        self.set(self.ops.__rshift__(other))
-        return self
-
     def eval(self, data_map: Dict[str, Any], *, data_model=None,):
         return self.ops.eval(data_map=data_map, data_model=data_model)
 
@@ -172,12 +164,6 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         assert (on is None) or (by is None)
         if by is not None:
             on = by
-        if on is None:
-            on = []
-        elif isinstance(on, str):
-            on = [on]
-        else:
-            on = list(on)
         self.set(
             self.ops.natural_join(
                 b=b,
