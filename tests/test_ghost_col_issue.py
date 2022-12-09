@@ -5,7 +5,7 @@ import data_algebra.util
 
 
 def test_ghost_col_issue():
-    d2 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d2 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "x": [1, 4, 5, 7, 8, 9],
             "v": [10.0, 40.0, 50.0, 70.0, 80.0, 90.0],
@@ -28,7 +28,7 @@ def test_ghost_col_issue():
         partition_by=["g"],
     )
 
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "x": [1, 4, 5, 7, 8, 9],
             "v": [10, 40, 50, 70, 80, 90],

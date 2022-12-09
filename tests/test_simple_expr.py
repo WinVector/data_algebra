@@ -6,7 +6,7 @@ import data_algebra.test_util
 
 
 def test_simple_expr_1():
-    d_orig = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"x": [1.0, 2.0, -3.0, 4.0]})
+    d_orig = data_algebra.data_model.default_data_model().pd.DataFrame({"x": [1.0, 2.0, -3.0, 4.0]})
     d = d_orig.copy()
 
     ops = describe_table(d, table_name="d").extend(
@@ -18,7 +18,7 @@ def test_simple_expr_1():
         }
     )
 
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"x": [1.0, 2.0, -3.0, 4.0]})
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame({"x": [1.0, 2.0, -3.0, 4.0]})
     expect["z"] = expect["x"] + 1
     expect["sin_x"] = numpy.sin(expect["x"])
     expect["xm"] = -expect["x"]

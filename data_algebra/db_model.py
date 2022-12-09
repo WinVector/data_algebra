@@ -794,7 +794,7 @@ class DBModel:
         union_all_term_end: str = ")",
     ):
         if local_data_model is None:
-            local_data_model = data_algebra.data_model.data_model_type_map["default_data_model"]
+            local_data_model = data_algebra.data_model.default_data_model()
         self.local_data_model = local_data_model
         if sql_formatters is None:
             sql_formatters = {}
@@ -860,7 +860,7 @@ class DBModel:
         else:
             q = str(q)
         assert isinstance(q, str)
-        data_algebra.data_model.data_model_type_map["default_data_model"].pd.io.sql.execute(q, conn)
+        data_algebra.data_model.default_data_model().pd.io.sql.execute(q, conn)
 
     def read_query(self, conn, q):
         """
@@ -874,7 +874,7 @@ class DBModel:
         else:
             q = str(q)
         assert isinstance(q, str)
-        r = data_algebra.data_model.data_model_type_map["default_data_model"].pd.io.sql.read_sql(q, conn)
+        r = data_algebra.data_model.default_data_model().pd.io.sql.read_sql(q, conn)
         r = self.local_data_model.pd.DataFrame(r)
         r = r.reset_index(drop=True)
         return r

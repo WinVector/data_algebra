@@ -13,10 +13,10 @@ import data_algebra.SQLite
 
 
 def test_ops():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [1, 2, 3, 4], "x2": [0.1, 0.2, 0.3, 0.4], "g": [1, 1, 2, 2],}
     )
-    d_orig = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d_orig = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [1, 2, 3, 4], "x2": [0.1, 0.2, 0.3, 0.4], "g": [1, 1, 2, 2],}
     )
     td = describe_table(d, table_name="d")
@@ -40,7 +40,7 @@ def test_ops():
         assert data_algebra.test_util.equivalent_frames(d, d_orig)
 
     ops = td.extend({"x": "x == 2"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "x": [False, True, False, False],
             "x2": [0.1, 0.2, 0.3, 0.4],
@@ -50,13 +50,13 @@ def test_ops():
     check_ops(ops, expect)
 
     ops = td.extend({"x": "x != 2"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [True, False, True, True], "x2": [0.1, 0.2, 0.3, 0.4], "g": [1, 1, 2, 2],}
     )
     check_ops(ops, expect)
 
     ops = td.extend({"x": "x < 2"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "x": [True, False, False, False],
             "x2": [0.1, 0.2, 0.3, 0.4],
@@ -65,7 +65,7 @@ def test_ops():
     )
     check_ops(ops, expect)
     ops = td.extend({"x": "x <= 2"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "x": [True, True, False, False],
             "x2": [0.1, 0.2, 0.3, 0.4],
@@ -75,7 +75,7 @@ def test_ops():
     check_ops(ops, expect)
 
     ops = td.extend({"x": "x > 2"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "x": [False, False, True, True],
             "x2": [0.1, 0.2, 0.3, 0.4],
@@ -85,13 +85,13 @@ def test_ops():
     check_ops(ops, expect)
 
     ops = td.extend({"x": "x >= 2"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [False, True, True, True], "x2": [0.1, 0.2, 0.3, 0.4], "g": [1, 1, 2, 2],}
     )
     check_ops(ops, expect)
 
     ops = td.extend({"x": "2 == x"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "x": [False, True, False, False],
             "x2": [0.1, 0.2, 0.3, 0.4],
@@ -101,13 +101,13 @@ def test_ops():
     check_ops(ops, expect)
 
     ops = td.extend({"x": "2 != x"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [True, False, True, True], "x2": [0.1, 0.2, 0.3, 0.4], "g": [1, 1, 2, 2],}
     )
     check_ops(ops, expect)
 
     ops = td.extend({"x": "2 > x"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "x": [True, False, False, False],
             "x2": [0.1, 0.2, 0.3, 0.4],
@@ -116,7 +116,7 @@ def test_ops():
     )
     check_ops(ops, expect)
     ops = td.extend({"x": "2 >= x"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "x": [True, True, False, False],
             "x2": [0.1, 0.2, 0.3, 0.4],
@@ -126,7 +126,7 @@ def test_ops():
     check_ops(ops, expect)
 
     ops = td.extend({"x": "2 < x"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "x": [False, False, True, True],
             "x2": [0.1, 0.2, 0.3, 0.4],
@@ -136,55 +136,55 @@ def test_ops():
     check_ops(ops, expect)
 
     ops = td.extend({"x": "2 <= x"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [False, True, True, True], "x2": [0.1, 0.2, 0.3, 0.4], "g": [1, 1, 2, 2],}
     )
     check_ops(ops, expect)
 
     ops = td.extend({"x": "-x"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [-1, -2, -3, -4], "x2": [0.1, 0.2, 0.3, 0.4], "g": [1, 1, 2, 2],}
     )
     check_ops(ops, expect)
 
     ops = td.extend({"x": "x + 1"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [2, 3, 4, 5], "x2": [0.1, 0.2, 0.3, 0.4], "g": [1, 1, 2, 2],}
     )
     check_ops(ops, expect)
 
     ops = td.extend({"x": "1 + x"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [2, 3, 4, 5], "x2": [0.1, 0.2, 0.3, 0.4], "g": [1, 1, 2, 2],}
     )
     check_ops(ops, expect)
 
     ops = td.extend({"x": "x - 1"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [0, 1, 2, 3], "x2": [0.1, 0.2, 0.3, 0.4], "g": [1, 1, 2, 2],}
     )
     check_ops(ops, expect)
 
     ops = td.extend({"x": "1 - x"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [0, -1, -2, -3], "x2": [0.1, 0.2, 0.3, 0.4], "g": [1, 1, 2, 2],}
     )
     check_ops(ops, expect)
 
     ops = td.extend({"x": "x * 2"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [2, 4, 6, 8], "x2": [0.1, 0.2, 0.3, 0.4], "g": [1, 1, 2, 2],}
     )
     check_ops(ops, expect)
 
     ops = td.extend({"x": "2 * x"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [2, 4, 6, 8], "x2": [0.1, 0.2, 0.3, 0.4], "g": [1, 1, 2, 2],}
     )
     check_ops(ops, expect)
 
     ops = td.extend({"x": "x / 2.0"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "x": [1 / 2, 2 / 2, 3 / 2, 4 / 2],
             "x2": [0.1, 0.2, 0.3, 0.4],
@@ -194,7 +194,7 @@ def test_ops():
     check_ops(ops, expect)
 
     ops = td.extend({"x": "2.0 / x"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "x": [2 / 1, 2 / 2, 2 / 3, 2 / 4],
             "x2": [0.1, 0.2, 0.3, 0.4],
@@ -204,7 +204,7 @@ def test_ops():
     check_ops(ops, expect)
 
     ops = td.extend({"x": "x // 2.0"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "x": [1 // 2, 2 // 2, 3 // 2, 4 // 2],
             "x2": [0.1, 0.2, 0.3, 0.4],
@@ -214,7 +214,7 @@ def test_ops():
     check_ops(ops, expect, test_sql=False)
 
     ops = td.extend({"x": "2.0 // x"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "x": [2 // 1, 2 // 2, 2 // 3, 2 // 4],
             "x2": [0.1, 0.2, 0.3, 0.4],
@@ -224,7 +224,7 @@ def test_ops():
     check_ops(ops, expect, test_sql=False)
 
     ops = td.extend({"x": "x % 2.0"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "x": [1 % 2, 2 % 2, 3 % 2, 4 % 2],
             "x2": [0.1, 0.2, 0.3, 0.4],
@@ -234,7 +234,7 @@ def test_ops():
     check_ops(ops, expect)
 
     ops = td.extend({"x": "2.0 % x"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "x": [2 % 1, 2 % 2, 2 % 3, 2 % 4],
             "x2": [0.1, 0.2, 0.3, 0.4],
@@ -244,7 +244,7 @@ def test_ops():
     check_ops(ops, expect)
 
     ops = td.extend({"x": "x ** 2.0"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "x": [1 ** 2, 2 ** 2, 3 ** 2, 4 ** 2],
             "x2": [0.1, 0.2, 0.3, 0.4],
@@ -254,7 +254,7 @@ def test_ops():
     check_ops(ops, expect, test_sql=False)  # TODO SQL translation
 
     ops = td.extend({"x": "2.0 ** x"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "x": [2 ** 1, 2 ** 2, 2 ** 3, 2 ** 4],
             "x2": [0.1, 0.2, 0.3, 0.4],
@@ -264,19 +264,19 @@ def test_ops():
     check_ops(ops, expect, test_sql=False)  # TODO SQL translation
 
     ops = td.extend({"x": "-x"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [-1, -2, -3, -4], "x2": [0.1, 0.2, 0.3, 0.4], "g": [1, 1, 2, 2],}
     )
     check_ops(ops, expect)
 
     ops = td.extend({"x": "-(1 + x)"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [-2, -3, -4, -5], "x2": [0.1, 0.2, 0.3, 0.4], "g": [1, 1, 2, 2],}
     )
     check_ops(ops, expect)
 
     ops = td.extend({"x": "+x"})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [+1, +2, +3, +4], "x2": [0.1, 0.2, 0.3, 0.4], "g": [1, 1, 2, 2],}
     )
     check_ops(ops, expect)
@@ -307,7 +307,7 @@ def test_ops():
     for k, f in fns_to_check.items():
         # print(k)
         ops = td.extend({"x3": "x2." + k + "()"})
-        expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+        expect = data_algebra.data_model.default_data_model().pd.DataFrame(
             {
                 "x": [1, 2, 3, 4],
                 "x2": [0.1, 0.2, 0.3, 0.4],

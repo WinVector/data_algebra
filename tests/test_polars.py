@@ -71,7 +71,7 @@ def test_polars_2():
         res_polars = ops.transform(d)
         res_pandas = ops.transform(d.to_pandas())
         assert isinstance(res_polars, pl.DataFrame)
-        assert isinstance(res_pandas, data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame)
+        assert isinstance(res_pandas, data_algebra.data_model.default_data_model().pd.DataFrame)
         assert res_polars.shape == res_pandas.shape
         assert data_algebra.test_util.equivalent_frames(res_polars.to_pandas(), res_pandas)
 
@@ -97,7 +97,7 @@ def test_polars_2c():
         res_polars = ops.transform(d)
         res_pandas = ops.transform(d.to_pandas())
         assert isinstance(res_polars, pl.DataFrame)
-        assert isinstance(res_pandas, data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame)
+        assert isinstance(res_pandas, data_algebra.data_model.default_data_model().pd.DataFrame)
         assert res_polars.shape == res_pandas.shape
         assert data_algebra.test_util.equivalent_frames(res_polars.to_pandas(), res_pandas)
 
@@ -123,7 +123,7 @@ def test_polars_2e():
         res_polars = ops.transform(d)
         res_pandas = ops.transform(d.to_pandas())
         assert isinstance(res_polars, pl.DataFrame)
-        assert isinstance(res_pandas, data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame)
+        assert isinstance(res_pandas, data_algebra.data_model.default_data_model().pd.DataFrame)
         assert res_polars.shape == res_pandas.shape
         assert np.max(res_pandas["count"]) == np.min(res_pandas["count"])
         assert np.max(res_pandas["count"]) == res_pandas.shape[0]

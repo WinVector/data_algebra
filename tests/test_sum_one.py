@@ -5,7 +5,7 @@ from data_algebra.data_ops import data, descr, ex
 
 
 def test_sum_one():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    d = data_algebra.data_model.default_data_model().pd.DataFrame({
         'group': ['a', 'a', 'b', 'b', 'b'],
         'one': [1, 1, 1, 1, 1],
     })
@@ -19,7 +19,7 @@ def test_sum_one():
             group_by=['group']
         )
     )
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame({
         'group': ['a', 'b'],
         'sum_one': [2, 3],
         'sum_1': [2, 3],

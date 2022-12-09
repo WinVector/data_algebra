@@ -8,7 +8,7 @@ import data_algebra.db_space
 
 
 def test_pandas_data_space_1():
-    dm = data_algebra.data_model.data_model_type_map["default_data_model"]
+    dm = data_algebra.data_model.default_data_model()
     pd = dm.pd
     t0 = dm.data_frame({'x': [1, 2, 3]})
     with data_algebra.data_model_space.DataModelSpace(dm) as ds:
@@ -27,7 +27,7 @@ def test_pandas_data_space_1():
 
 
 def test_db_data_space_1():
-    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
+    pd = data_algebra.data_model.default_data_model().pd
     t0 = pd.DataFrame({'x': [1, 2, 3]})
     with data_algebra.db_space.DBSpace() as ds:
         ds.insert(key="t0", value=t0)

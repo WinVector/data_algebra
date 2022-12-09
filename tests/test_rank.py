@@ -11,7 +11,7 @@ import data_algebra.BigQuery
 
 
 def test_rank_1():
-    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
+    pd = data_algebra.data_model.default_data_model().pd
     d = pd.DataFrame({
         'x': [1, 2, 1],
     })

@@ -20,7 +20,7 @@ def pandas_to_example_str(obj, *, local_data_model=None) -> str:
     :return: Python source code representation of obj.
     """
     if local_data_model is None:
-        local_data_model = data_algebra.data_model.data_model_type_map["default_data_model"]
+        local_data_model = data_algebra.data_model.default_data_model()
     pd_module_name = local_data_model.presentation_model_name
     if not local_data_model.is_appropriate_data_instance(obj):
         raise TypeError("Expect obj to be local_data_model.pd.DataFrame")
@@ -162,12 +162,12 @@ def guess_carried_scalar_type(col) -> type:
     }:
         return ct
     # look at a list or Series
-    if isinstance(col, data_algebra.data_model.data_model_type_map["default_data_model"].pd.core.series.Series):
+    if isinstance(col, data_algebra.data_model.default_data_model().pd.core.series.Series):
         col = col.values
     if len(col) < 1:
         return type(None)
     good_idx = numpy.where(
-        numpy.logical_not(data_algebra.data_model.data_model_type_map["default_data_model"].pd.isna(col))
+        numpy.logical_not(data_algebra.data_model.default_data_model().pd.isna(col))
     )[0]
     test_idx = 0
     if len(good_idx) > 0:
@@ -201,7 +201,7 @@ def guess_column_types(
         if (
             (gt is None)
             or (not isinstance(gt, type))
-            or gt == data_algebra.data_model.data_model_type_map["default_data_model"].pd.core.series.Series
+            or gt == data_algebra.data_model.default_data_model().pd.core.series.Series
         ):
             # pandas.concat() poisons types with Series, don't allow that
             return dict()

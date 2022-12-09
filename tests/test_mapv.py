@@ -8,7 +8,7 @@ import data_algebra.test_util
 
 
 def test_mapv_1():
-    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
+    pd = data_algebra.data_model.default_data_model().pd
     d = pd.DataFrame({"x": ["a", "b", "c", None, numpy.nan, "b"],})
     ops = (
         data(d=d)
@@ -41,7 +41,7 @@ def test_mapv_1():
 
 
 def test_mapv_1_spark():
-    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
+    pd = data_algebra.data_model.default_data_model().pd
     d = pd.DataFrame({"x": ["a", "b", "c", "z", "z", "b"],})
     ops = (
         data(d=d)

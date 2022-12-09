@@ -20,6 +20,12 @@ class PandasModel(PandasModelBase):
 
 def register_pandas_model():
     # set up what pandas supplier we are using
-    default_data_model = PandasModel()
-    data_algebra.data_model.data_model_type_map["default_data_model"] = default_data_model
-    data_algebra.data_model.data_model_type_map[str(type(default_data_model.data_frame()))] = default_data_model
+    common_key = "default_data_model"
+    if common_key not in data_algebra.data_model.data_model_type_map.keys():
+        pd_model = PandasModel()
+        data_algebra.data_model.data_model_type_map[common_key] = pd_model
+        data_algebra.data_model.data_model_type_map["default_Pandas_model"] = pd_model
+        data_algebra.data_model.data_model_type_map["<class 'pandas.core.frame.DataFrame'>"] = pd_model
+        data_algebra.data_model.data_model_type_map[str(type(pd_model.data_frame()))] = pd_model
+
+register_pandas_model()

@@ -8,7 +8,7 @@ import pytest
 
 def test_sum_cumsum_1():
     #  google.api_core.exceptions.BadRequest: 400 Partitioning by expressions of type FLOAT64 is not allowed
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": ["1.0", "2.0", "2.0", "1.0", "1.0"], "s": ["c", "d", "a", "b", "e"],}
     )
 
@@ -30,7 +30,7 @@ def test_sum_cumsum_1():
         .extend({"group_order": "(1).cumsum()",}, partition_by=["x"], order_by=["s"],)
     )
 
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "x": ["1.0", "2.0", "2.0", "1.0", "1.0"],
             "s": ["c", "d", "a", "b", "e"],

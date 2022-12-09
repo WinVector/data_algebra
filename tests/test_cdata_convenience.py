@@ -10,7 +10,7 @@ from data_algebra.data_ops import *
 
 def test_cdata_convenience_1():
     def parse_table(s):
-        return data_algebra.data_model.data_model_type_map["default_data_model"].pd.read_csv(
+        return data_algebra.data_model.default_data_model().pd.read_csv(
             io.StringIO(re.sub("[ \\t]+", "", s))
         )
 

@@ -5,12 +5,12 @@ import data_algebra.test_util
 
 
 def test_str_extend_str_const():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    d = data_algebra.data_model.default_data_model().pd.DataFrame({
         "x": [1, 2]
         })
     ops = data_algebra.descr(d=d).extend({"n": '"xx"'})
     res = ops.transform(d)
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame({
         "x": [1, 2],
         "n": ["xx", "xx"],
         })
@@ -19,12 +19,12 @@ def test_str_extend_str_const():
 
 
 def test_str_extend_str_const_col():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    d = data_algebra.data_model.default_data_model().pd.DataFrame({
         "x": [1, 2]
         })
     ops = data_algebra.descr(d=d).extend({"n": "x"})
     res = ops.transform(d)
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame({
         "x": [1, 2],
         "n": [1, 2],
         })
@@ -33,12 +33,12 @@ def test_str_extend_str_const_col():
 
 
 def test_str_extend_str_const_2():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    d = data_algebra.data_model.default_data_model().pd.DataFrame({
         "x": [1, 2]
         })
     ops = data_algebra.descr(d=d).extend({"n": '"x"'})
     res = ops.transform(d)
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame({
         "x": [1, 2],
         "n": ["x", "x"],
         })
@@ -47,12 +47,12 @@ def test_str_extend_str_const_2():
 
 
 def test_str_extend_str_const_3():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    d = data_algebra.data_model.default_data_model().pd.DataFrame({
         "x": [1, 2]
         })
     ops = data_algebra.descr(d=d).extend({"n": "'x'"})
     res = ops.transform(d)
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame({
         "x": [1, 2],
         "n": ["x", "x"],
         })
@@ -61,12 +61,12 @@ def test_str_extend_str_const_3():
 
 
 def test_str_extend_const_4():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    d = data_algebra.data_model.default_data_model().pd.DataFrame({
         "x": [1, 2]
         })
     ops = data_algebra.descr(d=d).extend({"n": '"xx"', "n2": "x", "n3": '"x"'})
     res = ops.transform(d)
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame({
         "x": [1, 2],
         "n": ["xx", "xx"],
         "n2": [1, 2],

@@ -50,7 +50,7 @@ def test_sqlite():
     # clean up
     conn.close()
 
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "symbol": ["RHAT"],
             "date": ["2006-01-05"],
@@ -63,7 +63,7 @@ def test_sqlite():
 
     assert data_algebra.test_util.equivalent_frames(res, expect)
 
-    d2 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d2 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "symbol": ["RHAT"],
             "date": ["2006-01-05"],
@@ -100,7 +100,7 @@ def test_sqllite_g2():
         .extend({"z": "-rat"})
     )
 
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"col1": [1, 2, 2], "col2": [3, 4, 3], "col3": [4, 5, 7]}
     )
 
@@ -125,10 +125,10 @@ def test_sqllite_g2():
 
 
 def test_join_g2():
-    d1 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d1 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"col1": [1, 2, 4], "col2": [3, None, 6], "col3": [4, 5, 7]}
     )
-    d2 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d2 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"col1": [1, 2, 3], "col2": [3, 4, None], "col4": [4, 5, 7]}
     )
 
@@ -159,10 +159,10 @@ def test_join_g2():
 
 
 def test_unionall_g2():
-    d1 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d1 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"col1": [1, 2, 4], "col2": [3, None, 6], "col3": [4, 5, 7]}
     )
-    d2 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d2 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"col1": [1, 2, 3], "col2": [3, 4, None], "col3": [4, 5, 7]}
     )
 
@@ -196,7 +196,7 @@ def test_unionall_g2():
 
 def test_sqlite_sign():
     sqlite_handle = data_algebra.SQLite.example_handle()
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    d = data_algebra.data_model.default_data_model().pd.DataFrame({
         'x': [-2, -1, 0, 1, None, numpy.nan]
     })
     sqlite_handle.insert_table(d, table_name='d', allow_overwrite=True)
@@ -210,7 +210,7 @@ def test_sqlite_sign():
 
 def test_sqlite_arccosh():
     sqlite_handle = data_algebra.SQLite.example_handle()
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    d = data_algebra.data_model.default_data_model().pd.DataFrame({
         'x': [.1, .2, .3, .4],
     })
     sqlite_handle.insert_table(d, table_name='d', allow_overwrite=True)
@@ -225,7 +225,7 @@ def test_sqlite_arccosh():
 
 
 def test_sqlite_median():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    d = data_algebra.data_model.default_data_model().pd.DataFrame({
         'x': [.1, .2, .3, .4],
         'g': ['a', 'a', 'a', 'b'],
     })
@@ -236,7 +236,7 @@ def test_sqlite_median():
                 group_by=['g'],
             )
     )
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame({
         'xs': [0.2, 0.4],
         'g': ['a', 'b'],
         })
@@ -250,7 +250,7 @@ def test_sqlite_median():
 
 
 def test_sqlite_int_div():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    d = data_algebra.data_model.default_data_model().pd.DataFrame({
         'x': [1, 2, 3, 5],
         'y': [2, 2, 3, 3],
     })
@@ -258,7 +258,7 @@ def test_sqlite_int_div():
         descr(d=d)
             .extend({'r': 'x // y'},)
     )
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame({
         'x': [1, 2, 3, 5],
         'y': [2, 2, 3, 3],
         'r': [0, 1, 1, 1],
@@ -273,7 +273,7 @@ def test_sqlite_int_div():
 
 
 def test_sqlite_concat():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    d = data_algebra.data_model.default_data_model().pd.DataFrame({
         'x': [1, 2, 3, 5],
         'y': [2, 2, 3, 3],
     })
@@ -281,7 +281,7 @@ def test_sqlite_concat():
         descr(d=d)
             .extend({'r': 'x %+% "_" %+% y'},)
     )
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame({
         'x': [1, 2, 3, 5],
         'y': [2, 2, 3, 3],
         'r': ['1_2', '2_2', '3_3', '5_3'],
@@ -296,7 +296,7 @@ def test_sqlite_concat():
 
 
 def test_sqlite_around():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    d = data_algebra.data_model.default_data_model().pd.DataFrame({
         'x': [1.11, 2.22, 3.33, 5.55],
     })
     ops = (
@@ -307,7 +307,7 @@ def test_sqlite_around():
                 'r2': 'x.around(2)',
               })
     )
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame({
         'x': [1.11, 2.22, 3.33, 5.55],
         'r0': [1.0, 2.0, 3.0, 6.0],
         'r1': [1.1, 2.2, 3.3, 5.6],
@@ -323,7 +323,7 @@ def test_sqlite_around():
 
 
 def test_sqlite_any_all_project():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    d = data_algebra.data_model.default_data_model().pd.DataFrame({
         'x0': [False, False],
         'x1': [False, True],
         'x2': [True, False],
@@ -343,7 +343,7 @@ def test_sqlite_any_all_project():
               },
             group_by=[])
     )
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame({
         'r0n': [False],
         'r0l': [False],
         'r1n': [True],
@@ -363,7 +363,7 @@ def test_sqlite_any_all_project():
 
 
 def test_sqlite_any_all_extend():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    d = data_algebra.data_model.default_data_model().pd.DataFrame({
         'x0': [False, False],
         'x1': [False, True],
         'x2': [True, False],
@@ -384,7 +384,7 @@ def test_sqlite_any_all_extend():
               },
             partition_by=['g'])
     )
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame({
         'x0': [False, False],
         'x1': [False, True],
         'x2': [True, False],
@@ -410,14 +410,14 @@ def test_sqlite_any_all_extend():
 
 
 def test_sqlite_floor():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    d = data_algebra.data_model.default_data_model().pd.DataFrame({
         'z': [1.6, None, -2.1, 0],
     })
     ops = (
         descr(d=d)
             .extend({'r': 'z.floor()'},)
     )
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame({
         'z': [1.6, None, -2.1, 0],
         'r': [1, None, -3, 0],
     })
@@ -432,7 +432,7 @@ def test_sqlite_floor():
 
 
 def test_sqlite_default_to_sql():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"x": [1], "y": [2], "z": ["q"]})
+    d = data_algebra.data_model.default_data_model().pd.DataFrame({"x": [1], "y": [2], "z": ["q"]})
     td = describe_table(d, table_name="d")
     ops = td.rename_columns({"y1": "y", "x2": "x"})
     ops_str = ops.to_sql()

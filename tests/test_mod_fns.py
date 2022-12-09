@@ -15,7 +15,7 @@ import pytest
 
 
 def test_mod_fns_one():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"a": [1, 2, 3, 4], "b": [2, 2, 3, 3],}
     )
     ops = (
@@ -26,7 +26,7 @@ def test_mod_fns_one():
                 'r': 'a.remainder(b)',
             })
     )
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame({
         'a': [1, 2, 3, 4],
         'b': [2, 2, 3, 3],
         'p': [1, 0, 0, 1],
@@ -49,7 +49,7 @@ def test_mod_fns_one():
 
 
 def test_mod_fns_one_edited():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"a": [1, 2, 3, 4], "b": [2, 2, 3, 3],}
     )
     ops = (
@@ -59,7 +59,7 @@ def test_mod_fns_one_edited():
                 'r': 'a.remainder(b)',
             })
     )
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame({
         'a': [1, 2, 3, 4],
         'b': [2, 2, 3, 3],
         'q': [1, 0, 0, 1],
@@ -82,7 +82,7 @@ def test_mod_fns_one_edited():
 
 
 def test_mod_fns_percent_notation():
-    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
+    pd = data_algebra.data_model.default_data_model().pd
     d = pd.DataFrame({
         'row_id': [0, 1, 2, 3],
         'a': [False, False, True, True],

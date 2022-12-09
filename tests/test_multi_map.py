@@ -6,7 +6,7 @@ import data_algebra.test_util
 # From:
 # https://github.com/WinVector/data_algebra/blob/main/Examples/MultiJoin/MultiJoin.ipynb
 def test_multi_map():
-    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd  # Pandas
+    pd = data_algebra.data_model.default_data_model().pd  # Pandas
 
     d = pd.DataFrame({
         'id': [1, 2, 3, 4],

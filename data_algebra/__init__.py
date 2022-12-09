@@ -21,19 +21,6 @@ import data_algebra.data_ops
 # import for easy access for package users
 from data_algebra.data_ops import TableDescription, SQLNode, describe_table, descr, data, ex
 from data_algebra.expr_rep import lit, col
-
-
-# ready our data models
-
-def _register_data_models():
-    import data_algebra.pandas_model
-    data_algebra.pandas_model.register_pandas_model()
-    assert isinstance(data_algebra.data_model.data_model_type_map["default_data_model"], data_algebra.pandas_model.PandasModel)
-    try:
-        import data_algebra.polars_model
-        data_algebra.polars_model.register_polars_model()
-    except ModuleNotFoundError:
-        pass
-
-if len(data_algebra.data_model.data_model_type_map) <= 0:
-    _register_data_models()
+# causes registration of default Pandas model
+import data_algebra.pandas_model
+data_algebra.pandas_model.register_pandas_model()

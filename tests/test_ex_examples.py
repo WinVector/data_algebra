@@ -14,13 +14,13 @@ def test_ex_example_ex_descr():
 
 
 def test_ex_examples_1():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [1, 1, 2], "y": [5, 4, 3], "z": [6, 7, 8],}
     )
 
     ops = describe_table(d, keep_all=True).drop_columns(["z"])
 
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [1, 1, 2], "y": [5, 4, 3],}
     )
 
@@ -34,7 +34,7 @@ def test_ex_examples_1():
 
 
 def test_ex_examples_catch_partial():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [1, 1, 2], "y": [5, 4, 3], "z": [6, 7, 8],}
     )
 
@@ -45,10 +45,10 @@ def test_ex_examples_catch_partial():
 
 
 def test_ex_examples_join():
-    d1 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d1 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [1, 2, 2], "y": [3, 3, 4], "z": [6, 7, 8],}
     )
-    d2 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d2 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [1, 2, 2], "y": [3, 3, 4], "q": ["a", "b", "c"],}
     )
 
@@ -56,7 +56,7 @@ def test_ex_examples_join():
         b=table(d2, table_name="d2"), by=["x", "y"], jointype="inner"
     )
 
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [1, 2, 2], "y": [3, 3, 4], "z": [6, 7, 8], "q": ["a", "b", "c"],}
     )
 
@@ -70,10 +70,10 @@ def test_ex_examples_join():
 
 
 def test_ex_examples_join_catch_partial():
-    d1 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d1 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [1, 2, 2], "y": [3, 3, 4], "z": [6, 7, 8],}
     )
-    d2 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d2 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [1, 2, 2], "y": [3, 3, 4], "q": ["a", "b", "c"],}
     )
 
@@ -89,7 +89,7 @@ def test_ex_examples_join_catch_partial():
 
     res = ops.ex(allow_limited_tables=True)
 
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [1, 2,], "y": [3, 3,], "z": [6, 7,], "q": ["a", "b",],}
     )
 
@@ -97,10 +97,10 @@ def test_ex_examples_join_catch_partial():
 
 
 def test_ex_examples_join_catch_unnamed_1():
-    d1 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d1 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [1, 2, 2], "y": [3, 3, 4], "z": [6, 7, 8],}
     )
-    d2 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d2 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [1, 2, 2], "y": [3, 3, 4], "q": ["a", "b", "c"],}
     )
 
@@ -114,10 +114,10 @@ def test_ex_examples_join_catch_unnamed_1():
 
 
 def test_ex_examples_join_catch_unnamed_2():
-    d1 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d1 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [1, 2, 2], "y": [3, 3, 4], "z": [6, 7, 8],}
     )
-    d2 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d2 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [1, 2, 2], "y": [3, 3, 4], "q": ["a", "b", "c"],}
     )
 
@@ -130,13 +130,13 @@ def test_ex_examples_join_catch_unnamed_2():
 
 
 def test_ex_examples_fn_notation_1():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [1, 1, 2], "y": [5, 4, 3], "z": [6, 7, 8],}
     )
 
     res = ex(data(d=d).drop_columns(["z"]))
 
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [1, 1, 2], "y": [5, 4, 3],}
     )
 
@@ -144,13 +144,13 @@ def test_ex_examples_fn_notation_1():
 
 
 def test_ex_examples_fn_notation_1_unnamed():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [1, 1, 2], "y": [5, 4, 3], "z": [6, 7, 8],}
     )
 
     res = ex(data(d).drop_columns(["z"]))
 
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [1, 1, 2], "y": [5, 4, 3],}
     )
 
@@ -158,32 +158,32 @@ def test_ex_examples_fn_notation_1_unnamed():
 
 
 def test_ex_examples_fn_notation_1_cant_ex_short_descr():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"x": range(20), "z": 7,})
+    d = data_algebra.data_model.default_data_model().pd.DataFrame({"x": range(20), "z": 7,})
 
     with pytest.raises(Exception):
         res = ex(descr(d=d).drop_columns(["z"]))
 
 
 def test_ex_examples_fn_notation_1_short_descr():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"x": range(20), "z": 7,})
+    d = data_algebra.data_model.default_data_model().pd.DataFrame({"x": range(20), "z": 7,})
 
     ops = descr(d=d).drop_columns(["z"])
     res = ops.transform(d)
-    expect = d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"x": range(20)})
+    expect = d = data_algebra.data_model.default_data_model().pd.DataFrame({"x": range(20)})
     assert data_algebra.test_util.equivalent_frames(expect, res)
 
 
 def test_ex_examples_fn_notation_data_named():
-    d1 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d1 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [1, 1, 2], "y": [5, 4, 3], "z": [6, 7, 8]}
     )
-    d2 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d2 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [1, 1, 2], "y": [5, 4, 3], "q": [10, 11, 12]}
     )
 
     res = ex(data(d1=d1).natural_join(b=data(d2=d2), by=["x", "y"], jointype="inner",))
 
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [1, 1, 2], "y": [5, 4, 3], "z": [6, 7, 8], "q": [10, 11, 12]}
     )
 

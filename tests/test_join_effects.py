@@ -9,11 +9,11 @@ import data_algebra.util
 
 
 def test_join_warn1():
-    d_left = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d_left = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"k": ["a", "a", "b"], "x": [1, None, 3], "y": [1, None, None],}
     )
 
-    d_right = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d_right = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"k": ["a", "b", "q"], "y": [10.0, 20.0, 30.0],}
     )
 
@@ -28,7 +28,7 @@ def test_join_warn1():
         warnings.simplefilter("error")
         ops.eval({"d_left": d_left, "d_right": d_right})
 
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"k": ["a", "a", "b"], "x": [1.0, None, 3.0], "y": [1.0, 10.0, 20.0],}
     )
 

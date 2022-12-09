@@ -7,7 +7,7 @@ import pytest
 
 
 def test_incomplete_agg_1():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "genus": (1, 1, 1, 2),
             "group": ("a", "a", "b", "b"),
@@ -20,7 +20,7 @@ def test_incomplete_agg_1():
         {"x": "x.mean()", "y": "y.mean()",}, group_by=["genus", "group"]
     )
 
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "genus": (1, 1, 2),
             "group": ("a", "b", "b"),

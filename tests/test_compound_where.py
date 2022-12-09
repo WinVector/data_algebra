@@ -7,7 +7,7 @@ import data_algebra.SQLite
 
 
 def test_compount_where_and():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "a": ["a", "b", None, None],
             "b": ["c", None, "d", None],
@@ -24,7 +24,7 @@ def test_compount_where_and():
     sql = db_handle.to_sql(ops)
     assert isinstance(sql, str)
 
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"a": ["a"], "b": ["c"], "x": [1.0], "y": [3.0],}
     )
 

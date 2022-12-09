@@ -9,7 +9,7 @@ import data_algebra.SQLite
 
 
 def test_parens_select_rows():
-    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
+    pd = data_algebra.data_model.default_data_model().pd
     d = pd.DataFrame({
         'x': [1, 2, 3, 4]
     })
@@ -27,7 +27,7 @@ def test_parens_select_rows():
 
 
 def test_parens_extend():
-    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
+    pd = data_algebra.data_model.default_data_model().pd
     d = pd.DataFrame({
         'x': [1, 2, 3, 4]
     })

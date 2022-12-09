@@ -9,11 +9,11 @@ import data_algebra.SQLite
 
 
 def test_join_where_merge():
-    d_observations = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    d_observations = data_algebra.data_model.default_data_model().pd.DataFrame({
         "target_date": [10, 10, 11, 11],
         "as_of_date": [8, 9, 9, 10],
         })
-    d_actions = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    d_actions = data_algebra.data_model.default_data_model().pd.DataFrame({
         "target_date": [11, 10, 11, 11],
         "action_date": [7, 9, 9, 10],
         "reservation_count": [3, 1, 2, 5],
@@ -41,8 +41,8 @@ def test_join_where_merge():
     with sqlite3.connect(":memory:") as conn:
         d_observations.to_sql("d_observations", conn, index=False)
         d_actions.to_sql("d_actions", conn, index=False)
-        res = data_algebra.data_model.data_model_type_map["default_data_model"].pd.read_sql_query(sql_query, conn)
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+        res = data_algebra.data_model.default_data_model().pd.read_sql_query(sql_query, conn)
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame({
         "target_date": [10, 10, 11, 11],
         "as_of_date": [8, 9, 9, 10],
         "reservation_count": [0, 1, 5, 10],
@@ -82,7 +82,7 @@ def test_join_where_merge():
     with sqlite3.connect(":memory:") as conn:
         d_observations.to_sql("d_observations", conn, index=False)
         d_actions.to_sql("d_actions", conn, index=False)
-        res_sql2 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.read_sql_query(ops.to_sql(data_algebra.SQLite.SQLiteModel()), conn)
+        res_sql2 = data_algebra.data_model.default_data_model().pd.read_sql_query(ops.to_sql(data_algebra.SQLite.SQLiteModel()), conn)
     assert res_sql2.equals(expect)
     # check throughout
     data_algebra.test_util.check_transform(ops=ops, data={"d_actions": d_actions, "d_observations": d_observations}, expect=expect)

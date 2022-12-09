@@ -4,13 +4,13 @@ import data_algebra.test_util
 
 
 def test_types_concat_good():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [None, 1.0], "y": ["a", "b"],}
     )
     ops = describe_table(d, table_name="d").concat_rows(
         b=describe_table(d, table_name="d")
     )
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "x": [None, 1.0, None, 1.0],
             "y": ["a", "b", "a", "b"],

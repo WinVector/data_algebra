@@ -11,7 +11,7 @@ import data_algebra.SQLite
 
 
 def test_window_fns():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "g": [1, 2, 2, 3, 3, 3],
             "x": [1, 4, 5, 7, 8, 9],
@@ -41,7 +41,7 @@ def test_window_fns():
         partition_by=["g"],
     )
 
-    expect1 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect1 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "g": [1, 2, 2, 3, 3, 3],
             "x": [1, 4, 5, 7, 8, 9],
@@ -63,7 +63,7 @@ def test_window_fns():
 
 
 def test_window_fns_pandas_only():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "g": [1, 2, 2, 3, 3, 3],
             "x": [1, 4, 5, 7, 8, 9],
@@ -90,7 +90,7 @@ def test_window_fns_pandas_only():
         partition_by=["g"],
     )
 
-    expect1 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect1 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "g": [1, 2, 2, 3, 3, 3],
             "x": [1, 4, 5, 7, 8, 9],
@@ -113,7 +113,7 @@ def test_window_fns_pandas_only():
 
 
 def test_window_fns_project():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "g": [1, 2, 2, 3, 3, 3],
             "x": [1, 4, 5, 7, 8, 9],
@@ -140,7 +140,7 @@ def test_window_fns_project():
         group_by=["g"],
     )
 
-    expect1 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect1 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "g": [1, 2, 3],
             "size": [1, 2, 3],
@@ -157,7 +157,7 @@ def test_window_fns_project():
 
 
 def test_window_fns_project_no_ngroup_project():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "g": [1, 2, 2, 3, 3, 3],
             "x": [1, 4, 5, 7, 8, 9],
@@ -187,7 +187,7 @@ def test_window_fns_project_no_ngroup_project():
 
 
 def test_window_fns_project_pandas_only():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "g": [1, 2, 2, 3, 3, 3],
             "x": [1, 4, 5, 7, 8, 9],
@@ -217,7 +217,7 @@ def test_window_fns_project_pandas_only():
 
     res = ops.transform(d)
 
-    expect1 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect1 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "g": [1, 2, 3],
             "ng_max": [0, 1, 2],

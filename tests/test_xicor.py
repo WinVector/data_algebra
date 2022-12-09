@@ -12,7 +12,7 @@ import data_algebra.data_model
 
 
 def test_xicor():
-    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd  # pandas
+    pd = data_algebra.data_model.default_data_model().pd  # pandas
 
     dir_path = os.path.dirname(os.path.realpath(__file__))
     with open(os.path.join(dir_path, "xicor_examples.yaml"), "r") as in_f:
@@ -117,7 +117,7 @@ def test_xicor():
 
 
 def test_xicor_frame_calc():
-    df = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({'x1': [1, 2, 3], 'x2': [1, 1, 2], 'y': [1, 2, 3]})
+    df = data_algebra.data_model.default_data_model().pd.DataFrame({'x1': [1, 2, 3], 'x2': [1, 1, 2], 'y': [1, 2, 3]})
     ops, rep_frame_name, rep_frame = data_algebra.solutions.xicor_score_variables_plan(
         descr(df=df),
         x_vars=['x1', 'x2'],
@@ -125,7 +125,7 @@ def test_xicor_frame_calc():
         n_rep=200,
     )
     res = ops.eval({'df': df, rep_frame_name: rep_frame})
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame({
         'variable_name': ['x1', 'x2'],
         'xicor_mean': [0.25, 0.1],
         'xicor_std': [0.0, 0.18],

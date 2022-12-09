@@ -14,7 +14,7 @@ def test_example1_1():
     conn = sqlite3.connect(":memory:")
     db_model = data_algebra.SQLite.SQLiteModel()
 
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "x_s": ["s_03", "s_04", "s_02", "s_01", "s_03", "s_01"],
             "x_n": ["n_13", "n_48", "n_77", "n_29", "n_91", "n_93"],
@@ -33,7 +33,7 @@ def test_example1_1():
     assert ops1 == ops1
     assert data_algebra.test_util.formats_to_self(ops1)
     res1 = ops1.transform(d)
-    expect1 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect1 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "x_s": ["s_01", "s_02", "s_03", "s_04"],
             "meany": [
@@ -59,7 +59,7 @@ def test_example1_1():
     assert ops2 != ops1
     assert data_algebra.test_util.formats_to_self(ops2)
     res2 = ops2.transform(d)
-    expect2 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect2 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "x_n": ["n_13", "n_29", "n_48", "n_77", "n_91", "n_93"],
             "meany": [
@@ -83,7 +83,7 @@ def test_example1_1():
 
 
 def test_example1_1_early_error():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "x_s": ["s_03", "s_04", "s_02", "s_01", "s_03", "s_01"],
             "x_n": ["n_13", "n_48", "n_77", "n_29", "n_91", "n_93"],
@@ -97,7 +97,7 @@ def test_example1_1_early_error():
 
 
 def test_example1_1_detect_agg():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "x_s": ["s_03", "s_04", "s_02", "s_01", "s_03", "s_01"],
             "x_n": ["n_13", "n_48", "n_77", "n_29", "n_91", "n_93"],
@@ -114,7 +114,7 @@ def test_example1_1_detect_agg():
 
 
 def test_example1_add_const():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "x_s": ["s_03", "s_04", "s_02", "s_01", "s_03", "s_01"],
             "x_n": ["n_13", "n_48", "n_77", "n_29", "n_91", "n_93"],
@@ -125,7 +125,7 @@ def test_example1_add_const():
 
     ops = table_desc.extend({"one": "1"})
     res = ops.transform(d)
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "x_s": ["s_03", "s_04", "s_02", "s_01", "s_03", "s_01"],
             "x_n": ["n_13", "n_48", "n_77", "n_29", "n_91", "n_93"],

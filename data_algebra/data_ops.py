@@ -484,11 +484,11 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             for k in tables.keys():
                 v = data_map[k]
                 if data_model is None:
-                    data_model = data_algebra.data_model.data_model_type_map[str(type(v))]
+                    data_model = data_algebra.data_model.lookup_data_model_for_dataframe(v)
                 if not data_model.is_appropriate_data_instance(v):
                     raise ValueError(f"data_map[{k}] type {type(v)} not appropriate for data model {data_model}")
         else:
-            data_model = data_algebra.data_model.data_model_type_map["default_data_model"]
+            data_model = data_algebra.data_model.default_data_model()
         assert isinstance(data_model, data_algebra.data_model.DataModel)
         self.check_constraints(
             {k: data_map[k].columns for k in tables.keys()}, strict=strict
@@ -1159,7 +1159,7 @@ def describe_table(
     assert isinstance(keep_all, bool)
     assert isinstance(table_name, (str, type(None)))  # TODO: see if we can change this to never None
     # confirm our data model is loaded
-    data_model = data_algebra.data_model.data_model_type_map[str(type(d))]
+    data_model = data_algebra.data_model.lookup_data_model_for_dataframe(d)
     assert data_model.is_appropriate_data_instance(d)
     column_names = list(d.columns)
     head = None

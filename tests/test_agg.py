@@ -5,11 +5,11 @@ import data_algebra.SQLite
 
 
 def test_agg():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [1, 2, 3, 4], "g": [1, 1, 2, 2],}
     )
     ops = describe_table(d, table_name="d").project({"x": "x.max()"}, group_by=["g"])
-    expect = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame({"g": [1, 2], "x": [2, 4],})
+    expect = data_algebra.data_model.default_data_model().pd.DataFrame({"g": [1, 2], "x": [2, 4],})
     db_handle = data_algebra.SQLite.SQLiteModel().db_handle(conn=None)
     sql = db_handle.to_sql(ops)
     assert isinstance(sql, str)
@@ -17,7 +17,7 @@ def test_agg():
 
 
 def test_agg_0_cols():
-    d = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [], "g": [],}
     )
     ops = describe_table(d, table_name="d").project({"x": "x.max()"}, group_by=["g"])

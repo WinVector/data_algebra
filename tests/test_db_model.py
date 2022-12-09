@@ -21,7 +21,7 @@ def test_db_model_base():
     str(db_handle)
     db_handle.__repr__()
 
-    d2 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d2 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"col1": [1, 2, 3], "col2": [3, 4, None], "col3": [4, 5, 7]}
     )
 

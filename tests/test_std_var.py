@@ -10,7 +10,7 @@ import data_algebra.SQLite
 # confirm implementation is sample standard deviation and sample variance
 
 def test_std_var_project():
-    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
+    pd = data_algebra.data_model.default_data_model().pd
     d = pd.DataFrame({'x': [1., 3.], 'g': ['a', 'a']})
     ops = (
         descr(d=d)
@@ -32,7 +32,7 @@ def test_std_var_project():
 
 
 def test_std_var_extend_disallow_ordered_var():
-    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
+    pd = data_algebra.data_model.default_data_model().pd
     d = pd.DataFrame({'x': [1., 3.], 'g': ['a', 'a'], 'z': [1, 2]})
     with pytest.raises(ValueError):
         ops = (
@@ -48,7 +48,7 @@ def test_std_var_extend_disallow_ordered_var():
 
 
 def test_std_var_extend_disallow_ordered_std():
-    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
+    pd = data_algebra.data_model.default_data_model().pd
     d = pd.DataFrame({'x': [1., 3.], 'g': ['a', 'a'], 'z': [1, 2]})
     with pytest.raises(ValueError):
         ops = (
@@ -64,7 +64,7 @@ def test_std_var_extend_disallow_ordered_std():
 
 
 def test_std_var_extend_allow_extend_var():
-    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
+    pd = data_algebra.data_model.default_data_model().pd
     d = pd.DataFrame({'x': [1., 3., 2., 2.], 'g': ['a', 'a', 'b', 'b'], 'z': [1, 2, 3, 4]})
     ops = (
         descr(d=d)
@@ -86,7 +86,7 @@ def test_std_var_extend_allow_extend_var():
 
 
 def test_std_var_extend_allow_extend_std():
-    pd = data_algebra.data_model.data_model_type_map["default_data_model"].pd
+    pd = data_algebra.data_model.default_data_model().pd
     d = pd.DataFrame({'x': [1., 3., 2., 2.], 'g': ['a', 'a', 'b', 'b'], 'z': [1, 2, 3, 4]})
     ops = (
         descr(d=d)

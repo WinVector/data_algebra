@@ -13,18 +13,18 @@ from data_algebra.sql_format_options import SQLFormatOptions
 def test_sqlite_joins_left_to_right():
     # No none keys, as they treat missingness different
     # in Pandas and databases
-    d1 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d1 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "g": ["a", "a", "b", "b", "b"],
             "v1": [1, None, 3, 4, None],
             "v2": [None, 1, 2, 7, 8],
         }
     )
-    d2 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d2 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"g": ["c", "b", "b"], "v1": [None, 1, None], "v2": [1, None, 2],}
     )
     ops_1 = descr(d1=d1).natural_join(b=descr(d2=d2), by=["g"], jointype="left")
-    expect_1 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect_1 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "g": ["a", "a", "b", "b", "b", "b", "b", "b"],
             "v1": [1.0, None, 3.0, 3.0, 4.0, 4.0, 1.0, None],
@@ -40,7 +40,7 @@ def test_sqlite_joins_left_to_right():
         models_to_skip={str(data_algebra.MySQL.MySQLModel())},
     )
     ops_2 = descr(d1=d1).natural_join(b=descr(d2=d2), by=["g"], jointype="right")
-    expect_2 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    expect_2 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "g": ["c", "b", "b", "b", "b", "b", "b"],
             "v1": [None, 3.0, 4.0, 1.0, 3.0, 4.0, None],
@@ -65,14 +65,14 @@ def test_sqlite_joins_left_to_right():
 
 
 def test_sqlite_joins_simulate_full_join():
-    d1 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d1 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "g": ["a", "a", "b", "b", "b"],
             "v1": [1, None, 3, 4, None],
             "v2": [None, 1, None, 7, 8],
         }
     )
-    d2 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d2 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"g": ["c", "b", "b"], "v1": [None, 1, None], "v2": [1, None, 2],}
     )
     join_columns = ["g"]
@@ -113,14 +113,14 @@ def test_sqlite_joins_simulate_full_join():
 
 
 def test_sqlite_joins_staged():
-    d1 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d1 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "g": ["a", "a", "b", "b", "b"],
             "v1": [1, None, 3, 4, None],
             "v2": [None, 1, None, 7, 8],
         }
     )
-    d2 = data_algebra.data_model.data_model_type_map["default_data_model"].pd.DataFrame(
+    d2 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"g": ["c", "b", "b"], "v1": [None, 1, None], "v2": [1, None, 2],}
     )
     join_columns = ["g"]
