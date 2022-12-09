@@ -2,6 +2,7 @@
 bash ./clean.bash
 
 # pytest --cov data_algebra tests > coverage.txt
+pip install --no-deps -e "$(pwd)"
 pytest --cov-report term-missing --cov data_algebra tests > coverage.txt
 pdoc -o ./docs ./data_algebra
 cat coverage.txt

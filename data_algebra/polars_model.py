@@ -352,8 +352,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
             how=op.jointype,
             suffix = "_da_right_tmp",
         )
-        # TODO: work on def with examples
-        coalesce_columns = set(op.sources[0].columns_produced()).union(op.sources[1].columns_produced()) - set(op.on_a)  
+        coalesce_columns = set(op.sources[0].columns_produced()).intersection(op.sources[1].columns_produced())
         if len(coalesce_columns) > 0:
             res = res.with_columns([
                 pl.when(pl.col(c).is_null())
@@ -362,7 +361,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
                     .alias(c)
                 for c in coalesce_columns
             ])
-        res = res.select(op.columns_produced())
+            res = res.select(op.columns_produced())
         return res
     
     def _order_rows_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):

@@ -141,20 +141,6 @@ class PreTerm(abc.ABC):
         """
         # can't use == as that builds a larger expression
 
-    # tree re-write
-
-    @abc.abstractmethod
-    def get_views(self):
-        """
-        return list of unique views, expectation list is of size zero or one
-        """
-
-    @abc.abstractmethod
-    def replace_view(self, view):
-        """
-        Move expression to a new view.
-        """
-
     # analysis
 
     def get_column_names(self, columns_seen: Set[str]) -> None:
@@ -1058,19 +1044,6 @@ class Value(Term):
             return False
         return self.value == other.value
 
-    def get_views(self):
-        """
-        return list of unique views, expectation list is of size zero or one
-        """
-        views = list()
-        return views
-
-    def replace_view(self, view):
-        """
-        Move expression to a new view.
-        """
-        return self
-
     def act_on(self, arg, *, data_model: data_algebra.data_model.DataModel):
         """
         Apply expression to argument.
@@ -1092,6 +1065,11 @@ class Value(Term):
         return Value(-self.value)
 
 
+def lit(x):
+    """Represent a value"""
+    return Value(x)
+
+
 class ListTerm(PreTerm):
     """
     Class to hold a collection.
@@ -1111,26 +1089,6 @@ class ListTerm(PreTerm):
         if not isinstance(other, ListTerm):
             return False
         return self.value == other.value
-
-    def get_views(self):
-        """
-        return list of unique views, expectation list is of size zero or one
-        """
-        views = list()
-        for ai in self.value:
-            if isinstance(ai, PreTerm):
-                vi = ai.get_views()
-                for vii in vi:
-                    if vii not in views:  # expect list to be of size zero or one
-                        views.append(vii)
-        return views
-
-    def replace_view(self, view):
-        """
-        Move expression to a new view.
-        """
-        new_list = [ai.replace_view(view) for ai in self.value]
-        return ListTerm(new_list)
 
     def act_on(self, arg, *, data_model: data_algebra.data_model.DataModel):
         """
@@ -1196,19 +1154,6 @@ class DictTerm(PreTerm):
             return False
         return self.value == other.value
 
-    def get_views(self):
-        """
-        return list of unique views, expectation list is of size zero or one
-        """
-        views = list()
-        return views
-
-    def replace_view(self, view):
-        """
-        Move expression to a new view.
-        """
-        return DictTerm(self.value)
-
     def act_on(self, arg, *, data_model: data_algebra.data_model.DataModel):
         """
         Apply expression to argument.
@@ -1252,22 +1197,11 @@ def enc_value(value):
 
 class ColumnReference(Term):
     """class to represent referring to a column"""
-
-    view: Optional[Any]
     column_name: str
 
-    def __init__(self, view, column_name):
-        self.view = view
+    def __init__(self, column_name):
         self.column_name = column_name
         assert isinstance(column_name, str)
-        # # an invariant we want, but don't want the expense of checking it against lists
-        # if view is not None:
-        #     if column_name not in view.column_names:
-        #         raise KeyError(
-        #             "column_name '"
-        #             + str(column_name)
-        #             + "' must be a column of the given view"
-        #         )
         Term.__init__(self)
 
     def act_on(self, arg, *, data_model: data_algebra.data_model.DataModel):
@@ -1284,23 +1218,7 @@ class ColumnReference(Term):
         # can't use == as that builds a larger expression
         if not isinstance(other, ColumnReference):
             return False
-        if self.view != other.view:
-            return False
         return self.column_name == other.column_name
-
-    def get_views(self):
-        """
-        return list of unique views, expectation list is of size zero or one
-        """
-        views = list()
-        views.append(self.view)
-        return views
-
-    def replace_view(self, view):
-        """
-        Move expression to a new view.
-        """
-        return ColumnReference(view=view, column_name=self.column_name)
 
     def to_python(self, *, want_inline_parens: bool = False) -> PythonText:
         """
@@ -1318,6 +1236,12 @@ class ColumnReference(Term):
         :return:
         """
         columns_seen.add(self.column_name)
+
+
+def col(nm: str):
+    """represent a column or value"""
+    assert isinstance(nm, str)
+    return ColumnReference(column_name=nm)
 
 
 # noinspection SpellCheckingInspection
@@ -1407,31 +1331,6 @@ class Expression(Term):
             if not lft.is_equal(rgt):
                 return False
         return True
-
-    def get_views(self):
-        """
-        return list of unique views, expectation list is of size zero or one
-        """
-        views = list()
-        for ai in self.args:
-            vi = ai.get_views()
-            for vii in vi:
-                if vii not in views:  # expect list to be of size zero or one
-                    views.append(vii)
-        return views
-
-    def replace_view(self, view):
-        """
-        Move expression to a new view.
-        """
-        new_args = [oi.replace_view(view) for oi in self.args]
-        return Expression(
-            op=self.op,
-            args=new_args,
-            params=self.params,
-            inline=self.inline,
-            method=self.method,
-        )
 
     def get_column_names(self, columns_seen: Set[str]) -> None:
         """
