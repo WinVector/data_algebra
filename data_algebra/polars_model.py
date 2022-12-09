@@ -2,7 +2,7 @@
 """
 Adapter to use Polars ( https://www.pola.rs ) in the data algebra.
 
-Note: not implemented yet.
+Note: fully not implemented yet.
 """
 
 from typing import Any, Callable, Dict, List
@@ -28,21 +28,26 @@ class PolarsTerm:
         self.is_literal = is_literal
 
 
+def _raise_not_impl(nm: str):   # TODO: get rid of this
+    raise ValueError(f" {nm} not implemented for Polars adapter, yet")
+
+
 def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
     """
     Map symbols to implementations.
     """
+    # TODO: fill in more
     impl_map_0 = {
-        "count": lambda : None,  # TODO: implement
-        "_count": lambda : None,  # TODO: implement
-        "ngroup": lambda : None,  # TODO: implement
-        "_ngroup": lambda : None,  # TODO: implement
-        "row_number": lambda : None,  # TODO: implement
-        "_row_number": lambda : None,  # TODO: implement
-        "size": lambda : None,  # TODO: implement
-        "_size": lambda : None,  # TODO: implement
-        "uniform": lambda : None,  # TODO: implement
-        "_uniform": lambda : None,  # TODO: implement
+        "count": lambda : _raise_not_impl("count"),  # TODO: implement
+        "_count": lambda : _raise_not_impl("_count"),  # TODO: implement
+        "ngroup": lambda : _raise_not_impl("ngroup"),  # TODO: implement
+        "_ngroup": lambda : _raise_not_impl("_ngroup"),  # TODO: implement
+        "row_number": lambda : _raise_not_impl("row_number"),  # TODO: implement
+        "_row_number": lambda : _raise_not_impl("_row_number"),  # TODO: implement
+        "size": lambda : _raise_not_impl("size"),  # TODO: implement
+        "_size": lambda : _raise_not_impl("_size"),  # TODO: implement
+        "uniform": lambda : _raise_not_impl("uniform"),  # TODO: implement
+        "_uniform": lambda : _raise_not_impl("_uniform"),  # TODO: implement
     }
     impl_map_1 = {
         "-": lambda x: 0 - x,
@@ -150,10 +155,10 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "!": lambda x: x == False,
     }
     impl_map_3 = {
-        "if_else": lambda a, b, c: a.if_else(b, c), 
+        "if_else": lambda a, b, c: pl.when(a).then(b).otherwise(c),
         "mapv": lambda a, b, c: a.mapv(b, c),
         "trimstr": lambda a, b, c: a.trimstr(b, c),
-        "where": lambda a, b, c: a.where(b, c),
+        "where": lambda a, b, c: pl.when(a).then(b).otherwise(c),
     }
     impl_map = {
         0: impl_map_0,
@@ -161,7 +166,6 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         2: impl_map_2,
         3: impl_map_3,
     }
-    # TODO: fill in more
     return impl_map
 
 
@@ -169,7 +173,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
     """
     Interface for realizing the data algebra as a sequence of steps over Polars https://www.pola.rs .
 
-    Note: not implemented yet.
+    Note: not fully implemented yet.
     """
 
     use_lazy_eval: bool
@@ -266,14 +270,14 @@ class PolarsModel(data_algebra.data_model.DataModel):
         """
         Execute record conversion step, returning a data frame.
         """
-        raise ValueError("not implemented yet")  # TODO: implement
-
-    def _drop_columns_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
-        """
-        Execute a drop columns step, returning a data frame.
-        """
+        if op.node_name != "ConvertRecordsNode":
+            raise TypeError(
+                "op was supposed to be a data_algebra.data_ops.ConvertRecordsNode"
+            )
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
-        res = res.select(op.columns_produced())
+        res = res.to_pandas()  # TODO: new Pandas/Polars re-impl of cdata
+        res = op.record_map.transform(res, local_data_model=data_algebra.data_model.data_model_type_map["default_data_model"])
+        res = pl.DataFrame(res)
         return res
     
     def _extend_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
@@ -339,16 +343,26 @@ class PolarsModel(data_algebra.data_model.DataModel):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.NaturalJoinNode"
             )
-        # TODO: coalesce common columns not in on, and corner cases
         inputs = [self._compose_polars_ops(s, data_map=data_map) for s in op.sources]
         assert len(inputs) == 2
-        assert op.on_a == op.on_b  # TODO: relax this
-        on = op.on_a
         res = inputs[0].join(
             inputs[1],
-            on=on,
+            left_on=op.on_a,
+            right_on=op.on_b,
             how=op.jointype,
+            suffix = "_da_right_tmp",
         )
+        # TODO: work on def with examples
+        coalesce_columns = set(op.sources[0].columns_produced()).union(op.sources[1].columns_produced()) - set(op.on_a)  
+        if len(coalesce_columns) > 0:
+            res = res.with_columns([
+                pl.when(pl.col(c).is_null())
+                    .then(pl.col(c + "_da_right_tmp"))
+                    .otherwise(pl.col(c))
+                    .alias(c)
+                for c in coalesce_columns
+            ])
+        res = res.select(op.columns_produced())
         return res
     
     def _order_rows_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
@@ -408,6 +422,18 @@ class PolarsModel(data_algebra.data_model.DataModel):
             res = res.select(op.columns_produced())
         return res
 
+    def _rename_columns_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
+        """
+        Execute a rename columns step, returning a data frame.
+        """
+        if op.node_name != "RenameColumnsNode":
+            raise TypeError(
+                "op was supposed to be a data_algebra.data_ops.RenameColumnsNode"
+            )
+        res = self._compose_polars_ops(op.sources[0], data_map=data_map)
+        res = res.rename(columns=op.reverse_mapping)
+        return res  
+
     def _map_columns_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
         """
         Execute a map columns step, returning a data frame.
@@ -423,18 +449,6 @@ class PolarsModel(data_algebra.data_model.DataModel):
             res = res.select(column_selection)
         return res
 
-    def _rename_columns_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
-        """
-        Execute a rename columns step, returning a data frame.
-        """
-        if op.node_name != "RenameColumnsNode":
-            raise TypeError(
-                "op was supposed to be a data_algebra.data_ops.RenameColumnsNode"
-            )
-        res = self._compose_polars_ops(op.sources[0], data_map=data_map)
-        res = res.rename(columns=op.reverse_mapping)
-        return res
-
     def _select_columns_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
         """
         Execute a select columns step, returning a data frame.
@@ -443,6 +457,14 @@ class PolarsModel(data_algebra.data_model.DataModel):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.SelectColumnsNode"
             )
+        res = self._compose_polars_ops(op.sources[0], data_map=data_map)
+        res = res.select(op.columns_produced())
+        return res
+
+    def _drop_columns_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
+        """
+        Execute a drop columns step, returning a data frame.
+        """
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
         res = res.select(op.columns_produced())
         return res
@@ -469,7 +491,9 @@ class PolarsModel(data_algebra.data_model.DataModel):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.SQLNode"
             )
-        raise ValueError("not implemented yet")  # TODO: implement
+        db_handle = data_map[op.view_name]
+        res = db_handle.read_query("\n".join(op.sql))
+        return pl.DataFrame(res)
     
     def _table_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
         """
