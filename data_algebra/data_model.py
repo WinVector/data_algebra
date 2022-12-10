@@ -90,10 +90,13 @@ def default_data_model() -> DataModel:
 
 polars_regexp = re.compile(r".*[^a-zA-Z]polars[^a-zA-Z].*[^a-zA-z]dataframe[^a-zA-Z].*")
 assert polars_regexp.match("<class 'polars.internals.dataframe.frame.DataFrame'>") is not None
+polars_regexp_lazy = re.compile(r".*[^a-zA-Z]polars[^a-zA-Z].*[^a-zA-z]lazyframe[^a-zA-Z].*")
+assert polars_regexp_lazy.match("<class 'polars.internals.lazyframe.frame.LazyFrame'>") is not None
 
 def lookup_data_model_for_key(key: str) -> DataModel:
     assert isinstance(key, str)
-    if polars_regexp.match(key.lower()) is not None:
+    key_lower = key.lower()
+    if (polars_regexp.match(key_lower) is not None) or (polars_regexp_lazy.match(key_lower) is not None):
         import data_algebra.polars_model
         data_algebra.polars_model.register_polars_model(key)
     return data_model_type_map[key]

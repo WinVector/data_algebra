@@ -19,7 +19,7 @@ import data_algebra.connected_components
 
 class PolarsTerm:
     """
-    Class to carry Polars term and annotations.
+    Class to carry Polars expression term and annotations.
     """
     def __init__(self, *, polars_term, is_literal: bool) -> None:
         assert isinstance(is_literal, bool)
@@ -219,7 +219,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
         """
         Check if df is our type of data frame.
         """
-        return isinstance(df, pl.DataFrame)
+        return isinstance(df, pl.DataFrame) or isinstance(df, pl.LazyFrame)
 
     # evaluate
 
@@ -234,7 +234,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
         assert isinstance(data_map, Dict)
         assert isinstance(op, data_algebra.data_ops_types.OperatorPlatform)
         res = self._compose_polars_ops(op=op, data_map=data_map)
-        if self.use_lazy_eval:
+        if isinstance(res, pl.LazyFrame):
             res = res.collect()
         assert self.is_appropriate_data_instance(res)
         return res
@@ -275,9 +275,13 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 "op was supposed to be a data_algebra.data_ops.ConvertRecordsNode"
             )
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
+        if isinstance(res, pl.LazyFrame):
+            res = res.collect()
         res = res.to_pandas()  # TODO: new Pandas/Polars re-impl of cdata
         res = op.record_map.transform(res, local_data_model=data_algebra.data_model.default_data_model())
         res = pl.DataFrame(res)
+        if self.use_lazy_eval and (not isinstance(res, pl.LazyFrame)):
+            res = res.lazy()
         return res
     
     def _extend_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
@@ -492,7 +496,10 @@ class PolarsModel(data_algebra.data_model.DataModel):
             )
         db_handle = data_map[op.view_name]
         res = db_handle.read_query("\n".join(op.sql))
-        return pl.DataFrame(res)
+        res = pl.DataFrame(res)
+        if self.use_lazy_eval and (not isinstance(res, pl.LazyFrame)):
+            res = res.lazy()
+        return res
     
     def _table_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
         """
@@ -502,15 +509,15 @@ class PolarsModel(data_algebra.data_model.DataModel):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.TableDescription"
             )
-        df = data_map[op.table_name]
-        if not self.is_appropriate_data_instance(df):
+        res = data_map[op.table_name]
+        if not self.is_appropriate_data_instance(res):
             raise ValueError(
                 "data_map[" + op.table_name + "] was not the right type"
             )
-        if self.use_lazy_eval:
-            df = df.lazy()
-        df = df.select(op.columns_produced())
-        return df
+        if self.use_lazy_eval and (not isinstance(res, pl.LazyFrame)):
+            res = res.lazy()
+        res = res.select(op.columns_produced())
+        return res
     
     # expression helpers
     
@@ -562,6 +569,8 @@ def register_polars_model(key:Optional[str] = None):
         data_algebra.data_model.data_model_type_map[common_key] = pd_model
         data_algebra.data_model.data_model_type_map["<class 'polars.internals.dataframe.frame.DataFrame'>"] = pd_model
         data_algebra.data_model.data_model_type_map[str(type(pd_model.data_frame()))] = pd_model
+        data_algebra.data_model.data_model_type_map["<class 'polars.internals.lazyframe.frame.LazyFrame'>"] = pd_model
+        data_algebra.data_model.data_model_type_map[str(type(pd_model.data_frame().lazy()))] = pd_model
         if key is not None:
             assert isinstance(key, str)
             data_algebra.data_model.data_model_type_map[key] = pd_model
