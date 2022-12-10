@@ -6,7 +6,6 @@ Class for representing record structure transformations.
 import re
 from typing import Iterable, List, Optional
 
-import numpy
 import data_algebra.data_model
 import data_algebra.util
 
@@ -37,12 +36,13 @@ class RecordSpecification:
         if local_data_model is None:
             local_data_model = data_algebra.data_model.default_data_model()
         assert isinstance(local_data_model, data_algebra.data_model.DataModel)
-        control_table = control_table.reset_index(inplace=False, drop=True)
+        assert local_data_model.is_appropriate_data_instance(control_table)
+        control_table = local_data_model.clean_copy(control_table)
         if control_table.shape[0] < 1:
             raise ValueError("control table should have at least 1 row")
         if len(control_table.columns) != len(set(control_table.columns)):
             raise ValueError("control table columns should be unique")
-        self.control_table = control_table.reset_index(drop=True, inplace=False)
+        self.control_table = control_table
         assert self.control_table.shape[0] > 0
         if record_keys is None:
             record_keys = []
@@ -293,7 +293,8 @@ class RecordMap:
         if local_data_model is None:
             local_data_model = data_algebra.data_model.default_data_model()
         assert isinstance(local_data_model, data_algebra.data_model.DataModel)
-        X = X.reset_index(drop=True)
+        assert local_data_model.is_appropriate_data_instance(X)
+        X = local_data_model.clean_copy(X)
         if self.blocks_in is not None:
             X = local_data_model.blocks_to_rowrecs(
                 X, blocks_in=self.blocks_in

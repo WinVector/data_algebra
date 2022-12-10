@@ -222,6 +222,16 @@ class PolarsModel(data_algebra.data_model.DataModel):
         """
         return isinstance(df, pl.DataFrame) or isinstance(df, pl.LazyFrame)
     
+    def clean_copy(self, df):
+        """
+        Copy of data frame without indices.
+        """
+        assert self.is_appropriate_data_instance(df)
+        # Polars doesn't need explicit copying due to copy on write semantics
+        if isinstance(df, pl.LazyFrame):
+            df = df.collect()
+        return df
+    
     def bad_column_positions(self, x):
         """
         Return vector indicating which entries are bad (null or nan) (vectorized).

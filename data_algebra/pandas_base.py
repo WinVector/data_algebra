@@ -381,6 +381,13 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         """
         # noinspection PyUnresolvedReferences
         return isinstance(df, self.pd.DataFrame)
+    
+    def clean_copy(self, df):
+        """
+        Copy of data frame without indices.
+        """
+        assert self.is_appropriate_data_instance(df)
+        return df.reset_index(drop=True, inplace=False)
 
     def can_convert_col_to_numeric(self, x):
         """

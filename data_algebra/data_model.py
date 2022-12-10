@@ -35,6 +35,12 @@ class DataModel(abc.ABC):
         """
         Check if df is our type of data frame.
         """
+    
+    @abc.abstractmethod
+    def clean_copy(self, df):
+        """
+        Copy of data frame without indices.
+        """
 
     @abc.abstractmethod
     def bad_column_positions(self, x):
