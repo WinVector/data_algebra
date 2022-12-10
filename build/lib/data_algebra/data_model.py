@@ -35,6 +35,18 @@ class DataModel(abc.ABC):
         """
         Check if df is our type of data frame.
         """
+    
+    @abc.abstractmethod
+    def clean_copy(self, df):
+        """
+        Copy of data frame without indices.
+        """
+
+    @abc.abstractmethod
+    def bad_column_positions(self, x):
+        """
+        Return vector indicating which entries are bad (null or nan) (vectorized).
+        """
 
     # evaluate
 
@@ -46,6 +58,35 @@ class DataModel(abc.ABC):
         :param op: ViewRepresentation to evaluate
         :param data_map: dictionary mapping table and view names to data frames
         :return: data frame result
+        """
+    
+    # cdata transform methods
+
+    @abc.abstractmethod
+    def blocks_to_rowrecs(self, data, *, blocks_in):
+        """
+        Convert a block record (record spanning multiple rows) into a rowrecord (record in a single row).
+
+        :param data: data frame to be transformed
+        :param blocks_in: cdata record specification
+        :return: transformed data frame
+        """
+    
+    @abc.abstractmethod
+    def rowrecs_to_blocks(
+        self,
+        data,
+        *,
+        blocks_out,
+        check_blocks_out_keying: bool = False,
+    ):
+        """
+        Convert rowrecs (single row records) into block records (multiple row records).
+
+        :param data: data frame to transform.
+        :param blocks_out: cdata record specification.
+        :param check_blocks_out_keying: logical, if True confirm keying
+        :return: transformed data frame
         """
     
     # expression helpers
@@ -90,10 +131,13 @@ def default_data_model() -> DataModel:
 
 polars_regexp = re.compile(r".*[^a-zA-Z]polars[^a-zA-Z].*[^a-zA-z]dataframe[^a-zA-Z].*")
 assert polars_regexp.match("<class 'polars.internals.dataframe.frame.DataFrame'>") is not None
+polars_regexp_lazy = re.compile(r".*[^a-zA-Z]polars[^a-zA-Z].*[^a-zA-z]lazyframe[^a-zA-Z].*")
+assert polars_regexp_lazy.match("<class 'polars.internals.lazyframe.frame.LazyFrame'>") is not None
 
 def lookup_data_model_for_key(key: str) -> DataModel:
     assert isinstance(key, str)
-    if polars_regexp.match(key.lower()) is not None:
+    key_lower = key.lower()
+    if (polars_regexp.match(key_lower) is not None) or (polars_regexp_lazy.match(key_lower) is not None):
         import data_algebra.polars_model
         data_algebra.polars_model.register_polars_model(key)
     return data_model_type_map[key]

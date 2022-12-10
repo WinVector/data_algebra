@@ -16,9 +16,10 @@ import data_algebra.data_model
 import data_algebra.expr_rep
 import data_algebra.data_ops_types
 import data_algebra.connected_components
+import data_algebra.cdata
 
 
-# TODO: possibly import dask, Nvidia Rapids, modin, datatable versions
+# also possible, Dask, Nvidia Rapids, Modin, or Datatable versions
 
 
 def none_mark_scalar_or_length(v) -> Optional[int]:
@@ -380,6 +381,13 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         """
         # noinspection PyUnresolvedReferences
         return isinstance(df, self.pd.DataFrame)
+    
+    def clean_copy(self, df):
+        """
+        Copy of data frame without indices.
+        """
+        assert self.is_appropriate_data_instance(df)
+        return df.reset_index(drop=True, inplace=False)
 
     def can_convert_col_to_numeric(self, x):
         """
@@ -459,7 +467,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             raise ValueError("missing required columns: " + str(missing))
         # make an index-free copy of the data to isolate side-effects and not deal with indices
         res = df.loc[:, columns_using]
-        res = res.reset_index(drop=True, inplace=False)  # copy and clear out indices
+        res = self.clean_copy(res)
         return res
 
     def _sql_proxy_step(self, op, *, data_map: dict):
@@ -488,7 +496,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         if len(cols) < 1:
             # all scalars, so nothing carrying index information
             if target_rows is not None:
-                return self.pd.DataFrame({}, index=range(target_rows)).reset_index(drop=True, inplace=False)
+                return self.clean_copy(self.pd.DataFrame({}, index=range(target_rows)))
             else:
                 return self.pd.DataFrame({})
         was_all_scalars = True
@@ -624,12 +632,12 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                     else:
                         raise ValueError("opk must be a ColumnReference or Value")
             ascending = [c not in set(op.reverse) for c in col_list]
-            subframe = res[col_list].reset_index(drop=True)
+            subframe = res[col_list].reset_index(drop=True, inplace=False)
             subframe["_data_algebra_orig_index"] = subframe.index
             if len(order_cols) > 0:
                 subframe = subframe.sort_values(
                     by=col_list, ascending=ascending
-                ).reset_index(drop=True)
+                ).reset_index(drop=True, inplace=False)
             subframe[standin_name] = 1
             if len(op.partition_by) > 0:
                 opframe = subframe.groupby(op.partition_by, observed=True)
@@ -709,7 +717,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             # copy out results
             subframe = subframe.sort_values(by=["_data_algebra_orig_index"])
             subframe = subframe.loc[:, list(op.ops.keys())]
-            subframe = subframe.reset_index(drop=True)
+            subframe = subframe.reset_index(drop=True, inplace=False)
             res = self.add_data_frame_columns_to_data_frame_(res, subframe)
         return res
 
@@ -785,7 +793,8 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         # agg can return scalars, which then can't be made into a self.pd.DataFrame
         res = self.columns_to_frame_(cols)
         res = res.reset_index(
-            drop=(len(op.group_by) < 1) or (res.shape[0] <= 0)
+            drop=(len(op.group_by) < 1) or (res.shape[0] <= 0),
+            inplace=False
         )  # grouping variables in the index
         missing_group_cols = set(op.group_by) - set(res.columns)
         if res.shape[0] > 0:
@@ -853,10 +862,10 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                 False if ci in set(op.reverse) else True for ci in op.order_columns
             ]
             res = res.sort_values(by=op.order_columns, ascending=ascending).reset_index(
-                drop=True
+                drop=True, inplace=False
             )
         if (op.limit is not None) and (res.shape[0] > op.limit):
-            res = res.iloc[range(op.limit), :].reset_index(drop=True)
+            res = res.iloc[range(op.limit), :].reset_index(drop=True, inplace=False)
         return res
 
     def _map_columns_step(self, op, *, data_map):
@@ -942,7 +951,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             sort=False,
             suffixes=("", "_tmp_right_col"),
         )
-        res = res.reset_index(drop=True)
+        res = res.reset_index(drop=True, inplace=False)
         if scratch_col is not None:
             del res[scratch_col]
         on_a_set = set(op.on_a)
@@ -951,7 +960,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                 is_null = res[c].isnull()
                 res.loc[is_null, c] = res.loc[is_null, c + "_tmp_right_col"]
                 res = res.drop(c + "_tmp_right_col", axis=1, inplace=False)
-        res = res.reset_index(drop=True)
+        res = res.reset_index(drop=True, inplace=False)
         return res
 
     def _concat_rows_step(self, op, *, data_map):
@@ -982,7 +991,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             raise ValueError(f"concat: incompatible column types: {type_checks}")
         # noinspection PyUnresolvedReferences
         res = self.pd.concat([left, right], axis=0, ignore_index=True, sort=False)
-        res = res.reset_index(drop=True)
+        res = res.reset_index(drop=True, inplace=False)
         return res
 
     def _convert_records_step(self, op, *, data_map):
@@ -995,6 +1004,174 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             )
         res = self._eval_value_source(op.sources[0], data_map=data_map)
         return op.record_map.transform(res, local_data_model=self)
+    
+    # cdata record conversion steps
+
+    def blocks_to_rowrecs(self, data, *, blocks_in: data_algebra.cdata.RecordSpecification):
+        """
+        Convert a block record (record spanning multiple rows) into a rowrecord (record in a single row).
+
+        :param data: data frame to be transformed
+        :param blocks_in: record specification
+        :return: transformed data frame
+        """
+        assert isinstance(blocks_in, data_algebra.cdata.RecordSpecification)
+        ck = [k for k in blocks_in.content_keys if k is not None]
+        if len(ck) != len(set(ck)):
+            raise ValueError("blocks_in can not have duplicate content keys")
+        data = data.reset_index(drop=True, inplace=False)
+        missing_cols = set(blocks_in.control_table_keys).union(blocks_in.record_keys) - set(
+            data.columns
+        )
+        if len(missing_cols) > 0:
+            raise KeyError("missing required columns: " + str(missing_cols))
+        # table must be keyed by record_keys + control_table_keys
+        if not data_algebra.util.table_is_keyed_by_columns(
+            data, blocks_in.record_keys + blocks_in.control_table_keys
+        ):
+            raise ValueError(
+                "table is not keyed by blocks_in.record_keys + blocks_in.control_table_keys"
+            )
+        # convert to row-records
+        # regularize/complete records
+        dtemp = data.copy()  # TODO: select down columns
+        dtemp["FALSE_AGG_KEY"] = 1
+        if len(blocks_in.record_keys) > 0:
+            ideal = dtemp[blocks_in.record_keys + ["FALSE_AGG_KEY"]].copy()
+            res = ideal.groupby(blocks_in.record_keys, observed=True)["FALSE_AGG_KEY"].agg("sum")
+            ideal = self.data_frame(res).reset_index(drop=False, inplace=False)
+            ideal["FALSE_AGG_KEY"] = 1
+            ctemp = blocks_in.control_table[blocks_in.control_table_keys].copy()
+            ctemp["FALSE_AGG_KEY"] = 1
+            ideal = ideal.merge(ctemp, how="outer", on="FALSE_AGG_KEY")
+            ideal = ideal.reset_index(drop=True, inplace=False)
+            dtemp = ideal.merge(
+                right=dtemp,
+                how="left",
+                on=blocks_in.record_keys + blocks_in.control_table_keys + ["FALSE_AGG_KEY"],
+            )
+        dtemp.sort_values(
+            by=blocks_in.record_keys + blocks_in.control_table_keys, inplace=True
+        )
+        dtemp = dtemp.reset_index(drop=True, inplace=False)
+        # start building up result frame
+        if len(blocks_in.record_keys) > 0:
+            res = dtemp.groupby(blocks_in.record_keys, observed=True)["FALSE_AGG_KEY"].agg("sum")
+        else:
+            res = dtemp.groupby("FALSE_AGG_KEY", observed=True)["FALSE_AGG_KEY"].agg("sum")
+        res = self.data_frame(res).reset_index(drop=False, inplace=False)
+        res.sort_values(by=blocks_in.record_keys, inplace=True)
+        res = self.data_frame(res).reset_index(drop=True, inplace=False)
+        del res["FALSE_AGG_KEY"]
+        # now fill in columns
+        ckeys = blocks_in.control_table_keys
+        value_keys = [k for k in blocks_in.control_table.columns if k not in set(ckeys)]
+        donor_cols = set(dtemp.columns)
+        for i in range(blocks_in.control_table.shape[0]):
+            want = numpy.ones((dtemp.shape[0],), dtype=bool)
+            for ck in ckeys:
+                want = numpy.logical_and(want, dtemp[ck] == blocks_in.control_table[ck][i])
+            if numpy.any(want):
+                for vk in value_keys:
+                    if vk in donor_cols:
+                        dcol = blocks_in.control_table[vk][i]
+                        res[dcol] = numpy.asarray(dtemp.loc[want, vk])
+        # fill in any missed columns
+        colset = set(res.columns)
+        for c in blocks_in.row_version():
+            if c not in colset:
+                res[c] = None
+        if data.shape[0] <= 0:
+            res = res.loc[range(0), :]
+            res = res.reset_index(inplace=False, drop=True)
+        return res
+
+    def rowrecs_to_blocks(
+        self,
+        data,
+        *,
+        blocks_out: data_algebra.cdata.RecordSpecification,
+        check_blocks_out_keying: bool = False,
+    ):
+        """
+        Convert rowrecs (single row records) into block records (multiple row records).
+
+        :param data: data frame to transform.
+        :param blocks_out: record specification.
+        :param check_blocks_out_keying: logical, if True confirm keying
+        :return: transformed data frame
+        """
+        assert isinstance(blocks_out, data_algebra.cdata.RecordSpecification)
+        data = data.reset_index(drop=True, inplace=False)
+        missing_cols = set(blocks_out.record_keys) - set(data.columns)
+        if len(missing_cols) > 0:
+            raise KeyError("missing required columns: " + str(missing_cols))
+        if check_blocks_out_keying:
+            # prefer table be keyed by record_keys
+            if not data_algebra.util.table_is_keyed_by_columns(
+                data, blocks_out.record_keys
+            ):
+                raise ValueError("table is not keyed by blocks_out.record_keys")
+        # convert to block records, first build up parallel structures
+        rv = [k for k in blocks_out.row_version(include_record_keys=True) if k is not None]
+        if len(rv) != len(set(rv)):
+            raise ValueError("duplicate row columns")
+        dtemp_cols = [
+            k
+            for k in rv
+            if k is not None and k in set(blocks_out.record_keys + blocks_out.content_keys)
+        ]
+        dtemp = data[dtemp_cols].copy()
+        dtemp.sort_values(by=blocks_out.record_keys, inplace=True)
+        dtemp = dtemp.reset_index(drop=True, inplace=False)
+        if len(dtemp.columns) != len(set(dtemp.columns)):
+            raise ValueError("targeted data columns not unique")
+        ctemp = blocks_out.control_table.copy()
+        dtemp["FALSE_JOIN_KEY"] = 1
+        ctemp["FALSE_JOIN_KEY"] = 1
+        res = dtemp[blocks_out.record_keys + ["FALSE_JOIN_KEY"]].merge(
+            ctemp, how="outer", on=["FALSE_JOIN_KEY"]
+        )
+        del res["FALSE_JOIN_KEY"]
+        ckeys = blocks_out.control_table_keys
+        res.sort_values(by=blocks_out.record_keys + ckeys, inplace=True)
+        res = res.reset_index(drop=True, inplace=False)
+        del ctemp["FALSE_JOIN_KEY"]
+        del dtemp["FALSE_JOIN_KEY"]
+        value_keys = [k for k in ctemp.columns if k not in set(ckeys)]
+        donor_cols = set(dtemp.columns)
+        for vk in value_keys:
+            res[vk] = None
+        # we now have parallel structures to copy between
+        for i in range(ctemp.shape[0]):
+            want = numpy.ones((res.shape[0],), dtype=bool)
+            for ck in ckeys:
+                want = numpy.logical_and(want, res[ck] == ctemp[ck][i])
+            if numpy.any(want):
+                for vk in value_keys:
+                    dcol = ctemp[vk][i]
+                    if dcol in donor_cols:
+                        nvals = numpy.asarray(dtemp[dcol])
+                        if len(nvals) < 1:
+                            nvals = [None] * numpy.sum(want)
+                        if numpy.all(want):
+                            res[vk] = nvals  # get around Pandas future warning
+                        else:
+                            res.loc[want, vk] = nvals
+        # see about promoting composite columns to numeric
+        for vk in set(value_keys):
+            converted = self.to_numeric(res[vk], errors="coerce")
+            if numpy.all(
+                self.isnull(converted) == self.isnull(res[vk])
+            ):
+                res[vk] = converted
+        if data.shape[0] < 1:
+            # empty input produces emtpy output (with different column structure)
+            res = res.iloc[range(0), :].reset_index(inplace=False, drop=True)
+        if data.shape[0] <= 0:
+            res = res.loc[range(0), :]
+            res = res.reset_index(inplace=False, drop=True)
+        return res
 
     # expression helpers
     
