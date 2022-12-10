@@ -226,7 +226,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
         """
         Return vector indicating which entries are bad (null or nan) (vectorized).
         """
-        raise ValueError("not implemented, yet")  # TODO: implement
+        _raise_not_impl("bad_column_positions")  # TODO: implement
 
     # evaluate
 
@@ -277,19 +277,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
         """
         Execute record conversion step, returning a data frame.
         """
-        if op.node_name != "ConvertRecordsNode":
-            raise TypeError(
-                "op was supposed to be a data_algebra.data_ops.ConvertRecordsNode"
-            )
-        res = self._compose_polars_ops(op.sources[0], data_map=data_map)
-        if isinstance(res, pl.LazyFrame):
-            res = res.collect()
-        res = res.to_pandas()  # TODO: new Pandas/Polars re-impl of cdata
-        res = op.record_map.transform(res, local_data_model=data_algebra.data_model.default_data_model())
-        res = pl.DataFrame(res)
-        if self.use_lazy_eval and (not isinstance(res, pl.LazyFrame)):
-            res = res.lazy()
-        return res
+        _raise_not_impl("_convert_records_step")  # TODO: implement
     
     def _extend_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
         """
@@ -536,8 +524,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
         :param blocks_in: cdata record specification
         :return: transformed data frame
         """
-        raise ValueError("not implemented, yet")  # TODO: implement
-
+        _raise_not_impl("blocks_to_rowrecs")  # TODO: implement
     
     def rowrecs_to_blocks(
         self,
@@ -554,7 +541,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
         :param check_blocks_out_keying: logical, if True confirm keying
         :return: transformed data frame
         """
-        raise ValueError("not implemented, yet")  # TODO: implement
+        _raise_not_impl("blocks_to_rowrecs")  # TODO: implement
     
     # expression helpers
     
