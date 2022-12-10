@@ -48,10 +48,12 @@ Related work includes:
   * [`table.express`](https://github.com/asardaes/table.express)
   * [`Pandas`](https://pandas.pydata.org)
   * [`pandas-ply`](https://github.com/coursera/pandas-ply)
+  * [`Polars`](https://www.pola.rs)
   * [`SQLAlchemy`](https://www.sqlalchemy.org)
   * [`rquery`](https://github.com/WinVector/rquery/)
   * [`cdata`](https://github.com/WinVector/cdata/)
   * [`siuba`](https://github.com/machow/siuba)
+  * [`tidypolars`](https://github.com/markfairbanks/tidypolars)
   * [`Preql`](https://github.com/erezsh/Preql)
   
 The `data_algebra` principles include:

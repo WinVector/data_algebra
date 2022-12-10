@@ -76,7 +76,7 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "cummax": lambda x: x.cummax(),
         "cummin": lambda x: x.cummin(),
         "cumprod": lambda x: x.cumprod(),
-        "cumsum": lambda x: pl.cumsum(x),  # https://stackoverflow.com/a/73950822/6901725 , but not working yet
+        "cumsum": lambda x: x.cumsum(),
         "datetime_to_date": lambda x: x.datetime_to_date(),
         "dayofmonth": lambda x: x.dayofmonth(),
         "dayofweek": lambda x: x.dayofweek(),
@@ -295,7 +295,6 @@ class PolarsModel(data_algebra.data_model.DataModel):
         """
         if op.node_name != "ExtendNode":
             raise TypeError("op was supposed to be a data_algebra.data_ops.ExtendNode")
-        assert len(op.order_by) == 0  # TODO: implement non-zero version of this
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
         partition_by = op.partition_by
         temp_v_columns = []
@@ -335,8 +334,8 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 for c in op.order_by:
                     if c not in partition_set:
                         order_cols.append(c)
-                reversed_cols = [True if ci in set(op.reverse) else False for ci in op.order_columns]
-                res = res.sort(by=op.order_columns, reverse=reversed_cols)
+                reversed_cols = [True if ci in set(op.reverse) else False for ci in op.order_by]
+                res = res.sort(by=op.order_by, reverse=reversed_cols)
             if len(temp_v_columns) > 0:
                 res = res.with_columns(temp_v_columns)
             res = res.with_columns(produced_columns)  
@@ -439,7 +438,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 "op was supposed to be a data_algebra.data_ops.RenameColumnsNode"
             )
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
-        res = res.rename(columns=op.reverse_mapping)
+        res = res.rename(op.reverse_mapping)
         return res  
 
     def _map_columns_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
@@ -451,10 +450,9 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 "op was supposed to be a data_algebra.data_ops.MapColumnsNode"
             )
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
-        res = res.rename(columns=op.column_remapping)
+        res = res.rename(op.column_remapping)
         if (op.column_deletions is not None) and (len(op.column_deletions) > 0):
-            column_selection = [c for c in res.columns if c not in op.column_deletions]
-            res = res.select(column_selection)
+            res = res.select(op.columns_produced())
         return res
 
     def _select_columns_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
