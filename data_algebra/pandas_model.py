@@ -27,5 +27,3 @@ def register_pandas_model():
         data_algebra.data_model.data_model_type_map["default_Pandas_model"] = pd_model
         data_algebra.data_model.data_model_type_map["<class 'pandas.core.frame.DataFrame'>"] = pd_model
         data_algebra.data_model.data_model_type_map[str(type(pd_model.data_frame()))] = pd_model
-
-register_pandas_model()

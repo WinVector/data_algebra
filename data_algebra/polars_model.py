@@ -565,5 +565,3 @@ def register_polars_model(key:Optional[str] = None):
         if key is not None:
             assert isinstance(key, str)
             data_algebra.data_model.data_model_type_map[key] = pd_model
-
-register_polars_model()
