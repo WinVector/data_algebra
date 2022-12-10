@@ -876,7 +876,6 @@ class DBModel:
         assert isinstance(q, str)
         r = data_algebra.data_model.default_data_model().pd.io.sql.read_sql(q, conn)
         r = self.local_data_model.pd.DataFrame(r)
-        r = r.reset_index(drop=True)
         return r
 
     def table_exists(self, conn, table_name: str) -> bool:

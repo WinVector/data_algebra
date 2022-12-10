@@ -88,13 +88,13 @@ def equivalent_frames(
         return True
     if a.equals(b):
         return True
-    a = a.reset_index(drop=True, inplace=False)  # get rid of indices
-    b = b.reset_index(drop=True, inplace=False)
+    a = local_data_model.clean_copy(a)
+    b = local_data_model.clean_copy(b)
     if not cols_case_sensitive:
         a.columns = [c.lower() for c in a.columns]
-        a = a.reset_index(drop=True)
+        a = local_data_model.clean_copy(a)
         b.columns = [c.lower() for c in b.columns]
-        b = b.reset_index(drop=True)
+        b = local_data_model.clean_copy(b)
     a_columns = [c for c in a.columns]
     b_columns = [c for c in b.columns]
     if set(a_columns) != set(b_columns):
@@ -105,14 +105,14 @@ def equivalent_frames(
     else:
         # re-order b into a's column order
         b = b[a_columns]
-        b = b.reset_index(drop=True)
+        b = local_data_model.clean_copy(b)
     if a.shape[0] < 1:
         return True
     if not check_row_order:
         a = a.sort_values(by=a_columns)
-        a = a.reset_index(drop=True)
+        a = local_data_model.clean_copy(a)
         b = b.sort_values(by=a_columns)
-        b = b.reset_index(drop=True)
+        b = local_data_model.clean_copy(b)
     for c in a_columns:
         ca = a[c]
         cb = b[c]
@@ -385,7 +385,7 @@ def check_transform_on_handles(
     if valid_for_empty:
         # try on empty inputs
         empty_map = {
-            k: v.iloc[range(0), :].reset_index(drop=True, inplace=False)
+            k: local_data_model.clean_copy(v.iloc[range(0), :])
             for k, v in data.items()
         }
         empty_res = ops.eval(empty_map)
@@ -401,12 +401,12 @@ def check_transform_on_handles(
             keys = [k for k in data.keys()]
             partial_maps = [
                 {
-                    keys[0]: data[keys[0]].reset_index(drop=True, inplace=False),
+                    keys[0]: local_data_model.clean_copy(data[keys[0]]),
                     keys[1]: data[keys[1]],
                 },
                 {
                     keys[0]: data[keys[0]],
-                    keys[1]: data[keys[1]].reset_index(drop=True, inplace=False),
+                    keys[1]: local_data_model.clean_copy(data[keys[1]]),
                 },
             ]
             for pm in partial_maps:

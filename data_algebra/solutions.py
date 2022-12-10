@@ -523,7 +523,8 @@ def replicate_rows_query(
     assert power_key_colname != count_column_name
     assert power_key_colname not in d.column_names
     # get a pandas namespace
-    pd = data_algebra.data_model.default_data_model().pd
+    local_data_model = data_algebra.data_model.default_data_model()
+    pd = local_data_model.pd
     # build powers of 2 until max_count is met or exceeded
     powers = list(range(int(numpy.ceil(numpy.log(max_count) / numpy.log(2))) + 1))
     # replicate each power the number of times it specifies
@@ -538,7 +539,7 @@ def replicate_rows_query(
             for p in powers
         ]
     )
-    count_frame.reset_index(drop=True, inplace=True)
+    local_data_model.clean_copy(count_frame)
     # specify ops that produce row replicates
     ops = (
         d

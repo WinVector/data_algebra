@@ -174,7 +174,7 @@ class BigQueryModel(data_algebra.db_model.DBModel):
             q = str(q)
         assert isinstance(q, str)
         r = self.local_data_model.pd.DataFrame(conn.query(q).result().to_dataframe())
-        r.reset_index(drop=True, inplace=True)
+        self.local_data_model.clean_copy(r)
         return r.copy()  # fresh copy
 
     def insert_table(

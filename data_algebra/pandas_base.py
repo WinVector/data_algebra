@@ -467,7 +467,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             raise ValueError("missing required columns: " + str(missing))
         # make an index-free copy of the data to isolate side-effects and not deal with indices
         res = df.loc[:, columns_using]
-        res = res.reset_index(drop=True, inplace=False)  # copy and clear out indices
+        res = self.clean_copy(res)
         return res
 
     def _sql_proxy_step(self, op, *, data_map: dict):
@@ -496,7 +496,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         if len(cols) < 1:
             # all scalars, so nothing carrying index information
             if target_rows is not None:
-                return self.pd.DataFrame({}, index=range(target_rows)).reset_index(drop=True, inplace=False)
+                return self.clean_copy(self.pd.DataFrame({}, index=range(target_rows)))
             else:
                 return self.pd.DataFrame({})
         was_all_scalars = True
