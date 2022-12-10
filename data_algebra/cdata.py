@@ -36,6 +36,7 @@ class RecordSpecification:
         """
         if local_data_model is None:
             local_data_model = data_algebra.data_model.default_data_model()
+        assert isinstance(local_data_model, data_algebra.data_model.DataModel)
         control_table = control_table.reset_index(inplace=False, drop=True)
         if control_table.shape[0] < 1:
             raise ValueError("control table should have at least 1 row")
@@ -179,180 +180,6 @@ class RecordSpecification:
         return RecordMap(blocks_out=self)
 
 
-def blocks_to_rowrecs(data, *, blocks_in: RecordSpecification, local_data_model=None):
-    """
-    Convert a block record (record spanning multiple rows) into a rowrecord (record in a single row).
-
-    :param data: data frame to be transformed
-    :param blocks_in: record specification
-    :param local_data_model: pandas model.
-    :return: transformed data frame
-    """
-    assert isinstance(blocks_in, RecordSpecification)
-    ck = [k for k in blocks_in.content_keys if k is not None]
-    if len(ck) != len(set(ck)):
-        raise ValueError("blocks_in can not have duplicate content keys")
-    if local_data_model is None:
-        local_data_model = data_algebra.data_model.default_data_model()
-    data = data.reset_index(drop=True)
-    missing_cols = set(blocks_in.control_table_keys).union(blocks_in.record_keys) - set(
-        data.columns
-    )
-    if len(missing_cols) > 0:
-        raise KeyError("missing required columns: " + str(missing_cols))
-    # table must be keyed by record_keys + control_table_keys
-    if not data_algebra.util.table_is_keyed_by_columns(
-        data, blocks_in.record_keys + blocks_in.control_table_keys
-    ):
-        raise ValueError(
-            "table is not keyed by blocks_in.record_keys + blocks_in.control_table_keys"
-        )
-    # convert to row-records
-    # regularize/complete records
-    dtemp = data.copy()  # TODO: select down columns
-    dtemp["FALSE_AGG_KEY"] = 1
-    if len(blocks_in.record_keys) > 0:
-        ideal = dtemp[blocks_in.record_keys + ["FALSE_AGG_KEY"]].copy()
-        res = ideal.groupby(blocks_in.record_keys, observed=True)["FALSE_AGG_KEY"].agg("sum")
-        ideal = local_data_model.data_frame(res).reset_index(drop=False)
-        ideal["FALSE_AGG_KEY"] = 1
-        ctemp = blocks_in.control_table[blocks_in.control_table_keys].copy()
-        ctemp["FALSE_AGG_KEY"] = 1
-        ideal = ideal.merge(ctemp, how="outer", on="FALSE_AGG_KEY")
-        ideal = ideal.reset_index(drop=True)
-        dtemp = ideal.merge(
-            right=dtemp,
-            how="left",
-            on=blocks_in.record_keys + blocks_in.control_table_keys + ["FALSE_AGG_KEY"],
-        )
-    dtemp.sort_values(
-        by=blocks_in.record_keys + blocks_in.control_table_keys, inplace=True
-    )
-    dtemp = dtemp.reset_index(drop=True)
-    # start building up result frame
-    if len(blocks_in.record_keys) > 0:
-        res = dtemp.groupby(blocks_in.record_keys, observed=True)["FALSE_AGG_KEY"].agg("sum")
-    else:
-        res = dtemp.groupby("FALSE_AGG_KEY", observed=True)["FALSE_AGG_KEY"].agg("sum")
-    res = local_data_model.data_frame(res).reset_index(drop=False)
-    res.sort_values(by=blocks_in.record_keys, inplace=True)
-    res = local_data_model.data_frame(res).reset_index(drop=True)
-    del res["FALSE_AGG_KEY"]
-    # now fill in columns
-    ckeys = blocks_in.control_table_keys
-    value_keys = [k for k in blocks_in.control_table.columns if k not in set(ckeys)]
-    donor_cols = set(dtemp.columns)
-    for i in range(blocks_in.control_table.shape[0]):
-        want = numpy.ones((dtemp.shape[0],), dtype=bool)
-        for ck in ckeys:
-            want = numpy.logical_and(want, dtemp[ck] == blocks_in.control_table[ck][i])
-        if numpy.any(want):
-            for vk in value_keys:
-                if vk in donor_cols:
-                    dcol = blocks_in.control_table[vk][i]
-                    res[dcol] = numpy.asarray(dtemp.loc[want, vk])
-    # fill in any missed columns
-    colset = set(res.columns)
-    for c in blocks_in.row_version():
-        if c not in colset:
-            res[c] = None
-    if data.shape[0] <= 0:
-        res = res.loc[range(0), :]
-        res = res.reset_index(inplace=False, drop=True)
-    return res
-
-
-def rowrecs_to_blocks(
-    data,
-    *,
-    blocks_out: RecordSpecification,
-    check_blocks_out_keying: bool = False,
-    local_data_model=None
-):
-    """
-    Convert rowrecs (single row records) into block records (multiple row records).
-
-    :param data: data frame to transform.
-    :param blocks_out: record specification.
-    :param check_blocks_out_keying: logical, if True confirm keying
-    :param local_data_model: pandas data model
-    :return: transformed data frame
-    """
-    assert isinstance(blocks_out, RecordSpecification)
-    if local_data_model is None:
-        local_data_model = data_algebra.data_model.default_data_model()
-    data = data.reset_index(drop=True)
-    missing_cols = set(blocks_out.record_keys) - set(data.columns)
-    if len(missing_cols) > 0:
-        raise KeyError("missing required columns: " + str(missing_cols))
-    if check_blocks_out_keying:
-        # prefer table be keyed by record_keys
-        if not data_algebra.util.table_is_keyed_by_columns(
-            data, blocks_out.record_keys
-        ):
-            raise ValueError("table is not keyed by blocks_out.record_keys")
-    # convert to block records, first build up parallel structures
-    rv = [k for k in blocks_out.row_version(include_record_keys=True) if k is not None]
-    if len(rv) != len(set(rv)):
-        raise ValueError("duplicate row columns")
-    dtemp_cols = [
-        k
-        for k in rv
-        if k is not None and k in set(blocks_out.record_keys + blocks_out.content_keys)
-    ]
-    dtemp = data[dtemp_cols].copy()
-    dtemp.sort_values(by=blocks_out.record_keys, inplace=True)
-    dtemp = dtemp.reset_index(drop=True)
-    if len(dtemp.columns) != len(set(dtemp.columns)):
-        raise ValueError("targeted data columns not unique")
-    ctemp = blocks_out.control_table.copy()
-    dtemp["FALSE_JOIN_KEY"] = 1
-    ctemp["FALSE_JOIN_KEY"] = 1
-    res = dtemp[blocks_out.record_keys + ["FALSE_JOIN_KEY"]].merge(
-        ctemp, how="outer", on=["FALSE_JOIN_KEY"]
-    )
-    del res["FALSE_JOIN_KEY"]
-    ckeys = blocks_out.control_table_keys
-    res.sort_values(by=blocks_out.record_keys + ckeys, inplace=True)
-    res = res.reset_index(drop=True)
-    del ctemp["FALSE_JOIN_KEY"]
-    del dtemp["FALSE_JOIN_KEY"]
-    value_keys = [k for k in ctemp.columns if k not in set(ckeys)]
-    donor_cols = set(dtemp.columns)
-    for vk in value_keys:
-        res[vk] = None
-    # we now have parallel structures to copy between
-    for i in range(ctemp.shape[0]):
-        want = numpy.ones((res.shape[0],), dtype=bool)
-        for ck in ckeys:
-            want = numpy.logical_and(want, res[ck] == ctemp[ck][i])
-        if numpy.any(want):
-            for vk in value_keys:
-                dcol = ctemp[vk][i]
-                if dcol in donor_cols:
-                    nvals = numpy.asarray(dtemp[dcol])
-                    if len(nvals) < 1:
-                        nvals = [None] * numpy.sum(want)
-                    if numpy.all(want):
-                        res[vk] = nvals  # get around Pandas future warning
-                    else:
-                        res.loc[want, vk] = nvals
-    # see about promoting composite columns to numeric
-    for vk in set(value_keys):
-        converted = local_data_model.to_numeric(res[vk], errors="coerce")
-        if numpy.all(
-            local_data_model.isnull(converted) == local_data_model.isnull(res[vk])
-        ):
-            res[vk] = converted
-    if data.shape[0] < 1:
-        # empty input produces emtpy output (with different column structure)
-        res = res.iloc[range(0), :].reset_index(inplace=False, drop=True)
-    if data.shape[0] <= 0:
-        res = res.loc[range(0), :]
-        res = res.reset_index(inplace=False, drop=True)
-    return res
-
-
 class RecordMap:
     """
     Class for specifying general record to record transforms.
@@ -434,6 +261,7 @@ class RecordMap:
         """
         if local_data_model is None:
             local_data_model = data_algebra.data_model.default_data_model()
+        assert isinstance(local_data_model, data_algebra.data_model.DataModel)
         if self.blocks_in is not None:
             example = self.blocks_in.control_table.copy()
             nrow = example.shape[0]
@@ -464,17 +292,17 @@ class RecordMap:
             raise ValueError("missing required columns: " + str(unknown))
         if local_data_model is None:
             local_data_model = data_algebra.data_model.default_data_model()
+        assert isinstance(local_data_model, data_algebra.data_model.DataModel)
         X = X.reset_index(drop=True)
         if self.blocks_in is not None:
-            X = blocks_to_rowrecs(
-                X, blocks_in=self.blocks_in, local_data_model=local_data_model
+            X = local_data_model.blocks_to_rowrecs(
+                X, blocks_in=self.blocks_in
             )
         if self.blocks_out is not None:
-            X = rowrecs_to_blocks(
+            X = local_data_model.rowrecs_to_blocks(
                 X,
                 blocks_out=self.blocks_out,
                 check_blocks_out_keying=check_blocks_out_keying,
-                local_data_model=local_data_model,
             )
         return X
 
@@ -531,15 +359,6 @@ class RecordMap:
                         control_table_keys=s2.blocks_out.control_table_keys,
                     ),
                 )
-
-    # noinspection PyTypeChecker
-    def __rrshift__(self, other):  # override other >> self
-        if other is None:
-            return self
-        if isinstance(other, RecordMap):
-            # (data >> other) >> self == data >> (other >> self)
-            return self.compose(other)
-        return self.transform(other)
 
     def inverse(self):
         """
@@ -654,6 +473,7 @@ def pivot_blocks_to_rowrecs(
 
     if local_data_model is None:
         local_data_model = data_algebra.data_model.default_data_model()
+    assert isinstance(local_data_model, data_algebra.data_model.DataModel)
     control_table = local_data_model.data_frame(
         {
             attribute_key_column: record_value_columns,
@@ -690,6 +510,7 @@ def pivot_rowrecs_to_blocks(
 
     if local_data_model is None:
         local_data_model = data_algebra.data_model.default_data_model()
+    assert isinstance(local_data_model, data_algebra.data_model.DataModel)
     control_table = local_data_model.data_frame(
         {
             attribute_key_column: record_value_columns,

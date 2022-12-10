@@ -166,6 +166,7 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         2: impl_map_2,
         3: impl_map_3,
     }
+    # could also key the map by grouped, partitioned, regular situation
     return impl_map
 
 
@@ -220,6 +221,12 @@ class PolarsModel(data_algebra.data_model.DataModel):
         Check if df is our type of data frame.
         """
         return isinstance(df, pl.DataFrame) or isinstance(df, pl.LazyFrame)
+    
+    def bad_column_positions(self, x):
+        """
+        Return vector indicating which entries are bad (null or nan) (vectorized).
+        """
+        raise ValueError("not implemented, yet")  # TODO: implement
 
     # evaluate
 
@@ -518,6 +525,36 @@ class PolarsModel(data_algebra.data_model.DataModel):
             res = res.lazy()
         res = res.select(op.columns_produced())
         return res
+    
+    # cdata transforms
+
+    def blocks_to_rowrecs(self, data, *, blocks_in):
+        """
+        Convert a block record (record spanning multiple rows) into a rowrecord (record in a single row).
+
+        :param data: data frame to be transformed
+        :param blocks_in: cdata record specification
+        :return: transformed data frame
+        """
+        raise ValueError("not implemented, yet")  # TODO: implement
+
+    
+    def rowrecs_to_blocks(
+        self,
+        data,
+        *,
+        blocks_out,
+        check_blocks_out_keying: bool = False,
+    ):
+        """
+        Convert rowrecs (single row records) into block records (multiple row records).
+
+        :param data: data frame to transform.
+        :param blocks_out: cdata record specification.
+        :param check_blocks_out_keying: logical, if True confirm keying
+        :return: transformed data frame
+        """
+        raise ValueError("not implemented, yet")  # TODO: implement
     
     # expression helpers
     

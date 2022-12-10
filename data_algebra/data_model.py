@@ -36,6 +36,12 @@ class DataModel(abc.ABC):
         Check if df is our type of data frame.
         """
 
+    @abc.abstractmethod
+    def bad_column_positions(self, x):
+        """
+        Return vector indicating which entries are bad (null or nan) (vectorized).
+        """
+
     # evaluate
 
     @abc.abstractmethod
@@ -46,6 +52,35 @@ class DataModel(abc.ABC):
         :param op: ViewRepresentation to evaluate
         :param data_map: dictionary mapping table and view names to data frames
         :return: data frame result
+        """
+    
+    # cdata transform methods
+
+    @abc.abstractmethod
+    def blocks_to_rowrecs(self, data, *, blocks_in):
+        """
+        Convert a block record (record spanning multiple rows) into a rowrecord (record in a single row).
+
+        :param data: data frame to be transformed
+        :param blocks_in: cdata record specification
+        :return: transformed data frame
+        """
+    
+    @abc.abstractmethod
+    def rowrecs_to_blocks(
+        self,
+        data,
+        *,
+        blocks_out,
+        check_blocks_out_keying: bool = False,
+    ):
+        """
+        Convert rowrecs (single row records) into block records (multiple row records).
+
+        :param data: data frame to transform.
+        :param blocks_out: cdata record specification.
+        :param check_blocks_out_keying: logical, if True confirm keying
+        :return: transformed data frame
         """
     
     # expression helpers
