@@ -5,7 +5,7 @@ Adapter to use Polars ( https://www.pola.rs ) in the data algebra.
 Note: fully not implemented yet.
 """
 
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Optional
 
 import polars as pl
 
@@ -276,7 +276,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
             )
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
         res = res.to_pandas()  # TODO: new Pandas/Polars re-impl of cdata
-        res = op.record_map.transform(res, local_data_model=data_algebra.data_model.data_model_type_map["default_data_model"])
+        res = op.record_map.transform(res, local_data_model=data_algebra.data_model.default_data_model())
         res = pl.DataFrame(res)
         return res
     
@@ -554,7 +554,14 @@ class PolarsModel(data_algebra.data_model.DataModel):
         return PolarsTerm(polars_term=res, is_literal=False)
 
 
-def register_polars_model():
+def register_polars_model(key:Optional[str] = None):
     # register data model
-    default_Polars_model = PolarsModel()
-    data_algebra.data_model.data_model_type_map[str(type(default_Polars_model.data_frame()))] = default_Polars_model
+    common_key = "default_Polars_model"
+    if common_key not in data_algebra.data_model.data_model_type_map.keys():
+        pd_model = PolarsModel()
+        data_algebra.data_model.data_model_type_map[common_key] = pd_model
+        data_algebra.data_model.data_model_type_map["<class 'polars.internals.dataframe.frame.DataFrame'>"] = pd_model
+        data_algebra.data_model.data_model_type_map[str(type(pd_model.data_frame()))] = pd_model
+        if key is not None:
+            assert isinstance(key, str)
+            data_algebra.data_model.data_model_type_map[key] = pd_model

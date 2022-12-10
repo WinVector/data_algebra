@@ -4,11 +4,8 @@ Interface for realizing the data algebra as a sequence of steps over an object.
 
 
 import abc
+import re
 from typing import Any, Dict, List
-
-
-# map type name strings to data models
-data_model_type_map = dict()
 
 
 class DataModel(abc.ABC):
@@ -82,3 +79,27 @@ class DataModel(abc.ABC):
         :param op: operator to apply
         :return: converted result
         """
+
+
+# map type name strings to data models
+data_model_type_map = dict()
+
+def default_data_model() -> DataModel:
+    """Get the default (Pandas) data model"""
+    return data_model_type_map["default_data_model"]
+
+polars_regexp = re.compile(r".*[^a-zA-Z]polars[^a-zA-Z].*[^a-zA-z]dataframe[^a-zA-Z].*")
+assert polars_regexp.match("<class 'polars.internals.dataframe.frame.DataFrame'>") is not None
+
+def lookup_data_model_for_key(key: str) -> DataModel:
+    assert isinstance(key, str)
+    if polars_regexp.match(key.lower()) is not None:
+        import data_algebra.polars_model
+        data_algebra.polars_model.register_polars_model(key)
+    return data_model_type_map[key]
+
+def lookup_data_model_for_dataframe(d) -> DataModel:
+    key = str(type(d))
+    res = lookup_data_model_for_key(key)
+    assert res.is_appropriate_data_instance(d)
+    return res

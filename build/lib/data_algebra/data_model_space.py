@@ -20,7 +20,7 @@ class DataModelSpace(data_algebra.data_space.DataSpace):
         """
         super().__init__()
         if data_model is None:
-            data_model = data_algebra.data_model.data_model_type_map["default_data_model"]
+            data_model = data_algebra.data_model.default_data_model()
         assert isinstance(data_model, data_algebra.data_model.DataModel)
         self.data_model = data_model
         self.data_map = dict()

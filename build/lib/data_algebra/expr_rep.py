@@ -1259,7 +1259,7 @@ def _can_find_method_by_name(op):
         return True
     # check user fns
     # first check chosen mappings
-    data_model = data_algebra.data_model.data_model_type_map["default_data_model"]  # just use default for checking defs
+    data_model = data_algebra.data_model.default_data_model()  # just use default for checking defs
     try:
         # noinspection PyUnusedLocal
         check_val = data_model.user_fun_map[op]  # for KeyError

@@ -42,7 +42,7 @@ def re_parse(ops):
         str1,
         globals(),
         {
-            "pd": data_algebra.data_model.data_model_type_map["default_data_model"].pd
+            "pd": data_algebra.data_model.default_data_model().pd
         },  # make our definition of pandas available
     )
     return ops2
@@ -79,7 +79,7 @@ def equivalent_frames(
     Ignores indexing. None and nan are considered equivalent in numeric contexts."""
     # leave in extra checks as this is usually used by test code
     if local_data_model is None:
-        local_data_model = data_algebra.data_model.data_model_type_map["default_data_model"]
+        local_data_model = data_algebra.data_model.default_data_model()
     assert local_data_model.is_appropriate_data_instance(a)
     assert local_data_model.is_appropriate_data_instance(b)
     if a.shape != b.shape:
@@ -318,7 +318,7 @@ def check_transform_on_handles(
     n_tables = len(data)
     assert n_tables > 0
     if local_data_model is None:
-        local_data_model = data_algebra.data_model.data_model_type_map["default_data_model"]
+        local_data_model = data_algebra.data_model.default_data_model()
     assert isinstance(ops, ViewRepresentation)
     if not local_data_model.is_appropriate_data_instance(expect):
         raise TypeError("expected expect to be a local_data_model.pd.DataFrame")

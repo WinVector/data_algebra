@@ -114,22 +114,9 @@ the <code>rquery</code><a href="https://github.com/WinVector/rquery">https://git
 </span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="c1"># import for easy access for package users</span>
 </span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="kn">from</span> <span class="nn">data_algebra.data_ops</span> <span class="kn">import</span> <span class="n">TableDescription</span><span class="p">,</span> <span class="n">SQLNode</span><span class="p">,</span> <span class="n">describe_table</span><span class="p">,</span> <span class="n">descr</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ex</span>
 </span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a><span class="kn">from</span> <span class="nn">data_algebra.expr_rep</span> <span class="kn">import</span> <span class="n">lit</span><span class="p">,</span> <span class="n">col</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a><span class="kn">import</span> <span class="nn">data_algebra.pandas_model</span>
 </span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>
-</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a><span class="c1"># ready our data models</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>
-</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a><span class="k">def</span> <span class="nf">_register_data_models</span><span class="p">():</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>    <span class="kn">import</span> <span class="nn">data_algebra.pandas_model</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>    <span class="n">data_algebra</span><span class="o">.</span><span class="n">pandas_model</span><span class="o">.</span><span class="n">register_pandas_model</span><span class="p">()</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">data_model_type_map</span><span class="p">[</span><span class="s2">&quot;default_data_model&quot;</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">pandas_model</span><span class="o">.</span><span class="n">PandasModel</span><span class="p">)</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>    <span class="k">try</span><span class="p">:</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>        <span class="kn">import</span> <span class="nn">data_algebra.polars_model</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>        <span class="n">data_algebra</span><span class="o">.</span><span class="n">polars_model</span><span class="o">.</span><span class="n">register_polars_model</span><span class="p">()</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>    <span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a>        <span class="k">pass</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>
-</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a><span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">data_model_type_map</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>    <span class="n">_register_data_models</span><span class="p">()</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a><span class="n">data_algebra</span><span class="o">.</span><span class="n">pandas_model</span><span class="o">.</span><span class="n">register_pandas_model</span><span class="p">()</span>
 </span></pre></div>
 
 
