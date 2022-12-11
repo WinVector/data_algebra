@@ -37,13 +37,13 @@ setuptools.setup(
         'PostgreSQL': ['sqlalchemy', 'psycopg2'],
         'MySQL': ['sqlalchemy', 'pymysql'],
         'Spark': ['pyspark'],
-        'Polars': ['polars'],
+        'Polars': ['polars', 'pyarrow'],
         'all': ['black',
                 'google.cloud', 'pyarrow', 'google-cloud-bigquery',
                 'sqlalchemy', 'psycopg2',
                 'pymysql',
                 'pyspark',
-                'polars'
+                'polars', 'pyarrow'
                 ],
     },
     platforms=['any'],

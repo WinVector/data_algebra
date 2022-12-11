@@ -94,7 +94,7 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "floor": lambda x: x.floor(),
         "format_date": lambda x: x.format_date(),
         "format_datetime": lambda x: x.format_datetime(),
-        "is_bad": lambda x: x.is_bad(),
+        "is_bad": lambda x: x.is_null(),  # TODO: need a different def for numeric v.s. char columns?
         "is_inf": lambda x: x.is_inf(),
         "is_nan": lambda x: x.is_nan(),
         "is_null": lambda x: x.is_null(),
