@@ -224,3 +224,26 @@ def test_polars_join():
             'z': ['a', 'b'],
         })
         assert data_algebra.test_util.equivalent_frames(res_polars.to_pandas(), expect.to_pandas())
+
+
+def test_polars_concat():
+    if have_polars:
+        d_a = pl.DataFrame({
+            'a': [1, 2],
+            'q': [3, 5],
+        })
+        d_b = pl.DataFrame({
+            'a': [1, 3],
+            'q': [7, 8],
+        })
+        ops = (
+            data_algebra.descr(d_a=d_a)
+                .concat_rows(data_algebra.descr(d_b=d_b))
+        )
+        res_polars = ops.eval({"d_a": d_a, "d_b": d_b})
+        expect = pl.DataFrame({
+            'a': [1, 2, 1, 3],
+            'q': [3, 5, 7, 8],
+            'source_name': ["a", "a", "b", "b"],
+        })
+        assert data_algebra.test_util.equivalent_frames(res_polars.to_pandas(), expect.to_pandas())

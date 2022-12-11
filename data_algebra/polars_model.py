@@ -293,6 +293,10 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 "op was supposed to be a data_algebra.data_ops.ConcatRowsNode"
             )
         inputs = [self._compose_polars_ops(s, data_map=data_map) for s in op.sources]
+        assert len(inputs) == 2
+        if op.id_column is not None:
+            inputs[0] = inputs[0].with_column(pl.lit(op.a_name).alias(op.id_column))
+            inputs[1] = inputs[1].with_column(pl.lit(op.b_name).alias(op.id_column))
         res = pl.concat(inputs, how="vertical")
         return res
     
