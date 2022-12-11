@@ -140,3 +140,40 @@ def test_polars_group_by():
         res = ops.transform(d)
         expect = pl.DataFrame({"y": ["a", "b"], "x": [1.5, 3.0]})
         assert data_algebra.test_util.equivalent_frames(res.to_pandas(), expect.to_pandas())
+
+
+def test_polars_logistic():
+    if have_polars:
+        # from Examples/Polars/PolarsLogisticExample.ipynb
+        d_polars = pl.DataFrame({
+            'subjectID':[1, 1, 2, 2],
+            'surveyCategory': [ "withdrawal behavior", "positive re-framing", "withdrawal behavior", "positive re-framing"],
+            'assessmentTotal': [5., 2., 3., 4.],
+            'irrelevantCol1': ['irrel1']*4,
+            'irrelevantCol2': ['irrel2']*4,
+        })
+        scale = 0.237
+        ops = (
+            data_algebra.descr(d=d_polars)
+                .extend({'probability': f'(assessmentTotal * {scale}).exp()'})
+                .extend({'total': 'probability.sum()'},
+                        partition_by='subjectID')
+                .extend({'probability': 'probability / total'})
+                .extend({'row_number': '(1).cumsum()'},
+                        partition_by=['subjectID'],
+                        order_by=['probability'], 
+                        reverse=['probability'])
+                .select_rows('row_number == 1')
+                .select_columns(['subjectID', 'surveyCategory', 'probability'])
+                .map_columns({'surveyCategory': 'diagnosis'})
+                .order_rows(["subjectID"])
+            )
+        res_polars = ops.transform(d_polars)
+        expect = pl.DataFrame(
+            {
+                "subjectID": [1, 2],
+                "diagnosis": ["withdrawal behavior", "positive re-framing"],
+                "probability": [0.670622, 0.558974],
+            }
+        )
+        assert data_algebra.test_util.equivalent_frames(res_polars.to_pandas(), expect.to_pandas(), float_tol=1.0e-3)

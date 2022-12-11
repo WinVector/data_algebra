@@ -32,20 +32,26 @@ def _raise_not_impl(nm: str):   # TODO: get rid of this
     raise ValueError(f" {nm} not implemented for Polars adapter, yet")
 
 
+_da_temp_one_column_name = "_da_temp_one_column"
+_da_temp_one_column = pl.lit(1).alias(_da_temp_one_column_name)
+
+
 def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
     """
     Map symbols to implementations.
     """
     # TODO: fill in more
     impl_map_0 = {
-        "count": lambda : _raise_not_impl("count"),  # TODO: implement
-        "_count": lambda : _raise_not_impl("_count"),  # TODO: implement
+        "count": lambda : _da_temp_one_column.cumsum(),  # ugly SQL def
+        "_count": lambda : _da_temp_one_column.cumsum(),  # ugly SQL def
+        "cumcount": lambda : _da_temp_one_column.cumsum(),  # ugly SQL def
+        "_cumcount": lambda : _da_temp_one_column.cumsum(),  # ugly SQL def
         "ngroup": lambda : _raise_not_impl("ngroup"),  # TODO: implement
         "_ngroup": lambda : _raise_not_impl("_ngroup"),  # TODO: implement
-        "row_number": lambda : _raise_not_impl("row_number"),  # TODO: implement
-        "_row_number": lambda : _raise_not_impl("_row_number"),  # TODO: implement
-        "size": lambda : _raise_not_impl("size"),  # TODO: implement
-        "_size": lambda : _raise_not_impl("_size"),  # TODO: implement
+        "row_number": lambda : _da_temp_one_column.cumsum(),
+        "_row_number": lambda : _da_temp_one_column.cumsum(),
+        "size": lambda : _da_temp_one_column.sum(),
+        "_size": lambda : _da_temp_one_column.sum(),
         "uniform": lambda : _raise_not_impl("uniform"),  # TODO: implement
         "_uniform": lambda : _raise_not_impl("_uniform"),  # TODO: implement
     }
@@ -297,6 +303,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
             raise TypeError("op was supposed to be a data_algebra.data_ops.ExtendNode")
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
         partition_by = op.partition_by
+        need_one_column = False
         temp_v_columns = []
         # see if we need to make partition non-empty
         if len(partition_by) <= 0:
@@ -308,11 +315,72 @@ class PolarsModel(data_algebra.data_model.DataModel):
             if op.windowed_situation:
                 # enforce is a simple v.f() expression
                 assert isinstance(opk, data_algebra.expr_rep.Expression)
-                assert len(opk.args) == 1
+                if len(opk.args) == 0:
+                    need_one_column = True
+                elif len(opk.args) == 1:
+                    assert isinstance(opk.args[0], (data_algebra.expr_rep.Value, data_algebra.expr_rep.ColumnReference))
+                    if isinstance(opk.args[0], data_algebra.expr_rep.Value):
+                        # promote value to column for uniformity of API
+                        v_name = f"_da_extend_temp_v_column_{len(temp_v_columns)}"
+                        temp_v_columns.append(pl.lit(opk.args[0].value).alias(v_name))
+                        opk = data_algebra.expr_rep.Expression(
+                            op=opk.op, 
+                            args=[data_algebra.expr_rep.ColumnReference(column_name=v_name)], 
+                            params=opk.params, 
+                            inline=opk.inline, 
+                            method=opk.method,
+                        )
+                else:
+                    raise ValueError(f"can't take {len(opk.args)} arity argument in windowed extend")
+            fld_k_container = opk.act_on(res, data_model=self)  # PolarsTerm
+            assert isinstance(fld_k_container, PolarsTerm)
+            fld_k = fld_k_container.polars_term
+            if op.windowed_situation:
+                fld_k = fld_k.over(partition_by)
+            produced_columns.append(fld_k.alias(k))
+        if need_one_column:
+            temp_v_columns.append(_da_temp_one_column)
+        if len(temp_v_columns) > 0:
+            res = res.with_columns(temp_v_columns)
+        if len(op.order_by) > 0:
+            order_cols = list(partition_by)
+            partition_set = set(partition_by)
+            for c in op.order_by:
+                if c not in partition_set:
+                    order_cols.append(c)
+            reversed_cols = [True if ci in set(op.reverse) else False for ci in op.order_by]
+            res = res.sort(by=op.order_by, reverse=reversed_cols)
+        res = res.with_columns(produced_columns)  
+        if len(temp_v_columns) > 0:
+            res = res.select(op.columns_produced())
+        return res
+
+    def _project_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
+        """
+        Execute a project step, returning a data frame.
+        """
+        if op.node_name != "ProjectNode":
+            raise TypeError("op was supposed to be a data_algebra.data_ops.ProjectNode")
+        res = self._compose_polars_ops(op.sources[0], data_map=data_map)
+        group_by = op.group_by
+        need_one_column = False
+        temp_v_columns = []
+        # see if we need to make group_by non-empty
+        if len(group_by) <= 0:
+            v_name = f"_da_project_temp_group_by_column"
+            group_by = [v_name]
+            temp_v_columns.append(pl.lit(1).alias(v_name))
+        produced_columns = []
+        for k, opk in op.ops.items():
+            # enforce is a simple v.f() expression
+            assert isinstance(opk, data_algebra.expr_rep.Expression)
+            if len(opk.args) == 0:
+                need_one_column = True
+            elif len(opk.args) == 1:
                 assert isinstance(opk.args[0], (data_algebra.expr_rep.Value, data_algebra.expr_rep.ColumnReference))
                 if isinstance(opk.args[0], data_algebra.expr_rep.Value):
                     # promote value to column for uniformity of API
-                    v_name = f"_da_extend_temp_v_column_{len(temp_v_columns)}"
+                    v_name = f"_da_project_temp_v_column_{len(temp_v_columns)}"
                     temp_v_columns.append(pl.lit(opk.args[0].value).alias(v_name))
                     opk = data_algebra.expr_rep.Expression(
                         op=opk.op, 
@@ -321,26 +389,19 @@ class PolarsModel(data_algebra.data_model.DataModel):
                         inline=opk.inline, 
                         method=opk.method,
                     )
+            else:
+                raise ValueError(f"can't take {len(opk.args)} arity argument in project")
             fld_k_container = opk.act_on(res, data_model=self)  # PolarsTerm
             assert isinstance(fld_k_container, PolarsTerm)
             fld_k = fld_k_container.polars_term
-            if op.windowed_situation:
-                fld_k = fld_k.over(partition_by)
             produced_columns.append(fld_k.alias(k))
-        if len(produced_columns) > 0:
-            if len(op.order_by) > 0:
-                order_cols = list(partition_by)
-                partition_set = set(partition_by)
-                for c in op.order_by:
-                    if c not in partition_set:
-                        order_cols.append(c)
-                reversed_cols = [True if ci in set(op.reverse) else False for ci in op.order_by]
-                res = res.sort(by=op.order_by, reverse=reversed_cols)
-            if len(temp_v_columns) > 0:
-                res = res.with_columns(temp_v_columns)
-            res = res.with_columns(produced_columns)  
-            if len(temp_v_columns) > 0:
-                res = res.select(op.columns_produced())
+        if need_one_column:
+            temp_v_columns.append(_da_temp_one_column)
+        if len(temp_v_columns) > 0:
+            res = res.with_columns(temp_v_columns)
+        res = res.groupby(group_by).agg(produced_columns)
+        if len(temp_v_columns) > 0:
+            res = res.select(op.columns_produced())
         return res
     
     def _natural_join_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
@@ -385,48 +446,6 @@ class PolarsModel(data_algebra.data_model.DataModel):
         res = res.sort(by=op.order_columns, reverse=reversed_cols)
         if op.limit is not None:
             res = res.head(op.limit)
-        return res
-
-    def _project_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
-        """
-        Execute a project step, returning a data frame.
-        """
-        if op.node_name != "ProjectNode":
-            raise TypeError("op was supposed to be a data_algebra.data_ops.ProjectNode")
-        res = self._compose_polars_ops(op.sources[0], data_map=data_map)
-        group_by = op.group_by
-        temp_v_columns = []
-        # see if we need to make group_by non-empty
-        if len(group_by) <= 0:
-            v_name = f"_da_project_temp_group_by_column"
-            group_by = [v_name]
-            temp_v_columns.append(pl.lit(1).alias(v_name))
-        produced_columns = []
-        for k, opk in op.ops.items():
-            # enforce is a simple v.f() expression
-            assert isinstance(opk, data_algebra.expr_rep.Expression)
-            assert len(opk.args) == 1
-            assert isinstance(opk.args[0], (data_algebra.expr_rep.Value, data_algebra.expr_rep.ColumnReference))
-            if isinstance(opk.args[0], data_algebra.expr_rep.Value):
-                # promote value to column for uniformity of API
-                v_name = f"_da_project_temp_v_column_{len(temp_v_columns)}"
-                temp_v_columns.append(pl.lit(opk.args[0].value).alias(v_name))
-                opk = data_algebra.expr_rep.Expression(
-                    op=opk.op, 
-                    args=[data_algebra.expr_rep.ColumnReference(column_name=v_name)], 
-                    params=opk.params, 
-                    inline=opk.inline, 
-                    method=opk.method,
-                )
-            fld_k_container = opk.act_on(res, data_model=self)  # PolarsTerm
-            assert isinstance(fld_k_container, PolarsTerm)
-            fld_k = fld_k_container.polars_term
-            produced_columns.append(fld_k.alias(k))
-        if len(temp_v_columns) > 0:
-            res = res.with_columns(temp_v_columns)
-        res = res.groupby(group_by).agg(produced_columns)
-        if len(temp_v_columns) > 0:
-            res = res.select(op.columns_produced())
         return res
 
     def _rename_columns_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
