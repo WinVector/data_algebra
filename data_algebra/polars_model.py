@@ -418,10 +418,10 @@ class PolarsModel(data_algebra.data_model.DataModel):
             inputs[1],
             left_on=op.on_a,
             right_on=op.on_b,
-            how=op.jointype,
+            how=op.jointype.lower(),
             suffix = "_da_right_tmp",
         )
-        coalesce_columns = set(op.sources[0].columns_produced()).intersection(op.sources[1].columns_produced())
+        coalesce_columns = set(op.sources[0].columns_produced()).intersection(op.sources[1].columns_produced()) - set(op.on_a)
         if len(coalesce_columns) > 0:
             res = res.with_columns([
                 pl.when(pl.col(c).is_null())

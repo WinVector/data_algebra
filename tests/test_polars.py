@@ -177,3 +177,50 @@ def test_polars_logistic():
             }
         )
         assert data_algebra.test_util.equivalent_frames(res_polars.to_pandas(), expect.to_pandas(), float_tol=1.0e-3)
+
+
+def test_polars_project():
+    if have_polars:
+        d_polars = pl.DataFrame({
+            'subjectID':[1, 1, 2, 2],
+            'assessmentTotal': [5., 2., 3., -4.],
+        })
+        ops = (
+            data_algebra.descr(d=d_polars)
+                .project({"tot": "assessmentTotal.sum()"}, group_by=["subjectID"])
+        )
+        res_polars = ops.transform(d_polars)
+        expect = pl.DataFrame(
+            {
+                "subjectID": [1, 2],
+                "tot": [7., -1.],
+            }
+        )
+        assert data_algebra.test_util.equivalent_frames(res_polars.to_pandas(), expect.to_pandas())
+
+
+def test_polars_join():
+    if have_polars:
+        d_a = pl.DataFrame({
+            'a': [1, 2],
+            'q': [3, 5],
+        })
+        d_b = pl.DataFrame({
+            'a': [1, 2],
+            'z': ['a', 'b'],
+        })
+        ops = (
+            data_algebra.descr(d_a=d_a)
+                .natural_join(
+                    data_algebra.descr(d_b=d_b),
+                    on=["a"],
+                    jointype='left'
+                )
+        )
+        res_polars = ops.eval({"d_a": d_a, "d_b": d_b})
+        expect = pl.DataFrame({
+            'a': [1, 2],
+            'q': [3, 5],
+            'z': ['a', 'b'],
+        })
+        assert data_algebra.test_util.equivalent_frames(res_polars.to_pandas(), expect.to_pandas())
