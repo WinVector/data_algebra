@@ -284,6 +284,9 @@ def test_polars_project_max_str():
         })
         # d.groupby(["g"]).agg([pl.col("v").min().alias("v_min"), pl.col("v").max().alias("v_max")])
         # returns nulls
+        # known Polars bug:
+        # https://stackoverflow.com/q/74763636/6901725
+        # https://github.com/pola-rs/polars/issues/5735
         ops = (
             data_algebra.descr(d=d)
                             .project(
