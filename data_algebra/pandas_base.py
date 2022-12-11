@@ -394,7 +394,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         Drop indices in place.
         """
         assert self.is_appropriate_data_instance(df)
-        return df.reset_index(drop=True, inplace=True)
+        df.reset_index(drop=True, inplace=True)
 
     def can_convert_col_to_numeric(self, x):
         """
