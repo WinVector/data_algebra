@@ -388,6 +388,13 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         """
         assert self.is_appropriate_data_instance(df)
         return df.reset_index(drop=True, inplace=False)
+    
+    def drop_indices(self, df) -> None:
+        """
+        Drop indices in place.
+        """
+        assert self.is_appropriate_data_instance(df)
+        return df.reset_index(drop=True, inplace=True)
 
     def can_convert_col_to_numeric(self, x):
         """
@@ -496,7 +503,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         if len(cols) < 1:
             # all scalars, so nothing carrying index information
             if target_rows is not None:
-                return self.clean_copy(self.pd.DataFrame({}, index=range(target_rows)))
+                res = self.pd.DataFrame({}, index=range(target_rows))
+                self.drop_indices(res)
+                return res
             else:
                 return self.pd.DataFrame({})
         was_all_scalars = True
