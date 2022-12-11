@@ -41,6 +41,12 @@ class DataModel(abc.ABC):
         """
         Copy of data frame without indices.
         """
+    
+    @abc.abstractmethod
+    def drop_indices(self, df) -> None:
+        """
+        Drop indices in place.
+        """
 
     @abc.abstractmethod
     def bad_column_positions(self, x):

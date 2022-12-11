@@ -238,6 +238,13 @@ class PolarsModel(data_algebra.data_model.DataModel):
             df = df.collect()
         return df
     
+    def drop_indices(self, df) -> None:
+        """
+        Drop indices in place.
+        """
+        assert self.is_appropriate_data_instance(df)
+        # no operation needed
+    
     def bad_column_positions(self, x):
         """
         Return vector indicating which entries are bad (null or nan) (vectorized).
