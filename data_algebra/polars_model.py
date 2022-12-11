@@ -5,7 +5,7 @@ Adapter to use Polars ( https://www.pola.rs ) in the data algebra.
 Note: fully not implemented yet.
 """
 
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Set
 
 import polars as pl
 
@@ -19,13 +19,58 @@ import data_algebra.connected_components
 
 class PolarsTerm:
     """
-    Class to carry Polars expression term and annotations.
+    Class to carry Polars expression term and annotations about expression tree.
     """
-    def __init__(self, *, polars_term, is_literal: bool) -> None:
+
+    polars_term: Any
+    is_literal: bool
+    is_column: bool
+    collect_required: bool = False  # property of tree, not node
+    one_constant_required: bool  # property of tree, not node
+
+    def __init__(
+        self, 
+        *, 
+        polars_term = None, 
+        is_literal: bool = False,
+        is_column: bool = False,
+        collect_required: bool = False,  # property of tree, not node
+        one_constant_required: bool = False,  # property of tree, not node
+        inputs: Optional[List] = None,
+        ) -> None:
+        """
+        Carry a Polars expression term (polars_term) plus annotations.
+
+        :param polars_term: Optional Polars expression (None means collect info, not a true term)
+        :param is_literal: True if term is a constant
+        :param is_column: True if term is a column name
+        :param collect_required: True if Polars frame collection required by this node or an input node
+        :param one_constant_required: True one constant required by this node or an input node
+        :param inputs: inputs to expression node
+        """
         assert isinstance(is_literal, bool)
-        assert polars_term is not None
+        assert isinstance(is_column, bool)
+        assert isinstance(collect_required, bool)
+        assert isinstance(one_constant_required, bool)
+        assert (is_literal + is_column + (inputs is not None) + (polars_term is None)) == 1
         self.polars_term = polars_term
         self.is_literal = is_literal
+        self.collect_required = collect_required
+        self.one_constant_required = one_constant_required
+        if inputs is not None:
+            assert isinstance(inputs, List)
+            for v in inputs:
+                self.observe(v)
+    
+    def observe(self, v) -> None:
+        """
+        Or conditions of v into our conditions
+        """
+        assert isinstance(v, PolarsTerm)
+        if v.collect_required:
+            self.collect_required = True
+        if v.one_constant_required:
+            self.one_constant_required = True
 
 
 def _raise_not_impl(nm: str):   # TODO: get rid of this
@@ -54,6 +99,12 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "_size": lambda : _da_temp_one_column.sum(),
         "uniform": lambda : _raise_not_impl("uniform"),  # TODO: implement
         "_uniform": lambda : _raise_not_impl("_uniform"),  # TODO: implement
+        # how to land new columns: https://github.com/pola-rs/polars/issues/3933#issuecomment-1179241568
+        # .with_column(
+        #  pl.Series(
+        #     name="random_nbr",
+        #     values=np.random.default_rng().uniform(0.0, 1.0, df.height),
+        # )
     }
     impl_map_1 = {
         "-": lambda x: 0 - x,
@@ -187,6 +238,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
     presentation_model_name: str
     _method_dispatch_table: Dict[str, Callable]
     _expr_impl_map: Dict[int, Dict[str, Callable]]
+    _collect_required: Set[str]
 
     def __init__(self, *, use_lazy_eval: bool = True):
         data_algebra.data_model.DataModel.__init__(
@@ -210,6 +262,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
             "TableDescription": self._table_step,
         }
         self._expr_impl_map = _populate_expr_impl_map()
+        self._collect_required = set()
 
     def data_frame(self, arg=None):
         """
@@ -314,7 +367,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
             raise TypeError("op was supposed to be a data_algebra.data_ops.ExtendNode")
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
         partition_by = op.partition_by
-        need_one_column = False
+        conditions_from_expressions = PolarsTerm()
         temp_v_columns = []
         # see if we need to make partition non-empty
         if len(partition_by) <= 0:
@@ -327,7 +380,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 # enforce is a simple v.f() expression
                 assert isinstance(opk, data_algebra.expr_rep.Expression)
                 if len(opk.args) == 0:
-                    need_one_column = True
+                    pass
                 elif len(opk.args) == 1:
                     assert isinstance(opk.args[0], (data_algebra.expr_rep.Value, data_algebra.expr_rep.ColumnReference))
                     if isinstance(opk.args[0], data_algebra.expr_rep.Value):
@@ -345,12 +398,14 @@ class PolarsModel(data_algebra.data_model.DataModel):
                     raise ValueError(f"can't take {len(opk.args)} arity argument in windowed extend")
             fld_k_container = opk.act_on(res, data_model=self)  # PolarsTerm
             assert isinstance(fld_k_container, PolarsTerm)
+            conditions_from_expressions.observe(fld_k_container)
             fld_k = fld_k_container.polars_term
             if op.windowed_situation:
                 fld_k = fld_k.over(partition_by)
             produced_columns.append(fld_k.alias(k))
-        if need_one_column:
+        if conditions_from_expressions.one_constant_required:
             temp_v_columns.append(_da_temp_one_column)
+        assert not conditions_from_expressions.collect_required  # implement if needed
         if len(temp_v_columns) > 0:
             res = res.with_columns(temp_v_columns)
         if len(op.order_by) > 0:
@@ -374,7 +429,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
             raise TypeError("op was supposed to be a data_algebra.data_ops.ProjectNode")
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
         group_by = op.group_by
-        need_one_column = False
+        conditions_from_expressions = PolarsTerm()
         temp_v_columns = []
         # see if we need to make group_by non-empty
         if len(group_by) <= 0:
@@ -386,7 +441,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
             # enforce is a simple v.f() expression
             assert isinstance(opk, data_algebra.expr_rep.Expression)
             if len(opk.args) == 0:
-                need_one_column = True
+                pass
             elif len(opk.args) == 1:
                 assert isinstance(opk.args[0], (data_algebra.expr_rep.Value, data_algebra.expr_rep.ColumnReference))
                 if isinstance(opk.args[0], data_algebra.expr_rep.Value):
@@ -404,10 +459,12 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 raise ValueError(f"can't take {len(opk.args)} arity argument in project")
             fld_k_container = opk.act_on(res, data_model=self)  # PolarsTerm
             assert isinstance(fld_k_container, PolarsTerm)
+            conditions_from_expressions.observe(fld_k_container)
             fld_k = fld_k_container.polars_term
             produced_columns.append(fld_k.alias(k))
-        if need_one_column:
+        if conditions_from_expressions.one_constant_required:
             temp_v_columns.append(_da_temp_one_column)
+        assert not conditions_from_expressions.collect_required  # implement if needed
         if len(temp_v_columns) > 0:
             res = res.with_columns(temp_v_columns)
         res = res.groupby(group_by).agg(produced_columns)
@@ -602,7 +659,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
         :return: arg acted on
         """
         assert isinstance(value, str)
-        return PolarsTerm(polars_term=pl.col(value), is_literal=False)
+        return PolarsTerm(polars_term=pl.col(value), is_column=True)
     
     def act_on_expression(self, *, arg, values: List, op):
         """
@@ -620,7 +677,12 @@ class PolarsModel(data_algebra.data_model.DataModel):
         f = self._expr_impl_map[len(values)][op.op]
         assert f is not None
         res = f(*[v.polars_term for v in values])
-        return PolarsTerm(polars_term=res, is_literal=False)
+        return PolarsTerm(
+            polars_term=res,
+            inputs=values,
+            one_constant_required=len(values) == 0,
+            collect_required=op.op in self._collect_required,
+        )
 
 
 def register_polars_model(key:Optional[str] = None):
