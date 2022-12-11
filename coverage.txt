@@ -2,7 +2,7 @@
 platform darwin -- Python 3.10.8, pytest-7.1.2, pluggy-1.0.0
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: anyio-3.5.0, cov-3.0.0
-collected 340 items
+collected 341 items
 
 tests/test_OrderedSet.py ......                                          [  1%]
 tests/test_agg.py ..                                                     [  2%]
@@ -10,7 +10,7 @@ tests/test_any_project.py ...                                            [  3%]
 tests/test_arith.py .                                                    [  3%]
 tests/test_arrow1.py ...                                                 [  4%]
 tests/test_bigquery_user_fns.py .                                        [  4%]
-tests/test_bitemporal_obs_agg_join.py .                                  [  5%]
+tests/test_bitemporal_obs_agg_join.py .                                  [  4%]
 tests/test_braid.py .                                                    [  5%]
 tests/test_calc_warnings_errors.py .                                     [  5%]
 tests/test_cc.py ....                                                    [  6%]
@@ -19,7 +19,7 @@ tests/test_cdata_convenience.py .                                        [  8%]
 tests/test_cdata_example.py ...                                          [  9%]
 tests/test_cdata_wvpy_case.py .                                          [  9%]
 tests/test_coalesce.py .                                                 [  9%]
-tests/test_cols_used.py .                                                [ 10%]
+tests/test_cols_used.py .                                                [  9%]
 tests/test_compare_data_frames.py .                                      [ 10%]
 tests/test_complex_expr.py ....                                          [ 11%]
 tests/test_compound_where.py .                                           [ 11%]
@@ -33,21 +33,21 @@ tests/test_db_model.py .                                                 [ 18%]
 tests/test_degenerate_project.py .                                       [ 18%]
 tests/test_drop_columns.py .                                             [ 18%]
 tests/test_dup_detection_example.py .                                    [ 19%]
-tests/test_eval_cache.py ...                                             [ 20%]
+tests/test_eval_cache.py ...                                             [ 19%]
 tests/test_ex_examples.py ............                                   [ 23%]
 tests/test_example1.py ....                                              [ 24%]
-tests/test_exp.py .                                                      [ 25%]
+tests/test_exp.py .                                                      [ 24%]
 tests/test_exp_parens.py .                                               [ 25%]
 tests/test_expand_rows.py .                                              [ 25%]
 tests/test_expr_parse.py .                                               [ 25%]
 tests/test_expression_expectations.py ..                                 [ 26%]
 tests/test_expression_expectations_polars.py .                           [ 26%]
 tests/test_extend.py ..........                                          [ 29%]
-tests/test_extend_order.py .                                             [ 30%]
+tests/test_extend_order.py .                                             [ 29%]
 tests/test_first_last.py .                                               [ 30%]
 tests/test_float_divide.py ...                                           [ 31%]
 tests/test_flow_text.py .                                                [ 31%]
-tests/test_forbidden_calculation.py ..                                   [ 32%]
+tests/test_forbidden_calculation.py ..                                   [ 31%]
 tests/test_forbidden_ops.py ...                                          [ 32%]
 tests/test_free_fn.py .                                                  [ 33%]
 tests/test_get_methods_used.py .                                         [ 33%]
@@ -57,23 +57,23 @@ tests/test_if_else.py .....                                              [ 40%]
 tests/test_if_else_return_type.py .                                      [ 40%]
 tests/test_incomplete_agg.py .                                           [ 40%]
 tests/test_join_check.py .                                               [ 41%]
-tests/test_join_conditions.py ...                                        [ 42%]
+tests/test_join_conditions.py ...                                        [ 41%]
 tests/test_join_effects.py .                                             [ 42%]
 tests/test_join_multi_key.py .                                           [ 42%]
 tests/test_join_opt.py .                                                 [ 42%]
 tests/test_join_variations.py .                                          [ 43%]
 tests/test_lark_parser.py .....                                          [ 44%]
-tests/test_locf.py .                                                     [ 45%]
+tests/test_locf.py .                                                     [ 44%]
 tests/test_logistic_example.py .                                         [ 45%]
 tests/test_mapv.py ..                                                    [ 45%]
 tests/test_math.py .                                                     [ 46%]
 tests/test_method_catalog_issues.py ..                                   [ 46%]
-tests/test_minimum.py .                                                  [ 47%]
+tests/test_minimum.py .                                                  [ 46%]
 tests/test_mod_fns.py ...                                                [ 47%]
 tests/test_multi_map.py .                                                [ 48%]
 tests/test_narrow.py .                                                   [ 48%]
 tests/test_natural_join.py ....                                          [ 49%]
-tests/test_neg.py .                                                      [ 50%]
+tests/test_neg.py .                                                      [ 49%]
 tests/test_null_bad.py ..                                                [ 50%]
 tests/test_one_row_cdata_convert.py .                                    [ 50%]
 tests/test_ops.py .                                                      [ 51%]
@@ -81,15 +81,15 @@ tests/test_ops_eq.py .                                                   [ 51%]
 tests/test_or.py .....                                                   [ 52%]
 tests/test_order_limit.py .                                              [ 53%]
 tests/test_ordered_agg_group.py .                                        [ 53%]
-tests/test_parens.py ..                                                  [ 54%]
+tests/test_parens.py ..                                                  [ 53%]
 tests/test_parse.py ..........................                           [ 61%]
-tests/test_polars.py ..........                                          [ 64%]
+tests/test_polars.py ...........                                         [ 64%]
 tests/test_project.py .....                                              [ 66%]
 tests/test_rank.py .                                                     [ 66%]
 tests/test_rank_to_average.py .                                          [ 66%]
 tests/test_ranked_example.py .                                           [ 67%]
 tests/test_readme_example.py .                                           [ 67%]
-tests/test_ref_detect.py ..                                              [ 67%]
+tests/test_ref_detect.py ..                                              [ 68%]
 tests/test_rename.py ......                                              [ 69%]
 tests/test_round.py ...                                                  [ 70%]
 tests/test_scalar_columns.py .                                           [ 70%]
@@ -103,7 +103,7 @@ tests/test_shift.py ..                                                   [ 75%]
 tests/test_shorten.py .                                                  [ 75%]
 tests/test_sign_parse.py ..                                              [ 76%]
 tests/test_simple.py ....                                                [ 77%]
-tests/test_simple_expr.py .                                              [ 77%]
+tests/test_simple_expr.py .                                              [ 78%]
 tests/test_simplification.py ..                                          [ 78%]
 tests/test_spark_sql.py ...                                              [ 79%]
 tests/test_sql_extend_shortening.py ..                                   [ 80%]
@@ -159,14 +159,14 @@ data_algebra/op_container.py             127     49    61%   46-47, 63-71, 80-81
 data_algebra/pandas_base.py              691     63    91%   53, 67, 76, 86, 96, 215, 217, 231, 234, 239, 244, 454, 460-467, 474, 505-510, 540, 544, 547, 549, 586, 640, 681, 698, 718, 736, 746, 761, 809, 817, 825, 840, 851, 863, 882, 897, 925, 940, 977, 994, 997, 1008, 1027, 1033, 1038, 1067, 1089, 1114, 1117-1120, 1124, 1134, 1233, 1247-1249
 data_algebra/pandas_model.py              15      0   100%
 data_algebra/parse_by_lark.py            164     24    85%   71, 93, 108, 129-130, 137, 161, 171, 185-186, 188, 200, 206, 213-217, 245, 253, 263-266
-data_algebra/polars_model.py             256     51    80%   32, 223, 235-239, 245, 252, 291-297, 303, 310, 326, 341, 349, 370, 377-379, 385, 400, 406, 419, 433-440, 448, 455, 462-468, 475, 481, 489, 509, 522-531, 538, 543, 561, 578
+data_algebra/polars_model.py             260     47    82%   32, 223, 235-239, 245, 252, 292, 307, 314, 330, 345, 353, 374, 381-383, 389, 404, 410, 423, 437-444, 452, 459, 466-472, 479, 485, 493, 513, 526-535, 542, 547, 565, 582
 data_algebra/python3_lark.py               1      0   100%
 data_algebra/solutions.py                136      4    97%   63, 303, 384, 467
 data_algebra/sql_format_options.py        15      2    87%   61, 69
 data_algebra/test_util.py                291     57    80%   88, 110, 120, 123, 127, 150, 153, 157, 159-162, 173, 230-231, 247-252, 256, 268, 270-278, 324, 327, 335, 346, 353, 357, 369, 380, 394, 465-468, 470-473, 475-478, 480-483, 557-562, 568-569, 572
 data_algebra/util.py                     140     31    78%   26, 51, 56, 61, 84-85, 88-89, 92-93, 96-97, 100-101, 104-105, 108-109, 112-113, 116-117, 120-121, 168, 190, 192, 207, 248, 252, 254
 --------------------------------------------------------------------
-TOTAL                                   6377    935    85%
+TOTAL                                   6381    931    85%
 
 
-======================= 340 passed in 782.02s (0:13:02) ========================
+======================= 341 passed in 817.90s (0:13:37) ========================
