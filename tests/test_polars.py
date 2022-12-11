@@ -236,8 +236,6 @@ def test_polars_concat():
             'a': [1, 3],
             'q': [7, 8],
         })
-        # d.groupby(["g"]).agg([pl.col("v").min().alias("v_min"), pl.col("v").max().alias("v_max")])
-        # returns correct answer
         ops = (
             data_algebra.descr(d_a=d_a)
                 .concat_rows(data_algebra.descr(d_b=d_b))
@@ -257,6 +255,8 @@ def test_polars_project_max_int():
             "g": ["a", "a", "b"],
             "v": [1, 2, 3],
         })
+        # d.groupby(["g"]).agg([pl.col("v").min().alias("v_min"), pl.col("v").max().alias("v_max")])
+        # returns correct answer
         ops = (
             data_algebra.descr(d=d)
                             .project(
