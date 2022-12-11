@@ -247,3 +247,28 @@ def test_polars_concat():
             'source_name': ["a", "a", "b", "b"],
         })
         assert data_algebra.test_util.equivalent_frames(res_polars.to_pandas(), expect.to_pandas())
+
+
+def test_polars_project_max():
+    if have_polars:
+        d = pl.DataFrame({
+            "g": ["a", "a", "b"],
+            "v": ["x", "y", "x"],
+        })
+        ops = (
+            data_algebra.descr(d=d)
+                            .project(
+                                {
+                                    "min_v": "v.min()",
+                                    "max_v": "v.max()",
+                                },
+                                group_by=["g"]
+                                )
+        )
+        res_polars = ops.transform(d)
+        expect = pl.DataFrame({
+            "g": ["a", "b"],
+            "min_v": ["x", "x"],
+            "max_v": ["y", "x"],
+        })
+        assert data_algebra.test_util.equivalent_frames(res_polars.to_pandas(), expect.to_pandas())
