@@ -119,12 +119,11 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "arctan": lambda x: x.arctan(),
         "arctan2": lambda x: x.arctan2(),
         "arctanh": lambda x: x.arctanh(),
-        "as_int64": lambda x: x.as_int64(),
-        "as_str": lambda x: x.as_str(),
+        "as_int64": lambda x: x.cast(int),
+        "as_str": lambda x: x.cast(str),
         "base_Sunday": lambda x: x.base_Sunday(),
         "bfill": lambda x: x.bfill(),
         "ceil": lambda x: x.ceil(),
-        "coalesce": lambda x: x.coalesce(0),
         "coalesce0": lambda x: x.coalesce(0),
         "cos": lambda x: x.cos(),
         "cosh": lambda x: x.cosh(),
@@ -159,8 +158,6 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "min": lambda x: x.min(),
         "month": lambda x: x.month(),
         "nunique": lambda x: x.nunique(),
-        "parse_date": lambda x: x.parse_date(),
-        "parse_datetime": lambda x: x.parse_datetime(),
         "quarter": lambda x: x.quarter(),
         "rank": lambda x: x.rank(),
         "round": lambda x: x.round(),
@@ -210,6 +207,12 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "not": lambda x: x == False,
         "~": lambda x: x == False,
         "!": lambda x: x == False,
+        # datetime parsing from https://stackoverflow.com/a/71759536/6901725
+        # TODO: figure out why format is wrong type
+        # TODO: wire up format
+        "parse_date": lambda x, format : x.cast(str).str.strptime(pl.Date, fmt="%Y-%m-%d", strict=False).cast(pl.Date),
+        # TODO: wire up format
+        "parse_datetime": lambda x, format : x.cast(str).str.strptime(pl.Datetime, strict=False).cast(pl.Datetime),
     }
     impl_map_3 = {
         "if_else": lambda a, b, c: pl.when(a).then(b).otherwise(c),

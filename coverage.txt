@@ -2,7 +2,7 @@
 platform darwin -- Python 3.10.8, pytest-7.1.2, pluggy-1.0.0
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: anyio-3.5.0, cov-3.0.0
-collected 343 items
+collected 344 items
 
 tests/test_OrderedSet.py ......                                          [  1%]
 tests/test_agg.py ..                                                     [  2%]
@@ -44,7 +44,7 @@ tests/test_expression_expectations.py ..                                 [ 26%]
 tests/test_expression_expectations_polars.py .                           [ 26%]
 tests/test_extend.py ..........                                          [ 29%]
 tests/test_extend_order.py .                                             [ 29%]
-tests/test_first_last.py .                                               [ 30%]
+tests/test_first_last.py .                                               [ 29%]
 tests/test_float_divide.py ...                                           [ 30%]
 tests/test_flow_text.py .                                                [ 31%]
 tests/test_forbidden_calculation.py ..                                   [ 31%]
@@ -71,26 +71,26 @@ tests/test_method_catalog_issues.py ..                                   [ 46%]
 tests/test_minimum.py .                                                  [ 46%]
 tests/test_mod_fns.py ...                                                [ 47%]
 tests/test_multi_map.py .                                                [ 47%]
-tests/test_narrow.py .                                                   [ 48%]
+tests/test_narrow.py .                                                   [ 47%]
 tests/test_natural_join.py ....                                          [ 49%]
 tests/test_neg.py .                                                      [ 49%]
 tests/test_null_bad.py ..                                                [ 50%]
 tests/test_one_row_cdata_convert.py .                                    [ 50%]
 tests/test_ops.py .                                                      [ 50%]
-tests/test_ops_eq.py .                                                   [ 51%]
+tests/test_ops_eq.py .                                                   [ 50%]
 tests/test_or.py .....                                                   [ 52%]
 tests/test_order_limit.py .                                              [ 52%]
-tests/test_ordered_agg_group.py .                                        [ 53%]
+tests/test_ordered_agg_group.py .                                        [ 52%]
 tests/test_parens.py ..                                                  [ 53%]
 tests/test_parse.py ..........................                           [ 61%]
-tests/test_polars.py ............F                                       [ 65%]
+tests/test_polars.py ............F.                                      [ 65%]
 tests/test_project.py .....                                              [ 66%]
 tests/test_rank.py .                                                     [ 66%]
 tests/test_rank_to_average.py .                                          [ 67%]
 tests/test_ranked_example.py .                                           [ 67%]
 tests/test_readme_example.py .                                           [ 67%]
 tests/test_ref_detect.py ..                                              [ 68%]
-tests/test_rename.py ......                                              [ 69%]
+tests/test_rename.py ......                                              [ 70%]
 tests/test_round.py ...                                                  [ 70%]
 tests/test_scalar_columns.py .                                           [ 71%]
 tests/test_scatter_example.py .                                          [ 71%]
@@ -144,13 +144,13 @@ _________________________ test_polars_project_max_str __________________________
             # https://github.com/pola-rs/polars/issues/5735
             ops = (
                 data_algebra.descr(d=d)
-                                .project(
-                                    {
-                                        "min_v": "v.min()",
-                                        "max_v": "v.max()",
-                                    },
-                                    group_by=["g"]
-                                    )
+                    .project(
+                        {
+                            "min_v": "v.min()",
+                            "max_v": "v.max()",
+                        },
+                        group_by=["g"]
+                        )
             )
             res_polars = ops.transform(d)
             expect = pl.DataFrame({
@@ -160,15 +160,15 @@ _________________________ test_polars_project_max_str __________________________
             })
 >           assert data_algebra.test_util.equivalent_frames(res_polars.to_pandas(), expect.to_pandas())
 E           AssertionError: assert False
-E            +  where False = <function equivalent_frames at 0x7fef6b015630>(   g min_v max_v\n0  a  None  None\n1  b  None  None,    g min_v max_v\n0  a     x     y\n1  b     x     x)
-E            +    where <function equivalent_frames at 0x7fef6b015630> = <module 'data_algebra.test_util' from '/Users/johnmount/Documents/work/data_algebra/data_algebra/test_util.py'>.equivalent_frames
+E            +  where False = <function equivalent_frames at 0x7f935be95630>(   g min_v max_v\n0  a  None  None\n1  b  None  None,    g min_v max_v\n0  a     x     y\n1  b     x     x)
+E            +    where <function equivalent_frames at 0x7f935be95630> = <module 'data_algebra.test_util' from '/Users/johnmount/Documents/work/data_algebra/data_algebra/test_util.py'>.equivalent_frames
 E            +      where <module 'data_algebra.test_util' from '/Users/johnmount/Documents/work/data_algebra/data_algebra/test_util.py'> = data_algebra.test_util
 E            +    and      g min_v max_v\n0  a  None  None\n1  b  None  None = <bound method DataFrame.to_pandas of shape: (2, 3)\n┌─────┬───────┬───────┐\n│ g   ┆ min_v ┆ max_v │\n│ --- ┆ ---   ┆ ---...═════╪═══════╪═══════╡\n│ a   ┆ null  ┆ null  │\n├╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┤\n│ b   ┆ null  ┆ null  │\n└─────┴───────┴───────┘>()
 E            +      where <bound method DataFrame.to_pandas of shape: (2, 3)\n┌─────┬───────┬───────┐\n│ g   ┆ min_v ┆ max_v │\n│ --- ┆ ---   ┆ ---...═════╪═══════╪═══════╡\n│ a   ┆ null  ┆ null  │\n├╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┤\n│ b   ┆ null  ┆ null  │\n└─────┴───────┴───────┘> = shape: (2, 3)\n┌─────┬───────┬───────┐\n│ g   ┆ min_v ┆ max_v │\n│ --- ┆ ---   ┆ ---   │\n│ str ┆ str   ┆ str   │\n╞═════╪═══════╪═══════╡\n│ a   ┆ null  ┆ null  │\n├╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┤\n│ b   ┆ null  ┆ null  │\n└─────┴───────┴───────┘.to_pandas
 E            +    and      g min_v max_v\n0  a     x     y\n1  b     x     x = <bound method DataFrame.to_pandas of shape: (2, 3)\n┌─────┬───────┬───────┐\n│ g   ┆ min_v ┆ max_v │\n│ --- ┆ ---   ┆ ---...═════╪═══════╪═══════╡\n│ a   ┆ x     ┆ y     │\n├╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┤\n│ b   ┆ x     ┆ x     │\n└─────┴───────┴───────┘>()
 E            +      where <bound method DataFrame.to_pandas of shape: (2, 3)\n┌─────┬───────┬───────┐\n│ g   ┆ min_v ┆ max_v │\n│ --- ┆ ---   ┆ ---...═════╪═══════╪═══════╡\n│ a   ┆ x     ┆ y     │\n├╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┤\n│ b   ┆ x     ┆ x     │\n└─────┴───────┴───────┘> = shape: (2, 3)\n┌─────┬───────┬───────┐\n│ g   ┆ min_v ┆ max_v │\n│ --- ┆ ---   ┆ ---   │\n│ str ┆ str   ┆ str   │\n╞═════╪═══════╪═══════╡\n│ a   ┆ x     ┆ y     │\n├╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┤\n│ b   ┆ x     ┆ x     │\n└─────┴───────┴───────┘.to_pandas
 
-tests/test_polars.py:306: AssertionError
+tests/test_polars.py:307: AssertionError
 
 ---------- coverage: platform darwin, python 3.10.8-final-0 ----------
 Name                                   Stmts   Miss  Cover   Missing
@@ -193,7 +193,7 @@ data_algebra/db_model.py                 996     89    91%   43, 58, 66-68, 204,
 data_algebra/db_space.py                  76     16    79%   58-59, 63, 73-77, 83, 118-119, 132-133, 137-139
 data_algebra/eval_cache.py                51      0   100%
 data_algebra/expr_parse.py                34      0   100%
-data_algebra/expr_rep.py                 581     73    87%   189-192, 197, 205, 221, 228, 239, 263, 272-287, 331, 337, 343, 349, 358, 364, 370, 379, 382, 385, 388, 391, 394, 445, 505, 583, 589, 624, 636, 660, 666, 714, 889, 904, 918, 933, 1029, 1044, 1070, 1090, 1104, 1120-1121, 1154, 1192, 1194, 1220, 1243-1244, 1300, 1314, 1316, 1318, 1321-1327, 1329, 1376, 1425
+data_algebra/expr_rep.py                 581     72    88%   189-192, 197, 205, 221, 228, 239, 263, 272-287, 331, 337, 343, 349, 358, 364, 370, 379, 382, 385, 388, 391, 394, 445, 505, 583, 589, 624, 636, 660, 666, 714, 889, 918, 933, 1029, 1044, 1070, 1090, 1104, 1120-1121, 1154, 1192, 1194, 1220, 1243-1244, 1300, 1314, 1316, 1318, 1321-1327, 1329, 1376, 1425
 data_algebra/flow_text.py                 17      0   100%
 data_algebra/near_sql.py                 237      3    99%   41, 256-257
 data_algebra/op_catalog.py                 3      0   100%
@@ -201,15 +201,15 @@ data_algebra/op_container.py             127     49    61%   46-47, 63-71, 80-81
 data_algebra/pandas_base.py              691     63    91%   53, 67, 76, 86, 96, 215, 217, 231, 234, 239, 244, 454, 460-467, 474, 505-510, 540, 544, 547, 549, 586, 640, 681, 698, 718, 736, 746, 761, 809, 817, 825, 840, 851, 863, 882, 897, 925, 940, 977, 994, 997, 1008, 1027, 1033, 1038, 1067, 1089, 1114, 1117-1120, 1124, 1134, 1233, 1247-1249
 data_algebra/pandas_model.py              15      0   100%
 data_algebra/parse_by_lark.py            164     24    85%   71, 93, 108, 129-130, 137, 161, 171, 185-186, 188, 200, 206, 213-217, 245, 253, 263-266
-data_algebra/polars_model.py             286     49    83%   71, 73, 77, 276, 288-292, 298, 305, 345, 360, 367, 383, 398, 407, 429, 436-438, 444, 459, 466, 480, 494-501, 509, 516, 523-529, 536, 542, 550, 570, 583-592, 599, 604, 622, 639
+data_algebra/polars_model.py             286     49    83%   71, 73, 77, 279, 291-295, 301, 308, 348, 363, 370, 386, 401, 410, 432, 439-441, 447, 462, 469, 483, 497-504, 512, 519, 526-532, 539, 545, 553, 573, 586-595, 602, 607, 625, 642
 data_algebra/python3_lark.py               1      0   100%
 data_algebra/solutions.py                136      4    97%   63, 303, 384, 467
 data_algebra/sql_format_options.py        15      2    87%   61, 69
 data_algebra/test_util.py                291     57    80%   88, 110, 120, 123, 127, 150, 153, 157, 159-162, 173, 230-231, 247-252, 256, 268, 270-278, 324, 327, 335, 346, 353, 357, 369, 380, 394, 465-468, 470-473, 475-478, 480-483, 557-562, 568-569, 572
 data_algebra/util.py                     140     31    78%   26, 51, 56, 61, 84-85, 88-89, 92-93, 96-97, 100-101, 104-105, 108-109, 112-113, 116-117, 120-121, 168, 190, 192, 207, 248, 252, 254
 --------------------------------------------------------------------
-TOTAL                                   6407    933    85%
+TOTAL                                   6407    932    85%
 
 =========================== short test summary info ============================
 FAILED tests/test_polars.py::test_polars_project_max_str - AssertionError: as...
-================== 1 failed, 342 passed in 780.53s (0:13:00) ===================
+================== 1 failed, 343 passed in 790.64s (0:13:10) ===================
