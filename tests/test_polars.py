@@ -307,7 +307,7 @@ def test_polars_project_max_str():
         assert data_algebra.test_util.equivalent_frames(res_polars.to_pandas(), expect.to_pandas())
 
 
-def test_polars_project_max_datetime():
+def test_polars_project_max_date():
     if have_polars:
         d = pl.DataFrame({
             "g": ["a", "a", "b"],
@@ -319,6 +319,36 @@ def test_polars_project_max_datetime():
         ops = (
             data_algebra.descr(d=d)
                 .extend({"v": "v.parse_date()"})
+                .project(
+                    {
+                        "min_v": "v.min()",
+                        "max_v": "v.max()",
+                    },
+                    group_by=["g"]
+                    )
+                .order_rows(["g"])
+        )
+        res_polars = ops.transform(d)
+        expect = pl.DataFrame({
+            "g": ["a", "b"],
+            "min_v": [datetime.date(2020, 1, 1), datetime.date(2020, 1, 1)],
+            "max_v": [datetime.date(2023, 1, 1), datetime.date(2020, 1, 1)],
+        })
+        assert data_algebra.test_util.equivalent_frames(res_polars.to_pandas(), expect.to_pandas())
+
+
+def test_polars_project_max_date_2():
+    if have_polars:
+        d = pl.DataFrame({
+            "g": ["a", "a", "b"],
+            "v": ['2020-01-01', "2023-01-01", "2020-01-01"],
+        })
+        # From: https://stackoverflow.com/a/71759536/6901725
+        # works:
+        # d.with_columns([pl.col("v").cast(str).str.strptime(pl.Date, fmt="%Y-%m-%d", strict=False).cast(pl.Date).alias("v2")])
+        ops = (
+            data_algebra.descr(d=d)
+                .extend({"v": "v.parse_date('%Y-%m-%d')"})
                 .project(
                     {
                         "min_v": "v.min()",
