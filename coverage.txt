@@ -2,7 +2,7 @@
 platform darwin -- Python 3.10.8, pytest-7.1.2, pluggy-1.0.0
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: anyio-3.5.0, cov-3.0.0
-collected 347 items
+collected 348 items
 
 tests/test_OrderedSet.py ......                                          [  1%]
 tests/test_agg.py ..                                                     [  2%]
@@ -27,12 +27,12 @@ tests/test_concat_rows.py ...                                            [ 12%]
 tests/test_container.py ..                                               [ 12%]
 tests/test_cross_product_join.py .                                       [ 13%]
 tests/test_dag_elim.py ...........                                       [ 16%]
-tests/test_data_space.py ..                                              [ 17%]
+tests/test_data_space.py ..                                              [ 16%]
 tests/test_date_stuff.py ..                                              [ 17%]
 tests/test_db_handle.py ..                                               [ 18%]
 tests/test_db_model.py .                                                 [ 18%]
 tests/test_degenerate_project.py .                                       [ 18%]
-tests/test_drop_columns.py .                                             [ 19%]
+tests/test_drop_columns.py .                                             [ 18%]
 tests/test_dup_detection_example.py .                                    [ 19%]
 tests/test_eval_cache.py ...                                             [ 20%]
 tests/test_ex_examples.py ............                                   [ 23%]
@@ -54,12 +54,12 @@ tests/test_free_fn.py .                                                  [ 33%]
 tests/test_get_methods_used.py .                                         [ 33%]
 tests/test_ghost_col_issue.py .                                          [ 33%]
 tests/test_idioms.py .................                                   [ 38%]
-tests/test_if_else.py .....                                              [ 40%]
+tests/test_if_else.py .....                                              [ 39%]
 tests/test_if_else_return_type.py .                                      [ 40%]
 tests/test_incomplete_agg.py .                                           [ 40%]
 tests/test_join_check.py .                                               [ 40%]
 tests/test_join_conditions.py ...                                        [ 41%]
-tests/test_join_effects.py .                                             [ 42%]
+tests/test_join_effects.py .                                             [ 41%]
 tests/test_join_multi_key.py .                                           [ 42%]
 tests/test_join_opt.py .                                                 [ 42%]
 tests/test_join_variations.py .                                          [ 42%]
@@ -72,19 +72,19 @@ tests/test_method_catalog_issues.py ..                                   [ 46%]
 tests/test_minimum.py .                                                  [ 46%]
 tests/test_mod_fns.py ...                                                [ 47%]
 tests/test_multi_map.py .                                                [ 47%]
-tests/test_narrow.py .                                                   [ 48%]
+tests/test_narrow.py .                                                   [ 47%]
 tests/test_natural_join.py ....                                          [ 49%]
 tests/test_neg.py .                                                      [ 49%]
 tests/test_null_bad.py ..                                                [ 50%]
 tests/test_one_row_cdata_convert.py .                                    [ 50%]
 tests/test_ops.py .                                                      [ 50%]
-tests/test_ops_eq.py .                                                   [ 51%]
+tests/test_ops_eq.py .                                                   [ 50%]
 tests/test_or.py .....                                                   [ 52%]
 tests/test_order_limit.py .                                              [ 52%]
-tests/test_ordered_agg_group.py .                                        [ 53%]
+tests/test_ordered_agg_group.py .                                        [ 52%]
 tests/test_parens.py ..                                                  [ 53%]
-tests/test_parse.py ..........................                           [ 61%]
-tests/test_polars.py ............F..                                     [ 65%]
+tests/test_parse.py ..........................                           [ 60%]
+tests/test_polars.py ................                                    [ 65%]
 tests/test_project.py .....                                              [ 66%]
 tests/test_rank.py .                                                     [ 67%]
 tests/test_rank_to_average.py .                                          [ 67%]
@@ -102,10 +102,10 @@ tests/test_select_values.py ..                                           [ 73%]
 tests/test_set_quoting.py ......                                         [ 75%]
 tests/test_shift.py ..                                                   [ 76%]
 tests/test_shorten.py .                                                  [ 76%]
-tests/test_sign_parse.py ..                                              [ 76%]
+tests/test_sign_parse.py ..                                              [ 77%]
 tests/test_simple.py ....                                                [ 78%]
 tests/test_simple_expr.py .                                              [ 78%]
-tests/test_simplification.py ..                                          [ 78%]
+tests/test_simplification.py ..                                          [ 79%]
 tests/test_spark_sql.py ...                                              [ 79%]
 tests/test_sql_extend_shortening.py ..                                   [ 80%]
 tests/test_sqlite.py ..............                                      [ 84%]
@@ -129,48 +129,6 @@ tests/test_window_fns.py .....                                           [ 98%]
 tests/test_with.py ..                                                    [ 99%]
 tests/test_xicor.py ..                                                   [100%]
 
-=================================== FAILURES ===================================
-_________________________ test_polars_project_max_str __________________________
-
-    def test_polars_project_max_str():
-        if have_polars:
-            d = pl.DataFrame({
-                "g": ["a", "a", "b"],
-                "v": ["x", "y", "x"],
-            })
-            # d.groupby(["g"]).agg([pl.col("v").min().alias("v_min"), pl.col("v").max().alias("v_max")])
-            # returns nulls
-            # known Polars bug:
-            # https://stackoverflow.com/q/74763636/6901725
-            # https://github.com/pola-rs/polars/issues/5735
-            ops = (
-                data_algebra.descr(d=d)
-                    .project(
-                        {
-                            "min_v": "v.min()",
-                            "max_v": "v.max()",
-                        },
-                        group_by=["g"]
-                        )
-            )
-            res_polars = ops.transform(d)
-            expect = pl.DataFrame({
-                "g": ["a", "b"],
-                "min_v": ["x", "x"],
-                "max_v": ["y", "x"],
-            })
->           assert data_algebra.test_util.equivalent_frames(res_polars.to_pandas(), expect.to_pandas())
-E           AssertionError: assert False
-E            +  where False = <function equivalent_frames at 0x7fdd48f5d630>(   g min_v max_v\n0  b  None  None\n1  a  None  None,    g min_v max_v\n0  a     x     y\n1  b     x     x)
-E            +    where <function equivalent_frames at 0x7fdd48f5d630> = <module 'data_algebra.test_util' from '/Users/johnmount/Documents/work/data_algebra/data_algebra/test_util.py'>.equivalent_frames
-E            +      where <module 'data_algebra.test_util' from '/Users/johnmount/Documents/work/data_algebra/data_algebra/test_util.py'> = data_algebra.test_util
-E            +    and      g min_v max_v\n0  b  None  None\n1  a  None  None = <bound method DataFrame.to_pandas of shape: (2, 3)\n┌─────┬───────┬───────┐\n│ g   ┆ min_v ┆ max_v │\n│ --- ┆ ---   ┆ ---...═════╪═══════╪═══════╡\n│ b   ┆ null  ┆ null  │\n├╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┤\n│ a   ┆ null  ┆ null  │\n└─────┴───────┴───────┘>()
-E            +      where <bound method DataFrame.to_pandas of shape: (2, 3)\n┌─────┬───────┬───────┐\n│ g   ┆ min_v ┆ max_v │\n│ --- ┆ ---   ┆ ---...═════╪═══════╪═══════╡\n│ b   ┆ null  ┆ null  │\n├╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┤\n│ a   ┆ null  ┆ null  │\n└─────┴───────┴───────┘> = shape: (2, 3)\n┌─────┬───────┬───────┐\n│ g   ┆ min_v ┆ max_v │\n│ --- ┆ ---   ┆ ---   │\n│ str ┆ str   ┆ str   │\n╞═════╪═══════╪═══════╡\n│ b   ┆ null  ┆ null  │\n├╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┤\n│ a   ┆ null  ┆ null  │\n└─────┴───────┴───────┘.to_pandas
-E            +    and      g min_v max_v\n0  a     x     y\n1  b     x     x = <bound method DataFrame.to_pandas of shape: (2, 3)\n┌─────┬───────┬───────┐\n│ g   ┆ min_v ┆ max_v │\n│ --- ┆ ---   ┆ ---...═════╪═══════╪═══════╡\n│ a   ┆ x     ┆ y     │\n├╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┤\n│ b   ┆ x     ┆ x     │\n└─────┴───────┴───────┘>()
-E            +      where <bound method DataFrame.to_pandas of shape: (2, 3)\n┌─────┬───────┬───────┐\n│ g   ┆ min_v ┆ max_v │\n│ --- ┆ ---   ┆ ---...═════╪═══════╪═══════╡\n│ a   ┆ x     ┆ y     │\n├╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┤\n│ b   ┆ x     ┆ x     │\n└─────┴───────┴───────┘> = shape: (2, 3)\n┌─────┬───────┬───────┐\n│ g   ┆ min_v ┆ max_v │\n│ --- ┆ ---   ┆ ---   │\n│ str ┆ str   ┆ str   │\n╞═════╪═══════╪═══════╡\n│ a   ┆ x     ┆ y     │\n├╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┤\n│ b   ┆ x     ┆ x     │\n└─────┴───────┴───────┘.to_pandas
-
-tests/test_polars.py:307: AssertionError
-
 ---------- coverage: platform darwin, python 3.10.8-final-0 ----------
 Name                                   Stmts   Miss  Cover   Missing
 --------------------------------------------------------------------
@@ -178,7 +136,7 @@ data_algebra/BigQuery.py                 126     67    47%   22-23, 27, 131-135,
 data_algebra/MySQL.py                     31      8    74%   16-17, 79, 91-97
 data_algebra/OrderedSet.py                82      7    91%   33, 46, 49, 55, 58, 61, 64
 data_algebra/PostgreSQL.py                30      7    77%   15-16, 69-75
-data_algebra/SQLite.py                   193     25    87%   91, 101, 127, 141, 143, 155, 171-172, 193, 201, 233, 260, 268-271, 291, 312-316, 448, 489, 494
+data_algebra/SQLite.py                   193     29    85%   91, 101, 127, 141, 143, 155, 171-172, 193, 201, 233, 260, 268-271, 281, 289-292, 312-316, 448, 489, 494
 data_algebra/SparkSQL.py                  87     46    47%   16-17, 21-22, 26-28, 89, 94, 132-136, 142-146, 170-172, 178-185, 192-207, 218-223
 data_algebra/__init__.py                   9      0   100%
 data_algebra/arrow.py                    141     41    71%   45, 52, 56-57, 66, 69, 73, 92, 96, 102, 113-116, 121, 129, 136, 155, 158, 171-172, 203, 212, 221-234, 237-245, 258, 260, 262, 266, 270
@@ -202,15 +160,14 @@ data_algebra/op_container.py             127     49    61%   46-47, 63-71, 80-81
 data_algebra/pandas_base.py              691     63    91%   53, 67, 76, 86, 96, 215, 217, 231, 234, 239, 244, 454, 460-467, 474, 505-510, 540, 544, 547, 549, 586, 640, 681, 698, 718, 736, 746, 761, 809, 817, 825, 840, 851, 863, 882, 897, 925, 940, 977, 994, 997, 1008, 1027, 1033, 1038, 1067, 1089, 1114, 1117-1120, 1124, 1134, 1233, 1247-1249
 data_algebra/pandas_model.py              15      0   100%
 data_algebra/parse_by_lark.py            164     24    85%   71, 93, 108, 129-130, 137, 161, 171, 185-186, 188, 200, 206, 213-217, 245, 253, 263-266
-data_algebra/polars_model.py             286     49    83%   71, 73, 77, 279, 291-295, 301, 308, 348, 363, 370, 386, 401, 410, 432, 439-441, 447, 462, 469, 483, 497-504, 512, 519, 526-532, 539, 545, 553, 573, 586-595, 602, 607, 625, 642
+data_algebra/polars_model.py             292     49    83%   76, 78, 82, 285, 297-301, 307, 314, 354, 369, 376, 392, 407, 416, 438, 445-447, 453, 468, 475, 489, 503-510, 518, 525, 532-538, 545, 551, 559, 579, 592-601, 608, 613, 631, 648
 data_algebra/python3_lark.py               1      0   100%
 data_algebra/solutions.py                136      4    97%   63, 303, 384, 467
 data_algebra/sql_format_options.py        15      2    87%   61, 69
-data_algebra/test_util.py                291     57    80%   88, 110, 120, 123, 127, 150, 153, 157, 159-162, 173, 230-231, 247-252, 256, 268, 270-278, 324, 327, 335, 346, 353, 357, 369, 380, 394, 465-468, 470-473, 475-478, 480-483, 557-562, 568-569, 572
+data_algebra/test_util.py                291     63    78%   88, 110, 120, 123, 127, 150, 153, 157, 159-162, 173, 216-217, 230-231, 234-252, 256, 268, 270-278, 324, 327, 335, 346, 353, 357, 369, 380, 394, 465-468, 470-473, 475-478, 480-483, 557-562, 568-569, 572
 data_algebra/util.py                     140     31    78%   26, 51, 56, 61, 84-85, 88-89, 92-93, 96-97, 100-101, 104-105, 108-109, 112-113, 116-117, 120-121, 168, 190, 192, 207, 248, 252, 254
 --------------------------------------------------------------------
-TOTAL                                   6407    932    85%
+TOTAL                                   6413    942    85%
 
-=========================== short test summary info ============================
-FAILED tests/test_polars.py::test_polars_project_max_str - AssertionError: as...
-================== 1 failed, 346 passed in 809.23s (0:13:29) ===================
+
+======================= 348 passed in 805.59s (0:13:25) ========================
