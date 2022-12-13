@@ -407,7 +407,6 @@ def test_polars_group_min_max_example():
         assert data_algebra.test_util.equivalent_frames(res_polars.to_pandas(), expect.to_pandas(), float_tol=1.0e-3)
 
 
-
 def test_polars_cdata_example():
     if have_polars:
         polars_model = data_algebra.data_model.default_data_model()
