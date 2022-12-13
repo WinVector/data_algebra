@@ -11,3 +11,7 @@ htmlcov
 .coverage*
 
 .vscode/settings.json
+.Rproj.user
+.Rhistory
+.RHistory
+

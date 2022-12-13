@@ -1,0 +1,11 @@
+method,time (seconds/run),language
+Pandas,0.2790230633225292,Python
+data_algebra_Pandas,0.406919257203117,Python
+Polars,0.11030262717977166,Python
+Polars (lazy),0.11203636536374688,Python
+data_algebra_Polars,0.12359043909236789,Python
+base_R,4.9417360718,R
+data_table,0.0978087869,R
+dplyr,1.0541964313,R
+dtplyr,0.1332245956,R
+rqdatabable,0.2125426378,R

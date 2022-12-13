@@ -1,0 +1,179 @@
+---
+title: "TimedGroupCalc"
+output: github_document
+date: "2022-12-13"
+---
+
+In this note compare a simple grouped calculation in Python using [base R](https://www.r-project.org), [data table]( https://CRAN.R-project.org/package=data.table), [dplyr](https://CRAN.R-project.org/package=dplyr), and [rqdatatable]( https://CRAN.R-project.org/package=rqdatatable).
+
+For similar timing in Python, please see [here](https://github.com/WinVector/data_algebra/blob/main/Examples/Polars/TimeGroupedCalc.ipynb).
+
+
+```{r}
+library(microbenchmark)
+library(dplyr)
+library(dtplyr)
+library(rqdatatable)
+library(data.table)
+```
+
+```{r}
+set.seed(2022)
+```
+
+```{r}
+mk_example <- function(n_rows, n_groups) {
+  groups <- vapply(seq(n_groups), function(x) paste0("group_", x), character(1))
+  data.frame(
+    group = sample(groups, size = n_rows, replace = TRUE),
+    value = rnorm(n_rows))
+}
+```
+
+```{r}
+d <- mk_example(10, 2)
+```
+
+```{r}
+base_r_fn <- function(d) {
+  agg_max <- aggregate(value ~ group, d, FUN=max)
+  colnames(agg_max) <- c("value", "max_value")
+  agg_min <- aggregate(value ~ group, d, FUN=min)
+  colnames(agg_min) <- c("value", "min_value")
+  merge(agg_min, agg_max)
+}
+```
+
+```{r}
+base_r_fn(d)
+```
+
+```{r}
+d_tibble <- tibble(d)
+d_data_table <- data.table(d)
+```
+
+Show a few matching examples.
+
+```{r}
+data_table_fn <- function(d_data_table) {
+  d_data_table[, .(min_value = min(value), max_value = max(value)), by = group]
+}
+```
+
+
+```{r}
+data_table_fn(d_data_table)
+```
+
+```{r}
+dplyr_fn <- function(d_tibble) {
+  d_tibble |>
+    group_by(group) |>
+    summarize(
+      min_value = min(value),
+      max_value = max(value)
+    ) |>
+    ungroup()
+}
+```
+
+```{r}
+dplyr_fn(d_tibble)
+```
+
+```{r}
+dtplyr_fn <- function(d_tibble) {
+  lazy_dt(d_tibble) |>
+    group_by(group) |>
+    summarize(
+      min_value = min(value),
+      max_value = max(value)
+    ) |>
+    ungroup() |>
+    as_tibble()
+}
+```
+
+```{r}
+dtplyr_fn(d_tibble)
+```
+
+
+```{r}
+rqdatatable_fn <- function(d_data_table) {
+  ops <- local_td(d_data_table, name = "d_data_table") |>
+    project(groupby = "group", 
+            min_value := min(value),
+            max_value := max(value))
+  d_data_table %.>% ops
+}
+```
+
+```{r}
+rqdatatable_fn(d)
+```
+
+Time a larger example.
+
+```{r}
+d <- mk_example(n_rows=1000000, n_groups=100000)
+d_tibble <- tibble(d)
+d_data_table <- data.table(d)
+n_repetitions <- 10L
+```
+
+```{r}
+timings <- microbenchmark(
+  base_R = nrow(base_r_fn(d)),
+  data_table = nrow(data_table_fn(d_data_table)),
+  dplyr = nrow(dplyr_fn(d_tibble)),
+  dtplyr = nrow(dtplyr_fn(d_tibble)),
+  rqdatabable = nrow(rqdatatable_fn(d_data_table)),
+  times = n_repetitions
+)
+```
+
+```{r}
+print(timings, unit="s")
+```
+
+```{r}
+timing_frame <- as.data.frame(timings)
+timing_frame$seconds <- timings$time/1e+9
+
+WVPlots::ScatterBoxPlotH(
+  timing_frame,
+  xvar = "seconds",
+  yvar = "expr",
+  title = "task duration by method (smaller is better)"
+)
+```
+
+
+```{r}
+# save summary
+summary_frame <- aggregate(seconds ~ expr, timing_frame, FUN=mean)
+colnames(summary_frame) <- c("method", "time (seconds/run)")
+summary_frame["language"] <- "R"
+write.csv(summary_frame, "tgc_r_summary.csv", row.names = FALSE) 
+```
+
+
+```{r}
+R.Version()$version.string
+```
+
+```{r}
+pkgs <- data.frame(
+  pkg = c("dplyr", "dtplyr", "data.table", "rqdatatable")
+)
+pkgs$version = vapply(
+  pkgs$pkg, 
+  function(p) as.character(packageVersion(p)),
+  character(1))
+
+knitr::kable(pkgs)
+```
+
+
