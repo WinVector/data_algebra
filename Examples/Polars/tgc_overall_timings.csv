@@ -1,11 +1,11 @@
 method,time (seconds/run),language
-Pandas,0.2790230633225292,Python
-data_algebra_Pandas,0.406919257203117,Python
-Polars,0.11030262717977166,Python
-Polars (lazy),0.11203636536374688,Python
-data_algebra_Polars,0.12359043909236789,Python
-base_R,4.9417360718,R
-data_table,0.0978087869,R
-dplyr,1.0541964313,R
-dtplyr,0.1332245956,R
-rqdatabable,0.2125426378,R
+Pandas,0.24659951883368195,Python
+data_algebra_Pandas,0.3624068050179631,Python
+Polars,0.10482051512226462,Python
+Polars (lazy),0.11043391609564424,Python
+data_algebra_Polars,0.11061393311247229,Python
+base_R,5.1529914751,R
+data_table,0.0989968926,R
+dplyr,1.1098811627,R
+dtplyr,0.1439978845,R
+rqdatabable,0.2151412388,R

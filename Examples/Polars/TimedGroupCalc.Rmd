@@ -6,7 +6,7 @@ date: "2022-12-13"
 
 In this note compare a simple grouped calculation in Python using [base R](https://www.r-project.org), [data table]( https://CRAN.R-project.org/package=data.table), [dplyr](https://CRAN.R-project.org/package=dplyr), and [rqdatatable]( https://CRAN.R-project.org/package=rqdatatable).
 
-For similar timing in Python, please see [here](https://github.com/WinVector/data_algebra/blob/main/Examples/Polars/TimeGroupedCalc.ipynb).
+For similar timing in Python, please see [here](https://github.com/WinVector/data_algebra/blob/main/Examples/Polars/TimeGroupedCalc.ipynb). For more definitive tests at scale, please see [here](https://h2oai.github.io/db-benchmark/).
 
 
 ```{r}

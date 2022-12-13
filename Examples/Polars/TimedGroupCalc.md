@@ -10,6 +10,8 @@ table](https://CRAN.R-project.org/package=data.table),
 
 For similar timing in Python, please see
 [here](https://github.com/WinVector/data_algebra/blob/main/Examples/Polars/TimeGroupedCalc.ipynb).
+For more definitive tests at scale, please see
+[here](https://h2oai.github.io/db-benchmark/).
 
 ``` r
 library(microbenchmark)
@@ -203,11 +205,11 @@ print(timings, unit="s")
 
     ## Unit: seconds
     ##         expr        min         lq       mean     median        uq       max
-    ##       base_R 4.70199419 4.81126104 4.94173607 4.90616173 5.0767859 5.2527458
-    ##   data_table 0.09002466 0.09263841 0.09780879 0.09894274 0.1006140 0.1053476
-    ##        dplyr 0.98075563 1.00402095 1.05419643 1.05555202 1.0946687 1.1609567
-    ##       dtplyr 0.11150974 0.11619267 0.13322460 0.12710622 0.1399637 0.1967556
-    ##  rqdatabable 0.18579404 0.19347639 0.21254264 0.21093781 0.2389501 0.2425832
+    ##       base_R 4.84112624 4.97467006 5.15299148 5.08502612 5.1931341 5.8078557
+    ##   data_table 0.08620469 0.09529214 0.09899689 0.09902279 0.1062521 0.1120769
+    ##        dplyr 1.00711809 1.01311405 1.10988116 1.06305300 1.1685141 1.3005730
+    ##       dtplyr 0.11619164 0.11890166 0.14399788 0.14593447 0.1594117 0.1914754
+    ##  rqdatabable 0.18456297 0.19571126 0.21514124 0.20395603 0.2205063 0.2818969
     ##  neval
     ##     10
     ##     10
