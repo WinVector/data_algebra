@@ -318,7 +318,7 @@ def test_polars_project_max_date():
         # d.with_columns([pl.col("v").cast(str).str.strptime(pl.Date, fmt="%Y-%m-%d", strict=False).cast(pl.Date).alias("v2")])
         ops = (
             data_algebra.descr(d=d)
-                .extend({"v": "v.parse_date()"})
+                .extend({"v": "v.parse_date('%Y-%m-%d')"})
                 .project(
                     {
                         "min_v": "v.min()",

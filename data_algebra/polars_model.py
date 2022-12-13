@@ -37,6 +37,7 @@ class PolarsTerm:
         collect_required: bool = False,  # property of tree, not node
         one_constant_required: bool = False,  # property of tree, not node
         inputs: Optional[List] = None,
+        lit_value = None,
         ) -> None:
         """
         Carry a Polars expression term (polars_term) plus annotations.
@@ -46,6 +47,7 @@ class PolarsTerm:
         :param is_column: True if term is a column name
         :param collect_required: True if Polars frame collection required by this node or an input node
         :param one_constant_required: True one constant required by this node or an input node
+        :param lit_value: original value for a literal
         :param inputs: inputs to expression node
         """
         assert isinstance(is_literal, bool)
@@ -53,6 +55,9 @@ class PolarsTerm:
         assert isinstance(collect_required, bool)
         assert isinstance(one_constant_required, bool)
         assert (is_literal + is_column + (inputs is not None) + (polars_term is None)) == 1
+        if lit_value is not None:
+            assert is_literal
+        self.lit_value = lit_value
         self.polars_term = polars_term
         self.is_literal = is_literal
         self.collect_required = collect_required
@@ -210,9 +215,9 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         # datetime parsing from https://stackoverflow.com/a/71759536/6901725
         # TODO: figure out why format is wrong type
         # TODO: wire up format
-        "parse_date": lambda x, format : x.cast(str).str.strptime(pl.Date, fmt="%Y-%m-%d", strict=False).cast(pl.Date),
+        "parse_date": lambda x, format : x.cast(str).str.strptime(pl.Date, fmt=format, strict=False).cast(pl.Date),
         # TODO: wire up format
-        "parse_datetime": lambda x, format : x.cast(str).str.strptime(pl.Datetime, strict=False).cast(pl.Datetime),
+        "parse_datetime": lambda x, format : x.cast(str).str.strptime(pl.Datetime, fmt=format, strict=False).cast(pl.Datetime),
     }
     impl_map_3 = {
         "if_else": lambda a, b, c: pl.when(a).then(b).otherwise(c),
@@ -265,6 +270,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
             "TableDescription": self._table_step,
         }
         self._expr_impl_map = _populate_expr_impl_map()
+        self._want_literals_unpacked = {"parse_date", "parse_datetime"}
         self._collect_required = set()
 
     def data_frame(self, arg=None):
@@ -651,7 +657,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
         :return: converted result
         """
         assert not isinstance(value, PolarsTerm)
-        return PolarsTerm(polars_term=pl.lit(value), is_literal=True)
+        return PolarsTerm(polars_term=pl.lit(value), is_literal=True, lit_value=value)
     
     def act_on_column_name(self, *, arg, value):
         """
@@ -679,7 +685,9 @@ class PolarsModel(data_algebra.data_model.DataModel):
             assert isinstance(v, PolarsTerm)
         f = self._expr_impl_map[len(values)][op.op]
         assert f is not None
-        res = f(*[v.polars_term for v in values])
+        want_literals_unpacked = op.op in self._want_literals_unpacked
+        args = [v.lit_value if (want_literals_unpacked and v.is_literal) else v.polars_term for v in values]
+        res = f(*args)
         return PolarsTerm(
             polars_term=res,
             inputs=values,
