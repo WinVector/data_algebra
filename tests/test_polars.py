@@ -1,6 +1,6 @@
 
-import numpy as np
 import datetime
+import numpy as np
 import data_algebra
 import data_algebra.data_model
 import data_algebra.test_util
@@ -365,3 +365,42 @@ def test_polars_project_max_date_2():
             "max_v": [datetime.date(2023, 1, 1), datetime.date(2020, 1, 1)],
         })
         assert data_algebra.test_util.equivalent_frames(res_polars.to_pandas(), expect.to_pandas())
+
+
+def test_polars_group_min_max_example():
+    # from Examples/TimedGroupedCalc.ipynb
+    if have_polars:
+        pd = data_algebra.data_model.default_data_model().pd
+        rng = np.random.default_rng(2022)
+
+        def mk_example(*, n_rows: int, n_groups: int):
+            assert n_rows > 0
+            assert n_groups > 0
+            groups = [f"group_{i:04d}" for i in range(n_groups)]
+            d = pd.DataFrame({
+                "group": rng.choice(groups, size=n_rows, replace=True),
+                "value": rng.normal(size=n_rows)
+            })
+            return d
+        
+        d_Pandas = mk_example(n_rows=10, n_groups=2)
+        d_Polars = pl.DataFrame(d_Pandas)
+        res_pandas = (
+            d_Pandas
+                .groupby(["group"])
+                .agg({"value": ["min", "max"]})
+            )
+        res_polars = (
+            d_Polars
+                .groupby(["group"])
+                .agg([
+                    pl.col("value").min().alias("min_value"),
+                    pl.col("value").max().alias("max_value"),
+                ])
+            )
+        expect = pl.DataFrame({
+            "group": ["group_0000", "group_0001"],
+            "min_value": [-2.931249, -1.440234],
+            "max_value": [1.667716, 0.078888],
+        })
+        assert data_algebra.test_util.equivalent_frames(res_polars.to_pandas(), expect.to_pandas(), float_tol=1.0e-3)
