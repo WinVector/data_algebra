@@ -638,6 +638,9 @@ class PolarsModel(data_algebra.data_model.DataModel):
         :param blocks_in: cdata record specification
         :return: transformed data frame
         """
+        assert self.is_appropriate_data_instance(data)
+        assert isinstance(data, pl.DataFrame)
+        assert blocks_in is not None
         _raise_not_impl("blocks_to_rowrecs")  # TODO: implement
     
     def rowrecs_to_blocks(
@@ -655,6 +658,10 @@ class PolarsModel(data_algebra.data_model.DataModel):
         :param check_blocks_out_keying: logical, if True confirm keying
         :return: transformed data frame
         """
+        assert self.is_appropriate_data_instance(data)
+        assert isinstance(data, pl.DataFrame)
+        assert blocks_out is not None
+        assert isinstance(check_blocks_out_keying, bool)
         _raise_not_impl("blocks_to_rowrecs")  # TODO: implement
     
     # expression helpers
