@@ -366,7 +366,17 @@ class PolarsModel(data_algebra.data_model.DataModel):
         """
         Execute record conversion step, returning a data frame.
         """
-        _raise_not_impl("_convert_records_step")  # TODO: implement
+        if op.node_name != "ConvertRecordsNode":
+            raise TypeError(
+                "op was supposed to be a data_algebra.data_ops.ConvertRecordsNode"
+            )
+        res = self._compose_polars_ops(op.sources[0], data_map=data_map)
+        if isinstance(res, pl.LazyFrame):
+            res = res.collect()
+        res = op.record_map.transform(res, local_data_model=self)
+        if self.use_lazy_eval and (not isinstance(res, pl.LazyFrame)):
+            res = res.lazy()
+        return res
     
     def _extend_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
         """
