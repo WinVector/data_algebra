@@ -82,8 +82,16 @@ def _raise_not_impl(nm: str):   # TODO: get rid of this
     raise ValueError(f" {nm} not implemented for Polars adapter, yet")
 
 
+def _build_lit(v):
+    if isinstance(v, int):
+        # Polars defaults ints in constructor to Int64,
+        # but ints in lit to Int32. Try to prevent type clashes
+        return pl.lit(v, pl.Int64)
+    return pl.lit(v)
+
+
 _da_temp_one_column_name = "_da_temp_one_column"
-_da_temp_one_column = pl.lit(1).alias(_da_temp_one_column_name)
+_da_temp_one_column = _build_lit(1).alias(_da_temp_one_column_name)
 
 
 def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
@@ -250,7 +258,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
 
     def __init__(self, *, use_lazy_eval: bool = True):
         data_algebra.data_model.DataModel.__init__(
-            self, presentation_model_name="Polars"
+            self, presentation_model_name="pl"
         )
         assert isinstance(use_lazy_eval, bool)
         self.use_lazy_eval = use_lazy_eval
@@ -317,6 +325,18 @@ class PolarsModel(data_algebra.data_model.DataModel):
         """
         return x.is_null()
 
+    def concat_columns(self, frame_list):
+        """
+        Concatinate columns from frame_list
+        """
+        frame_list = list(frame_list)
+        if len(frame_list) <= 0:
+            return None
+        if len(frame_list) == 1:
+            return frame_list[0]
+        res = pl.concat(frame_list, how="horizontal")
+        return res
+
     # evaluate
 
     def eval(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]) -> pl.DataFrame:
@@ -361,8 +381,8 @@ class PolarsModel(data_algebra.data_model.DataModel):
         inputs = [self._compose_polars_ops(s, data_map=data_map) for s in op.sources]
         assert len(inputs) == 2
         if op.id_column is not None:
-            inputs[0] = inputs[0].with_column(pl.lit(op.a_name).alias(op.id_column))
-            inputs[1] = inputs[1].with_column(pl.lit(op.b_name).alias(op.id_column))
+            inputs[0] = inputs[0].with_column(_build_lit(op.a_name).alias(op.id_column))
+            inputs[1] = inputs[1].with_column(_build_lit(op.b_name).alias(op.id_column))
         res = pl.concat(inputs, how="vertical")
         return res
     
@@ -396,7 +416,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
         if len(partition_by) <= 0:
             v_name = f"_da_extend_temp_partition_column"
             partition_by = [v_name]
-            temp_v_columns.append(pl.lit(1).alias(v_name))
+            temp_v_columns.append(_build_lit(1).alias(v_name))
         produced_columns = []
         for k, opk in op.ops.items():
             if op.windowed_situation:
@@ -409,7 +429,8 @@ class PolarsModel(data_algebra.data_model.DataModel):
                     if isinstance(opk.args[0], data_algebra.expr_rep.Value):
                         # promote value to column for uniformity of API
                         v_name = f"_da_extend_temp_v_column_{len(temp_v_columns)}"
-                        temp_v_columns.append(pl.lit(opk.args[0].value).alias(v_name))
+                        v_value = opk.args[0].value
+                        temp_v_columns.append(_build_lit(v_value).alias(v_name))
                         opk = data_algebra.expr_rep.Expression(
                             op=opk.op, 
                             args=[data_algebra.expr_rep.ColumnReference(column_name=v_name)], 
@@ -458,7 +479,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
         if len(group_by) <= 0:
             v_name = f"_da_project_temp_group_by_column"
             group_by = [v_name]
-            temp_v_columns.append(pl.lit(1).alias(v_name))
+            temp_v_columns.append(_build_lit(1).alias(v_name))
         produced_columns = []
         for k, opk in op.ops.items():
             # enforce is a simple v.f() expression
@@ -470,7 +491,8 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 if isinstance(opk.args[0], data_algebra.expr_rep.Value):
                     # promote value to column for uniformity of API
                     v_name = f"_da_project_temp_v_column_{len(temp_v_columns)}"
-                    temp_v_columns.append(pl.lit(opk.args[0].value).alias(v_name))
+                    v_value = opk.args[0].value
+                    temp_v_columns.append(_build_lit(v_value).alias(v_name))
                     opk = data_algebra.expr_rep.Expression(
                         op=opk.op, 
                         args=[data_algebra.expr_rep.ColumnReference(column_name=v_name)], 
@@ -720,7 +742,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
             new_dat.columns = new_names
             if (blocks_out.record_keys is not None) and (len(blocks_out.record_keys) > 0):
                 row = data[blocks_out.record_keys]
-                row = row.with_columns([pl.lit(ct_keys[0, c]).alias(c) for c in ct_keys.columns])
+                row = row.with_columns([_build_lit(ct_keys[0, c]).alias(c) for c in ct_keys.columns])
             else:
                 row = pl.DataFrame({c: [ct_keys[0, c]] * data.shape[0] for c in ct_keys.columns})
             row = pl.concat([
@@ -747,7 +769,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
         :return: converted result
         """
         assert not isinstance(value, PolarsTerm)
-        return PolarsTerm(polars_term=pl.lit(value), is_literal=True, lit_value=value)
+        return PolarsTerm(polars_term=_build_lit(value), is_literal=True, lit_value=value)
     
     def act_on_column_name(self, *, arg, value):
         """

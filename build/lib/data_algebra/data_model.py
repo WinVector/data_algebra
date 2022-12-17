@@ -53,6 +53,12 @@ class DataModel(abc.ABC):
         """
         Return vector indicating which entries are bad (null or nan) (vectorized).
         """
+    
+    @abc.abstractmethod
+    def concat_columns(self, frame_list):
+        """
+        Concatinate columns from frame_list
+        """
 
     # evaluate
 
