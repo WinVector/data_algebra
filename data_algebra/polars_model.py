@@ -641,7 +641,33 @@ class PolarsModel(data_algebra.data_model.DataModel):
         assert self.is_appropriate_data_instance(data)
         assert isinstance(data, pl.DataFrame)
         assert blocks_in is not None
-        _raise_not_impl("blocks_to_rowrecs")  # TODO: implement
+        assert blocks_in.control_table.shape[0] > 1
+        # split on block keys
+        split = data.partition_by(blocks_in.control_table_keys)
+        # ensure sorted in record order
+        split = [s.sort(blocks_in.record_keys) for s in split]
+        # capture the record keys
+        sk = split[0][blocks_in.record_keys]
+        # check same number of ids for each block
+        # could also double check id columns are identical
+        for i in range(1, len(sk)):
+            assert sk[i].shape[0] == sk[0].shape[0]
+        # limit and rename columns
+
+        def limit_and_rename_cols(s):
+            # get keying
+            keying = s[0, blocks_in.control_table_keys]
+            keys = keying.join(pl.DataFrame(blocks_in.control_table), on=blocks_in.control_table_keys, how="left")
+            assert keys.shape[0] == 1
+            keys = keys.drop(blocks_in.control_table_keys)
+            s = s.drop(blocks_in.record_keys + blocks_in.control_table_keys)
+            assert keys.shape[1] == s.shape[1]
+            s.columns = [keys[0, i] for i in range(keys.shape[1])]
+            return s
+
+        split = [limit_and_rename_cols(s) for s in split]
+        res = pl.concat([sk] + split, how="horizontal")
+        return res
     
     def rowrecs_to_blocks(
         self,
@@ -661,6 +687,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
         assert self.is_appropriate_data_instance(data)
         assert isinstance(data, pl.DataFrame)
         assert blocks_out is not None
+        assert blocks_out.control_table.shape[0] > 1
         assert isinstance(check_blocks_out_keying, bool)
         _raise_not_impl("blocks_to_rowrecs")  # TODO: implement
     
