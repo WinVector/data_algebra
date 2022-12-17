@@ -20,7 +20,7 @@ def pandas_to_example_str(obj, *, local_data_model=None) -> str:
     :return: Python source code representation of obj.
     """
     if local_data_model is None:
-        local_data_model = data_algebra.data_model.default_data_model()
+        local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(obj)
     pd_module_name = local_data_model.presentation_model_name
     if not local_data_model.is_appropriate_data_instance(obj):
         raise TypeError("Expect obj to be local_data_model.pd.DataFrame")

@@ -480,3 +480,143 @@ def test_polars_cdata_example():
         conv_pure_polars_ops = ops_polars.transform(pl.DataFrame(d))
         assert isinstance(conv_pure_polars_ops, pl.DataFrame)
         assert data_algebra.test_util.equivalent_frames(conv_pure_polars_ops.to_pandas(), expect)
+
+
+def test_polars_cdata_example_exbb():
+    if have_polars:
+        c1 = pl.DataFrame({
+            "k1": [1, 2, 3],
+            "v1": ["a", "c", "e"],
+            "v2": ["b", "d", "f"],
+        })
+        c2 = pl.DataFrame({
+            "k2": [4, 5],
+            "w1": ["a", "b"],
+            "w2": ["c", "d"],
+            "w3": ["e", "f"],
+        })
+        rm = data_algebra.cdata.RecordMap(
+                blocks_in=data_algebra.cdata.RecordSpecification(
+                    c1,
+                    control_table_keys=["k1"],
+                    record_keys=["id"],
+                ),
+                blocks_out=data_algebra.cdata.RecordSpecification(
+                    c2,
+                    control_table_keys=["k2"],
+                    record_keys=["id"],
+                ),
+        )
+        rm_str = str(rm)
+        assert isinstance(rm_str, str)
+        rm_repr = rm.__repr__()
+        assert isinstance(rm_repr, str)
+        inp1 = rm.example_input()
+        assert isinstance(inp1, pl.DataFrame)
+        expect_inp1 = pl.DataFrame({
+            "id": ["id", "id", "id"],
+            "k1": [1, 2, 3],
+            "v1": ["a", "c", "e"],
+            "v2": ["b", "d", "f"],
+        })
+        assert data_algebra.test_util.equivalent_frames(inp1.to_pandas(), expect_inp1.to_pandas())
+        out1 = rm.transform(inp1)
+        assert isinstance(out1, pl.DataFrame)
+        expect_out1 = pl.DataFrame({
+            "id": ["id", "id"],
+            "k2": [4, 5],
+            "w1": ["a", "b"],
+            "w2": ["c", "d"],
+            "w3": ["e", "f"],
+        })
+        assert data_algebra.test_util.equivalent_frames(out1.to_pandas(), expect_out1.to_pandas())
+        back_1 = rm.inverse().transform(out1)
+        assert data_algebra.test_util.equivalent_frames(back_1.to_pandas(), expect_inp1.to_pandas())
+
+
+def test_polars_cdata_example_exbr():
+    if have_polars:
+        c1 = pl.DataFrame({
+            "k1": [1, 2, 3],
+            "v1": ["a", "c", "e"],
+            "v2": ["b", "d", "f"],
+        })
+        rm = data_algebra.cdata.RecordMap(
+                blocks_in=data_algebra.cdata.RecordSpecification(
+                    c1,
+                    control_table_keys=["k1"],
+                    record_keys=["id"],
+                ),
+        )
+        rm_str = str(rm)
+        assert isinstance(rm_str, str)
+        rm_repr = rm.__repr__()
+        assert isinstance(rm_repr, str)
+        inp1 = rm.example_input()
+        assert isinstance(inp1, pl.DataFrame)
+        expect_inp1 = pl.DataFrame({
+            "id": ["id", "id", "id"],
+            "k1": [1, 2, 3],
+            "v1": ["a", "c", "e"],
+            "v2": ["b", "d", "f"],
+        })
+        assert data_algebra.test_util.equivalent_frames(inp1.to_pandas(), expect_inp1.to_pandas())
+        out1 = rm.transform(inp1)
+        assert isinstance(out1, pl.DataFrame)
+        expect_out1 = pl.DataFrame({
+            "id": ["id"],
+            "a": ["a"],
+            "b": ["b"],
+            "c": ["c"],
+            "d": ["d"],
+            "e": ["e"],
+            "f": ["f"],
+        })
+        assert data_algebra.test_util.equivalent_frames(out1.to_pandas(), expect_out1.to_pandas())
+        back_1 = rm.inverse().transform(out1)
+        assert data_algebra.test_util.equivalent_frames(back_1.to_pandas(), expect_inp1.to_pandas())
+
+
+def test_polars_cdata_example_exrb():
+    if have_polars:
+        c2 = pl.DataFrame({
+            "k2": [4, 5],
+            "w1": ["a", "b"],
+            "w2": ["c", "d"],
+            "w3": ["e", "f"],
+        })
+        rm = data_algebra.cdata.RecordMap(
+                blocks_out=data_algebra.cdata.RecordSpecification(
+                    c2,
+                    control_table_keys=["k2"],
+                    record_keys=["id"],
+                ),
+        )
+        rm_str = str(rm)
+        assert isinstance(rm_str, str)
+        rm_repr = rm.__repr__()
+        assert isinstance(rm_repr, str)
+        inp1 = rm.example_input()
+        assert isinstance(inp1, pl.DataFrame)
+        expect_inp1 = pl.DataFrame({
+            "id": ["id"],
+            "a": ["a"],
+            "b": ["b"],
+            "c": ["c"],
+            "d": ["d"],
+            "e": ["e"],
+            "f": ["f"],
+        })
+        assert data_algebra.test_util.equivalent_frames(inp1.to_pandas(), expect_inp1.to_pandas())
+        out1 = rm.transform(inp1)
+        assert isinstance(out1, pl.DataFrame)
+        expect_out1 = pl.DataFrame({
+            "id": ["id", "id"],
+            "k2": [4, 5],
+            "w1": ["a", "b"],
+            "w2": ["c", "d"],
+            "w3": ["e", "f"],
+        })
+        assert data_algebra.test_util.equivalent_frames(out1.to_pandas(), expect_out1.to_pandas())
+        back_1 = rm.inverse().transform(out1)
+        assert data_algebra.test_util.equivalent_frames(back_1.to_pandas(), expect_inp1.to_pandas())
