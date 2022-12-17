@@ -317,6 +317,18 @@ class PolarsModel(data_algebra.data_model.DataModel):
         """
         return x.is_null()
 
+    def concat_columns(self, frame_list):
+        """
+        Concatinate columns from frame_list
+        """
+        frame_list = list(frame_list)
+        if len(frame_list) <= 0:
+            return None
+        if len(frame_list) == 1:
+            return frame_list[0]
+        res = pl.concat(frame_list, how="horizontal")
+        return res
+
     # evaluate
 
     def eval(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]) -> pl.DataFrame:

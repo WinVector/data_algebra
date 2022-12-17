@@ -259,24 +259,22 @@ class RecordMap:
         :param local_data_model: optional Pandas data model.
         :return: example result data frame.
         """
-        
-        
         if self.blocks_in is not None:
-            example = self.blocks_in.control_table.copy()
             if local_data_model is None:
                 local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(self.blocks_in.control_table)
             assert isinstance(local_data_model, data_algebra.data_model.DataModel)
-            nrow = example.shape[0]
-            for rk in self.blocks_in.record_keys:
-                example[rk] = [rk] * nrow
+            example_data = local_data_model.clean_copy(self.blocks_in.control_table)
+            if (self.blocks_in.record_keys is None) or (len(self.blocks_in.record_keys) == 0):
+                return example_data
+            nrow = example_data.shape[0]
+            row_key_frame = local_data_model.data_frame({k: [k] * nrow for k in self.blocks_in.record_keys})
+            example = local_data_model.concat_columns([row_key_frame, example_data])
             return example
         if self.blocks_out is not None:
             if local_data_model is None:
                 local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(self.blocks_out.control_table)
             assert isinstance(local_data_model, data_algebra.data_model.DataModel)
-            example = local_data_model.data_frame()
-            for k in self.blocks_out.row_columns:
-                example[k] = [k]
+            example = local_data_model.data_frame({k : [k] for k in self.blocks_out.row_columns})
             return example
         return None
 

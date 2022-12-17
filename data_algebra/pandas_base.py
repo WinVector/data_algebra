@@ -443,6 +443,18 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             )
         return self.pd.isnull(x)
 
+    def concat_columns(self, frame_list):
+        """
+        Concatinate columns from frame_list
+        """
+        frame_list = list(frame_list)
+        if len(frame_list) <= 0:
+            return None
+        if len(frame_list) == 1:
+            return self.clean_copy(frame_list[0])
+        res = self.pd.concat(frame_list, axis=1)
+        return res
+
     # bigger stuff
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
