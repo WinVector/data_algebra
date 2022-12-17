@@ -315,7 +315,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
         """
         Return vector indicating which entries are bad (null or nan) (vectorized).
         """
-        _raise_not_impl("bad_column_positions")  # TODO: implement
+        return x.is_null()
 
     # evaluate
 
