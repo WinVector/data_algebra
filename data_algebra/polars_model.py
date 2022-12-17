@@ -5,7 +5,7 @@ Adapter to use Polars ( https://www.pola.rs ) in the data algebra.
 Note: fully not implemented yet.
 """
 
-from typing import Any, Callable, Dict, List, Optional, Set
+from typing import Any, Callable, Dict, Iterable, List, Optional, Set
 
 import polars as pl
 
@@ -336,6 +336,37 @@ class PolarsModel(data_algebra.data_model.DataModel):
             return frame_list[0]
         res = pl.concat(frame_list, how="horizontal")
         return res
+
+    def table_is_keyed_by_columns(self, table, *, column_names: Iterable[str]) -> bool:
+        """
+        Check if a table is keyed by a given list of column names.
+
+        :param table: DataFrame
+        :param column_names: list of column names
+        :return: True if rows are uniquely keyed by values in named columns
+        """
+        # check for ill-condition
+        if isinstance(column_names, str):
+            column_names = [column_names]
+        else:
+            column_names = list(column_names)
+        missing_columns = set(column_names) - set(table.columns)
+        if len(missing_columns) > 0:
+            return False
+        # get rid of some corner cases
+        if table.shape[0] < 2:
+            return True
+        if len(column_names) < 1:
+            return False
+        mx = (
+            table
+                .select(column_names)
+                .with_column(pl.lit(1, pl.Int64).alias("_da_count_tmp"))
+                .groupby(column_names)
+                .sum()["_da_count_tmp"]
+                .max()
+        )
+        return mx <= 1
 
     # evaluate
 
@@ -669,7 +700,8 @@ class PolarsModel(data_algebra.data_model.DataModel):
         assert blocks_in is not None
         assert blocks_in.control_table.shape[0] > 1
         assert len(blocks_in.control_table_keys) > 0
-        # TODO: confirm keyed by blocks_in.record_keys + blocks_in.control_table_keys
+        data = data.select(blocks_in.block_columns)
+        assert set(data.columns) == set(blocks_in.block_columns)
         # split on block keys
         split = data.partition_by(blocks_in.control_table_keys)
         # check same number of ids for each block
@@ -715,23 +747,21 @@ class PolarsModel(data_algebra.data_model.DataModel):
         data,
         *,
         blocks_out,
-        check_blocks_out_keying: bool = False,
     ):
         """
         Convert rowrecs (single row records) into block records (multiple row records).
 
         :param data: data frame to transform.
         :param blocks_out: cdata record specification.
-        :param check_blocks_out_keying: logical, if True confirm keying
         :return: transformed data frame
         """
-        # TODO: check_blocks_out_keying
         assert self.is_appropriate_data_instance(data)
         assert isinstance(data, pl.DataFrame)
         assert blocks_out is not None
         assert blocks_out.control_table.shape[0] > 1
         assert len(blocks_out.control_table_keys) > 0
-        assert isinstance(check_blocks_out_keying, bool)
+        data = data.select(blocks_out.row_columns)
+        assert set(data.columns) == set(blocks_out.row_columns)
         ct = self.data_frame(blocks_out.control_table)
         new_names = [ct.columns[j] for j in range(ct.shape[1]) if ct.columns[j] not in set(blocks_out.control_table_keys)]
 

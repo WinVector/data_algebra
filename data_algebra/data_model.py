@@ -5,7 +5,7 @@ Interface for realizing the data algebra as a sequence of steps over an object.
 
 import abc
 import re
-from typing import Any, Dict, List
+from typing import Any, Dict, Iterable, List
 
 
 class DataModel(abc.ABC):
@@ -53,11 +53,15 @@ class DataModel(abc.ABC):
         """
         Return vector indicating which entries are bad (null or nan) (vectorized).
         """
-    
+
     @abc.abstractmethod
-    def concat_columns(self, frame_list):
+    def table_is_keyed_by_columns(self, table, *, column_names: Iterable[str]) -> bool:
         """
-        Concatinate columns from frame_list
+        Check if a table is keyed by a given list of column names.
+
+        :param table: DataFrame
+        :param column_names: list of column names
+        :return: True if rows are uniquely keyed by values in named columns
         """
 
     # evaluate
@@ -90,14 +94,12 @@ class DataModel(abc.ABC):
         data,
         *,
         blocks_out,
-        check_blocks_out_keying: bool = False,
     ):
         """
         Convert rowrecs (single row records) into block records (multiple row records).
 
         :param data: data frame to transform.
         :param blocks_out: cdata record specification.
-        :param check_blocks_out_keying: logical, if True confirm keying
         :return: transformed data frame
         """
     

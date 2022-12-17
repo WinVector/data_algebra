@@ -620,3 +620,13 @@ def test_polars_cdata_example_exrb():
         assert data_algebra.test_util.equivalent_frames(out1.to_pandas(), expect_out1.to_pandas())
         back_1 = rm.inverse().transform(out1)
         assert data_algebra.test_util.equivalent_frames(back_1.to_pandas(), expect_inp1.to_pandas())
+
+
+def test_polars_table_is_keyed_by_columns():
+    if have_polars:
+        d = pl.DataFrame(
+            {"a": [1, 1, 2, 2], "b": [1, 2, 1, 2]}
+        )
+        local_model = data_algebra.data_model.lookup_data_model_for_dataframe(d)
+        assert local_model.table_is_keyed_by_columns(d, column_names=["a", "b"])
+        assert not local_model.table_is_keyed_by_columns(d, column_names=["a"])

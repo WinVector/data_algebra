@@ -38,31 +38,6 @@ def pandas_to_example_str(obj, *, local_data_model=None) -> str:
     return pandas_string
 
 
-def table_is_keyed_by_columns(table, column_names: Iterable[str]) -> bool:
-    """
-    Check if a table is keyed by a given list of column names.
-
-    :param table: pandas DataFrame
-    :param column_names: list of column names
-    :return: True if rows are uniquely keyed by values in named columns
-    """
-    # check for ill-condition
-    if isinstance(column_names, str):
-        column_names = [column_names]
-    else:
-        column_names = [c for c in column_names]
-    missing_columns = set(column_names) - set([c for c in table.columns])
-    if len(missing_columns) > 0:
-        raise KeyError("missing columns: " + str(missing_columns))
-    # get rid of some corner cases
-    if table.shape[0] < 2:
-        return True
-    if len(column_names) < 1:
-        return False
-    counts = table.groupby(column_names, observed=True).size()
-    return max(counts) <= 1
-
-
 # noinspection PyBroadException
 def _mk_type_conversion_table() -> Dict[type, type]:
     """

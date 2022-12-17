@@ -15,6 +15,9 @@ class RecordSpecification:
     Class to represent a multi-row data record.
     """
 
+    row_columns: List[str]  # columns when in row form
+    block_columns: List[str]  # columns when in block form
+
     def __init__(
         self,
         control_table,
@@ -78,8 +81,8 @@ class RecordSpecification:
             if any(local_data_model.bad_column_positions(control_table[ck])):
                 raise ValueError("NA/NaN/inf/None not allowed as control table keys")
         if strict:
-            if not data_algebra.util.table_is_keyed_by_columns(
-                self.control_table, self.control_table_keys
+            if not local_data_model.table_is_keyed_by_columns(
+                self.control_table, column_names=self.control_table_keys
             ):
                 raise ValueError("control table wasn't keyed by control table keys")
         self.block_columns = self.record_keys + [c for c in self.control_table.columns]
@@ -104,7 +107,10 @@ class RecordSpecification:
             if len(set(cvs)) != len(cvs):
                 raise ValueError("duplicate content keys")
         self.content_keys = cvs
+        # columns in the row-record form
         self.row_columns = self.record_keys + cvs
+        # columns in the block-record form
+        self.block_columns = self.record_keys + list(self.control_table.columns)
 
     def row_version(self, *, include_record_keys: bool = True) -> List[str]:
         """
@@ -280,13 +286,12 @@ class RecordMap:
 
     # noinspection PyPep8Naming
     def transform(
-        self, X, *, check_blocks_out_keying: bool = False, local_data_model=None
+        self, X, *, local_data_model=None
     ):
         """
         Transform X records.
 
         :param X: data frame to be transformed.
-        :param check_blocks_out_keying: logical, if True check output key constraints.
         :param local_data_model: pandas data model.
         :return: transformed data frame.
         """
@@ -306,7 +311,6 @@ class RecordMap:
             X = local_data_model.rowrecs_to_blocks(
                 X,
                 blocks_out=self.blocks_out,
-                check_blocks_out_keying=check_blocks_out_keying,
             )
         return X
 
