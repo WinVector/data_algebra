@@ -34,7 +34,7 @@ class RecordSpecification:
         :param local_data_model: data.frame data model
         """
         if local_data_model is None:
-            local_data_model = data_algebra.data_model.default_data_model()
+            local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(control_table)
         assert isinstance(local_data_model, data_algebra.data_model.DataModel)
         assert local_data_model.is_appropriate_data_instance(control_table)
         control_table = local_data_model.clean_copy(control_table)
@@ -84,10 +84,10 @@ class RecordSpecification:
                 raise ValueError("control table wasn't keyed by control table keys")
         self.block_columns = self.record_keys + [c for c in self.control_table.columns]
         cvs = []
-        for c in self.control_table:
+        for c in self.control_table.columns:
             if c not in self.control_table_keys:
                 col = self.control_table[c]
-                isnull = col.isnull()
+                isnull = local_data_model.bad_column_positions(col)
                 if all(isnull):
                     raise ValueError("column " + c + " was all null")
                 for i in range(len(col)):
@@ -259,16 +259,21 @@ class RecordMap:
         :param local_data_model: optional Pandas data model.
         :return: example result data frame.
         """
-        if local_data_model is None:
-            local_data_model = data_algebra.data_model.default_data_model()
-        assert isinstance(local_data_model, data_algebra.data_model.DataModel)
+        
+        
         if self.blocks_in is not None:
             example = self.blocks_in.control_table.copy()
+            if local_data_model is None:
+                local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(self.blocks_in.control_table)
+            assert isinstance(local_data_model, data_algebra.data_model.DataModel)
             nrow = example.shape[0]
             for rk in self.blocks_in.record_keys:
                 example[rk] = [rk] * nrow
             return example
-        if self.blocks_in is not None:
+        if self.blocks_out is not None:
+            if local_data_model is None:
+                local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(self.blocks_out.control_table)
+            assert isinstance(local_data_model, data_algebra.data_model.DataModel)
             example = local_data_model.data_frame()
             for k in self.blocks_out.row_columns:
                 example[k] = [k]
@@ -291,7 +296,7 @@ class RecordMap:
         if len(unknown) > 0:
             raise ValueError("missing required columns: " + str(unknown))
         if local_data_model is None:
-            local_data_model = data_algebra.data_model.default_data_model()
+            local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(X)
         assert isinstance(local_data_model, data_algebra.data_model.DataModel)
         assert local_data_model.is_appropriate_data_instance(X)
         X = local_data_model.clean_copy(X)
@@ -496,7 +501,7 @@ def pivot_rowrecs_to_blocks(
     attribute_value_column,
     record_keys,
     record_value_columns,
-    local_data_model=None
+    local_data_model=None,
 ):
     """
     Build a row records to block records map. This is very similar to a SQL unpivot.
@@ -532,7 +537,8 @@ def pivot_specification(
     row_keys: Iterable[str],
     col_name_key: str = "column_name",
     col_value_key: str = "column_value",
-    value_cols: Iterable[str]
+    value_cols: Iterable[str],
+    local_data_model = None,
 ) -> RecordMap:
     """
     Specify the cdata transformation that pivots records from a single column of values into collected rows.
@@ -542,6 +548,7 @@ def pivot_specification(
     :param col_name_key: column name to take the names of columns as a column
     :param col_value_key: column name to take the values in columns as a column
     :param value_cols: columns to place values in
+    :param local_data_model: data.frame data model
     :return: RecordSpecification
     """
     assert not isinstance(value_cols, str)
@@ -552,9 +559,12 @@ def pivot_specification(
     assert isinstance(col_value_key, str)
     known_cols = row_keys + [col_name_key, col_value_key] + value_cols
     assert len(known_cols) == len(set(known_cols))
+    if local_data_model is None:
+        local_data_model = data_algebra.data_model.default_data_model()
+    assert isinstance(local_data_model, data_algebra.data_model.DataModel)
     record_map = RecordMap(
         blocks_in=RecordSpecification(
-            control_table=data_algebra.data_model.default_data_model().pd.DataFrame(
+            control_table=local_data_model.pd.DataFrame(
                 {
                     col_name_key: value_cols,
                     col_value_key: value_cols,
@@ -572,7 +582,8 @@ def unpivot_specification(
     row_keys: Iterable[str],
     col_name_key: str = "column_name",
     col_value_key: str = "column_value",
-    value_cols: Iterable[str]
+    value_cols: Iterable[str],
+    local_data_model=None,
 ) -> RecordMap:
     """
     Specify the cdata transformation that un-pivots records into a single column of values plus keys.
@@ -582,6 +593,7 @@ def unpivot_specification(
     :param col_name_key: column name to land the names of columns as a column
     :param col_value_key: column name to land the values in columns as a column
     :param value_cols: columns to take values from
+    :param local_data_model: data.frame data model
     :return: RecordSpecification
     """
     assert not isinstance(value_cols, str)
@@ -592,9 +604,12 @@ def unpivot_specification(
     assert isinstance(col_value_key, str)
     known_cols = row_keys + [col_name_key, col_value_key] + value_cols
     assert len(known_cols) == len(set(known_cols))
+    if local_data_model is None:
+        local_data_model = data_algebra.data_model.default_data_model()
+    assert isinstance(local_data_model, data_algebra.data_model.DataModel)
     record_map = RecordMap(
         blocks_out=RecordSpecification(
-            control_table=data_algebra.data_model.default_data_model().pd.DataFrame(
+            control_table=local_data_model.pd.DataFrame(
                 {
                     col_name_key: value_cols,
                     col_value_key: value_cols,
