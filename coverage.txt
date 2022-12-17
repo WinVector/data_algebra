@@ -84,7 +84,7 @@ tests/test_order_limit.py .                                              [ 52%]
 tests/test_ordered_agg_group.py .                                        [ 52%]
 tests/test_parens.py ..                                                  [ 53%]
 tests/test_parse.py ..........................                           [ 60%]
-tests/test_polars.py ................F                                   [ 65%]
+tests/test_polars.py .................                                   [ 65%]
 tests/test_project.py .....                                              [ 67%]
 tests/test_rank.py .                                                     [ 67%]
 tests/test_rank_to_average.py .                                          [ 67%]
@@ -129,87 +129,6 @@ tests/test_window_fns.py .....                                           [ 98%]
 tests/test_with.py ..                                                    [ 99%]
 tests/test_xicor.py ..                                                   [100%]
 
-=================================== FAILURES ===================================
-__________________________ test_polars_cdata_example ___________________________
-
-    def test_polars_cdata_example():
-        if have_polars:
-            polars_model = data_algebra.data_model.default_data_model()
-            pd = polars_model.pd
-            c1 = pd.DataFrame({
-                "k1": [1, 2, 3],
-                "v1": ["a", "c", "e"],
-                "v2": ["b", "d", "f"],
-            })
-            rs1 = data_algebra.cdata.RecordSpecification(
-                c1,
-                control_table_keys=["k1"],
-                record_keys=["id"],
-            )
-            c2 = pd.DataFrame({
-                "k2": [4, 5],
-                "w1": ["a", "b"],
-                "w2": ["c", "d"],
-                "w3": ["e", "f"],
-            })
-            rs2 = data_algebra.cdata.RecordSpecification(
-                c2,
-                control_table_keys=["k2"],
-                record_keys=["id"],
-            )
-            record_map = data_algebra.cdata.RecordMap(
-                    blocks_in=rs1,
-                    blocks_out=rs2
-            )
-            d = pd.DataFrame({
-                "id": [1, 1, 1, 2, 2, 2],
-                "k1": [1, 2, 3, 1, 2, 3],
-                "v1": ["a", "c", "e", "g", "i", "k"],
-                "v2": ["b", "d", "f", "h", "j", "l"],
-            })
-            expect =  pd.DataFrame({
-                "id": [1, 1, 2, 2],
-                "k2": [4, 5, 4, 5],
-                "w1": ["a", "b", "g", "h"],
-                "w2": ["c", "d", "i", "j"],
-                "w3": ["e", "f", "k", "l"],
-            })
-            conv_pandas_rm = record_map.transform(d)
-            assert data_algebra.test_util.equivalent_frames(conv_pandas_rm, expect)
-            ops = (
-                data_algebra.descr(d=d)
-                    .convert_records(record_map=record_map)
-            )
-            conv_pandas_ops = ops.transform(d)
-            assert data_algebra.test_util.equivalent_frames(conv_pandas_ops, expect)
->           conv_polars_ops = ops.transform(pl.DataFrame(d))
-
-tests/test_polars.py:460: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-data_algebra/data_ops.py:523: in transform
-    return self.eval(
-data_algebra/data_ops.py:496: in eval
-    return data_model.eval(op=self, data_map=data_map)
-data_algebra/polars_model.py:328: in eval
-    res = self._compose_polars_ops(op=op, data_map=data_map)
-data_algebra/polars_model.py:344: in _compose_polars_ops
-    res = self._method_dispatch_table[op.node_name](op=op, data_map=data_map)
-data_algebra/polars_model.py:376: in _convert_records_step
-    res = op.record_map.transform(res, local_data_model=self)
-data_algebra/cdata.py:299: in transform
-    X = local_data_model.blocks_to_rowrecs(
-data_algebra/polars_model.py:641: in blocks_to_rowrecs
-    _raise_not_impl("blocks_to_rowrecs")  # TODO: implement
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-nm = 'blocks_to_rowrecs'
-
-    def _raise_not_impl(nm: str):   # TODO: get rid of this
->       raise ValueError(f" {nm} not implemented for Polars adapter, yet")
-E       ValueError:  blocks_to_rowrecs not implemented for Polars adapter, yet
-
-data_algebra/polars_model.py:82: ValueError
-
 ---------- coverage: platform darwin, python 3.10.8-final-0 ----------
 Name                                   Stmts   Miss  Cover   Missing
 --------------------------------------------------------------------
@@ -241,15 +160,14 @@ data_algebra/op_container.py             127     49    61%   46-47, 63-71, 80-81
 data_algebra/pandas_base.py              691     63    91%   53, 67, 76, 86, 96, 215, 217, 231, 234, 239, 244, 454, 460-467, 474, 505-510, 540, 544, 547, 549, 586, 640, 681, 698, 718, 736, 746, 761, 809, 817, 825, 840, 851, 863, 882, 897, 925, 940, 977, 994, 997, 1008, 1027, 1033, 1038, 1067, 1089, 1114, 1117-1120, 1124, 1134, 1233, 1247-1249
 data_algebra/pandas_model.py              15      0   100%
 data_algebra/parse_by_lark.py            164     24    85%   71, 93, 108, 129-130, 137, 161, 171, 185-186, 188, 200, 206, 213-217, 245, 253, 263-266
-data_algebra/polars_model.py             300     47    84%   76, 78, 285, 300, 307, 314, 354, 370, 377-379, 386, 402, 417, 426, 448, 455-457, 463, 478, 485, 499, 513-520, 528, 535, 542-548, 555, 561, 569, 589, 602-611, 618, 623, 658
+data_algebra/polars_model.py             357     49    86%   76, 78, 82, 286, 288, 304, 311, 318, 358, 374, 390, 406, 421, 430, 452, 459-461, 467, 482, 489, 503, 517-524, 532, 539, 546-552, 559, 565, 573, 593, 606-615, 622, 627, 677, 686, 725, 737
 data_algebra/python3_lark.py               1      0   100%
 data_algebra/solutions.py                136      4    97%   63, 303, 384, 467
 data_algebra/sql_format_options.py        15      2    87%   61, 69
 data_algebra/test_util.py                291     57    80%   88, 110, 120, 123, 127, 150, 153, 157, 159-162, 173, 230-231, 247-252, 256, 268, 270-278, 324, 327, 335, 346, 353, 357, 369, 380, 394, 465-468, 470-473, 475-478, 480-483, 557-562, 568-569, 572
 data_algebra/util.py                     140     31    78%   26, 51, 56, 61, 84-85, 88-89, 92-93, 96-97, 100-101, 104-105, 108-109, 112-113, 116-117, 120-121, 168, 190, 192, 207, 248, 252, 254
 --------------------------------------------------------------------
-TOTAL                                   6421    930    86%
+TOTAL                                   6478    932    86%
 
-=========================== short test summary info ============================
-FAILED tests/test_polars.py::test_polars_cdata_example - ValueError:  blocks_...
-================== 1 failed, 348 passed in 792.54s (0:13:12) ===================
+
+======================= 349 passed in 815.43s (0:13:35) ========================

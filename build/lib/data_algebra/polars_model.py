@@ -282,6 +282,10 @@ class PolarsModel(data_algebra.data_model.DataModel):
         """
         if arg is None:
             return pl.DataFrame()
+        if isinstance(arg, pl.DataFrame):
+            return arg
+        if isinstance(arg, pl.LazyFrame):
+            return arg.collect()
         return pl.DataFrame(arg)
 
     def is_appropriate_data_instance(self, df) -> bool:
@@ -605,7 +609,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
             )
         db_handle = data_map[op.view_name]
         res = db_handle.read_query("\n".join(op.sql))
-        res = pl.DataFrame(res)
+        res = self.data_frame(res)
         if self.use_lazy_eval and (not isinstance(res, pl.LazyFrame)):
             res = res.lazy()
         return res
@@ -638,7 +642,51 @@ class PolarsModel(data_algebra.data_model.DataModel):
         :param blocks_in: cdata record specification
         :return: transformed data frame
         """
-        _raise_not_impl("blocks_to_rowrecs")  # TODO: implement
+        assert self.is_appropriate_data_instance(data)
+        assert isinstance(data, pl.DataFrame)
+        assert blocks_in is not None
+        assert blocks_in.control_table.shape[0] > 1
+        assert len(blocks_in.control_table_keys) > 0
+        # TODO: confirm keyed by blocks_in.record_keys + blocks_in.control_table_keys
+        # split on block keys
+        split = data.partition_by(blocks_in.control_table_keys)
+        # check same number of ids for each block
+        # could also double check id columns are identical
+        for i in range(1, len(split)):
+            assert split[i].shape[0] == split[0].shape[0]
+        sk = None
+        if (blocks_in.record_keys is not None) and (len(blocks_in.record_keys) > 0):
+            # ensure sorted in record order
+            split = [s.sort(blocks_in.record_keys) for s in split]
+            # capture the record keys
+            sk = split[0][blocks_in.record_keys]
+        # limit and rename columns
+
+        def limit_and_rename_cols(s):
+            # get keying
+            keying = s[0, blocks_in.control_table_keys]
+            keys = keying.join(
+                self.data_frame(blocks_in.control_table), 
+                on=blocks_in.control_table_keys, 
+                how="left")
+            assert keys.shape[0] == 1
+            keys = keys.drop(blocks_in.control_table_keys)
+            if (blocks_in.record_keys is not None) and (len(blocks_in.record_keys) > 0):
+                s = s.drop(blocks_in.record_keys + blocks_in.control_table_keys)
+            else:
+                s = s.drop(blocks_in.control_table_keys)
+            assert keys.shape[1] == s.shape[1]
+            s.columns = [keys[0, i] for i in range(keys.shape[1])]
+            return s
+
+        split = [limit_and_rename_cols(s) for s in split]
+        if sk is not None:
+            res = pl.concat([sk] + split, how="horizontal")
+        else:
+            res = pl.concat(split, how="horizontal")
+        if (blocks_in.record_keys is not None) and (len(blocks_in.record_keys) > 0):
+            res = res.sort(blocks_in.record_keys)
+        return res
     
     def rowrecs_to_blocks(
         self,
@@ -655,7 +703,39 @@ class PolarsModel(data_algebra.data_model.DataModel):
         :param check_blocks_out_keying: logical, if True confirm keying
         :return: transformed data frame
         """
-        _raise_not_impl("blocks_to_rowrecs")  # TODO: implement
+        # TODO: check_blocks_out_keying
+        assert self.is_appropriate_data_instance(data)
+        assert isinstance(data, pl.DataFrame)
+        assert blocks_out is not None
+        assert blocks_out.control_table.shape[0] > 1
+        assert len(blocks_out.control_table_keys) > 0
+        assert isinstance(check_blocks_out_keying, bool)
+        ct = self.data_frame(blocks_out.control_table)
+        new_names = [ct.columns[j] for j in range(ct.shape[1]) if ct.columns[j] not in set(blocks_out.control_table_keys)]
+
+        def extract_rows(i):
+            ct_keys = ct[i, blocks_out.control_table_keys]
+            col_names = [ct[i, j] for j in range(ct.shape[1]) if ct.columns[j] not in set(blocks_out.control_table_keys)]
+            new_dat = data[:, col_names]
+            new_dat.columns = new_names
+            if (blocks_out.record_keys is not None) and (len(blocks_out.record_keys) > 0):
+                row = data[blocks_out.record_keys]
+                row = row.with_columns([pl.lit(ct_keys[0, c]).alias(c) for c in ct_keys.columns])
+            else:
+                row = pl.DataFrame({c: [ct_keys[0, c]] * data.shape[0] for c in ct_keys.columns})
+            row = pl.concat([
+                row, new_dat],
+                how="horizontal"
+            )
+            return row
+
+        rows = [extract_rows(i) for i in range(ct.shape[0])]
+        res = pl.concat(rows, how="vertical")
+        if (blocks_out.record_keys is not None) and (len(blocks_out.record_keys) > 0):
+            res = res.sort(blocks_out.record_keys + blocks_out.control_table_keys)
+        else:
+            res = res.sort(blocks_out.control_table_keys)
+        return res
     
     # expression helpers
     
@@ -710,12 +790,12 @@ def register_polars_model(key:Optional[str] = None):
     # register data model
     common_key = "default_Polars_model"
     if common_key not in data_algebra.data_model.data_model_type_map.keys():
-        pd_model = PolarsModel()
-        data_algebra.data_model.data_model_type_map[common_key] = pd_model
-        data_algebra.data_model.data_model_type_map["<class 'polars.internals.dataframe.frame.DataFrame'>"] = pd_model
-        data_algebra.data_model.data_model_type_map[str(type(pd_model.data_frame()))] = pd_model
-        data_algebra.data_model.data_model_type_map["<class 'polars.internals.lazyframe.frame.LazyFrame'>"] = pd_model
-        data_algebra.data_model.data_model_type_map[str(type(pd_model.data_frame().lazy()))] = pd_model
+        pl_model = PolarsModel()
+        data_algebra.data_model.data_model_type_map[common_key] = pl_model
+        data_algebra.data_model.data_model_type_map["<class 'polars.internals.dataframe.frame.DataFrame'>"] = pl_model
+        data_algebra.data_model.data_model_type_map[str(type(pl_model.data_frame()))] = pl_model
+        data_algebra.data_model.data_model_type_map["<class 'polars.internals.lazyframe.frame.LazyFrame'>"] = pl_model
+        data_algebra.data_model.data_model_type_map[str(type(pl_model.data_frame().lazy()))] = pl_model
         if key is not None:
             assert isinstance(key, str)
-            data_algebra.data_model.data_model_type_map[key] = pd_model
+            data_algebra.data_model.data_model_type_map[key] = pl_model
