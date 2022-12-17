@@ -409,8 +409,7 @@ def test_polars_group_min_max_example():
 
 def test_polars_cdata_example():
     if have_polars:
-        polars_model = data_algebra.data_model.default_data_model()
-        pd = polars_model.pd
+        pd = data_algebra.data_model.default_data_model().pd
         c1 = pd.DataFrame({
             "k1": [1, 2, 3],
             "v1": ["a", "c", "e"],
@@ -458,6 +457,5 @@ def test_polars_cdata_example():
         conv_pandas_ops = ops.transform(d)
         assert data_algebra.test_util.equivalent_frames(conv_pandas_ops, expect)
         conv_polars_ops = ops.transform(pl.DataFrame(d))
-        assert polars_model.is_appropriate_data_instance(conv_polars_ops)
         assert isinstance(conv_polars_ops, pl.DataFrame)
         assert data_algebra.test_util.equivalent_frames(conv_polars_ops.to_pandas(), expect)
