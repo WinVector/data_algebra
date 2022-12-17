@@ -282,6 +282,10 @@ class PolarsModel(data_algebra.data_model.DataModel):
         """
         if arg is None:
             return pl.DataFrame()
+        if isinstance(arg, pl.DataFrame):
+            return arg
+        if isinstance(arg, pl.LazyFrame):
+            return arg.collect()
         return pl.DataFrame(arg)
 
     def is_appropriate_data_instance(self, df) -> bool:
@@ -605,7 +609,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
             )
         db_handle = data_map[op.view_name]
         res = db_handle.read_query("\n".join(op.sql))
-        res = pl.DataFrame(res)
+        res = self.data_frame(res)
         if self.use_lazy_eval and (not isinstance(res, pl.LazyFrame)):
             res = res.lazy()
         return res
@@ -657,7 +661,10 @@ class PolarsModel(data_algebra.data_model.DataModel):
         def limit_and_rename_cols(s):
             # get keying
             keying = s[0, blocks_in.control_table_keys]
-            keys = keying.join(pl.DataFrame(blocks_in.control_table), on=blocks_in.control_table_keys, how="left")
+            keys = keying.join(
+                self.data_frame(blocks_in.control_table), 
+                on=blocks_in.control_table_keys, 
+                how="left")
             assert keys.shape[0] == 1
             keys = keys.drop(blocks_in.control_table_keys)
             s = s.drop(blocks_in.record_keys + blocks_in.control_table_keys)
