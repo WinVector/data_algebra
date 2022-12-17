@@ -415,25 +415,23 @@ def test_polars_cdata_example():
             "v1": ["a", "c", "e"],
             "v2": ["b", "d", "f"],
         })
-        rs1 = data_algebra.cdata.RecordSpecification(
-            c1,
-            control_table_keys=["k1"],
-            record_keys=["id"],
-        )
         c2 = pd.DataFrame({
             "k2": [4, 5],
             "w1": ["a", "b"],
             "w2": ["c", "d"],
             "w3": ["e", "f"],
         })
-        rs2 = data_algebra.cdata.RecordSpecification(
-            c2,
-            control_table_keys=["k2"],
-            record_keys=["id"],
-        )
-        record_map = data_algebra.cdata.RecordMap(
-                blocks_in=rs1,
-                blocks_out=rs2
+        record_map_pandas = data_algebra.cdata.RecordMap(
+                blocks_in=data_algebra.cdata.RecordSpecification(
+                    c1,
+                    control_table_keys=["k1"],
+                    record_keys=["id"],
+                ),
+                blocks_out=data_algebra.cdata.RecordSpecification(
+                    c2,
+                    control_table_keys=["k2"],
+                    record_keys=["id"],
+                ),
         )
         d = pd.DataFrame({
             "id": [1, 1, 1, 2, 2, 2],
@@ -448,14 +446,37 @@ def test_polars_cdata_example():
             "w2": ["c", "d", "i", "j"],
             "w3": ["e", "f", "k", "l"],
         })
-        conv_pandas_rm = record_map.transform(d)
+        conv_pandas_rm = record_map_pandas.transform(d)
         assert data_algebra.test_util.equivalent_frames(conv_pandas_rm, expect)
         ops = (
             data_algebra.descr(d=d)
-                .convert_records(record_map=record_map)
+                .convert_records(record_map=record_map_pandas)
         )
         conv_pandas_ops = ops.transform(d)
         assert data_algebra.test_util.equivalent_frames(conv_pandas_ops, expect)
         conv_polars_ops = ops.transform(pl.DataFrame(d))
         assert isinstance(conv_polars_ops, pl.DataFrame)
         assert data_algebra.test_util.equivalent_frames(conv_polars_ops.to_pandas(), expect)
+        # again with pure Polars structures
+        record_map_polars = data_algebra.cdata.RecordMap(
+                blocks_in=data_algebra.cdata.RecordSpecification(
+                    pl.DataFrame(c1),
+                    control_table_keys=["k1"],
+                    record_keys=["id"],
+                ),
+                blocks_out=data_algebra.cdata.RecordSpecification(
+                    pl.DataFrame(c2),
+                    control_table_keys=["k2"],
+                    record_keys=["id"],
+                ),
+        )
+        conv_pure_polars_rm = record_map_polars.transform(pl.DataFrame(d))
+        assert isinstance(conv_pure_polars_rm, pl.DataFrame)
+        assert data_algebra.test_util.equivalent_frames(conv_pure_polars_rm.to_pandas(), expect)
+        ops_polars = (
+            data_algebra.descr(d=pl.DataFrame(d))
+                .convert_records(record_map=record_map_polars)
+        )
+        conv_pure_polars_ops = ops.transform(pl.DataFrame(d))
+        assert isinstance(conv_pure_polars_ops, pl.DataFrame)
+        assert data_algebra.test_util.equivalent_frames(conv_pure_polars_ops.to_pandas(), expect)
