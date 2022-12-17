@@ -477,6 +477,6 @@ def test_polars_cdata_example():
             data_algebra.descr(d=pl.DataFrame(d))
                 .convert_records(record_map=record_map_polars)
         )
-        conv_pure_polars_ops = ops.transform(pl.DataFrame(d))
+        conv_pure_polars_ops = ops_polars.transform(pl.DataFrame(d))
         assert isinstance(conv_pure_polars_ops, pl.DataFrame)
         assert data_algebra.test_util.equivalent_frames(conv_pure_polars_ops.to_pandas(), expect)
