@@ -51,7 +51,7 @@ class RecordSpecification:
             record_keys = []
         if isinstance(record_keys, str):
             record_keys = [record_keys]
-        self.record_keys = [k for k in record_keys]
+        self.record_keys = list(record_keys)
         if control_table_keys is None:
             if self.control_table.shape[0] > 1:
                 control_table_keys = [self.control_table.columns[0]]

@@ -702,6 +702,13 @@ class PolarsModel(data_algebra.data_model.DataModel):
         assert len(blocks_in.control_table_keys) > 0
         data = data.select(blocks_in.block_columns)
         assert set(data.columns) == set(blocks_in.block_columns)
+        # table must be keyed by record_keys + control_table_keys
+        if not self.table_is_keyed_by_columns(
+            data, column_names=blocks_in.record_keys + blocks_in.control_table_keys
+        ):
+            raise ValueError(
+                "table is not keyed by blocks_in.record_keys + blocks_in.control_table_keys"
+            )
         # split on block keys
         split = data.partition_by(blocks_in.control_table_keys)
         # check same number of ids for each block
@@ -762,6 +769,12 @@ class PolarsModel(data_algebra.data_model.DataModel):
         assert len(blocks_out.control_table_keys) > 0
         data = data.select(blocks_out.row_columns)
         assert set(data.columns) == set(blocks_out.row_columns)
+        if (data.shape[0] > 1) and (not self.table_is_keyed_by_columns(
+            data, column_names=blocks_out.record_keys
+        )):
+            raise ValueError(
+                "table is not keyed by blocks_out.record_keys"
+            )
         ct = self.data_frame(blocks_out.control_table)
         new_names = [ct.columns[j] for j in range(ct.shape[1]) if ct.columns[j] not in set(blocks_out.control_table_keys)]
 

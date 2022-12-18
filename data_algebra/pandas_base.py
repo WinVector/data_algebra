@@ -1143,6 +1143,13 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         missing_cols = set(blocks_out.record_keys) - set(data.columns)
         if len(missing_cols) > 0:
             raise KeyError("missing required columns: " + str(missing_cols))
+        # table must be keyed by record_keys
+        if (data.shape[0] > 1) and (not self.table_is_keyed_by_columns(
+            data, column_names=blocks_out.record_keys
+        )):
+            raise ValueError(
+                "table is not keyed by blocks_out.record_keys"
+            )
         # convert to block records, first build up parallel structures
         rv = [k for k in blocks_out.row_version(include_record_keys=True) if k is not None]
         if len(rv) != len(set(rv)):
