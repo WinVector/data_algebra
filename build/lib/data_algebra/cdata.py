@@ -15,14 +15,18 @@ class RecordSpecification:
     Class to represent a multi-row data record.
     """
 
+    row_columns: List[str]  # columns when in row form
+    block_columns: List[str]  # columns when in block form
+    strict: bool  # do or do not allow repeated value names
+
     def __init__(
         self,
         control_table,
         *,
         record_keys=None,
         control_table_keys=None,
-        strict=False,
-        local_data_model=None
+        strict: bool = True,
+        local_data_model=None,
     ):
         """
         :param control_table: data.frame describing record layout
@@ -30,9 +34,11 @@ class RecordSpecification:
                defaults to no columns.
         :param control_table_keys: array of control_table key column names,
                defaults to first column for non-trivial blocks and no columns for rows.
-        :param strict: logical, if True more checks on transform
+        :param strict: if True don't allow duplicate value names
         :param local_data_model: data.frame data model
         """
+        assert isinstance(strict, bool)
+        self.strict = strict
         if local_data_model is None:
             local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(control_table)
         assert isinstance(local_data_model, data_algebra.data_model.DataModel)
@@ -48,7 +54,7 @@ class RecordSpecification:
             record_keys = []
         if isinstance(record_keys, str):
             record_keys = [record_keys]
-        self.record_keys = [k for k in record_keys]
+        self.record_keys = list(record_keys)
         if control_table_keys is None:
             if self.control_table.shape[0] > 1:
                 control_table_keys = [self.control_table.columns[0]]
@@ -56,7 +62,7 @@ class RecordSpecification:
                 control_table_keys = []  # single row records don't need to be keyed
         if isinstance(control_table_keys, str):
             control_table_keys = [control_table_keys]
-        if strict and (self.control_table.shape[0] > 1):
+        if self.control_table.shape[0] > 1:
             if len(control_table_keys) <= 0:
                 raise ValueError(
                     "multi-row records must have at least one control table key"
@@ -77,34 +83,43 @@ class RecordSpecification:
         for ck in self.control_table_keys:
             if any(local_data_model.bad_column_positions(control_table[ck])):
                 raise ValueError("NA/NaN/inf/None not allowed as control table keys")
-        if strict:
-            if not data_algebra.util.table_is_keyed_by_columns(
-                self.control_table, self.control_table_keys
-            ):
-                raise ValueError("control table wasn't keyed by control table keys")
+        if not local_data_model.table_is_keyed_by_columns(
+            self.control_table, column_names=self.control_table_keys
+        ):
+            raise ValueError("control table wasn't keyed by control table keys")
         self.block_columns = self.record_keys + [c for c in self.control_table.columns]
         cvs = []
         for c in self.control_table.columns:
             if c not in self.control_table_keys:
                 col = self.control_table[c]
                 isnull = local_data_model.bad_column_positions(col)
-                if all(isnull):
-                    raise ValueError("column " + c + " was all null")
+                if any(isnull):
+                    raise ValueError("column " + c + " has null(s)")
                 for i in range(len(col)):
-                    if not isnull[i]:
-                        v = col[i]
-                        if v not in cvs:
-                            cvs.append(v)
+                    v = col[i]
+                    assert isinstance(v, str)
+                    assert len(v) > 0
+                    cvs.append(v)
         confused = set(record_keys).intersection(cvs)
         if len(confused) > 0:
             raise ValueError(
                 "control table entries confused with row keys or control table keys"
             )
-        if strict:
-            if len(set(cvs)) != len(cvs):
+        if len(set(cvs)) != len(cvs):
+            if strict:
                 raise ValueError("duplicate content keys")
+            cvs_orig = cvs
+            cvs = []
+            cvs_seen = set()
+            for v in cvs_orig:
+                if v not in cvs_seen:
+                    cvs.append(v)
+                    cvs_seen.add(v)
         self.content_keys = cvs
+        # columns in the row-record form
         self.row_columns = self.record_keys + cvs
+        # columns in the block-record form
+        self.block_columns = self.record_keys + list(self.control_table.columns)
 
     def row_version(self, *, include_record_keys: bool = True) -> List[str]:
         """
@@ -128,6 +143,8 @@ class RecordSpecification:
             + data_algebra.util.pandas_to_example_str(self.control_table)
             + ",\n    control_table_keys="
             + self.control_table_keys.__repr__()
+            + ",\n    strict="
+            + self.strict.__repr__()
             + ")"
         )
         return s
@@ -185,25 +202,37 @@ class RecordMap:
     Class for specifying general record to record transforms.
     """
 
+    blocks_in: Optional[RecordSpecification]
+    blocks_out: Optional[RecordSpecification]
+    strict: bool
+
     def __init__(
         self,
         *,
         blocks_in: Optional[RecordSpecification] = None,
-        blocks_out: Optional[RecordSpecification] = None
+        blocks_out: Optional[RecordSpecification] = None,
+        strict: bool = True,
     ):
         """
         Build the transform specification. At least one of blocks_in or blocks_out must not be None.
 
         :param blocks_in: incoming record specification, None for row-records.
         :param blocks_out: outgoing record specification, None for row-records.
+        :param strict: if True insist block be strict, and in and out blocks agree on row-form columns.∂
         """
+        assert isinstance(strict, bool)
+        self.strict = strict
         if blocks_in is not None:
             assert isinstance(blocks_in, RecordSpecification)
+            if strict:
+                assert blocks_in.strict
             ck = [k for k in blocks_in.content_keys if k is not None]
             if len(ck) != len(set(ck)):
                 raise ValueError("blocks_in can not have duplicate content keys")
         if blocks_out is not None:
             assert isinstance(blocks_out, RecordSpecification)
+            if strict:
+                assert blocks_out.strict
         if (blocks_in is None) and (blocks_out is None):
             raise ValueError(
                 "At least one of blocks_in or blocks_out should not be None"
@@ -215,6 +244,8 @@ class RecordMap:
             unknown = set(blocks_out.content_keys) - set(blocks_in.content_keys)
             if len(unknown) > 0:
                 raise ValueError("unknown outgoing content_keys" + str(unknown))
+            if strict:
+                assert set(blocks_out.record_keys) == set(blocks_in.record_keys)
         self.blocks_in = blocks_in
         self.blocks_out = blocks_out
         if self.blocks_in is not None:
@@ -280,13 +311,12 @@ class RecordMap:
 
     # noinspection PyPep8Naming
     def transform(
-        self, X, *, check_blocks_out_keying: bool = False, local_data_model=None
+        self, X, *, local_data_model=None
     ):
         """
         Transform X records.
 
         :param X: data frame to be transformed.
-        :param check_blocks_out_keying: logical, if True check output key constraints.
         :param local_data_model: pandas data model.
         :return: transformed data frame.
         """
@@ -306,7 +336,6 @@ class RecordMap:
             X = local_data_model.rowrecs_to_blocks(
                 X,
                 blocks_out=self.blocks_out,
-                check_blocks_out_keying=check_blocks_out_keying,
             )
         return X
 
@@ -366,9 +395,10 @@ class RecordMap:
 
     def inverse(self):
         """
-        Return inverse transform.
+        Return inverse transform, if there is such (duplicate value keys or mis-matching
+        row representations can prevent this).
         """
-        return RecordMap(blocks_in=self.blocks_out, blocks_out=self.blocks_in)
+        return RecordMap(blocks_in=self.blocks_out, blocks_out=self.blocks_in, strict=self.strict)
 
     def fmt(self) -> str:
         """Format for informal presentation."""
@@ -417,6 +447,8 @@ class RecordMap:
             + self.blocks_in.__repr__()
             + ",\n    blocks_out="
             + self.blocks_out.__repr__()
+            + ",\n    strict="
+            + self.strict.__repr__()
             + ")"
         )
         return s

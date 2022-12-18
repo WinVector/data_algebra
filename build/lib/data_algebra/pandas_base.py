@@ -3,7 +3,7 @@ Base class for adapters for Pandas-like APIs
 """
 
 from abc import ABC
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, Iterable, List, Optional
 import datetime
 import types
 import numbers
@@ -455,6 +455,30 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         res = self.pd.concat(frame_list, axis=1)
         return res
 
+    def table_is_keyed_by_columns(self, table, *, column_names: Iterable[str]) -> bool:
+        """
+        Check if a table is keyed by a given list of column names.
+
+        :param table: DataFrame
+        :param column_names: list of column names
+        :return: True if rows are uniquely keyed by values in named columns
+        """
+        # check for ill-condition
+        if isinstance(column_names, str):
+            column_names = [column_names]
+        else:
+            column_names = list(column_names)
+        missing_columns = set(column_names) - set(table.columns)
+        if len(missing_columns) > 0:
+            return False
+        # get rid of some corner cases
+        if table.shape[0] < 2:
+            return True
+        if len(column_names) < 1:
+            return False
+        counts = table.groupby(column_names, observed=True).size()
+        return max(counts) <= 1
+
     # bigger stuff
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
@@ -825,7 +849,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         if "_data_table_temp_col" in res.columns:
             res = res.drop("_data_table_temp_col", axis=1, inplace=False)
         # double check shape is what we expect
-        if not data_algebra.util.table_is_keyed_by_columns(res, op.group_by):
+        if not self.table_is_keyed_by_columns(res, column_names=op.group_by):
             raise ValueError("result wasn't keyed by group_by columns")
         return res
 
@@ -1037,15 +1061,11 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         ck = [k for k in blocks_in.content_keys if k is not None]
         if len(ck) != len(set(ck)):
             raise ValueError("blocks_in can not have duplicate content keys")
-        data = self.clean_copy(data)
-        missing_cols = set(blocks_in.control_table_keys).union(blocks_in.record_keys) - set(
-            data.columns
-        )
-        if len(missing_cols) > 0:
-            raise KeyError("missing required columns: " + str(missing_cols))
+        data = self.clean_copy(data[blocks_in.block_columns])
+        assert set(data.columns) == set(blocks_in.block_columns)
         # table must be keyed by record_keys + control_table_keys
-        if not data_algebra.util.table_is_keyed_by_columns(
-            data, blocks_in.record_keys + blocks_in.control_table_keys
+        if not self.table_is_keyed_by_columns(
+            data, column_names=blocks_in.record_keys + blocks_in.control_table_keys
         ):
             raise ValueError(
                 "table is not keyed by blocks_in.record_keys + blocks_in.control_table_keys"
@@ -1109,27 +1129,27 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         data,
         *,
         blocks_out: data_algebra.cdata.RecordSpecification,
-        check_blocks_out_keying: bool = False,
     ):
         """
         Convert rowrecs (single row records) into block records (multiple row records).
 
         :param data: data frame to transform.
         :param blocks_out: record specification.
-        :param check_blocks_out_keying: logical, if True confirm keying
         :return: transformed data frame
         """
         assert isinstance(blocks_out, data_algebra.cdata.RecordSpecification)
-        data = self.clean_copy(data)
+        data = self.clean_copy(data[blocks_out.row_columns])
+        assert set(data.columns) == set(blocks_out.row_columns)
         missing_cols = set(blocks_out.record_keys) - set(data.columns)
         if len(missing_cols) > 0:
             raise KeyError("missing required columns: " + str(missing_cols))
-        if check_blocks_out_keying:
-            # prefer table be keyed by record_keys
-            if not data_algebra.util.table_is_keyed_by_columns(
-                data, blocks_out.record_keys
-            ):
-                raise ValueError("table is not keyed by blocks_out.record_keys")
+        # table must be keyed by record_keys
+        if (data.shape[0] > 1) and (not self.table_is_keyed_by_columns(
+            data, column_names=blocks_out.record_keys
+        )):
+            raise ValueError(
+                "table is not keyed by blocks_out.record_keys"
+            )
         # convert to block records, first build up parallel structures
         rv = [k for k in blocks_out.row_version(include_record_keys=True) if k is not None]
         if len(rv) != len(set(rv)):
