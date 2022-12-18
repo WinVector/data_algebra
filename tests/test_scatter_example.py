@@ -19,6 +19,7 @@ def test_scatter_example():
             control_table,
             record_keys=["iris_id", "Species"],
             control_table_keys=["v1", "v2"],
+            strict=False,
         )
     )
 

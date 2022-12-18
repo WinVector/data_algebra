@@ -56,8 +56,6 @@ def test_xicor():
         'rep': range(100)
     })
 
-    
-
     grouped_calc = (
         data_algebra.solutions.xicor_query(
             descr(d=example_frames)
@@ -92,8 +90,6 @@ def test_xicor():
 
     compare_res(xicor_results)
 
-    
-
     if data_algebra.test_util.test_BigQuery:
         # try it in database
         db_handle = data_algebra.BigQuery.example_handle()
@@ -101,12 +97,8 @@ def test_xicor():
         db_handle.insert_table(rep_frame, table_name='rep_frame', allow_overwrite=True)
         db_handle.drop_table("xicor")
 
-        
-
         db_handle.execute(f"CREATE TABLE {db_handle.db_model.table_prefix}.xicor AS {db_handle.to_sql(grouped_calc)}")
         db_res = db_handle.read_query(f"SELECT * FROM {db_handle.db_model.table_prefix}.xicor ORDER BY vname")
-
-        
 
         compare_res(db_res)
 

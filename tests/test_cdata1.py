@@ -382,7 +382,7 @@ def test_cdata_explode():
     )
 
     record_spec = data_algebra.cdata.RecordSpecification(
-        control, control_table_keys=["v1", "v2"], record_keys=["iris_id", "Species"],
+        control, control_table_keys=["v1", "v2"], record_keys=["iris_id", "Species"], strict=False,
     )
     transform = RecordMap(blocks_out=record_spec)
     res = transform.transform(iris)

@@ -24,8 +24,8 @@ class RecordSpecification:
         *,
         record_keys=None,
         control_table_keys=None,
-        strict=False,
-        local_data_model=None
+        strict=True,
+        local_data_model=None,
     ):
         """
         :param control_table: data.frame describing record layout
@@ -33,9 +33,11 @@ class RecordSpecification:
                defaults to no columns.
         :param control_table_keys: array of control_table key column names,
                defaults to first column for non-trivial blocks and no columns for rows.
-        :param strict: logical, if True more checks on transform
+        :param strict: if True don't allow duplicate value names
         :param local_data_model: data.frame data model
         """
+        assert isinstance(strict, bool)
+        self.strict = strict
         if local_data_model is None:
             local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(control_table)
         assert isinstance(local_data_model, data_algebra.data_model.DataModel)
@@ -59,7 +61,7 @@ class RecordSpecification:
                 control_table_keys = []  # single row records don't need to be keyed
         if isinstance(control_table_keys, str):
             control_table_keys = [control_table_keys]
-        if strict and (self.control_table.shape[0] > 1):
+        if self.control_table.shape[0] > 1:
             if len(control_table_keys) <= 0:
                 raise ValueError(
                     "multi-row records must have at least one control table key"
@@ -80,32 +82,38 @@ class RecordSpecification:
         for ck in self.control_table_keys:
             if any(local_data_model.bad_column_positions(control_table[ck])):
                 raise ValueError("NA/NaN/inf/None not allowed as control table keys")
-        if strict:
-            if not local_data_model.table_is_keyed_by_columns(
-                self.control_table, column_names=self.control_table_keys
-            ):
-                raise ValueError("control table wasn't keyed by control table keys")
+        if not local_data_model.table_is_keyed_by_columns(
+            self.control_table, column_names=self.control_table_keys
+        ):
+            raise ValueError("control table wasn't keyed by control table keys")
         self.block_columns = self.record_keys + [c for c in self.control_table.columns]
         cvs = []
         for c in self.control_table.columns:
             if c not in self.control_table_keys:
                 col = self.control_table[c]
                 isnull = local_data_model.bad_column_positions(col)
-                if all(isnull):
-                    raise ValueError("column " + c + " was all null")
+                if any(isnull):
+                    raise ValueError("column " + c + " has null(s)")
                 for i in range(len(col)):
-                    if not isnull[i]:
-                        v = col[i]
-                        if v not in cvs:
-                            cvs.append(v)
+                    v = col[i]
+                    assert isinstance(v, str)
+                    assert len(v) > 0
+                    cvs.append(v)
         confused = set(record_keys).intersection(cvs)
         if len(confused) > 0:
             raise ValueError(
                 "control table entries confused with row keys or control table keys"
             )
-        if strict:
-            if len(set(cvs)) != len(cvs):
+        if len(set(cvs)) != len(cvs):
+            if strict:
                 raise ValueError("duplicate content keys")
+            cvs_orig = cvs
+            cvs = []
+            cvs_seen = set()
+            for v in cvs_orig:
+                if v not in cvs_seen:
+                    cvs.append(v)
+                    cvs_seen.add(v)
         self.content_keys = cvs
         # columns in the row-record form
         self.row_columns = self.record_keys + cvs
@@ -134,6 +142,8 @@ class RecordSpecification:
             + data_algebra.util.pandas_to_example_str(self.control_table)
             + ",\n    control_table_keys="
             + self.control_table_keys.__repr__()
+            + ",\n    strict="
+            + self.strict.__repr__()
             + ")"
         )
         return s
@@ -370,7 +380,8 @@ class RecordMap:
 
     def inverse(self):
         """
-        Return inverse transform.
+        Return inverse transform, if there is such (duplicate value keys or mis-matching
+        row representations can prevent this).
         """
         return RecordMap(blocks_in=self.blocks_out, blocks_out=self.blocks_in)
 
