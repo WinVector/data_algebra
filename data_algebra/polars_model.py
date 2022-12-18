@@ -221,10 +221,7 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "~": lambda x: x == False,
         "!": lambda x: x == False,
         # datetime parsing from https://stackoverflow.com/a/71759536/6901725
-        # TODO: figure out why format is wrong type
-        # TODO: wire up format
         "parse_date": lambda x, format : x.cast(str).str.strptime(pl.Date, fmt=format, strict=False).cast(pl.Date),
-        # TODO: wire up format
         "parse_datetime": lambda x, format : x.cast(str).str.strptime(pl.Datetime, fmt=format, strict=False).cast(pl.Datetime),
     }
     impl_map_3 = {
