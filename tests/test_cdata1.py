@@ -384,7 +384,7 @@ def test_cdata_explode():
     record_spec = data_algebra.cdata.RecordSpecification(
         control, control_table_keys=["v1", "v2"], record_keys=["iris_id", "Species"], strict=False,
     )
-    transform = RecordMap(blocks_out=record_spec)
+    transform = RecordMap(blocks_out=record_spec, strict=False)
     res = transform.transform(iris)
     assert data_algebra.test_util.equivalent_frames(res, expect)
 

@@ -17,6 +17,7 @@ class RecordSpecification:
 
     row_columns: List[str]  # columns when in row form
     block_columns: List[str]  # columns when in block form
+    strict: bool  # do or do not allow repeated value names
 
     def __init__(
         self,
@@ -24,7 +25,7 @@ class RecordSpecification:
         *,
         record_keys=None,
         control_table_keys=None,
-        strict=True,
+        strict: bool = True,
         local_data_model=None,
     ):
         """
@@ -201,25 +202,37 @@ class RecordMap:
     Class for specifying general record to record transforms.
     """
 
+    blocks_in: Optional[RecordSpecification]
+    blocks_out: Optional[RecordSpecification]
+    strict: bool
+
     def __init__(
         self,
         *,
         blocks_in: Optional[RecordSpecification] = None,
-        blocks_out: Optional[RecordSpecification] = None
+        blocks_out: Optional[RecordSpecification] = None,
+        strict: bool = True,
     ):
         """
         Build the transform specification. At least one of blocks_in or blocks_out must not be None.
 
         :param blocks_in: incoming record specification, None for row-records.
         :param blocks_out: outgoing record specification, None for row-records.
+        :param strict: if True insist block be strict, and in and out blocks agree on row-form columns.∂
         """
+        assert isinstance(strict, bool)
+        self.strict = strict
         if blocks_in is not None:
             assert isinstance(blocks_in, RecordSpecification)
+            if strict:
+                assert blocks_in.strict
             ck = [k for k in blocks_in.content_keys if k is not None]
             if len(ck) != len(set(ck)):
                 raise ValueError("blocks_in can not have duplicate content keys")
         if blocks_out is not None:
             assert isinstance(blocks_out, RecordSpecification)
+            if strict:
+                assert blocks_out.strict
         if (blocks_in is None) and (blocks_out is None):
             raise ValueError(
                 "At least one of blocks_in or blocks_out should not be None"
@@ -231,6 +244,8 @@ class RecordMap:
             unknown = set(blocks_out.content_keys) - set(blocks_in.content_keys)
             if len(unknown) > 0:
                 raise ValueError("unknown outgoing content_keys" + str(unknown))
+            if strict:
+                assert set(blocks_out.record_keys) == set(blocks_in.record_keys)
         self.blocks_in = blocks_in
         self.blocks_out = blocks_out
         if self.blocks_in is not None:
@@ -383,7 +398,7 @@ class RecordMap:
         Return inverse transform, if there is such (duplicate value keys or mis-matching
         row representations can prevent this).
         """
-        return RecordMap(blocks_in=self.blocks_out, blocks_out=self.blocks_in)
+        return RecordMap(blocks_in=self.blocks_out, blocks_out=self.blocks_in, strict=self.strict)
 
     def fmt(self) -> str:
         """Format for informal presentation."""
@@ -432,6 +447,8 @@ class RecordMap:
             + self.blocks_in.__repr__()
             + ",\n    blocks_out="
             + self.blocks_out.__repr__()
+            + ",\n    strict="
+            + self.strict.__repr__()
             + ")"
         )
         return s

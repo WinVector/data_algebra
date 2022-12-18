@@ -234,7 +234,8 @@ def xicor_score_variables_plan(
             record_keys=["_da_xicor_tmp_index"],
             control_table_keys=["variable_name"],
             strict=False,
-        )
+        ),
+        strict=False,
     )
     rep_frame = data_algebra.data_model.default_data_model().pd.DataFrame({"rep": range(n_rep)})
     grouped_calc = (

@@ -20,7 +20,8 @@ def test_scatter_example():
             record_keys=["iris_id", "Species"],
             control_table_keys=["v1", "v2"],
             strict=False,
-        )
+        ),
+        strict=False,
     )
 
     str = format(record_map)
