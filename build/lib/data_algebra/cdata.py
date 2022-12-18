@@ -185,7 +185,7 @@ class RecordSpecification:
         :return: RecordMap
         """
 
-        return RecordMap(blocks_in=self)
+        return RecordMap(blocks_in=self, strict=self.strict)
 
     def map_from_rows(self):
         """
@@ -194,7 +194,7 @@ class RecordSpecification:
         :return: RecordMap
         """
 
-        return RecordMap(blocks_out=self)
+        return RecordMap(blocks_out=self, strict=self.strict)
 
 
 class RecordMap:
@@ -359,6 +359,7 @@ class RecordMap:
         out = s2.transform(s1.transform(inp))
         rsi = inp.drop(rk, axis=1, inplace=False)
         rso = out.drop(rk, axis=1, inplace=False)
+        strict = self.strict and other.strict
         if inp.shape[0] < 2:
             if out.shape[0] < 2:
                 return None
@@ -368,7 +369,9 @@ class RecordMap:
                         control_table=rso,
                         record_keys=rk,
                         control_table_keys=s2.blocks_out.control_table_keys,
-                    )
+                        strict=strict,
+                    ),
+                    strict=strict,
                 )
         else:
             if out.shape[0] < 2:
@@ -377,7 +380,9 @@ class RecordMap:
                         control_table=rsi,
                         record_keys=rk,
                         control_table_keys=s1.blocks_in.control_table_keys,
-                    )
+                        strict=strict,
+                    ),
+                    strict=strict,
                 )
             else:
                 return RecordMap(
@@ -385,12 +390,15 @@ class RecordMap:
                         control_table=rsi,
                         record_keys=rk,
                         control_table_keys=s1.blocks_in.control_table_keys,
+                        strict=strict,
                     ),
                     blocks_out=RecordSpecification(
                         control_table=rso,
                         record_keys=rk,
                         control_table_keys=s2.blocks_out.control_table_keys,
+                        strict=strict,
                     ),
+                    strict=strict,
                 )
 
     def inverse(self):
