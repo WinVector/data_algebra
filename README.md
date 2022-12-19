@@ -10,9 +10,9 @@ The package is [available on PyPi](https://pypi.org/project/data-algebra/), and 
 
 A good introduction can be found [here](https://github.com/WinVector/data_algebra/blob/main/Examples/Introduction/data_algebra_Introduction.ipynb), and many worked examples are [here](https://github.com/WinVector/data_algebra/tree/main/Examples). A catalog of expression methods is found [here](https://github.com/WinVector/data_algebra/blob/main/Examples/Methods/op_catalog.csv). The pydoc documentation is [here](https://winvector.github.io/data_algebra/). And the [README](https://github.com/WinVector/data_algebra/blob/main/README.md) is a good place to check for news or updates.
 
-Currently, the system is primarily adapted and testing for Pandas, Google BigQuery, PostgreSQL, SQLite, and Spark. Porting and extension is designed to be easy.
+Currently, the system is primarily adapted and testing for Pandas, Polars, Google BigQuery, PostgreSQL, SQLite, and Spark. Porting and extension is designed to be easy.
 
-[This](https://github.com/WinVector/data_algebra) is to be the [`Python`](https://www.python.org) equivalent of the [`R`](https://www.r-project.org) packages [`rquery`](https://github.com/WinVector/rquery/), [`rqdatatable`](https://github.com/WinVector/rqdatatable), and [`cdata`](https://CRAN.R-project.org/package=cdata).  This package supplies piped Codd-transform style notation that can perform data engineering in [`Pandas`](https://pandas.pydata.org) and generate [`SQL`](https://en.wikipedia.org/wiki/SQL) queries from the same specification.
+[This](https://github.com/WinVector/data_algebra) is to be the [`Python`](https://www.python.org) equivalent of the [`R`](https://www.r-project.org) packages [`rquery`](https://github.com/WinVector/rquery/), [`rqdatatable`](https://github.com/WinVector/rqdatatable), and [`cdata`](https://CRAN.R-project.org/package=cdata).  This package supplies piped Codd-transform style notation that can perform data engineering in [`Pandas`](https://pandas.pydata.org) or (still in development) [`Polars`](https://www.pola.rs) and generate [`SQL`](https://en.wikipedia.org/wiki/SQL) queries from the same specification.
 
 # Installing
 
@@ -82,27 +82,32 @@ Let's start our `Python` example.  First we import the packages we are going to 
 
 
 ```python
-import pandas
-import data_algebra
+import polars as pl
+import data_algebra as da
 import data_algebra.BigQuery
 
 
-data_algebra.__version__
+da.__version__
 ```
 
 
 
 
-    '1.4.4'
+    '1.5.1'
 
 
 
-Now let's type in our example data.  Notice this is an in-memory `Pandas` `Data.Frame`.
+Now let's type in our example data.  Notice this is an in-memory `Polars` `Data.Frame`.
 
 
 
 ```python
-d_local = pandas.DataFrame({
+
+```
+
+
+```python
+d_local = pl.DataFrame({
     'subjectID':[1, 1, 2, 2],
     'surveyCategory': [ "withdrawal behavior", "positive re-framing", "withdrawal behavior", "positive re-framing"],
     'assessmentTotal': [5., 2., 3., 4.],
@@ -117,51 +122,115 @@ d_local
 
 
 <div>
+
 <table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>subjectID</th>
-      <th>surveyCategory</th>
-      <th>assessmentTotal</th>
-      <th>irrelevantCol1</th>
-      <th>irrelevantCol2</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>withdrawal behavior</td>
-      <td>5.0</td>
-      <td>irrel1</td>
-      <td>irrel2</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1</td>
-      <td>positive re-framing</td>
-      <td>2.0</td>
-      <td>irrel1</td>
-      <td>irrel2</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>2</td>
-      <td>withdrawal behavior</td>
-      <td>3.0</td>
-      <td>irrel1</td>
-      <td>irrel2</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>2</td>
-      <td>positive re-framing</td>
-      <td>4.0</td>
-      <td>irrel1</td>
-      <td>irrel2</td>
-    </tr>
-  </tbody>
+<small>shape: (4, 5)</small>
+<thead>
+<tr>
+<th>
+subjectID
+</th>
+<th>
+surveyCategory
+</th>
+<th>
+assessmentTotal
+</th>
+<th>
+irrelevantCol1
+</th>
+<th>
+irrelevantCol2
+</th>
+</tr>
+<tr>
+<td>
+i64
+</td>
+<td>
+str
+</td>
+<td>
+f64
+</td>
+<td>
+str
+</td>
+<td>
+str
+</td>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+1
+</td>
+<td>
+&quot;withdrawal beh...
+</td>
+<td>
+5.0
+</td>
+<td>
+&quot;irrel1&quot;
+</td>
+<td>
+&quot;irrel2&quot;
+</td>
+</tr>
+<tr>
+<td>
+1
+</td>
+<td>
+&quot;positive re-fr...
+</td>
+<td>
+2.0
+</td>
+<td>
+&quot;irrel1&quot;
+</td>
+<td>
+&quot;irrel2&quot;
+</td>
+</tr>
+<tr>
+<td>
+2
+</td>
+<td>
+&quot;withdrawal beh...
+</td>
+<td>
+3.0
+</td>
+<td>
+&quot;irrel1&quot;
+</td>
+<td>
+&quot;irrel2&quot;
+</td>
+</tr>
+<tr>
+<td>
+2
+</td>
+<td>
+&quot;positive re-fr...
+</td>
+<td>
+4.0
+</td>
+<td>
+&quot;irrel1&quot;
+</td>
+<td>
+&quot;irrel2&quot;
+</td>
+</tr>
+</tbody>
 </table>
 </div>
 
@@ -178,7 +247,7 @@ db_handle = data_algebra.BigQuery.example_handle()
 print(db_handle)
 ```
 
-    BigQuery_DBHandle(db_model=BigQueryModel, conn=<google.cloud.bigquery.client.Client object at 0x7f9f10a152b0>)
+    BigQuery_DBHandle(db_model=BigQueryModel, conn=<google.cloud.bigquery.client.Client object at 0x7fb1c0cad270>)
 
 
 
@@ -186,7 +255,7 @@ print(db_handle)
 
 ```python
 remote_table_description = db_handle.insert_table(
-    d_local, 
+    d_local.to_pandas(), 
     table_name='d', 
     allow_overwrite=True)
 
@@ -198,6 +267,7 @@ remote_table_description.head
 
 
 <div>
+
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -263,7 +333,7 @@ Now we use the `data_algebra` to define our processing pipeline: `ops`.  We are 
 scale = 0.237
 
 ops = (
-    data_algebra.descr(d=d_local)
+    da.descr(d=d_local)
         .extend({'probability': f'(assessmentTotal * {scale}).exp()'})
         .extend({'total': 'probability.sum()'},
                 partition_by='subjectID')
@@ -279,9 +349,9 @@ ops = (
 
 ```
 
-We are deliberately writing a longer pipeline of simple steps, so we can use the same pipeline locally with Pandas, and (potentially) great scale with `PostgreSQL` or Apache `Spark`.  A more concise variation of this pipeline can be found in the R example [here](https://github.com/WinVector/rquery).
+We are deliberately writing a longer pipeline of simple steps, so we can use the same pipeline locally with Pandas or Polars, and (potentially) great scale with `PostgreSQL` or Apache `Spark`.  A more concise variation of this pipeline can be found in the R example [here](https://github.com/WinVector/rquery).
 
-The intent is: the user can build up very sophisticated processing pipelines using a small number of primitive steps.  The pipelines tend to be long, but can still be very efficient- as they are well suited for use with `Pandas` and with `SQL` query optimizers.  Most of the heavy lifting is performed by the  very powerful "window functions" (triggered by use of `partition_by` and `order_by`) available on the `extend()` step.  Multiple statements can be combined into extend steps, but only when they have the same window-structure, and don't create and use the same value name in the same statement (except for replacement, which is shown in this example).  Many conditions are checked and enforced during pipeline construction, making debugging very easy.
+The intent is: the user can build up very sophisticated processing pipelines using a small number of primitive steps.  The pipelines tend to be long, but can still be very efficient- as they are well suited for use with `Polars`, and with `SQL` query optimizers.  Most of the heavy lifting is performed by the  very powerful "window functions" (triggered by use of `partition_by` and `order_by`) available on the `extend()` step.  Multiple statements can be combined into extend steps, but only when they have the same window-structure, and don't create and use the same value name in the same statement (except for replacement, which is shown in this example).  Many conditions are checked and enforced during pipeline construction, making debugging very easy.
 
 For a more Pythonic way of writing the same pipeline we can show how the code would have been formatted by [`black`](https://github.com/psf/black).
 
@@ -347,7 +417,7 @@ print(sql)
 ```
 
     -- data_algebra SQL https://github.com/WinVector/data_algebra
-    --  dialect: BigQueryModel 1.4.4
+    --  dialect: BigQueryModel 1.5.1
     --       string quote: "
     --   identifier quote: `
     WITH
@@ -427,6 +497,7 @@ db_handle.read_query(sql)
 
 
 <div>
+
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -461,9 +532,9 @@ What comes back is: one row per subject, with the highest per-subject diagnosis 
 
 The hope is that the `data_algebra` pipeline is easier to read, write, and maintain than the `SQL` query. If we wanted to change the calculation we would just add a stage to the `data_algebra` pipeline and then regenerate the `SQL` query.
 
-### `Pandas`
+### `Polars`
 
-An advantage of the pipeline is it can also be directly used on `Pandas` `DataFrame`s. Let's see how that is achieved.
+An advantage of the pipeline is it can also be directly used on `Pandas` or `Polars` `DataFrame`s. Let's see how that is achieved.
 
 
 
@@ -475,29 +546,57 @@ ops.eval({'d': d_local})
 
 
 <div>
+
 <table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>subjectID</th>
-      <th>diagnosis</th>
-      <th>probability</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>withdrawal behavior</td>
-      <td>0.670622</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>2</td>
-      <td>positive re-framing</td>
-      <td>0.558974</td>
-    </tr>
-  </tbody>
+<small>shape: (2, 3)</small>
+<thead>
+<tr>
+<th>
+subjectID
+</th>
+<th>
+diagnosis
+</th>
+<th>
+probability
+</th>
+</tr>
+<tr>
+<td>
+i64
+</td>
+<td>
+str
+</td>
+<td>
+f64
+</td>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+1
+</td>
+<td>
+&quot;withdrawal beh...
+</td>
+<td>
+0.670622
+</td>
+</tr>
+<tr>
+<td>
+2
+</td>
+<td>
+&quot;positive re-fr...
+</td>
+<td>
+0.558974
+</td>
+</tr>
+</tbody>
 </table>
 </div>
 
@@ -517,6 +616,80 @@ ops.transform(d_local)
 
 
 <div>
+
+<table border="1" class="dataframe">
+<small>shape: (2, 3)</small>
+<thead>
+<tr>
+<th>
+subjectID
+</th>
+<th>
+diagnosis
+</th>
+<th>
+probability
+</th>
+</tr>
+<tr>
+<td>
+i64
+</td>
+<td>
+str
+</td>
+<td>
+f64
+</td>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+1
+</td>
+<td>
+&quot;withdrawal beh...
+</td>
+<td>
+0.670622
+</td>
+</tr>
+<tr>
+<td>
+2
+</td>
+<td>
+&quot;positive re-fr...
+</td>
+<td>
+0.558974
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+
+
+`eval` takes a dictionary of `DataFrame`s (names matching names specified in the pipeline) and returns the result of applying the pipeline to this data.  Currently our `Pandas` and `Polars` implementation only allows very simple window functions.  This is why we didn't write `probability = probability/sum(probability)`, but instead broken the calculation into multiple steps by introducing the `total` column (the `SQL` realization does in fact support more complex window functions).  This is a small issue with the grammar: but our feeling encourage simple steps is in fact a good thing (improves debuggability), and in `SQL` the query optimizers likely optimize the different query styles into very similar realizations anyway.
+
+
+## Pandas
+
+The exact same pipeline can be applied directly to Pandas data frames.
+
+
+```python
+ops.transform(d_local.to_pandas())
+```
+
+
+
+
+<div>
+
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -546,15 +719,13 @@ ops.transform(d_local)
 
 
 
-`eval` takes a dictionary of `Pandas` `DataFrame`s (names matching names specified in the pipeline) and returns the result of applying the pipeline to the data using `Pandas` commands.  Currently our `Pandas` implementation only allows very simple window functions.  This is why we didn't write `probability = probability/sum(probability)`, but instead broken the calculation into multiple steps by introducing the `total` column (the `SQL` realization does in fact support more complex window functions).  This is a small issue with the grammar: but our feeling encourage simple steps is in fact a good thing (improves debuggability), and in `SQL` the query optimizers likely optimize the different query styles into very similar realizations anyway.
-
 
 ## Export/Import
 
 Because our operator pipeline is a `Python` object with no references to external objects (such as the database connection), it can be saved through standard methods such as "[pickling](https://docs.python.org/3/library/pickle.html)."
 
 
-## Advantages of `data_algebra`
+## Some Advantages of `data_algebra`
 
 A `data_algebra` operator pipeline carries around usable knowledge of the data transform.
 
@@ -607,3 +778,4 @@ Note: `mysql` is not fully supported, as it doesn't name quoted common table exp
 ```python
 
 ```
+
