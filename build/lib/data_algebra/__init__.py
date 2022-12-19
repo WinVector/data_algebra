@@ -10,7 +10,7 @@ __doc__ = """
 based on Codd's relational algebra and experience working with dplyr at scale.  The primary 
 purpose of the package is to support an easy to compose and maintain grammar of data processing
 steps that in turn can be used to generate database specific SQL.  The package also implements
-the same transforms for Pandas DataFrames. 
+the same transforms for Pandas and Polars DataFrames. 
 
 `R`<https://www.r-project.org> versions of the system are available as 
 the `rquery`<https://github.com/WinVector/rquery> and `rqdatatable`<https://github.com/WinVector/rqdatatable> packages.

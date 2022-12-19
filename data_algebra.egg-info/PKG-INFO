@@ -32,9 +32,9 @@ License-File: LICENSE
 based on Codd's relational algebra and experience working with data manipulation languages at scale.  
 The primary purpose of the package is to support an easy to 
 compose and maintain grammar of data processing steps that in turn can be used to generate
-database specific SQL. The package also implements the same transforms for Pandas DataFrames.
+database specific SQL. The package also implements the same transforms for Pandas and Polars DataFrames.
 
-Currently the system is primarily adapted and testing for Pandas, Google BigQuery, PostgreSQL, SQLite, Spark, and
+Currently the system is primarily adapted and testing for Pandas, Polars, Google BigQuery, PostgreSQL, SQLite, Spark, and
 MySQL.
 
 [R](https://www.r-project.org) versions of the system are available as 
