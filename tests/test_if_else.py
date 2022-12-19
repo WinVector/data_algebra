@@ -92,7 +92,6 @@ def test_maximum_1():
     expect["d"] = numpy.minimum(expect.a, expect.b)
 
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect,
-        try_on_Polars=False,  # TODO: turn this on
     )
 
 

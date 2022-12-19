@@ -33,7 +33,6 @@ def test_any_project_value():
         data=d,
         expect=expect,
         valid_for_empty=False,
-        try_on_Polars=False,  # TODO: turn this on
         )
     bq_sql = data_algebra.BigQuery.BigQueryModel().to_sql(ops)
     assert 'ANY_VALUE(`x`)' in bq_sql

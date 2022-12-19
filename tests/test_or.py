@@ -1,6 +1,4 @@
-import sqlite3
 
-import numpy
 
 import data_algebra
 from data_algebra.data_ops import *
@@ -8,7 +6,6 @@ import data_algebra.util
 import data_algebra.test_util
 import data_algebra.SQLite
 
-import pytest
 
 # TODO: SQL tests for all non-failing steps
 
