@@ -255,7 +255,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
 
     def __init__(self, *, use_lazy_eval: bool = True):
         data_algebra.data_model.DataModel.__init__(
-            self, presentation_model_name="pl"
+            self, presentation_model_name="pl", module=pl
         )
         assert isinstance(use_lazy_eval, bool)
         self.use_lazy_eval = use_lazy_eval

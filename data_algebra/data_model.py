@@ -14,10 +14,12 @@ class DataModel(abc.ABC):
     """
 
     presentation_model_name: str
+    module: Any
 
-    def __init__(self, presentation_model_name: str):
+    def __init__(self, *, presentation_model_name: str, module):
         assert isinstance(presentation_model_name, str)
         self.presentation_model_name = presentation_model_name
+        self.module = module
 
     # data frame helpers
 

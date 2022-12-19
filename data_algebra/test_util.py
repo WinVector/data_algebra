@@ -33,7 +33,7 @@ run_direct_ops_path_tests = False
 global_test_result_cache: Optional[data_algebra.eval_cache.ResultCache] = None
 
 
-def re_parse(ops):
+def _re_parse(ops, *, local_data_model_name: str, local_data_model_module):
     """
     Return copy of object made by dumping to string via repr() and then evaluating that string.
     """
@@ -42,13 +42,14 @@ def re_parse(ops):
         str1,
         globals(),
         {
-            "pd": data_algebra.data_model.default_data_model().pd
-        },  # make our definition of pandas available
+           local_data_model_name: local_data_model_module
+        },  # make our definition of data module available
+            # cdata uses this
     )
     return ops2
 
 
-def formats_to_self(ops) -> bool:
+def formats_to_self(ops, *, local_data_model=None) -> bool:
     """
     Check a operator dag formats and parses back to itself.
     Can raise exceptions. Also checks pickling.
@@ -56,7 +57,12 @@ def formats_to_self(ops) -> bool:
     :param ops: data_algebra.data_ops.ViewRepresentation
     :return: logical, True if formats and evals back to self
     """
-    ops2 = re_parse(ops)
+    if local_data_model is None:
+        local_data_model = data_algebra.data_model.default_data_model()
+    ops2 = _re_parse(
+        ops, 
+        local_data_model_name=local_data_model.presentation_model_name, 
+        local_data_model_module=local_data_model.module)
     ops_match = ops == ops2
     assert ops_match
     pickle_string = pickle.dumps(ops)
@@ -79,7 +85,7 @@ def equivalent_frames(
     Ignores indexing. None and nan are considered equivalent in numeric contexts."""
     # leave in extra checks as this is usually used by test code
     if local_data_model is None:
-        local_data_model = data_algebra.data_model.default_data_model()
+        local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(a)
     assert local_data_model.is_appropriate_data_instance(a)
     assert local_data_model.is_appropriate_data_instance(b)
     if a.shape != b.shape:
@@ -299,8 +305,8 @@ def check_transform_on_handles(
     Asserts if there are issues
 
     :param ops: data_algebra.data_ops.ViewRepresentation
-    :param data: pd.DataFrame or map of strings to pd.DataFrame
-    :param expect: pd.DataFrame
+    :param data: DataFrame or map of strings to pd.DataFrame
+    :param expect: DataFrame
     :param db_handles:  list of database handles to use in testing
     :param float_tol: passed to equivalent_frames()
     :param check_column_order: passed to equivalent_frames()
@@ -314,12 +320,14 @@ def check_transform_on_handles(
     """
 
     assert isinstance(data, dict)
+    assert expect is not None
+    assert isinstance(ops, ViewRepresentation)
+    if local_data_model is None:
+        local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(expect)
     orig_data = {k: v.copy() for k, v in data.items()}
     n_tables = len(data)
     assert n_tables > 0
-    if local_data_model is None:
-        local_data_model = data_algebra.data_model.default_data_model()
-    assert isinstance(ops, ViewRepresentation)
+
     if not local_data_model.is_appropriate_data_instance(expect):
         raise TypeError("expected expect to be a local_data_model.pd.DataFrame")
     cols_used = ops.columns_used()
@@ -349,9 +357,12 @@ def check_transform_on_handles(
         v2 = data[k]
         assert equivalent_frames(v, v2)
     if check_parse:
-        if not formats_to_self(ops):
+        if not formats_to_self(ops, local_data_model=local_data_model):
             raise ValueError("ops did not round-trip format")
-        ops_2 = re_parse(ops)
+        ops_2 = _re_parse(
+            ops, 
+            local_data_model_name=local_data_model.presentation_model_name,
+            local_data_model_module=local_data_model.module)
         res_2 = ops_2.eval(data_map=data)
         if not local_data_model.is_appropriate_data_instance(res_2):
             raise ValueError(

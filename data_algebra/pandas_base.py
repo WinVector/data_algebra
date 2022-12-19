@@ -154,7 +154,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
     def __init__(self, *, pd: types.ModuleType, presentation_model_name: str):
         assert isinstance(pd, types.ModuleType)
         data_algebra.data_model.DataModel.__init__(
-            self, presentation_model_name=presentation_model_name
+            self, presentation_model_name=presentation_model_name, module=pd
         )
         self.pd = pd
         self.impl_map = self._populate_impl_map()
