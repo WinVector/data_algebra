@@ -221,10 +221,7 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "~": lambda x: x == False,
         "!": lambda x: x == False,
         # datetime parsing from https://stackoverflow.com/a/71759536/6901725
-        # TODO: figure out why format is wrong type
-        # TODO: wire up format
         "parse_date": lambda x, format : x.cast(str).str.strptime(pl.Date, fmt=format, strict=False).cast(pl.Date),
-        # TODO: wire up format
         "parse_datetime": lambda x, format : x.cast(str).str.strptime(pl.Datetime, fmt=format, strict=False).cast(pl.Datetime),
     }
     impl_map_3 = {
@@ -258,7 +255,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
 
     def __init__(self, *, use_lazy_eval: bool = True):
         data_algebra.data_model.DataModel.__init__(
-            self, presentation_model_name="pl"
+            self, presentation_model_name="pl", module=pl
         )
         assert isinstance(use_lazy_eval, bool)
         self.use_lazy_eval = use_lazy_eval
@@ -311,6 +308,16 @@ class PolarsModel(data_algebra.data_model.DataModel):
         if isinstance(df, pl.LazyFrame):
             df = df.collect()
         return df
+    
+    def to_pandas(self, df):
+        """
+        Convert to Pandas
+        """
+        assert self.is_appropriate_data_instance(df)
+        # Polars doesn't need explicit copying due to copy on write semantics
+        if isinstance(df, pl.LazyFrame):
+            df = df.collect()
+        return df.to_pandas()
     
     def drop_indices(self, df) -> None:
         """
@@ -661,10 +668,13 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 "op was supposed to be a data_algebra.data_ops.SQLNode"
             )
         db_handle = data_map[op.view_name]
+        # would like (but causes cicrular import) assert isinstance(db_handle, data_algebra.db_model.DBHandle)
         res = db_handle.read_query("\n".join(op.sql))
         res = self.data_frame(res)
+        assert self.is_appropriate_data_instance(res)
         if self.use_lazy_eval and (not isinstance(res, pl.LazyFrame)):
             res = res.lazy()
+        res = res.select(op.columns_produced())
         return res
     
     def _table_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):

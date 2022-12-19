@@ -154,7 +154,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
     def __init__(self, *, pd: types.ModuleType, presentation_model_name: str):
         assert isinstance(pd, types.ModuleType)
         data_algebra.data_model.DataModel.__init__(
-            self, presentation_model_name=presentation_model_name
+            self, presentation_model_name=presentation_model_name, module=pd
         )
         self.pd = pd
         self.impl_map = self._populate_impl_map()
@@ -389,6 +389,12 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         assert self.is_appropriate_data_instance(df)
         return df.reset_index(drop=True, inplace=False)
     
+    def to_pandas(self, df):
+        """
+        Convert to Pandas
+        """
+        return self.clean_copy(df)
+    
     def drop_indices(self, df) -> None:
         """
         Drop indices in place.
@@ -519,7 +525,10 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         """
         assert op.node_name == "SQLNode"
         db_handle = data_map[op.view_name]
+        # would like (but causes cicrular import) assert isinstance(db_handle, data_algebra.db_model.DBHandle)
         res = db_handle.read_query("\n".join(op.sql))
+        res = self.data_frame(res[op.columns_produced()])
+        assert self.is_appropriate_data_instance(res)
         return res
 
     def columns_to_frame_(self, cols: Dict[str, Any], *, target_rows: Optional[int] = None):
