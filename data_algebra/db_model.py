@@ -779,7 +779,6 @@ class DBModel:
         string_quote: str = "'",
         sql_formatters=None,
         op_replacements=None,
-        local_data_model=None,
         on_start: str = "",
         on_end: str = "",
         on_joiner: str = "AND",
@@ -793,9 +792,7 @@ class DBModel:
         union_all_term_start: str = "(",
         union_all_term_end: str = ")",
     ):
-        if local_data_model is None:
-            local_data_model = data_algebra.data_model.default_data_model()
-        self.local_data_model = local_data_model
+        self.local_data_model = data_algebra.data_model.default_data_model()
         if sql_formatters is None:
             sql_formatters = {}
         assert identifier_quote != string_quote
@@ -874,8 +871,7 @@ class DBModel:
         else:
             q = str(q)
         assert isinstance(q, str)
-        r = data_algebra.data_model.default_data_model().pd.io.sql.read_sql(q, conn)
-        r = self.local_data_model.pd.DataFrame(r)
+        r = self.local_data_model.pd.io.sql.read_sql(q, conn)
         return r
 
     def table_exists(self, conn, table_name: str) -> bool:
@@ -916,6 +912,8 @@ class DBModel:
 
         if qualifiers is not None:
             raise ValueError("non-empty qualifiers not yet supported on insert")
+        incoming_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(d)
+        d = incoming_data_model.to_pandas(d)
         if self.table_exists(conn, table_name):
             if not allow_overwrite:
                 raise ValueError("table " + table_name + " already exists")
@@ -925,6 +923,7 @@ class DBModel:
         # it refers to sqlite_master
         # this behavior seems to change if sqlalchemy is active
         # n.b. sqlalchemy tries to insert values on %
+        d = data_algebra.data_model.lookup_data_model_for_dataframe(d).to_pandas(d)
         if d.shape[1] < 1:
             # deal with no columns case
             d = d.copy()
@@ -2396,11 +2395,14 @@ class DBHandle:
         """
         Insert a table into the database.
         """
+        incoming_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(d)
+        d = incoming_data_model.to_pandas(d)
         self.db_model.insert_table(
             conn=self.conn, d=d, table_name=table_name, allow_overwrite=allow_overwrite
         )
-        return self.describe_table(table_name)
-
+        res = self.describe_table(table_name)
+        return res
+    
     def to_sql(
         self,
         ops: data_algebra.data_ops.ViewRepresentation,
