@@ -4,7 +4,7 @@ Utils that help with testing. This module is allowed to import many other module
 
 import pickle
 import traceback
-from typing import Any, Optional
+from typing import Any, Dict, Optional
 
 import numpy
 
@@ -33,7 +33,7 @@ run_direct_ops_path_tests = False
 global_test_result_cache: Optional[data_algebra.eval_cache.ResultCache] = None
 
 
-def _re_parse(ops, *, local_data_model_name: str, local_data_model_module):
+def _re_parse(ops, *, data_model_map: Dict[str, Any]):
     """
     Return copy of object made by dumping to string via repr() and then evaluating that string.
     """
@@ -41,28 +41,27 @@ def _re_parse(ops, *, local_data_model_name: str, local_data_model_module):
     ops2 = eval(
         str1,
         globals(),
-        {
-           local_data_model_name: local_data_model_module
-        },  # make our definition of data module available
+        data_model_map,  # make our definition of data module available
             # cdata uses this
     )
     return ops2
 
 
-def formats_to_self(ops, *, local_data_model=None) -> bool:
+def formats_to_self(ops, *, data_model_map: Optional[Dict[str, Any]] = None) -> bool:
     """
     Check a operator dag formats and parses back to itself.
     Can raise exceptions. Also checks pickling.
 
     :param ops: data_algebra.data_ops.ViewRepresentation
+    :param data_model_map: map from abbreviated module names to modules (i.e. define pd)
     :return: logical, True if formats and evals back to self
     """
-    if local_data_model is None:
+    if data_model_map is None:
         local_data_model = data_algebra.data_model.default_data_model()
+        data_model_map = {local_data_model.presentation_model_name: local_data_model.module}
     ops2 = _re_parse(
         ops, 
-        local_data_model_name=local_data_model.presentation_model_name, 
-        local_data_model_module=local_data_model.module)
+        data_model_map=data_model_map)
     ops_match = ops == ops2
     assert ops_match
     pickle_string = pickle.dumps(ops)
@@ -284,13 +283,11 @@ def _run_handle_experiments(
             raise ValueError(f"{db_handle} ops result did not match expect")
 
 
-# noinspection PyShadowingNames
-def check_transform_on_handles(
+def check_transform_on_data_model(
     *,
     ops,
     data: dict,
     expect,
-    db_handles,
     float_tol: float = 1e-8,
     check_column_order: bool = False,
     cols_case_sensitive: bool = False,
@@ -307,7 +304,6 @@ def check_transform_on_handles(
     :param ops: data_algebra.data_ops.ViewRepresentation
     :param data: DataFrame or map of strings to pd.DataFrame
     :param expect: DataFrame
-    :param db_handles:  list of database handles to use in testing
     :param float_tol: passed to equivalent_frames()
     :param check_column_order: passed to equivalent_frames()
     :param cols_case_sensitive: passed to equivalent_frames()
@@ -318,18 +314,20 @@ def check_transform_on_handles(
     :param empty_produces_empty: logical, if True assume emtpy inputs should produce empty output
     :return: None, assert if there is an issue
     """
-
     assert isinstance(data, dict)
     assert expect is not None
     assert isinstance(ops, ViewRepresentation)
-    if local_data_model is None:
-        local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(expect)
     orig_data = {k: v.copy() for k, v in data.items()}
     n_tables = len(data)
     assert n_tables > 0
-
+    if local_data_model is None:
+        local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(expect)
     if not local_data_model.is_appropriate_data_instance(expect):
         raise TypeError("expected expect to be a local_data_model.pd.DataFrame")
+    data_model_map = {local_data_model.presentation_model_name: local_data_model.module}
+    def_pd_data_model = data_algebra.data_model.lookup_data_model_for_key("default_Pandas_model")
+    if def_pd_data_model.presentation_model_name not in data_model_map.keys():
+        data_model_map[def_pd_data_model.presentation_model_name] = def_pd_data_model.module
     cols_used = ops.columns_used()
     if len(cols_used) < 1:
         raise ValueError("no tables used")
@@ -357,16 +355,15 @@ def check_transform_on_handles(
         v2 = data[k]
         assert equivalent_frames(v, v2)
     if check_parse:
-        if not formats_to_self(ops, local_data_model=local_data_model):
+        if not formats_to_self(ops, data_model_map=data_model_map):
             raise ValueError("ops did not round-trip format")
         ops_2 = _re_parse(
             ops, 
-            local_data_model_name=local_data_model.presentation_model_name,
-            local_data_model_module=local_data_model.module)
+            data_model_map=data_model_map)
         res_2 = ops_2.eval(data_map=data)
         if not local_data_model.is_appropriate_data_instance(res_2):
             raise ValueError(
-                "(reparse) expected res to be local_data_model.pd.DataFrame, got: "
+                "(reparse) expected res to be DataFrame, got: "
                 + str(type(res_2))
             )
         if not equivalent_frames(
@@ -377,7 +374,7 @@ def check_transform_on_handles(
             cols_case_sensitive=cols_case_sensitive,
             check_row_order=check_row_order,
         ):
-            raise ValueError("(reparse) Pandas eval result did not match expect")
+            raise ValueError("(reparse) eval result did not match expect")
     if len(data) == 1:
         res_t = ops.transform(list(data.values())[0])
         if not equivalent_frames(
@@ -423,6 +420,45 @@ def check_transform_on_handles(
             for pm in partial_maps:
                 empty_res_i = ops.eval(pm)
                 assert set(empty_res_i.columns) == set(res.columns)
+
+
+def _check_transform_on_handles(
+    *,
+    ops,
+    data: dict,
+    expect,
+    db_handles,
+    float_tol: float = 1e-8,
+    check_column_order: bool = False,
+    cols_case_sensitive: bool = False,
+    check_row_order: bool = False,
+    local_data_model=None,
+) -> None:
+    """
+    Test an operator dag produces the expected result, and parses correctly.
+    Asserts if there are issues
+
+    :param ops: data_algebra.data_ops.ViewRepresentation
+    :param data: DataFrame or map of strings to pd.DataFrame
+    :param expect: DataFrame
+    :param db_handles:  list of database handles to use in testing
+    :param float_tol: passed to equivalent_frames()
+    :param check_column_order: passed to equivalent_frames()
+    :param cols_case_sensitive: passed to equivalent_frames()
+    :param check_row_order: passed to equivalent_frames()
+    :param local_data_model: optional alternate evaluation model
+    :return: None, assert if there is an issue
+    """
+
+    assert isinstance(data, dict)
+    assert expect is not None
+    assert isinstance(ops, ViewRepresentation)
+    if local_data_model is None:
+        local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(expect)
+    n_tables = len(data)
+    assert n_tables > 0
+    if not local_data_model.is_appropriate_data_instance(expect):
+        raise TypeError("expected expect to be a local_data_model.pd.DataFrame")
     # try any db paths
     global global_test_result_cache
     global run_direct_ops_path_tests
@@ -509,10 +545,11 @@ def check_transform(
     models_to_skip: Optional[Iterable] = None,
     valid_for_empty: bool = True,
     empty_produces_empty: bool = True,
+    local_data_model = None
 ) -> None:
     """
     Test an operator dag produces the expected result, and parses correctly.
-    Assert if there are issues.
+    Assert/raise if there are issues.
 
     :param ops: data_algebra.data_ops.ViewRepresentation
     :param data: pd.DataFrame or map of strings to pd.DataFrame
@@ -524,16 +561,33 @@ def check_transform(
     :param check_parse: if True check expression parses/formats to self
     :param models_to_skip: None or set of model names or models to skip testing
     :param valid_for_empty: logical, if True perform tests on empty inputs
-    :param empty_produces_empty: logical, if True assume emtpy inputs should produce empty output
+    :param empty_produces_empty: logical, if True assume empty inputs should produce empty output
+    :param local_data_mode: data model to use
     :return: nothing
     """
-
     # convert single table to dictionary
     if not isinstance(data, dict):
         cols_used = ops.columns_used()
         table_name = [k for k in cols_used.keys()][0]
         data = {table_name: data}
-
+    assert expect is not None
+    if local_data_model is None:
+        local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(expect)
+    assert local_data_model.is_appropriate_data_instance(expect)
+    check_transform_on_data_model(
+        ops=ops,
+        data=data,
+        expect=expect,
+        float_tol=float_tol,
+        check_column_order=check_column_order,
+        cols_case_sensitive=cols_case_sensitive,
+        check_row_order=check_row_order,
+        check_parse=check_parse,
+        valid_for_empty=valid_for_empty,
+        empty_produces_empty=empty_produces_empty,
+        local_data_model=local_data_model,
+    )
+    caught: Optional[Any] = None
     db_handles = [
         # non-connected handles, lets us test some of the SQL generation path
         data_algebra.SQLite.SQLiteModel().db_handle(None),
@@ -542,17 +596,13 @@ def check_transform(
         data_algebra.SparkSQL.SparkSQLModel().db_handle(None),
         data_algebra.MySQL.MySQLModel().db_handle(None),
     ]
-
-    test_dbs = get_test_dbs()
-    db_handles = db_handles + test_dbs
-
-    if models_to_skip is not None:
-        models_to_skip = {str(m) for m in models_to_skip}
-        db_handles = [h for h in db_handles if str(h.db_model) not in models_to_skip]
-
-    caught: Optional[Any] = None
     try:
-        check_transform_on_handles(
+        test_dbs = get_test_dbs()
+        db_handles = db_handles + test_dbs
+        if models_to_skip is not None:
+            models_to_skip = {str(m) for m in models_to_skip}
+            db_handles = [h for h in db_handles if str(h.db_model) not in models_to_skip]
+        _check_transform_on_handles(
             ops=ops,
             data=data,
             expect=expect,
@@ -560,10 +610,8 @@ def check_transform(
             check_column_order=check_column_order,
             cols_case_sensitive=cols_case_sensitive,
             check_row_order=check_row_order,
-            check_parse=check_parse,
             db_handles=db_handles,
-            valid_for_empty=valid_for_empty,
-            empty_produces_empty=empty_produces_empty,
+            local_data_model=local_data_model,
         )
     except AssertionError as ase:
         traceback.print_exc()
@@ -571,13 +619,11 @@ def check_transform(
     except Exception as exc:
         traceback.print_exc()
         caught = exc
-
     for handle in db_handles:
         # noinspection PyBroadException
         try:
             handle.close()
         except Exception:
             pass
-
     if caught is not None:
         raise ValueError("testing caught " + str(caught))
