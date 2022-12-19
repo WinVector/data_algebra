@@ -59,7 +59,9 @@ def test_window_fns():
         }
     )
 
-    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect1)
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect1,
+        try_on_Polars=False,  # TODO: turn this on
+    )
 
 
 def test_window_fns_pandas_only():
@@ -153,7 +155,9 @@ def test_window_fns_project():
         }
     )
 
-    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect1)
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect1,
+        try_on_Polars=False,  # TODO: turn this on
+    )
 
 
 def test_window_fns_project_no_ngroup_project():

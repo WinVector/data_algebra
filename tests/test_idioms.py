@@ -69,7 +69,8 @@ def test_idiom_extend_special_count():
 
     with pytest.warns(UserWarning):
         data_algebra.test_util.check_transform(
-            ops=ops, data=d, expect=expect, empty_produces_empty=False
+            ops=ops, data=d, expect=expect, empty_produces_empty=False,
+            try_on_Polars=False,  # TODO: turn this on
         )
 
 
@@ -309,7 +310,9 @@ def test_idiom_row_number_3():
         {"i": [1, 2, 3, 4, 5], "g": [1, 2, 2, 1, 1], "n": [1, 1, 2, 2, 3],}
     )
 
-    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect,
+        try_on_Polars=False,  # TODO: turn this on
+    )
 
 
 def test_idiom_sum_cumsum():
@@ -384,7 +387,9 @@ def test_idiom_concat_op():
         {"x": ["a", "b", "c"], "y": ["1", "2", "3"], "z": ["a1a", "b2b", "c3c"]}
     )
 
-    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect,
+        try_on_Polars=False,  # TODO: turn this on
+    )
 
 
 def test_idiom_coalesce_op():
@@ -403,4 +408,6 @@ def test_idiom_coalesce_op():
         }
     )
 
-    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect,
+        try_on_Polars=False,  # TODO: turn this on
+    )

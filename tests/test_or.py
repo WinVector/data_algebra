@@ -50,7 +50,9 @@ def test_in_1():
         }
     )
 
-    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect,
+        try_on_Polars=False,  # TODO: turn this on
+    )
 
 
 def test_in_1b():
@@ -72,7 +74,9 @@ def test_in_1b():
         }
     )
 
-    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect,
+        try_on_Polars=False,  # TODO: turn this on
+    )
 
 
 def test_in_2():
@@ -94,7 +98,9 @@ def test_in_2():
         {"ID": [34, 44, 44, 44, 44,], "OP": ["D", "C", "A", "D", "B"], "v": [True] * 5,}
     )
 
-    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect,
+        try_on_Polars=False,  # TODO: turn this on
+    )
 
 
 def test_in_3():
@@ -112,4 +118,6 @@ def test_in_3():
         {"ID": [3, 4, 4, 4, 4], "OP": ["D", "C", "A", "D", "B"],}
     )
 
-    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect,
+        try_on_Polars=False,  # TODO: turn this on
+    )

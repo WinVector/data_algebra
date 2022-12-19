@@ -36,5 +36,6 @@ def test_locf():
         expect=expect,
         models_to_skip={
             data_algebra.SparkSQL.SparkSQLModel(),
-        }
+        },
+        try_on_Polars=False,  # TODO: turn this on
     )

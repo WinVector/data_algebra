@@ -45,6 +45,12 @@ class DataModel(abc.ABC):
         """
     
     @abc.abstractmethod
+    def to_pandas(self, df):
+        """
+        Convert to Pandas
+        """
+    
+    @abc.abstractmethod
     def drop_indices(self, df) -> None:
         """
         Drop indices in place.
@@ -143,17 +149,24 @@ data_model_type_map = dict()
 
 def default_data_model() -> DataModel:
     """Get the default (Pandas) data model"""
+    global data_model_type_map
     return data_model_type_map["default_data_model"]
 
+pandas_regexp = re.compile(r".*[^a-zA-Z]pandas[^a-zA-Z].*[^a-zA-z]dataframe[^a-zA-Z].*")
+assert pandas_regexp.match("<class 'pandas.core.frame.DataFrame'>".lower()) is not None
 polars_regexp = re.compile(r".*[^a-zA-Z]polars[^a-zA-Z].*[^a-zA-z]dataframe[^a-zA-Z].*")
-assert polars_regexp.match("<class 'polars.internals.dataframe.frame.DataFrame'>") is not None
+assert polars_regexp.match("<class 'polars.internals.dataframe.frame.DataFrame'>".lower()) is not None
 polars_regexp_lazy = re.compile(r".*[^a-zA-Z]polars[^a-zA-Z].*[^a-zA-z]lazyframe[^a-zA-Z].*")
-assert polars_regexp_lazy.match("<class 'polars.internals.lazyframe.frame.LazyFrame'>") is not None
+assert polars_regexp_lazy.match("<class 'polars.internals.lazyframe.frame.LazyFrame'>".lower()) is not None
 
 def lookup_data_model_for_key(key: str) -> DataModel:
+    global data_model_type_map
     assert isinstance(key, str)
     key_lower = key.lower()
-    if (polars_regexp.match(key_lower) is not None) or (polars_regexp_lazy.match(key_lower) is not None):
+    if (key == "default_data_model") or (key == "default_Pandas_model") or (pandas_regexp.match(key_lower) is not None):
+        import data_algebra.pandas_model
+        data_algebra.pandas_model.register_pandas_model(key)
+    elif (key == "default_Polars_model") or (polars_regexp.match(key_lower) is not None) or (polars_regexp_lazy.match(key_lower) is not None):
         import data_algebra.polars_model
         data_algebra.polars_model.register_polars_model(key)
     return data_model_type_map[key]

@@ -309,6 +309,16 @@ class PolarsModel(data_algebra.data_model.DataModel):
             df = df.collect()
         return df
     
+    def to_pandas(self, df):
+        """
+        Convert to Pandas
+        """
+        assert self.is_appropriate_data_instance(df)
+        # Polars doesn't need explicit copying due to copy on write semantics
+        if isinstance(df, pl.LazyFrame):
+            df = df.collect()
+        return df.to_pandas()
+    
     def drop_indices(self, df) -> None:
         """
         Drop indices in place.

@@ -83,23 +83,35 @@ def test_one_row_cdata_convert():
     # test db paths
 
     ops1 = describe_table(a, table_name="a").convert_records(record_map)
-    data_algebra.test_util.check_transform(ops=ops1, data=a, expect=b)
+    data_algebra.test_util.check_transform(ops=ops1, data=a, expect=b,
+        try_on_Polars=False,  # TODO: turn this on
+    )
     ops1_r = describe_table(b, table_name="b").convert_records(record_map.inverse())
-    data_algebra.test_util.check_transform(ops=ops1_r, data=b, expect=a)
+    data_algebra.test_util.check_transform(ops=ops1_r, data=b, expect=a,
+        try_on_Polars=False,  # TODO: turn this on
+    )
 
     db_model = data_algebra.SQLite.SQLiteModel()
 
     ops1_e = describe_table(a, table_name="a").convert_records(record_map_e)
-    data_algebra.test_util.check_transform(ops=ops1_e, data=a, expect=b)
+    data_algebra.test_util.check_transform(ops=ops1_e, data=a, expect=b,
+        try_on_Polars=False,  # TODO: turn this on
+    )
     example_sql = db_model.to_sql(ops1_e)
     assert isinstance(example_sql, str)
     # print(example_sql)
     ops1_e_r = describe_table(b, table_name="b").convert_records(record_map_e.inverse())
-    data_algebra.test_util.check_transform(ops=ops1_e_r, data=b, expect=a)
+    data_algebra.test_util.check_transform(ops=ops1_e_r, data=b, expect=a,
+        try_on_Polars=False,  # TODO: turn this on
+    )
 
     ops1_e2 = describe_table(a, table_name="a").convert_records(record_map_e2)
-    data_algebra.test_util.check_transform(ops=ops1_e2, data=a, expect=b)
+    data_algebra.test_util.check_transform(ops=ops1_e2, data=a, expect=b,
+        try_on_Polars=False,  # TODO: turn this on
+    )
     ops1_e2_r = describe_table(b, table_name="b").convert_records(
         record_map_e2.inverse()
     )
-    data_algebra.test_util.check_transform(ops=ops1_e2_r, data=b, expect=a)
+    data_algebra.test_util.check_transform(ops=ops1_e2_r, data=b, expect=a,
+        try_on_Polars=False,  # TODO: turn this on
+    )

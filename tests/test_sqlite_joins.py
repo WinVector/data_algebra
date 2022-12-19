@@ -38,6 +38,7 @@ def test_sqlite_joins_left_to_right():
         data={"d1": d1, "d2": d2},
         expect=expect_1,
         models_to_skip={str(data_algebra.MySQL.MySQLModel())},
+        try_on_Polars=False,  # TODO: turn this on
     )
     ops_2 = descr(d1=d1).natural_join(b=descr(d2=d2), by=["g"], jointype="right")
     expect_2 = data_algebra.data_model.default_data_model().pd.DataFrame(
@@ -54,6 +55,7 @@ def test_sqlite_joins_left_to_right():
         data={"d1": d1, "d2": d2},
         expect=expect_2,
         models_to_skip={str(data_algebra.MySQL.MySQLModel())},
+        try_on_Polars=False,  # TODO: turn this on
     )
     # check test is strong enough
     assert not data_algebra.test_util.equivalent_frames(expect_1, expect_2)
@@ -83,6 +85,7 @@ def test_sqlite_joins_simulate_full_join():
         data={"d1": d1, "d2": d2},
         expect=res_pandas,
         models_to_skip={str(data_algebra.MySQL.MySQLModel())},
+        try_on_Polars=False,  # TODO: turn this on
     )
     ops_simulate = (
         # get shared key set
@@ -109,6 +112,7 @@ def test_sqlite_joins_simulate_full_join():
         data={"d1": d1, "d2": d2},
         expect=res_pandas,
         models_to_skip={str(data_algebra.MySQL.MySQLModel())},
+        try_on_Polars=False,  # TODO: turn this on
     )
 
 
@@ -139,4 +143,5 @@ def test_sqlite_joins_staged():
         models_to_skip={
             data_algebra.MySQL.MySQLModel(),
         },
+        try_on_Polars=False,  # TODO: turn this on
     )

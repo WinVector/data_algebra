@@ -60,7 +60,9 @@ def test_map_columns_del():
     res_pandas = ops.transform(d)
     expect = data_algebra.data_model.default_data_model().pd.DataFrame({"y1": [2], "z": ["q"]})
     assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
-    data_algebra.test_util.check_transform(ops, data={"d": d}, expect=expect)
+    data_algebra.test_util.check_transform(ops, data={"d": d}, expect=expect,
+        try_on_Polars=False,  # TODO: turn this on
+    )
 
 
 def test_map_columns_swap_del():
@@ -70,4 +72,6 @@ def test_map_columns_swap_del():
     res_pandas = swap.transform(d)
     expect = data_algebra.data_model.default_data_model().pd.DataFrame({"y": [1], "x": [2],})
     assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
-    data_algebra.test_util.check_transform(swap, data={"d": d}, expect=expect)
+    data_algebra.test_util.check_transform(swap, data={"d": d}, expect=expect,
+        try_on_Polars=False,  # TODO: turn this on
+    )

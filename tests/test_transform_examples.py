@@ -1,6 +1,3 @@
-import pytest
-
-import sqlite3
 
 import data_algebra
 import data_algebra.SQLite

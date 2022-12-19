@@ -21,6 +21,14 @@ from data_algebra.sql_format_options import SQLFormatOptions
 from data_algebra.data_ops import *
 
 
+have_polars = False
+try:
+    import data_algebra.polars_model
+    have_polars = True
+except ModuleNotFoundError:
+    pass
+
+
 # controls
 test_PostgreSQL = False  # causes an external dependency
 test_BigQuery = False  # causes an external dependency
@@ -78,13 +86,16 @@ def equivalent_frames(
     check_column_order: bool = False,
     cols_case_sensitive: bool = False,
     check_row_order: bool = False,
-    local_data_model=None,
 ) -> bool:
     """return False if the frames are equivalent (up to column re-ordering and possible row-reordering).
     Ignores indexing. None and nan are considered equivalent in numeric contexts."""
     # leave in extra checks as this is usually used by test code
-    if local_data_model is None:
-        local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(a)
+    local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(a)
+    assert local_data_model.is_appropriate_data_instance(a)
+    assert local_data_model.is_appropriate_data_instance(b)
+    a = local_data_model.to_pandas(a)
+    b = local_data_model.to_pandas(b)
+    local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(a)
     assert local_data_model.is_appropriate_data_instance(a)
     assert local_data_model.is_appropriate_data_instance(b)
     if a.shape != b.shape:
@@ -286,7 +297,7 @@ def _run_handle_experiments(
 def check_transform_on_data_model(
     *,
     ops,
-    data: dict,
+    data: Dict,
     expect,
     float_tol: float = 1e-8,
     check_column_order: bool = False,
@@ -316,14 +327,14 @@ def check_transform_on_data_model(
     """
     assert isinstance(data, dict)
     assert expect is not None
-    assert isinstance(ops, ViewRepresentation)
-    orig_data = {k: v.copy() for k, v in data.items()}
-    n_tables = len(data)
-    assert n_tables > 0
     if local_data_model is None:
         local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(expect)
     if not local_data_model.is_appropriate_data_instance(expect):
-        raise TypeError("expected expect to be a local_data_model.pd.DataFrame")
+        raise TypeError("expected expect to be a DataFrame")
+    assert isinstance(ops, ViewRepresentation)
+    orig_data = {k: local_data_model.clean_copy(v) for k, v in data.items()}
+    n_tables = len(data)
+    assert n_tables > 0
     data_model_map = {local_data_model.presentation_model_name: local_data_model.module}
     def_pd_data_model = data_algebra.data_model.lookup_data_model_for_key("default_Pandas_model")
     if def_pd_data_model.presentation_model_name not in data_model_map.keys():
@@ -339,7 +350,7 @@ def check_transform_on_data_model(
     res = ops.eval(data_map=data)
     if not local_data_model.is_appropriate_data_instance(res):
         raise ValueError(
-            "expected res to be local_data_model.pd.DataFrame, got: " + str(type(res))
+            "expected res to be DataFrame, got: " + str(type(res))
         )
     if not equivalent_frames(
         res,
@@ -349,7 +360,7 @@ def check_transform_on_data_model(
         cols_case_sensitive=cols_case_sensitive,
         check_row_order=check_row_order,
     ):
-        raise ValueError("Pandas eval result did not match expect")
+        raise ValueError("local data model eval result did not match expect")
     # show inputs didn't change
     for k, v in orig_data.items():
         v2 = data[k]
@@ -374,7 +385,7 @@ def check_transform_on_data_model(
             cols_case_sensitive=cols_case_sensitive,
             check_row_order=check_row_order,
         ):
-            raise ValueError("(reparse) eval result did not match expect")
+            raise ValueError("(re-parse) eval result did not match expect")
     if len(data) == 1:
         res_t = ops.transform(list(data.values())[0])
         if not equivalent_frames(
@@ -385,7 +396,7 @@ def check_transform_on_data_model(
             cols_case_sensitive=cols_case_sensitive,
             check_row_order=check_row_order,
         ):
-            raise ValueError("Pandas transform result did not match expect")
+            raise ValueError("local data model transform result did not match expect")
         # show inputs didn't change
         for k, v in orig_data.items():
             v2 = data[k]
@@ -425,7 +436,7 @@ def check_transform_on_data_model(
 def _check_transform_on_handles(
     *,
     ops,
-    data: dict,
+    data: Dict,
     expect,
     db_handles,
     float_tol: float = 1e-8,
@@ -458,7 +469,7 @@ def _check_transform_on_handles(
     n_tables = len(data)
     assert n_tables > 0
     if not local_data_model.is_appropriate_data_instance(expect):
-        raise TypeError("expected expect to be a local_data_model.pd.DataFrame")
+        raise TypeError("expected expect to be a DataFrame")
     # try any db paths
     global global_test_result_cache
     global run_direct_ops_path_tests
@@ -545,7 +556,8 @@ def check_transform(
     models_to_skip: Optional[Iterable] = None,
     valid_for_empty: bool = True,
     empty_produces_empty: bool = True,
-    local_data_model = None
+    local_data_model = None,
+    try_on_Polars: bool = True,
 ) -> None:
     """
     Test an operator dag produces the expected result, and parses correctly.
@@ -563,6 +575,7 @@ def check_transform(
     :param valid_for_empty: logical, if True perform tests on empty inputs
     :param empty_produces_empty: logical, if True assume empty inputs should produce empty output
     :param local_data_mode: data model to use
+    :param try_on_Polars: try tests again on Polars
     :return: nothing
     """
     # convert single table to dictionary
@@ -570,6 +583,7 @@ def check_transform(
         cols_used = ops.columns_used()
         table_name = [k for k in cols_used.keys()][0]
         data = {table_name: data}
+    assert isinstance(try_on_Polars, bool)
     assert expect is not None
     if local_data_model is None:
         local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(expect)
@@ -587,6 +601,25 @@ def check_transform(
         empty_produces_empty=empty_produces_empty,
         local_data_model=local_data_model,
     )
+    if try_on_Polars and have_polars:
+        polars_data_model = data_algebra.data_model.lookup_data_model_for_key("default_Polars_model")
+        pl = polars_data_model.module
+        expect_polars = pl.DataFrame(expect)
+        data_polars = {k: pl.DataFrame(d) for k, d in data.items()}
+        check_transform_on_data_model(
+            ops=ops,
+            data=data_polars,
+            expect=expect_polars,
+            float_tol=float_tol,
+            check_column_order=check_column_order,
+            cols_case_sensitive=cols_case_sensitive,
+            check_row_order=check_row_order,
+            check_parse=False,
+            valid_for_empty=False,
+            empty_produces_empty=False,
+            local_data_model=polars_data_model,
+        )
+
     caught: Optional[Any] = None
     db_handles = [
         # non-connected handles, lets us test some of the SQL generation path

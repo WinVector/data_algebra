@@ -34,7 +34,9 @@ def test_shift():
         'v_p2': [None, None, 'a', 'b', 'c'],
         })
     assert data_algebra.test_util.equivalent_frames(res, expect)
-    data_algebra.test_util.check_transform(ops, data={"d": d}, expect=expect)
+    data_algebra.test_util.check_transform(ops, data={"d": d}, expect=expect,
+        try_on_Polars=False,  # TODO: turn this on
+    )
 
 
 def test_shift_assert_on_0():

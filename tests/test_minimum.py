@@ -23,4 +23,6 @@ def test_minimum_1():
         }
     )
 
-    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect,
+        try_on_Polars=False,  # TODO: turn this on
+    )

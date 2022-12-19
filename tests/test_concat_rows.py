@@ -45,7 +45,8 @@ def test_if_concat_is_stoopid_1():
     )
 
     data_algebra.test_util.check_transform(
-        ops=ops, data={"d1": d1, "d2": d2}, expect=expect
+        ops=ops, data={"d1": d1, "d2": d2}, expect=expect,
+        try_on_Polars=False,  # TODO: turn this on
     )
 
 
@@ -60,4 +61,6 @@ def test_if_concat_is_stoopid_2():
         {"x": ["a", "a"], "y": ["b", "b"]}
     )
 
-    data_algebra.test_util.check_transform(ops=ops, data=d1, expect=expect)
+    data_algebra.test_util.check_transform(ops=ops, data=d1, expect=expect,
+        try_on_Polars=False,  # TODO: turn this on
+    )

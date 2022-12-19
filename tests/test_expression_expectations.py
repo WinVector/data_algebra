@@ -48,6 +48,7 @@ def test_expression_expectations_1():
                         valid_for_empty=False,
                         empty_produces_empty=False,
                         models_to_skip=to_skip,
+                        try_on_Polars=False,  # TODO: turn this on
                     )
     for op, op_class, exp, ops, expect in u_results:
         # re-run, but don't check value

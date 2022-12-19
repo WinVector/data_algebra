@@ -242,7 +242,9 @@ def test_complex_expr_arith():
             ],
         }
     )
-    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect,
+        try_on_Polars=False,  # TODO: turn this on
+    )
 
 
 def test_complex_expr_logic():
@@ -274,7 +276,9 @@ def test_complex_expr_logic():
             "res": [True, False, True, False, True, False, False, False, False, False],
         }
     )
-    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect,
+        try_on_Polars=False,  # TODO: turn this on
+    )
 
 
 def test_complex_expr_arith_minus():
@@ -337,7 +341,9 @@ def test_complex_expr_arith_minus():
     res_pandas = ops.transform(d)
     assert data_algebra.test_util.equivalent_frames(expect, res_pandas)
 
-    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect,
+        try_on_Polars=False,  # TODO: turn this on
+    )
 
 
 def test_complex_expr_arith_minus_2():

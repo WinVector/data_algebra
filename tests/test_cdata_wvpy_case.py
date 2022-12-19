@@ -103,10 +103,13 @@ threshold,count,fraction,precision,true_positive_rate,false_positive_rate,true_n
         to_plot.loc[:, ["threshold"] + plotvars], back2
     )
     pipe1 = descr(to_plot=to_plot).convert_records(reshaper)
-    data_algebra.test_util.check_transform(ops=pipe1, data=to_plot, expect=prtlong)
+    data_algebra.test_util.check_transform(ops=pipe1, data=to_plot, expect=prtlong,
+        try_on_Polars=False,  # TODO: turn this on
+    )
     pipe2 = descr(prtlong=prtlong).convert_records(reshaper.inverse())
     data_algebra.test_util.check_transform(
-        ops=pipe2, data=prtlong, expect=to_plot.loc[:, ["threshold"] + plotvars]
+        ops=pipe2, data=prtlong, expect=to_plot.loc[:, ["threshold"] + plotvars],
+        try_on_Polars=False,  # TODO: turn this on
     )
     # TODO: should we get measure back?
     # TODO: should we be strict that isn't in technically an invertible transform.
@@ -147,10 +150,13 @@ threshold,count,fraction,precision,true_positive_rate,false_positive_rate,true_n
         to_plot.loc[:, ["threshold"] + plotvars], back2
     )
     pipe1 = descr(to_plot=to_plot).convert_records(reshaper)
-    data_algebra.test_util.check_transform(ops=pipe1, data=to_plot, expect=prtlong)
+    data_algebra.test_util.check_transform(ops=pipe1, data=to_plot, expect=prtlong,
+        try_on_Polars=False,  # TODO: turn this on
+    )
     pipe2 = descr(prtlong=prtlong).convert_records(reshaper.inverse())
     data_algebra.test_util.check_transform(
-        ops=pipe2, data=prtlong, expect=to_plot.loc[:, ["threshold"] + plotvars]
+        ops=pipe2, data=prtlong, expect=to_plot.loc[:, ["threshold"] + plotvars],
+        try_on_Polars=False,  # TODO: turn this on
     )
     # TODO: should we get measure back?
     # TODO: should we be strict that isn't in technically an invertible transform.

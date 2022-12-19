@@ -62,4 +62,5 @@ def test_compare_data_frames():
         data={"d1": d1, "d2": d2},
         expect=expect,
         models_to_skip={str(data_algebra.MySQL.MySQLModel())},
+        try_on_Polars=False,  # TODO: turn this on
     )

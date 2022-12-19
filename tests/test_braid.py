@@ -46,5 +46,6 @@ def test_braid():
             data_algebra.MySQL.MySQLModel(),
             data_algebra.PostgreSQL.PostgreSQLModel(),
             data_algebra.BigQuery.BigQueryModel(),
-        }
+        },
+        try_on_Polars=False,  # TODO: turn this on
     )

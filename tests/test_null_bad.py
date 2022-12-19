@@ -36,6 +36,7 @@ def test_null_bad():
     )  # None/Null/Non handled differently
     data_algebra.test_util.check_transform(
         ops=ops, data=d, expect=expect, models_to_skip=models_to_skip,
+        try_on_Polars=False,  # TODO: turn this on
     )
 
 

@@ -66,7 +66,9 @@ def test_is_inf():
         models_to_skip={
             data_algebra.MySQL.MySQLModel(),  # sqlalchemy won't insert inf
             data_algebra.SparkSQL.SparkSQLModel(),  # probably not inserting values
-        })
+        },
+        try_on_Polars=False,  # TODO: turn this on
+        )
 
 
 def test_float_divide_works():
@@ -103,4 +105,6 @@ def test_float_divide_works():
         models_to_skip={
             data_algebra.MySQL.MySQLModel(),  # sqlalchemy won't insert inf
             data_algebra.SparkSQL.SparkSQLModel(),  # probably not inserting values
-        })
+        },
+        try_on_Polars=False,  # TODO: turn this on
+        )

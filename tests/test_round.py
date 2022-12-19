@@ -20,7 +20,9 @@ def test_round_1():
     expect["v"] = numpy.round(expect["x"])
 
     assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
-    data_algebra.test_util.check_transform(ops, data={"d": d}, expect=expect)
+    data_algebra.test_util.check_transform(ops, data={"d": d}, expect=expect,
+        try_on_Polars=False,  # TODO: turn this on
+    )
 
 
 def test_floor_1():

@@ -59,5 +59,6 @@ def test_join_conditions_on_join():
     res = ops.eval({"d1": d1, "d2": d2})
     assert data_algebra.test_util.equivalent_frames(res, expect)
     data_algebra.test_util.check_transform(
-        ops=ops, data={"d1": d1, "d2": d2}, expect=expect
+        ops=ops, data={"d1": d1, "d2": d2}, expect=expect,
+        try_on_Polars=False,  # TODO: turn this on
     )

@@ -389,6 +389,12 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         assert self.is_appropriate_data_instance(df)
         return df.reset_index(drop=True, inplace=False)
     
+    def to_pandas(self, df):
+        """
+        Convert to Pandas
+        """
+        return self.clean_copy(df)
+    
     def drop_indices(self, df) -> None:
         """
         Drop indices in place.

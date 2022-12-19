@@ -71,7 +71,9 @@ def test_if_else_2():
         }
     )
 
-    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect,
+        try_on_Polars=False,  # TODO: turn this on
+    )
 
 
 def test_maximum_1():
@@ -89,7 +91,9 @@ def test_maximum_1():
     expect["c"] = numpy.maximum(expect.a, expect.b)
     expect["d"] = numpy.minimum(expect.a, expect.b)
 
-    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect,
+        try_on_Polars=False,  # TODO: turn this on
+    )
 
 
 def test_if_else_complex():
@@ -135,4 +139,6 @@ def test_if_else_where():
     res_sqlite = sqlite_handle.read_query(ops)
     assert data_algebra.test_util.equivalent_frames(res_sqlite, expect)
     sqlite_handle.close()
-    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect,
+        try_on_Polars=False,  # TODO: turn this on
+    )

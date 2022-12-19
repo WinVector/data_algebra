@@ -130,4 +130,5 @@ def test_xicor_frame_calc():
         valid_for_empty=False,
         empty_produces_empty=False,
         float_tol = 0.1,
+        try_on_Polars=False,  # TODO: turn this on
     )
