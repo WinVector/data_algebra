@@ -87,6 +87,10 @@ def _type_safe_not_equal(a, b):
     return numpy.not_equal(a, b)
 
 
+def _not_equal_false(a):
+    return a != False
+
+
 def _type_safe_is_in(a, b):
     b = list(b)
     if len(b) > 0:
@@ -285,12 +289,12 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             "%": numpy.mod,
             "**": numpy.power,
             "and": _k_and,
-            "&": numpy.bitwise_and,
+            "&": _k_and,
             "or": _k_or,
             "|": _k_or,
             "xor": numpy.logical_xor,
             "^": numpy.logical_xor,
-            "not": numpy.bitwise_or,
+            "not": _not_equal_false,
             "where": _where_expr,
             "if_else": lambda *args: self._if_else_expr(*args),
             "is_nan": self.isnan,
