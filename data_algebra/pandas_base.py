@@ -519,7 +519,10 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         """
         assert op.node_name == "SQLNode"
         db_handle = data_map[op.view_name]
+        # would like (but causes cicrular import) assert isinstance(db_handle, data_algebra.db_model.DBHandle)
         res = db_handle.read_query("\n".join(op.sql))
+        res = self.data_frame(res[op.columns_produced()])
+        assert self.is_appropriate_data_instance(res)
         return res
 
     def columns_to_frame_(self, cols: Dict[str, Any], *, target_rows: Optional[int] = None):

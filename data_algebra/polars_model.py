@@ -658,10 +658,13 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 "op was supposed to be a data_algebra.data_ops.SQLNode"
             )
         db_handle = data_map[op.view_name]
+        # would like (but causes cicrular import) assert isinstance(db_handle, data_algebra.db_model.DBHandle)
         res = db_handle.read_query("\n".join(op.sql))
         res = self.data_frame(res)
+        assert self.is_appropriate_data_instance(res)
         if self.use_lazy_eval and (not isinstance(res, pl.LazyFrame)):
             res = res.lazy()
+        res = res.select(op.columns_produced())
         return res
     
     def _table_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):

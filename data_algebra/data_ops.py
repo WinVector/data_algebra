@@ -481,13 +481,19 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         self.columns_used()  # for table consistency check/raise
         tables = self.get_tables()
         if len(tables) > 0:
+            all_op_platforms = True
             for k in tables.keys():
                 v = data_map[k]
-                if data_model is None:
-                    data_model = data_algebra.data_model.lookup_data_model_for_dataframe(v)
-                if not data_model.is_appropriate_data_instance(v):
-                    raise ValueError(f"data_map[{k}] type {type(v)} not appropriate for data model {data_model}")
-        else:
+                if not isinstance(v, OperatorPlatform):
+                    all_op_platforms = False
+                    if data_model is None:
+                        data_model = data_algebra.data_model.lookup_data_model_for_dataframe(v)
+                    if not data_model.is_appropriate_data_instance(v):
+                        raise ValueError(f"data_map[{k}] type {type(v)} not appropriate for data model {data_model}")
+            if all_op_platforms:
+                # apply self to replacement leaf definitions
+                return self.replace_leaves(data_map)
+        if data_model is None:
             data_model = data_algebra.data_model.default_data_model()
         assert isinstance(data_model, data_algebra.data_model.DataModel)
         self.check_constraints(
@@ -512,13 +518,12 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         :return: transformed data frame
         """
         assert isinstance(strict, bool)
-        self.columns_used()  # for table consistency check/raise
         tables = self.get_tables()
         if len(tables) != 1:
             raise ValueError(
                 "transform(DataFrame) can only be applied to ops-dags with only one table def"
             )
-        k = [k for k in tables.keys()][0]
+        k = list(tables.keys())[0]
         data_map = {k: X}
         return self.eval(
             data_map=data_map,
