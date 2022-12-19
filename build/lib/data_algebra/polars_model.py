@@ -178,7 +178,7 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "sign": lambda x: x.sign(),
         "sin": lambda x: x.sin(),
         "sinh": lambda x: x.sinh(),
-        "size": lambda x: x.size(),
+        "size": lambda x: _da_temp_one_column.sum(),
         "sqrt": lambda x: x.sqrt(),
         "std": lambda x: x.std(),
         "sum": lambda x: x.sum(),
@@ -229,6 +229,12 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "mapv": lambda a, b, c: a.mapv(b, c),
         "trimstr": lambda a, b, c: a.trimstr(b, c),
         "where": lambda a, b, c: pl.when(a).then(b).otherwise(c),
+        "+": lambda a, b, c: a + b + c,
+        "*": lambda a, b, c: a * b * c,
+        "and": lambda a, b, c: a & b & c,
+        "&": lambda a, b, c: a & b & c,
+        "or": lambda a, b, c: a | b | c,
+        "|": lambda a, b, c: a | b | c,
     }
     impl_map = {
         0: impl_map_0,
@@ -236,6 +242,7 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         2: impl_map_2,
         3: impl_map_3,
     }
+    # TODO: all the _k-arity ops
     # could also key the map by grouped, partitioned, regular situation
     return impl_map
 

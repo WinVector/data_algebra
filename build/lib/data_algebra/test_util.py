@@ -659,4 +659,4 @@ def check_transform(
         except Exception:
             pass
     if caught is not None:
-        raise ValueError("testing caught " + str(caught))
+        raise caught
