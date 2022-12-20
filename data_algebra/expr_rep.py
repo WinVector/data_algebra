@@ -773,7 +773,7 @@ class Term(PreTerm, abc.ABC):
 
     def is_bad(self):
         """
-        Return which items are bad (null or nan) (vectorized).
+        Return which items in a numeric column are bad (null, None, nan, or infinite) (vectorized).
         """
         return self.__uop_expr__("is_bad")
 
