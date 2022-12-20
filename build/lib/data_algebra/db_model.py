@@ -136,7 +136,7 @@ def _db_is_nan_expr(dbmodel, expression):
     subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
     return (
         "(CASE"
-        + f" WHEN {subexpr} IS NULL THEN TRUE"
+        + f" WHEN {subexpr} IS NULL THEN FALSE"
         + f" WHEN ({subexpr} > 0) AND (-{subexpr} > 0) THEN TRUE"
         + f" WHEN ({subexpr} != {subexpr}) THEN TRUE"
         + f" WHEN ({subexpr} != 0) AND ({subexpr} = -{subexpr}) THEN TRUE"

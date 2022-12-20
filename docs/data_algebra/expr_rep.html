@@ -1254,7 +1254,7 @@
 </span><span id="L-773"><a href="#L-773"><span class="linenos"> 773</span></a>
 </span><span id="L-774"><a href="#L-774"><span class="linenos"> 774</span></a>    <span class="k">def</span> <span class="nf">is_bad</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-775"><a href="#L-775"><span class="linenos"> 775</span></a>        <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-776"><a href="#L-776"><span class="linenos"> 776</span></a><span class="sd">        Return which items are bad (null or nan) (vectorized).</span>
+</span><span id="L-776"><a href="#L-776"><span class="linenos"> 776</span></a><span class="sd">        Return which items in a numeric column are bad (null, None, nan, or infinite) (vectorized).</span>
 </span><span id="L-777"><a href="#L-777"><span class="linenos"> 777</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-778"><a href="#L-778"><span class="linenos"> 778</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;is_bad&quot;</span><span class="p">)</span>
 </span><span id="L-779"><a href="#L-779"><span class="linenos"> 779</span></a>
@@ -2854,7 +2854,7 @@ str() method returns only the text for interoperability.</p>
 </span><span id="Term-774"><a href="#Term-774"><span class="linenos"> 774</span></a>
 </span><span id="Term-775"><a href="#Term-775"><span class="linenos"> 775</span></a>    <span class="k">def</span> <span class="nf">is_bad</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="Term-776"><a href="#Term-776"><span class="linenos"> 776</span></a>        <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Term-777"><a href="#Term-777"><span class="linenos"> 777</span></a><span class="sd">        Return which items are bad (null or nan) (vectorized).</span>
+</span><span id="Term-777"><a href="#Term-777"><span class="linenos"> 777</span></a><span class="sd">        Return which items in a numeric column are bad (null, None, nan, or infinite) (vectorized).</span>
 </span><span id="Term-778"><a href="#Term-778"><span class="linenos"> 778</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="Term-779"><a href="#Term-779"><span class="linenos"> 779</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;is_bad&quot;</span><span class="p">)</span>
 </span><span id="Term-780"><a href="#Term-780"><span class="linenos"> 780</span></a>
@@ -4548,13 +4548,13 @@ str() method returns only the text for interoperability.</p>
     <a class="headerlink" href="#Term.is_bad"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="Term.is_bad-775"><a href="#Term.is_bad-775"><span class="linenos">775</span></a>    <span class="k">def</span> <span class="nf">is_bad</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="Term.is_bad-776"><a href="#Term.is_bad-776"><span class="linenos">776</span></a>        <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Term.is_bad-777"><a href="#Term.is_bad-777"><span class="linenos">777</span></a><span class="sd">        Return which items are bad (null or nan) (vectorized).</span>
+</span><span id="Term.is_bad-777"><a href="#Term.is_bad-777"><span class="linenos">777</span></a><span class="sd">        Return which items in a numeric column are bad (null, None, nan, or infinite) (vectorized).</span>
 </span><span id="Term.is_bad-778"><a href="#Term.is_bad-778"><span class="linenos">778</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="Term.is_bad-779"><a href="#Term.is_bad-779"><span class="linenos">779</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;is_bad&quot;</span><span class="p">)</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Return which items are bad (null or nan) (vectorized).</p>
+            <div class="docstring"><p>Return which items in a numeric column are bad (null, None, nan, or infinite) (vectorized).</p>
 </div>
 
 

@@ -719,6 +719,8 @@ class PolarsModel(data_algebra.data_model.DataModel):
         data = data.select(blocks_in.block_columns)
         assert set(data.columns) == set(blocks_in.block_columns)
         # table must be keyed by record_keys + control_table_keys
+        if data.shape[0] < 1:
+            return pl.DataFrame({c: [] for c in blocks_in.row_columns})
         if not self.table_is_keyed_by_columns(
             data, column_names=blocks_in.record_keys + blocks_in.control_table_keys
         ):
@@ -785,9 +787,9 @@ class PolarsModel(data_algebra.data_model.DataModel):
         assert len(blocks_out.control_table_keys) > 0
         data = data.select(blocks_out.row_columns)
         assert set(data.columns) == set(blocks_out.row_columns)
-        if (data.shape[0] > 1) and (not self.table_is_keyed_by_columns(
-            data, column_names=blocks_out.record_keys
-        )):
+        if data.shape[0] < 1:
+            return pl.DataFrame({c: [] for c in blocks_out.block_columns})
+        if not self.table_is_keyed_by_columns(data, column_names=blocks_out.record_keys):
             raise ValueError(
                 "table is not keyed by blocks_out.record_keys"
             )
