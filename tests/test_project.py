@@ -31,7 +31,8 @@ def test_project_z():
     expect = data_algebra.data_model.default_data_model().pd.DataFrame({"c": [1]})
 
     data_algebra.test_util.check_transform(
-        ops=ops, data=d, expect=expect, empty_produces_empty=False
+        ops=ops, data=d, expect=expect, empty_produces_empty=False,
+        try_on_Polars=False,  # TODO: turn this on
     )
 
 

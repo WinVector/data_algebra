@@ -404,7 +404,7 @@ def check_transform_on_data_model(
     if valid_for_empty:
         # try on empty inputs
         empty_map = {
-            k: local_data_model.clean_copy(v.iloc[range(0), :])
+            k: local_data_model.clean_copy(v.head(0))
             for k, v in data.items()
         }
         empty_res = ops.eval(empty_map)
@@ -615,8 +615,8 @@ def check_transform(
             cols_case_sensitive=cols_case_sensitive,
             check_row_order=check_row_order,
             check_parse=False,
-            valid_for_empty=False,
-            empty_produces_empty=False,
+            valid_for_empty=valid_for_empty,
+            empty_produces_empty=empty_produces_empty,
             local_data_model=polars_data_model,
         )
 

@@ -43,17 +43,18 @@ def test_idiom_extend_one_count():
         {"group": ["a", "a", "b", "b"], "val": [1, 2, 3, 4],}
     )
     table_name = "pytest_temp_d"
-
     ops = (
         describe_table(d, table_name=table_name)
         .extend({"one": 1})
         .project({"count": "one.sum()"})
     )
-
     expect = data_algebra.data_model.default_data_model().pd.DataFrame({"count": [4]})
-
     data_algebra.test_util.check_transform(
-        ops=ops, data=d, expect=expect, empty_produces_empty=False
+        ops=ops, data=d, expect=expect, valid_for_empty=False,
+    )
+    data_algebra.test_util.check_transform(
+        ops=ops, data=d, expect=expect, empty_produces_empty=False,
+        try_on_Polars=False,  # TODO: turn this on
     )
 
 
@@ -231,23 +232,23 @@ def test_idiom_simulate_cross_join_select():
 def test_idiom_cross_join():
     d = data_algebra.data_model.default_data_model().pd.DataFrame({"x": [1, 2, 3, 4],})
     table_name_d = "pytest_temp_d"
-
     e = data_algebra.data_model.default_data_model().pd.DataFrame({"y": ["a", "b", "c"],})
     table_name_e = "pytest_temp_e"
-
     ops = describe_table(d, table_name=table_name_d).natural_join(
         b=describe_table(e, table_name=table_name_e), by=[], jointype="cross"
     )
-
     expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "x": [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4],
             "y": ["a", "b", "c", "a", "b", "c", "a", "b", "c", "a", "b", "c"],
         }
     )
-
     data_algebra.test_util.check_transform(
-        ops=ops, data={table_name_d: d, table_name_e: e}, expect=expect
+        ops=ops, data={table_name_d: d, table_name_e: e}, expect=expect, valid_for_empty=False
+    )
+    data_algebra.test_util.check_transform(
+        ops=ops, data={table_name_d: d, table_name_e: e}, expect=expect,
+        try_on_Polars=False,  # TODO: turn this on
     )
 
 
