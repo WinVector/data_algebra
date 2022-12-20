@@ -91,7 +91,6 @@ def _build_lit(v):
 
 
 _da_temp_one_column_name = "_da_temp_one_column"
-_da_temp_one_column = _build_lit(1).alias(_da_temp_one_column_name)
 
 
 def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
@@ -100,16 +99,16 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
     """
     # TODO: fill in more
     impl_map_0 = {
-        "count": lambda : _da_temp_one_column.cumsum(),  # ugly SQL def
-        "_count": lambda : _da_temp_one_column.cumsum(),  # ugly SQL def
-        "cumcount": lambda : _da_temp_one_column.cumsum(),  # ugly SQL def
-        "_cumcount": lambda : _da_temp_one_column.cumsum(),  # ugly SQL def
+        "count": lambda : pl.col(_da_temp_one_column_name).cumsum(),  # ugly SQL def
+        "_count": lambda : pl.col(_da_temp_one_column_name).cumsum(),  # ugly SQL def
+        "cumcount": lambda : pl.col(_da_temp_one_column_name).cumsum(),  # ugly SQL def
+        "_cumcount": lambda : pl.col(_da_temp_one_column_name).cumsum(),  # ugly SQL def
         "ngroup": lambda : _raise_not_impl("ngroup"),  # TODO: implement
         "_ngroup": lambda : _raise_not_impl("_ngroup"),  # TODO: implement
-        "row_number": lambda : _da_temp_one_column.cumsum(),
-        "_row_number": lambda : _da_temp_one_column.cumsum(),
-        "size": lambda : _da_temp_one_column.sum(),
-        "_size": lambda : _da_temp_one_column.sum(),
+        "row_number": lambda : pl.col(_da_temp_one_column_name).cumsum(),
+        "_row_number": lambda : pl.col(_da_temp_one_column_name).cumsum(),
+        "size": lambda : pl.col(_da_temp_one_column_name).sum(),
+        "_size": lambda : pl.col(_da_temp_one_column_name).sum(),
         "uniform": lambda : _raise_not_impl("uniform"),  # TODO: implement
         "_uniform": lambda : _raise_not_impl("_uniform"),  # TODO: implement
         # how to land new columns: https://github.com/pola-rs/polars/issues/3933#issuecomment-1179241568
@@ -178,7 +177,7 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "sign": lambda x: x.sign(),
         "sin": lambda x: x.sin(),
         "sinh": lambda x: x.sinh(),
-        "size": lambda x: _da_temp_one_column.sum(),
+        "size": lambda x: pl.col(_da_temp_one_column_name).sum(),
         "sqrt": lambda x: x.sqrt(),
         "std": lambda x: x.std(),
         "sum": lambda x: x.sum(),
@@ -493,7 +492,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 fld_k = fld_k.over(partition_by)
             produced_columns.append(fld_k.alias(k))
         if conditions_from_expressions.one_constant_required:
-            temp_v_columns.append(_da_temp_one_column)
+            temp_v_columns.append(_build_lit(1).alias(_da_temp_one_column_name))
         assert not conditions_from_expressions.collect_required  # implement if needed
         if len(temp_v_columns) > 0:
             res = res.with_columns(temp_v_columns)
@@ -553,7 +552,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
             fld_k = fld_k_container.polars_term
             produced_columns.append(fld_k.alias(k))
         if conditions_from_expressions.one_constant_required:
-            temp_v_columns.append(_da_temp_one_column)
+            temp_v_columns.append(_build_lit(1).alias(_da_temp_one_column_name))
         assert not conditions_from_expressions.collect_required  # implement if needed
         if len(temp_v_columns) > 0:
             res = res.with_columns(temp_v_columns)
