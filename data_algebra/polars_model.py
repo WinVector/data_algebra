@@ -136,7 +136,7 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "base_Sunday": lambda x: x.base_Sunday(),
         "bfill": lambda x: x.bfill(),
         "ceil": lambda x: x.ceil(),
-        "coalesce0": lambda x: x.coalesce(0),
+        "coalesce0": lambda x: pl.when(a.is_null()).then(pl.lit(0)).otherwise(a),
         "cos": lambda x: x.cos(),
         "cosh": lambda x: x.cosh(),
         "count": lambda x: x.count(),
@@ -196,19 +196,19 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "-": lambda a, b: a - b,
         "&": lambda a, b: a & b,
         "and": lambda a, b: a & b,
-        "around": lambda a, b: a.around(b),
-        "coalesce": lambda a, b: a.coalesce(b),
+        "around": lambda a, b: a.round(b), 
+        "coalesce": lambda a, b: pl.when(a.is_null()).then(b).otherwise(a),
         "concat": lambda a, b: a.concat(b),
         "date_diff": lambda a, b: a.date_diff(b),
-        "fmax": lambda a, b: a.fmax(b),
-        "fmin": lambda a, b: a.fmin(b),
+        "fmax": lambda a, b: pl.max([a, b]),
+        "fmin": lambda a, b: pl.min([a, b]),
         "is_in": lambda a, b: a.is_in(b),
         "maximum": lambda a, b: pl.max([a, b]),
         "minimum": lambda a, b: pl.min([a, b]),
         "mod": lambda a, b: a % b,
         "|": lambda a, b: a | b,
         "or": lambda a, b: a | b,
-        "remainder": lambda a, b: a.remainder(b),
+        "remainder": lambda a, b: a % b,
         "timestamp_diff": lambda a, b: a.timestamp_diff(b),
         "==": lambda a, b: a == b,
         "<=": lambda a, b: a <= b,
@@ -281,7 +281,10 @@ class PolarsModel(data_algebra.data_model.DataModel):
             "TableDescription": self._table_step,
         }
         self._expr_impl_map = _populate_expr_impl_map()
-        self._want_literals_unpacked = {"parse_date", "parse_datetime"}
+        self._want_literals_unpacked = {
+            "around",
+            "parse_date", "parse_datetime"
+            }
         self._collect_required = set()
 
     def data_frame(self, arg=None):
