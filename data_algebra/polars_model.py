@@ -17,6 +17,38 @@ import data_algebra.data_ops_types
 import data_algebra.connected_components
 
 
+def _reduce_plus(*args):
+    assert len(args) > 0
+    res = args[0]
+    for i in range(1, len(args)):
+        res = res + args[i]
+    return res
+
+
+def _reduce_times(*args):
+    assert len(args) > 0
+    res = args[0]
+    for i in range(1, len(args)):
+        res = res * args[i]
+    return res
+
+
+def _reduce_and(*args):
+    assert len(args) > 0
+    res = args[0]
+    for i in range(1, len(args)):
+        res = res & args[i]
+    return res
+
+
+def _reduce_or(*args):
+    assert len(args) > 0
+    res = args[0]
+    for i in range(1, len(args)):
+        res = res | args[i]
+    return res
+
+
 class PolarsTerm:
     """
     Class to carry Polars expression term and annotations about expression tree.
@@ -144,6 +176,7 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "base_Sunday": lambda x: x.base_Sunday(),
         "bfill": lambda x: x.bfill(),
         "ceil": lambda x: x.ceil(),
+        "coalesce": lambda x: pl.when(a.is_null()).then(pl.lit(0)).otherwise(a),
         "coalesce0": lambda x: pl.when(a.is_null()).then(pl.lit(0)).otherwise(a),
         "cos": lambda x: x.cos(),
         "cosh": lambda x: x.cosh(),
@@ -194,28 +227,18 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "weekofyear": lambda x: x.weekofyear(),
     }
     impl_map_2 = {
-        "*": lambda a, b: a * b,
+        "-": lambda a, b: a - b,
         "**": lambda a, b: a ** b,
         "/": lambda a, b: a / b,
         "//": lambda a, b: a // b,
         "%": lambda a, b: a % b,
         "%/%": lambda a, b: a / b,
-        "+": lambda a, b: a + b,
-        "-": lambda a, b: a - b,
-        "&": lambda a, b: a & b,
-        "and": lambda a, b: a & b,
-        "around": lambda a, b: a.round(b), 
+        "around": lambda a, b: a.round(b),
         "coalesce": lambda a, b: pl.when(a.is_null()).then(b).otherwise(a),
         "concat": lambda a, b: a.concat(b),
         "date_diff": lambda a, b: a.date_diff(b),
-        "fmax": lambda a, b: pl.max([a, b]),
-        "fmin": lambda a, b: pl.min([a, b]),
         "is_in": lambda a, b: a.is_in(b),
-        "maximum": lambda a, b: pl.max([a, b]),
-        "minimum": lambda a, b: pl.min([a, b]),
         "mod": lambda a, b: a % b,
-        "|": lambda a, b: a | b,
-        "or": lambda a, b: a | b,
         "remainder": lambda a, b: a % b,
         "timestamp_diff": lambda a, b: a.timestamp_diff(b),
         "==": lambda a, b: a == b,
@@ -236,12 +259,6 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "mapv": lambda a, b, c: a.mapv(b, c),
         "trimstr": lambda a, b, c: a.trimstr(b, c),
         "where": lambda a, b, c: pl.when(a).then(b).otherwise(c),
-        "+": lambda a, b, c: a + b + c,
-        "*": lambda a, b, c: a * b * c,
-        "and": lambda a, b, c: a & b & c,
-        "&": lambda a, b, c: a & b & c,
-        "or": lambda a, b, c: a | b | c,
-        "|": lambda a, b, c: a | b | c,
     }
     impl_map = {
         0: impl_map_0,
@@ -249,10 +266,8 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         2: impl_map_2,
         3: impl_map_3,
     }
-    # TODO: all the _k-arity ops
     # could also key the map by grouped, partitioned, regular situation
     return impl_map
-
 
 class PolarsModel(data_algebra.data_model.DataModel):
     """
@@ -265,6 +280,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
     presentation_model_name: str
     _method_dispatch_table: Dict[str, Callable]
     _expr_impl_map: Dict[int, Dict[str, Callable]]
+    _impl_map_arbitrary_arity: Dict[str, Callable]
     _collect_required: Set[str]
 
     def __init__(self, *, use_lazy_eval: bool = True):
@@ -289,6 +305,18 @@ class PolarsModel(data_algebra.data_model.DataModel):
             "TableDescription": self._table_step,
         }
         self._expr_impl_map = _populate_expr_impl_map()
+        self._impl_map_arbitrary_arity = {
+            "fmax": lambda *args: pl.max(args),
+            "fmin": lambda *args: pl.min(args),
+            "maximum": lambda *args: pl.max(args),
+            "minimum": lambda *args: pl.min(args),
+            "+": _reduce_plus,
+            "*": _reduce_times,
+            "and": _reduce_and,
+            "&": _reduce_and,
+            "or": _reduce_or,
+            "|": _reduce_or,
+        }
         self._want_literals_unpacked = {
             "around",
             "parse_date", "parse_datetime",
@@ -873,13 +901,28 @@ class PolarsModel(data_algebra.data_model.DataModel):
         """
         assert isinstance(values, List)
         assert isinstance(op, data_algebra.expr_rep.Expression)
+        # process inputs
         for v in values:
             assert isinstance(v, PolarsTerm)
-        f = self._expr_impl_map[len(values)][op.op]
-        assert f is not None
         want_literals_unpacked = op.op in self._want_literals_unpacked
         args = [v.lit_value if (want_literals_unpacked and v.is_literal) else v.polars_term for v in values]
+        # lookup method
+        f = None
+        arity = len(values)
+        if f is None:
+            try:
+                f = self._expr_impl_map[len(values)][op.op]
+            except KeyError:
+                pass
+        if (f is None) and (arity > 0):
+            try:
+                f = self._impl_map_arbitrary_arity[op.op]
+            except KeyError:
+                pass
+        assert f is not None
+        # apply method
         res = f(*args)
+        # wrap result
         return PolarsTerm(
             polars_term=res,
             inputs=values,
