@@ -35,5 +35,4 @@ def test_rank_to_average():
         ops=ops,
         data=d,
         expect=expect,
-        try_on_Polars=False,  # TODO: turn this on
     )

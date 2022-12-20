@@ -1,5 +1,3 @@
-import math
-import sqlite3
 
 import data_algebra
 import data_algebra.test_util
@@ -58,7 +56,6 @@ def test_scoring_example():
 
     data_algebra.test_util.check_transform(
         ops=ops, data=d_local, expect=expect, float_tol=1e-3,
-        try_on_Polars=False,  # TODO: turn this on
     )
 
     # test instrumentation

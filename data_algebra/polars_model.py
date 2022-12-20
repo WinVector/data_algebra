@@ -172,7 +172,7 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "nunique": lambda x: x.nunique(),
         "quarter": lambda x: x.quarter(),
         "rank": lambda x: x.rank(),
-        "round": lambda x: x.round(),
+        "round": lambda x: x.round(decimals=0),
         "shift": lambda x: x.shift(),
         "sign": lambda x: x.sign(),
         "sin": lambda x: x.sin(),
