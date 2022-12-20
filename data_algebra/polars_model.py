@@ -26,6 +26,7 @@ class PolarsTerm:
     is_literal: bool
     is_column: bool
     collect_required: bool = False  # property of tree, not node
+    zero_constant_required: bool  # property of tree, not node
     one_constant_required: bool  # property of tree, not node
 
     def __init__(
@@ -35,6 +36,7 @@ class PolarsTerm:
         is_literal: bool = False,
         is_column: bool = False,
         collect_required: bool = False,  # property of tree, not node
+        zero_constant_required: bool = False,  # property of tree, not node
         one_constant_required: bool = False,  # property of tree, not node
         inputs: Optional[List] = None,
         lit_value = None,
@@ -46,13 +48,15 @@ class PolarsTerm:
         :param is_literal: True if term is a constant
         :param is_column: True if term is a column name
         :param collect_required: True if Polars frame collection required by this node or an input node
-        :param one_constant_required: True one constant required by this node or an input node
+        :param zero_constant_required: True if zero constant required by this node or an input node
+        :param one_constant_required: True if zero constant required by this node or an input node
         :param lit_value: original value for a literal
         :param inputs: inputs to expression node
         """
         assert isinstance(is_literal, bool)
         assert isinstance(is_column, bool)
         assert isinstance(collect_required, bool)
+        assert isinstance(zero_constant_required, bool)
         assert isinstance(one_constant_required, bool)
         assert (is_literal + is_column + (inputs is not None) + (polars_term is None)) == 1
         if lit_value is not None:
@@ -61,6 +65,7 @@ class PolarsTerm:
         self.polars_term = polars_term
         self.is_literal = is_literal
         self.collect_required = collect_required
+        self.zero_constant_required = zero_constant_required
         self.one_constant_required = one_constant_required
         if inputs is not None:
             assert isinstance(inputs, List)
@@ -76,6 +81,8 @@ class PolarsTerm:
             self.collect_required = True
         if v.one_constant_required:
             self.one_constant_required = True
+        if v.zero_constant_required:
+            self.zero_constant_required = True
 
 
 def _raise_not_impl(nm: str):   # TODO: get rid of this
@@ -90,6 +97,7 @@ def _build_lit(v):
     return pl.lit(v)
 
 
+_da_temp_zero_column_name = "_da_temp_zero_column"
 _da_temp_one_column_name = "_da_temp_one_column"
 
 
@@ -101,8 +109,8 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
     impl_map_0 = {
         "count": lambda : pl.col(_da_temp_one_column_name).cumsum(),  # ugly SQL def
         "_count": lambda : pl.col(_da_temp_one_column_name).cumsum(),  # ugly SQL def
-        "cumcount": lambda : pl.col(_da_temp_one_column_name).cumsum(),  # ugly SQL def
-        "_cumcount": lambda : pl.col(_da_temp_one_column_name).cumsum(),  # ugly SQL def
+        "cumcount": lambda : pl.col(_da_temp_one_column_name).cumsum(),
+        "_cumcount": lambda : pl.col(_da_temp_one_column_name).cumsum(),
         "ngroup": lambda : _raise_not_impl("ngroup"),  # TODO: implement
         "_ngroup": lambda : _raise_not_impl("_ngroup"),  # TODO: implement
         "row_number": lambda : pl.col(_da_temp_one_column_name).cumsum(),
@@ -139,8 +147,8 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "coalesce0": lambda x: pl.when(a.is_null()).then(pl.lit(0)).otherwise(a),
         "cos": lambda x: x.cos(),
         "cosh": lambda x: x.cosh(),
-        "count": lambda x: x.count(),
-        "cumcount": lambda x: x.cumcount(),
+        "count": lambda x: pl.col(_da_temp_one_column_name).cumsum(),
+        "cumcount": lambda x: pl.col(_da_temp_one_column_name).cumsum(),
         "cummax": lambda x: x.cummax(),
         "cummin": lambda x: x.cummin(),
         "cumprod": lambda x: x.cumprod(),
@@ -283,8 +291,12 @@ class PolarsModel(data_algebra.data_model.DataModel):
         self._expr_impl_map = _populate_expr_impl_map()
         self._want_literals_unpacked = {
             "around",
-            "parse_date", "parse_datetime"
+            "parse_date", "parse_datetime",
             }
+        self._needs_zero_constant= set()
+        self._needs_one_constant= {
+            "size", "count", "cumcount",
+        }
         self._collect_required = set()
 
     def data_frame(self, arg=None):
@@ -494,6 +506,8 @@ class PolarsModel(data_algebra.data_model.DataModel):
             if op.windowed_situation:
                 fld_k = fld_k.over(partition_by)
             produced_columns.append(fld_k.alias(k))
+        if conditions_from_expressions.zero_constant_required:
+            temp_v_columns.append(_build_lit(0).alias(_da_temp_zero_column_name))
         if conditions_from_expressions.one_constant_required:
             temp_v_columns.append(_build_lit(1).alias(_da_temp_one_column_name))
         assert not conditions_from_expressions.collect_required  # implement if needed
@@ -554,6 +568,8 @@ class PolarsModel(data_algebra.data_model.DataModel):
             conditions_from_expressions.observe(fld_k_container)
             fld_k = fld_k_container.polars_term
             produced_columns.append(fld_k.alias(k))
+        if conditions_from_expressions.zero_constant_required:
+            temp_v_columns.append(_build_lit(0).alias(_da_temp_zero_column_name))
         if conditions_from_expressions.one_constant_required:
             temp_v_columns.append(_build_lit(1).alias(_da_temp_one_column_name))
         assert not conditions_from_expressions.collect_required  # implement if needed
@@ -867,7 +883,8 @@ class PolarsModel(data_algebra.data_model.DataModel):
         return PolarsTerm(
             polars_term=res,
             inputs=values,
-            one_constant_required=len(values) == 0,
+            one_constant_required=(len(values) == 0) or (op.op in self._needs_one_constant),
+            zero_constant_required=op.op in self._needs_zero_constant,
             collect_required=op.op in self._collect_required,
         )
 

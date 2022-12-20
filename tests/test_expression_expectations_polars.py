@@ -22,10 +22,11 @@ def test_expression_expectations_polars_1():
         'base_Sunday',
         'bfill',
         'concat',
-        'count',
+        'count',  # Pandas null treatment in the wrong
+        'cumcount',
         'date_diff',
         'datetime_to_date',
-        'dayofmonth', 
+        'dayofmonth',
         'dayofweek',
         'dayofyear',
         'expm1',
@@ -40,7 +41,6 @@ def test_expression_expectations_polars_1():
         'parse_date',
         'quarter',
         'shift',
-        'size',   # TODO: fix this, failing to load constant def bug
         'std',
         'timestamp_diff',
         'trimstr',
@@ -70,10 +70,7 @@ def test_expression_expectations_polars_1():
             if op not in known_not_to_work:
                 # test Polars
                 if have_polars:
-                    try:
-                        res_polars = ops.transform(d_polars)
-                    except Exception as ex:
-                        raise ValueError(f"failure on {op} {op_class} {exp} {ops}")
+                    res_polars = ops.transform(d_polars)
                     if not isinstance(res_polars, pl.DataFrame):
                         raise ValueError(f"failure on {op} {op_class} {exp} {ops}")
                     res_polars_pandas = res_polars.to_pandas()
@@ -81,4 +78,3 @@ def test_expression_expectations_polars_1():
                         raise ValueError(f"failure on {op} {op_class} {exp} {ops}")
                     if not data_algebra.test_util.equivalent_frames(res_polars_pandas, expect):
                         raise ValueError(f"failure on {op} {op_class} {exp} {ops}")
-
