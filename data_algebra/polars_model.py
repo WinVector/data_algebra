@@ -80,6 +80,7 @@ class ExpressionRequirements(data_algebra.expression_walker.ExpressionWalker):
         }
         self._collect_required = {
             "uniform", "_uniform",
+            "ngroup", "_ngroup",
         }
     
     def act_on_literal(self, *, value):
@@ -120,7 +121,7 @@ class ExpressionRequirements(data_algebra.expression_walker.ExpressionWalker):
         if op.op in self._needs_zero_constant:
             self.zero_constant_required = True
         if op.op in self._collect_required:
-            self.one_constant_required = True
+            self.collect_required = True
     
     def add_in_temp_columns(self, temp_v_columns: List):
         """
@@ -170,10 +171,6 @@ class PolarsTerm:
         self.is_literal = is_literal
 
 
-def _raise_not_impl(nm: str):   # TODO: get rid of this
-    raise ValueError(f" {nm} not implemented for Polars adapter, yet")
-
-
 def _build_lit(v):
     if isinstance(v, int):
         # Polars defaults ints in constructor to Int64,
@@ -192,21 +189,10 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "_count": lambda : pl.col(_da_temp_one_column_name).cumsum(),  # ugly SQL def
         "cumcount": lambda : pl.col(_da_temp_one_column_name).cumsum(),
         "_cumcount": lambda : pl.col(_da_temp_one_column_name).cumsum(),
-        "ngroup": lambda : _raise_not_impl("ngroup"),  # TODO: implement
-        "_ngroup": lambda : _raise_not_impl("_ngroup"),  # TODO: implement
         "row_number": lambda : pl.col(_da_temp_one_column_name).cumsum(),
         "_row_number": lambda : pl.col(_da_temp_one_column_name).cumsum(),
         "size": lambda : pl.col(_da_temp_one_column_name).sum(),
         "_size": lambda : pl.col(_da_temp_one_column_name).sum(),
-        "uniform": lambda : _raise_not_impl("uniform"),  # TODO: implement
-        "_uniform": lambda : _raise_not_impl("_uniform"),  # TODO: implement
-        # how to land new columns: https://github.com/pola-rs/polars/issues/3933#issuecomment-1179241568
-        # .with_column(
-        #  pl.Series(
-        #     name="random_nbr",
-        #     values=np.random.default_rng().uniform(0.0, 1.0, df.height),
-        # )
-        # pl.Series(values=np.random.default_rng().uniform(0.0, 1.0, 10))
     }
     impl_map_1 = {
         "-": lambda x: 0 - x,
@@ -991,6 +977,20 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
         # lookup method
         f = None
         arity = len(values)
+        if (f is None) and (arity == 0):
+            if op.op in ["_uniform", "uniform"]:
+                assert isinstance(arg, pl.DataFrame)
+                return PolarsTerm(
+                    polars_term=pl.Series(
+                        values=self._rng.uniform(0.0, 1.0, arg.shape[0]),
+                        dtype=pl.datatypes.Float64,
+                        dtype_if_empty=pl.datatypes.Float64),
+                    inputs=values,
+                )
+        if (f is None): 
+            if op.op in ["_ngroup", "ngroup"]:
+                assert isinstance(arg, pl.DataFrame)
+                raise ValueError(f" {op.op} not implemented for Polars adapter, yet")
         if f is None:
             try:
                 f = self._expr_impl_map[len(values)][op.op]

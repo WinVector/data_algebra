@@ -4,6 +4,13 @@ from data_algebra.data_ops import *
 import data_algebra.util
 import numpy
 
+have_polars = False
+try:
+    import polars as pl
+    have_polars = True
+except ModuleNotFoundError:
+    pass
+
 
 def test_uniform_1():
     # some example data
@@ -64,6 +71,11 @@ def test_uniform_2():
         assert statistic < 0.2
 
     check_r(res_pandas)
+
+    if have_polars:
+        res_polars = ops.transform(pl.DataFrame(d))
+        assert isinstance(res_polars, pl.DataFrame)
+        check_r(res_polars.to_pandas())
 
     handles = data_algebra.test_util.get_test_dbs()
     for h in handles:
