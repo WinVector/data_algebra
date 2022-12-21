@@ -53,6 +53,7 @@ def _reduce_or(*args):
 class ExpressionRequirements(data_algebra.expression_walker.ExpressionWalker):
     """
     Class to collect what accommodations an expression needs.
+    TODO: move all constant to col promotion into this class.
     """
     collect_required: bool
     zero_constant_required: bool
@@ -760,22 +761,29 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.SelectRowsNode"
             )
+        res = self._compose_polars_ops(op.sources[0], data_map=data_map)
+        temp_v_columns = []
         # pre-scan expressions
         er = ExpressionRequirements()
         for opk in op.ops.values():
             opk.act_on(None, expr_walker=er)
-        assert not er.zero_constant_required  # could support move complicated expressions by impl as in extend
-        assert not er.one_constant_required  # could support move complicated expressions by impl as in extend
+        if er.zero_constant_required:
+            temp_v_columns.append(_build_lit(0).alias(_da_temp_zero_column_name))
+        if er.one_constant_required:
+            temp_v_columns.append(_build_lit(1).alias(_da_temp_one_column_name))
         value_to_send_to_act = None
         if er.collect_required:
             if isinstance(res, pl.LazyFrame):
                 res = res.collect()
             value_to_send_to_act = res
-        # work on expressions
-        res = self._compose_polars_ops(op.sources[0], data_map=data_map)
+        # work on expression
+        if len(temp_v_columns) > 0:
+            res = res.with_columns(temp_v_columns)
         selection = op.expr.act_on(value_to_send_to_act, expr_walker=self)  # PolarsTerm
         assert isinstance(selection, PolarsTerm)
         res = res.filter(selection.polars_term)
+        if len(temp_v_columns) > 0:
+            res = res.select(op.columns_produced())
         if self.use_lazy_eval and isinstance(res, pl.DataFrame):
             res = res.lazy()
         return res
