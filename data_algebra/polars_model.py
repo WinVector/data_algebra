@@ -323,9 +323,13 @@ class PolarsModel(data_algebra.data_model.DataModel):
             }
         self._needs_zero_constant= set()
         self._needs_one_constant= {
-            "size", "count", "cumcount",
+            "size", "_size", 
+            "count", "_count", 
+            "cumcount", "_cumcount",
         }
-        self._collect_required = set()
+        self._collect_required = {
+            "uniform", "_uniform",
+        }
 
     def data_frame(self, arg=None):
         """
@@ -527,7 +531,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
                         )
                 else:
                     raise ValueError(f"can't take {len(opk.args)} arity argument in windowed extend")
-            fld_k_container = opk.act_on(res, data_model=self)  # PolarsTerm
+            fld_k_container = opk.act_on(None, data_model=self)  # PolarsTerm
             assert isinstance(fld_k_container, PolarsTerm)
             conditions_from_expressions.observe(fld_k_container)
             fld_k = fld_k_container.polars_term
@@ -538,7 +542,8 @@ class PolarsModel(data_algebra.data_model.DataModel):
             temp_v_columns.append(_build_lit(0).alias(_da_temp_zero_column_name))
         if conditions_from_expressions.one_constant_required:
             temp_v_columns.append(_build_lit(1).alias(_da_temp_one_column_name))
-        assert not conditions_from_expressions.collect_required  # implement if needed
+        if conditions_from_expressions.collect_required and isinstance(res, pl.LazyFrame):
+            res = res.collect()
         if len(temp_v_columns) > 0:
             res = res.with_columns(temp_v_columns)
         if len(op.order_by) > 0:
@@ -549,9 +554,11 @@ class PolarsModel(data_algebra.data_model.DataModel):
                     order_cols.append(c)
             reversed_cols = [True if ci in set(op.reverse) else False for ci in op.order_by]
             res = res.sort(by=op.order_by, reverse=reversed_cols)
-        res = res.with_columns(produced_columns)  
+        res = res.with_columns(produced_columns)
         if len(temp_v_columns) > 0:
             res = res.select(op.columns_produced())
+        if self.use_lazy_eval and isinstance(res, pl.DataFrame):
+            res = res.lazy()
         return res
 
     def _project_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
@@ -591,7 +598,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
                     )
             else:
                 raise ValueError(f"can't take {len(opk.args)} arity argument in project")
-            fld_k_container = opk.act_on(res, data_model=self)  # PolarsTerm
+            fld_k_container = opk.act_on(None, data_model=self)  # PolarsTerm
             assert isinstance(fld_k_container, PolarsTerm)
             conditions_from_expressions.observe(fld_k_container)
             fld_k = fld_k_container.polars_term
@@ -600,12 +607,15 @@ class PolarsModel(data_algebra.data_model.DataModel):
             temp_v_columns.append(_build_lit(0).alias(_da_temp_zero_column_name))
         if conditions_from_expressions.one_constant_required:
             temp_v_columns.append(_build_lit(1).alias(_da_temp_one_column_name))
-        assert not conditions_from_expressions.collect_required  # implement if needed
+        if conditions_from_expressions.collect_required and isinstance(res, pl.LazyFrame):
+            res = res.collect()
         if len(temp_v_columns) > 0:
             res = res.with_columns(temp_v_columns)
         res = res.groupby(group_by).agg(produced_columns)
         if len(temp_v_columns) > 0:
             res = res.select(op.columns_produced())
+        if self.use_lazy_eval and isinstance(res, pl.DataFrame):
+            res = res.lazy()
         return res
     
     def _natural_join_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
@@ -707,7 +717,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 "op was supposed to be a data_algebra.data_ops.SelectRowsNode"
             )
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
-        selection = op.expr.act_on(res, data_model=self)  # PolarsTerm
+        selection = op.expr.act_on(None, data_model=self)  # PolarsTerm
         assert isinstance(selection, PolarsTerm)
         res = res.filter(selection.polars_term)
         return res
@@ -883,22 +893,24 @@ class PolarsModel(data_algebra.data_model.DataModel):
         """
         Action for a column name.
 
-        :param arg: item we are acting on
+        :param arg: None
         :param value: column name
         :return: arg acted on
         """
         assert isinstance(value, str)
+        assert arg is None
         return PolarsTerm(polars_term=pl.col(value), is_column=True)
     
     def act_on_expression(self, *, arg, values: List, op):
         """
         Action for a column name.
 
-        :param arg: item we are acting on
+        :param arg: None
         :param values: list of values to work on
         :param op: operator to apply
         :return: arg acted on
         """
+        assert arg is None
         assert isinstance(values, List)
         assert isinstance(op, data_algebra.expr_rep.Expression)
         # process inputs
