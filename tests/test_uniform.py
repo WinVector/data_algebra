@@ -41,7 +41,6 @@ def test_uniform_1():
             'r': 0.0
         })
     data_algebra.test_util.check_transform(ops_z, data={"d": d}, expect=expect,
-        try_on_Polars=False,  # TODO: turn this on
     )
 
 
