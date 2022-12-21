@@ -17,6 +17,38 @@ import data_algebra.data_ops_types
 import data_algebra.connected_components
 
 
+def _reduce_plus(*args):
+    assert len(args) > 0
+    res = args[0]
+    for i in range(1, len(args)):
+        res = res + args[i]
+    return res
+
+
+def _reduce_times(*args):
+    assert len(args) > 0
+    res = args[0]
+    for i in range(1, len(args)):
+        res = res * args[i]
+    return res
+
+
+def _reduce_and(*args):
+    assert len(args) > 0
+    res = args[0]
+    for i in range(1, len(args)):
+        res = res & args[i]
+    return res
+
+
+def _reduce_or(*args):
+    assert len(args) > 0
+    res = args[0]
+    for i in range(1, len(args)):
+        res = res | args[i]
+    return res
+
+
 class PolarsTerm:
     """
     Class to carry Polars expression term and annotations about expression tree.
@@ -26,6 +58,7 @@ class PolarsTerm:
     is_literal: bool
     is_column: bool
     collect_required: bool = False  # property of tree, not node
+    zero_constant_required: bool  # property of tree, not node
     one_constant_required: bool  # property of tree, not node
 
     def __init__(
@@ -35,6 +68,7 @@ class PolarsTerm:
         is_literal: bool = False,
         is_column: bool = False,
         collect_required: bool = False,  # property of tree, not node
+        zero_constant_required: bool = False,  # property of tree, not node
         one_constant_required: bool = False,  # property of tree, not node
         inputs: Optional[List] = None,
         lit_value = None,
@@ -46,13 +80,15 @@ class PolarsTerm:
         :param is_literal: True if term is a constant
         :param is_column: True if term is a column name
         :param collect_required: True if Polars frame collection required by this node or an input node
-        :param one_constant_required: True one constant required by this node or an input node
+        :param zero_constant_required: True if zero constant required by this node or an input node
+        :param one_constant_required: True if zero constant required by this node or an input node
         :param lit_value: original value for a literal
         :param inputs: inputs to expression node
         """
         assert isinstance(is_literal, bool)
         assert isinstance(is_column, bool)
         assert isinstance(collect_required, bool)
+        assert isinstance(zero_constant_required, bool)
         assert isinstance(one_constant_required, bool)
         assert (is_literal + is_column + (inputs is not None) + (polars_term is None)) == 1
         if lit_value is not None:
@@ -61,6 +97,7 @@ class PolarsTerm:
         self.polars_term = polars_term
         self.is_literal = is_literal
         self.collect_required = collect_required
+        self.zero_constant_required = zero_constant_required
         self.one_constant_required = one_constant_required
         if inputs is not None:
             assert isinstance(inputs, List)
@@ -76,6 +113,8 @@ class PolarsTerm:
             self.collect_required = True
         if v.one_constant_required:
             self.one_constant_required = True
+        if v.zero_constant_required:
+            self.zero_constant_required = True
 
 
 def _raise_not_impl(nm: str):   # TODO: get rid of this
@@ -90,6 +129,7 @@ def _build_lit(v):
     return pl.lit(v)
 
 
+_da_temp_zero_column_name = "_da_temp_zero_column"
 _da_temp_one_column_name = "_da_temp_one_column"
 
 
@@ -101,8 +141,8 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
     impl_map_0 = {
         "count": lambda : pl.col(_da_temp_one_column_name).cumsum(),  # ugly SQL def
         "_count": lambda : pl.col(_da_temp_one_column_name).cumsum(),  # ugly SQL def
-        "cumcount": lambda : pl.col(_da_temp_one_column_name).cumsum(),  # ugly SQL def
-        "_cumcount": lambda : pl.col(_da_temp_one_column_name).cumsum(),  # ugly SQL def
+        "cumcount": lambda : pl.col(_da_temp_one_column_name).cumsum(),
+        "_cumcount": lambda : pl.col(_da_temp_one_column_name).cumsum(),
         "ngroup": lambda : _raise_not_impl("ngroup"),  # TODO: implement
         "_ngroup": lambda : _raise_not_impl("_ngroup"),  # TODO: implement
         "row_number": lambda : pl.col(_da_temp_one_column_name).cumsum(),
@@ -136,11 +176,12 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "base_Sunday": lambda x: x.base_Sunday(),
         "bfill": lambda x: x.bfill(),
         "ceil": lambda x: x.ceil(),
-        "coalesce0": lambda x: x.coalesce(0),
+        "coalesce": lambda x: pl.when(a.is_null()).then(pl.lit(0)).otherwise(a),
+        "coalesce0": lambda x: pl.when(a.is_null()).then(pl.lit(0)).otherwise(a),
         "cos": lambda x: x.cos(),
         "cosh": lambda x: x.cosh(),
-        "count": lambda x: x.count(),
-        "cumcount": lambda x: x.cumcount(),
+        "count": lambda x: pl.col(_da_temp_one_column_name).cumsum(),
+        "cumcount": lambda x: pl.col(_da_temp_one_column_name).cumsum(),
         "cummax": lambda x: x.cummax(),
         "cummin": lambda x: x.cummin(),
         "cumprod": lambda x: x.cumprod(),
@@ -172,7 +213,7 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "nunique": lambda x: x.nunique(),
         "quarter": lambda x: x.quarter(),
         "rank": lambda x: x.rank(),
-        "round": lambda x: x.round(),
+        "round": lambda x: x.round(decimals=0),
         "shift": lambda x: x.shift(),
         "sign": lambda x: x.sign(),
         "sin": lambda x: x.sin(),
@@ -186,29 +227,19 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "weekofyear": lambda x: x.weekofyear(),
     }
     impl_map_2 = {
-        "*": lambda a, b: a * b,
+        "-": lambda a, b: a - b,
         "**": lambda a, b: a ** b,
         "/": lambda a, b: a / b,
         "//": lambda a, b: a // b,
         "%": lambda a, b: a % b,
         "%/%": lambda a, b: a / b,
-        "+": lambda a, b: a + b,
-        "-": lambda a, b: a - b,
-        "&": lambda a, b: a & b,
-        "and": lambda a, b: a & b,
-        "around": lambda a, b: a.around(b),
-        "coalesce": lambda a, b: a.coalesce(b),
+        "around": lambda a, b: a.round(b),
+        "coalesce": lambda a, b: pl.when(a.is_null()).then(b).otherwise(a),
         "concat": lambda a, b: a.concat(b),
         "date_diff": lambda a, b: a.date_diff(b),
-        "fmax": lambda a, b: a.fmax(b),
-        "fmin": lambda a, b: a.fmin(b),
         "is_in": lambda a, b: a.is_in(b),
-        "maximum": lambda a, b: pl.max([a, b]),
-        "minimum": lambda a, b: pl.min([a, b]),
         "mod": lambda a, b: a % b,
-        "|": lambda a, b: a | b,
-        "or": lambda a, b: a | b,
-        "remainder": lambda a, b: a.remainder(b),
+        "remainder": lambda a, b: a % b,
         "timestamp_diff": lambda a, b: a.timestamp_diff(b),
         "==": lambda a, b: a == b,
         "<=": lambda a, b: a <= b,
@@ -228,12 +259,6 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "mapv": lambda a, b, c: a.mapv(b, c),
         "trimstr": lambda a, b, c: a.trimstr(b, c),
         "where": lambda a, b, c: pl.when(a).then(b).otherwise(c),
-        "+": lambda a, b, c: a + b + c,
-        "*": lambda a, b, c: a * b * c,
-        "and": lambda a, b, c: a & b & c,
-        "&": lambda a, b, c: a & b & c,
-        "or": lambda a, b, c: a | b | c,
-        "|": lambda a, b, c: a | b | c,
     }
     impl_map = {
         0: impl_map_0,
@@ -241,10 +266,8 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         2: impl_map_2,
         3: impl_map_3,
     }
-    # TODO: all the _k-arity ops
     # could also key the map by grouped, partitioned, regular situation
     return impl_map
-
 
 class PolarsModel(data_algebra.data_model.DataModel):
     """
@@ -257,6 +280,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
     presentation_model_name: str
     _method_dispatch_table: Dict[str, Callable]
     _expr_impl_map: Dict[int, Dict[str, Callable]]
+    _impl_map_arbitrary_arity: Dict[str, Callable]
     _collect_required: Set[str]
 
     def __init__(self, *, use_lazy_eval: bool = True):
@@ -281,7 +305,26 @@ class PolarsModel(data_algebra.data_model.DataModel):
             "TableDescription": self._table_step,
         }
         self._expr_impl_map = _populate_expr_impl_map()
-        self._want_literals_unpacked = {"parse_date", "parse_datetime"}
+        self._impl_map_arbitrary_arity = {
+            "fmax": lambda *args: pl.max(args),
+            "fmin": lambda *args: pl.min(args),
+            "maximum": lambda *args: pl.max(args),
+            "minimum": lambda *args: pl.min(args),
+            "+": _reduce_plus,
+            "*": _reduce_times,
+            "and": _reduce_and,
+            "&": _reduce_and,
+            "or": _reduce_or,
+            "|": _reduce_or,
+        }
+        self._want_literals_unpacked = {
+            "around",
+            "parse_date", "parse_datetime",
+            }
+        self._needs_zero_constant= set()
+        self._needs_one_constant= {
+            "size", "count", "cumcount",
+        }
         self._collect_required = set()
 
     def data_frame(self, arg=None):
@@ -491,6 +534,8 @@ class PolarsModel(data_algebra.data_model.DataModel):
             if op.windowed_situation:
                 fld_k = fld_k.over(partition_by)
             produced_columns.append(fld_k.alias(k))
+        if conditions_from_expressions.zero_constant_required:
+            temp_v_columns.append(_build_lit(0).alias(_da_temp_zero_column_name))
         if conditions_from_expressions.one_constant_required:
             temp_v_columns.append(_build_lit(1).alias(_da_temp_one_column_name))
         assert not conditions_from_expressions.collect_required  # implement if needed
@@ -551,6 +596,8 @@ class PolarsModel(data_algebra.data_model.DataModel):
             conditions_from_expressions.observe(fld_k_container)
             fld_k = fld_k_container.polars_term
             produced_columns.append(fld_k.alias(k))
+        if conditions_from_expressions.zero_constant_required:
+            temp_v_columns.append(_build_lit(0).alias(_da_temp_zero_column_name))
         if conditions_from_expressions.one_constant_required:
             temp_v_columns.append(_build_lit(1).alias(_da_temp_one_column_name))
         assert not conditions_from_expressions.collect_required  # implement if needed
@@ -854,17 +901,33 @@ class PolarsModel(data_algebra.data_model.DataModel):
         """
         assert isinstance(values, List)
         assert isinstance(op, data_algebra.expr_rep.Expression)
+        # process inputs
         for v in values:
             assert isinstance(v, PolarsTerm)
-        f = self._expr_impl_map[len(values)][op.op]
-        assert f is not None
         want_literals_unpacked = op.op in self._want_literals_unpacked
         args = [v.lit_value if (want_literals_unpacked and v.is_literal) else v.polars_term for v in values]
+        # lookup method
+        f = None
+        arity = len(values)
+        if f is None:
+            try:
+                f = self._expr_impl_map[len(values)][op.op]
+            except KeyError:
+                pass
+        if (f is None) and (arity > 0):
+            try:
+                f = self._impl_map_arbitrary_arity[op.op]
+            except KeyError:
+                pass
+        assert f is not None
+        # apply method
         res = f(*args)
+        # wrap result
         return PolarsTerm(
             polars_term=res,
             inputs=values,
-            one_constant_required=len(values) == 0,
+            one_constant_required=(len(values) == 0) or (op.op in self._needs_one_constant),
+            zero_constant_required=op.op in self._needs_zero_constant,
             collect_required=op.op in self._collect_required,
         )
 
