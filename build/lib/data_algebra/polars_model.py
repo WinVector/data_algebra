@@ -7,6 +7,7 @@ Note: fully not implemented yet.
 
 from typing import Any, Callable, Dict, Iterable, List, Optional, Set
 
+import numpy as np
 import polars as pl
 
 import data_algebra
@@ -15,6 +16,7 @@ import data_algebra.util
 import data_algebra.expr_rep
 import data_algebra.data_ops_types
 import data_algebra.connected_components
+import data_algebra.expression_walker
 
 
 def _reduce_plus(*args):
@@ -49,17 +51,97 @@ def _reduce_or(*args):
     return res
 
 
+_da_temp_zero_column_name = "_da_temp_zero_column"
+_da_temp_one_column_name = "_da_temp_one_column"
+
+
+class ExpressionRequirements(data_algebra.expression_walker.ExpressionWalker):
+    """
+    Class to collect what accommodations an expression needs.
+    """
+    collect_required: bool
+    zero_constant_required: bool
+    one_constant_required: bool
+
+    def __init__(self) -> None:
+        data_algebra.expression_walker.ExpressionWalker.__init__(
+            self,
+        )
+        self.collect_required = False
+        self.zero_constant_required = False
+        self.one_constant_required = False
+        self._needs_zero_constant= {
+            "coalesce0",
+        }
+        self._needs_one_constant= {
+            "size", "_size",
+            "count", "_count",
+            "cumcount", "_cumcount",
+        }
+        self._collect_required = {
+            "uniform", "_uniform",
+            "ngroup", "_ngroup",
+        }
+    
+    def act_on_literal(self, *, value):
+        """
+        Action for a literal/constant in an expression.
+
+        :param value: literal value being supplied
+        :return: converted result
+        """
+        assert not isinstance(value, PolarsTerm)
+    
+    def act_on_column_name(self, *, arg, value):
+        """
+        Action for a column name.
+
+        :param arg: None
+        :param value: column name
+        :return: arg acted on
+        """
+        assert arg is None
+        assert isinstance(value, str)
+    
+    def act_on_expression(self, *, arg, values: List, op):
+        """
+        Action for a column name.
+
+        :param arg: None
+        :param values: list of values to work on
+        :param op: operator to apply
+        :return: arg acted on
+        """
+        assert arg is None
+        assert isinstance(values, List)
+        assert isinstance(op, data_algebra.expr_rep.Expression)
+        # work on expression requirements
+        if (len(values) == 0) or (op.op in self._needs_one_constant):
+            self.one_constant_required = True
+        if op.op in self._needs_zero_constant:
+            self.zero_constant_required = True
+        if op.op in self._collect_required:
+            self.collect_required = True
+    
+    def add_in_temp_columns(self, temp_v_columns: List):
+        """
+        Add required temp columns to temp_v_columns_list
+        """
+        if self.zero_constant_required:
+            temp_v_columns.append(_build_lit(0).alias(_da_temp_zero_column_name))
+        if self.one_constant_required:
+            temp_v_columns.append(_build_lit(1).alias(_da_temp_one_column_name))
+
+
 class PolarsTerm:
     """
     Class to carry Polars expression term and annotations about expression tree.
     """
 
     polars_term: Any
+    lit_value: Any
     is_literal: bool
     is_column: bool
-    collect_required: bool = False  # property of tree, not node
-    zero_constant_required: bool  # property of tree, not node
-    one_constant_required: bool  # property of tree, not node
 
     def __init__(
         self, 
@@ -67,9 +149,6 @@ class PolarsTerm:
         polars_term = None, 
         is_literal: bool = False,
         is_column: bool = False,
-        collect_required: bool = False,  # property of tree, not node
-        zero_constant_required: bool = False,  # property of tree, not node
-        one_constant_required: bool = False,  # property of tree, not node
         inputs: Optional[List] = None,
         lit_value = None,
         ) -> None:
@@ -79,46 +158,17 @@ class PolarsTerm:
         :param polars_term: Optional Polars expression (None means collect info, not a true term)
         :param is_literal: True if term is a constant
         :param is_column: True if term is a column name
-        :param collect_required: True if Polars frame collection required by this node or an input node
-        :param zero_constant_required: True if zero constant required by this node or an input node
-        :param one_constant_required: True if zero constant required by this node or an input node
         :param lit_value: original value for a literal
         :param inputs: inputs to expression node
         """
         assert isinstance(is_literal, bool)
         assert isinstance(is_column, bool)
-        assert isinstance(collect_required, bool)
-        assert isinstance(zero_constant_required, bool)
-        assert isinstance(one_constant_required, bool)
         assert (is_literal + is_column + (inputs is not None) + (polars_term is None)) == 1
         if lit_value is not None:
             assert is_literal
         self.lit_value = lit_value
         self.polars_term = polars_term
         self.is_literal = is_literal
-        self.collect_required = collect_required
-        self.zero_constant_required = zero_constant_required
-        self.one_constant_required = one_constant_required
-        if inputs is not None:
-            assert isinstance(inputs, List)
-            for v in inputs:
-                self.observe(v)
-    
-    def observe(self, v) -> None:
-        """
-        Or conditions of v into our conditions
-        """
-        assert isinstance(v, PolarsTerm)
-        if v.collect_required:
-            self.collect_required = True
-        if v.one_constant_required:
-            self.one_constant_required = True
-        if v.zero_constant_required:
-            self.zero_constant_required = True
-
-
-def _raise_not_impl(nm: str):   # TODO: get rid of this
-    raise ValueError(f" {nm} not implemented for Polars adapter, yet")
 
 
 def _build_lit(v):
@@ -127,10 +177,6 @@ def _build_lit(v):
         # but ints in lit to Int32. Try to prevent type clashes
         return pl.lit(v, pl.Int64)
     return pl.lit(v)
-
-
-_da_temp_zero_column_name = "_da_temp_zero_column"
-_da_temp_one_column_name = "_da_temp_one_column"
 
 
 def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
@@ -143,20 +189,10 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "_count": lambda : pl.col(_da_temp_one_column_name).cumsum(),  # ugly SQL def
         "cumcount": lambda : pl.col(_da_temp_one_column_name).cumsum(),
         "_cumcount": lambda : pl.col(_da_temp_one_column_name).cumsum(),
-        "ngroup": lambda : _raise_not_impl("ngroup"),  # TODO: implement
-        "_ngroup": lambda : _raise_not_impl("_ngroup"),  # TODO: implement
         "row_number": lambda : pl.col(_da_temp_one_column_name).cumsum(),
         "_row_number": lambda : pl.col(_da_temp_one_column_name).cumsum(),
         "size": lambda : pl.col(_da_temp_one_column_name).sum(),
         "_size": lambda : pl.col(_da_temp_one_column_name).sum(),
-        "uniform": lambda : _raise_not_impl("uniform"),  # TODO: implement
-        "_uniform": lambda : _raise_not_impl("_uniform"),  # TODO: implement
-        # how to land new columns: https://github.com/pola-rs/polars/issues/3933#issuecomment-1179241568
-        # .with_column(
-        #  pl.Series(
-        #     name="random_nbr",
-        #     values=np.random.default_rng().uniform(0.0, 1.0, df.height),
-        # )
     }
     impl_map_1 = {
         "-": lambda x: 0 - x,
@@ -176,8 +212,7 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "base_Sunday": lambda x: x.base_Sunday(),
         "bfill": lambda x: x.bfill(),
         "ceil": lambda x: x.ceil(),
-        "coalesce": lambda x: pl.when(a.is_null()).then(pl.lit(0)).otherwise(a),
-        "coalesce0": lambda x: pl.when(a.is_null()).then(pl.lit(0)).otherwise(a),
+        "coalesce0": lambda x: pl.when(x.is_null()).then(pl.col(_da_temp_zero_column_name)).otherwise(x),
         "cos": lambda x: x.cos(),
         "cosh": lambda x: x.cosh(),
         "count": lambda x: pl.col(_da_temp_one_column_name).cumsum(),
@@ -197,7 +232,7 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "floor": lambda x: x.floor(),
         "format_date": lambda x: x.format_date(),
         "format_datetime": lambda x: x.format_datetime(),
-        "is_bad": lambda x: x.is_null() | x.is_infinite() | x.is_nan(),  # TODO: need a different def for numeric v.s. char columns?
+        "is_bad": lambda x: x.is_null() | x.is_infinite() | x.is_nan(),  # recommend only for numeric columns
         "is_inf": lambda x: x.is_infinite(),
         "is_nan": lambda x: x.is_nan(),
         "is_null": lambda x: x.is_null(),
@@ -240,6 +275,7 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "is_in": lambda a, b: a.is_in(b),
         "mod": lambda a, b: a % b,
         "remainder": lambda a, b: a % b,
+        "shift": lambda a, b: a.shift(b),
         "timestamp_diff": lambda a, b: a.timestamp_diff(b),
         "==": lambda a, b: a == b,
         "<=": lambda a, b: a <= b,
@@ -269,7 +305,8 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
     # could also key the map by grouped, partitioned, regular situation
     return impl_map
 
-class PolarsModel(data_algebra.data_model.DataModel):
+
+class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_walker.ExpressionWalker):
     """
     Interface for realizing the data algebra as a sequence of steps over Polars https://www.pola.rs .
 
@@ -282,11 +319,16 @@ class PolarsModel(data_algebra.data_model.DataModel):
     _expr_impl_map: Dict[int, Dict[str, Callable]]
     _impl_map_arbitrary_arity: Dict[str, Callable]
     _collect_required: Set[str]
+    _rng: Any
 
     def __init__(self, *, use_lazy_eval: bool = True):
         data_algebra.data_model.DataModel.__init__(
             self, presentation_model_name="pl", module=pl
         )
+        data_algebra.expression_walker.ExpressionWalker.__init__(
+            self,
+        )
+        self._rng = np.random.default_rng()
         assert isinstance(use_lazy_eval, bool)
         self.use_lazy_eval = use_lazy_eval
         self._method_dispatch_table = {
@@ -320,12 +362,8 @@ class PolarsModel(data_algebra.data_model.DataModel):
         self._want_literals_unpacked = {
             "around",
             "parse_date", "parse_datetime",
+            "shift",
             }
-        self._needs_zero_constant= set()
-        self._needs_one_constant= {
-            "size", "count", "cumcount",
-        }
-        self._collect_required = set()
 
     def data_frame(self, arg=None):
         """
@@ -497,48 +535,45 @@ class PolarsModel(data_algebra.data_model.DataModel):
             raise TypeError("op was supposed to be a data_algebra.data_ops.ExtendNode")
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
         partition_by = op.partition_by
-        conditions_from_expressions = PolarsTerm()
         temp_v_columns = []
         # see if we need to make partition non-empty
         if len(partition_by) <= 0:
-            v_name = f"_da_extend_temp_partition_column"
+            v_name = "_da_extend_temp_partition_column"
             partition_by = [v_name]
             temp_v_columns.append(_build_lit(1).alias(v_name))
+        # pre-scan expressions
+        er = ExpressionRequirements()
+        for opk in op.ops.values():
+            opk.act_on(None, expr_walker=er)
+        er.add_in_temp_columns(temp_v_columns)
+        value_to_send_to_act = None
+        if er.collect_required:
+            if isinstance(res, pl.LazyFrame):
+                res = res.collect()
+            value_to_send_to_act = res
+        # work on expressions
         produced_columns = []
         for k, opk in op.ops.items():
             if op.windowed_situation:
-                # enforce is a simple v.f() expression
-                assert isinstance(opk, data_algebra.expr_rep.Expression)
-                if len(opk.args) == 0:
-                    pass
-                elif len(opk.args) == 1:
-                    assert isinstance(opk.args[0], (data_algebra.expr_rep.Value, data_algebra.expr_rep.ColumnReference))
-                    if isinstance(opk.args[0], data_algebra.expr_rep.Value):
-                        # promote value to column for uniformity of API
-                        v_name = f"_da_extend_temp_v_column_{len(temp_v_columns)}"
-                        v_value = opk.args[0].value
-                        temp_v_columns.append(_build_lit(v_value).alias(v_name))
-                        opk = data_algebra.expr_rep.Expression(
-                            op=opk.op, 
-                            args=[data_algebra.expr_rep.ColumnReference(column_name=v_name)], 
-                            params=opk.params, 
-                            inline=opk.inline, 
-                            method=opk.method,
-                        )
-                else:
-                    raise ValueError(f"can't take {len(opk.args)} arity argument in windowed extend")
-            fld_k_container = opk.act_on(res, data_model=self)  # PolarsTerm
+                if (len(opk.args) == 1) and isinstance(opk.args[0], data_algebra.expr_rep.Value):
+                    # TODO: move this to leave of nested expressions
+                    # promote value to column for uniformity of API
+                    v_name = f"_da_extend_temp_v_column_{len(temp_v_columns)}"
+                    v_value = opk.args[0].value
+                    temp_v_columns.append(_build_lit(v_value).alias(v_name))
+                    opk = data_algebra.expr_rep.Expression(
+                        op=opk.op,
+                        args=[data_algebra.expr_rep.ColumnReference(column_name=v_name)],
+                        params=opk.params,
+                        inline=opk.inline,
+                        method=opk.method,
+                    )
+            fld_k_container = opk.act_on(value_to_send_to_act, expr_walker=self)  # PolarsTerm
             assert isinstance(fld_k_container, PolarsTerm)
-            conditions_from_expressions.observe(fld_k_container)
             fld_k = fld_k_container.polars_term
             if op.windowed_situation:
                 fld_k = fld_k.over(partition_by)
             produced_columns.append(fld_k.alias(k))
-        if conditions_from_expressions.zero_constant_required:
-            temp_v_columns.append(_build_lit(0).alias(_da_temp_zero_column_name))
-        if conditions_from_expressions.one_constant_required:
-            temp_v_columns.append(_build_lit(1).alias(_da_temp_one_column_name))
-        assert not conditions_from_expressions.collect_required  # implement if needed
         if len(temp_v_columns) > 0:
             res = res.with_columns(temp_v_columns)
         if len(op.order_by) > 0:
@@ -549,9 +584,11 @@ class PolarsModel(data_algebra.data_model.DataModel):
                     order_cols.append(c)
             reversed_cols = [True if ci in set(op.reverse) else False for ci in op.order_by]
             res = res.sort(by=op.order_by, reverse=reversed_cols)
-        res = res.with_columns(produced_columns)  
+        res = res.with_columns(produced_columns)
         if len(temp_v_columns) > 0:
             res = res.select(op.columns_produced())
+        if self.use_lazy_eval and isinstance(res, pl.DataFrame):
+            res = res.lazy()
         return res
 
     def _project_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
@@ -562,50 +599,49 @@ class PolarsModel(data_algebra.data_model.DataModel):
             raise TypeError("op was supposed to be a data_algebra.data_ops.ProjectNode")
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
         group_by = op.group_by
-        conditions_from_expressions = PolarsTerm()
         temp_v_columns = []
         # see if we need to make group_by non-empty
         if len(group_by) <= 0:
-            v_name = f"_da_project_temp_group_by_column"
+            v_name = "_da_project_temp_group_by_column"
             group_by = [v_name]
             temp_v_columns.append(_build_lit(1).alias(v_name))
+        # pre-scan expressions
+        er = ExpressionRequirements()
+        for opk in op.ops.values():
+            opk.act_on(None, expr_walker=er)
+        er.add_in_temp_columns(temp_v_columns)
+        value_to_send_to_act = None
+        if er.collect_required:
+            if isinstance(res, pl.LazyFrame):
+                res = res.collect()
+            value_to_send_to_act = res
+        # work on expressions
         produced_columns = []
         for k, opk in op.ops.items():
-            # enforce is a simple v.f() expression
-            assert isinstance(opk, data_algebra.expr_rep.Expression)
-            if len(opk.args) == 0:
-                pass
-            elif len(opk.args) == 1:
-                assert isinstance(opk.args[0], (data_algebra.expr_rep.Value, data_algebra.expr_rep.ColumnReference))
-                if isinstance(opk.args[0], data_algebra.expr_rep.Value):
-                    # promote value to column for uniformity of API
-                    v_name = f"_da_project_temp_v_column_{len(temp_v_columns)}"
-                    v_value = opk.args[0].value
-                    temp_v_columns.append(_build_lit(v_value).alias(v_name))
-                    opk = data_algebra.expr_rep.Expression(
-                        op=opk.op, 
-                        args=[data_algebra.expr_rep.ColumnReference(column_name=v_name)], 
-                        params=opk.params, 
-                        inline=opk.inline, 
-                        method=opk.method,
-                    )
-            else:
-                raise ValueError(f"can't take {len(opk.args)} arity argument in project")
-            fld_k_container = opk.act_on(res, data_model=self)  # PolarsTerm
+            if (len(opk.args) == 1) and isinstance(opk.args[0], data_algebra.expr_rep.Value):
+                # TODO: push this into leaves of nested ops
+                # promote value to column for uniformity of API
+                v_name = f"_da_project_temp_v_column_{len(temp_v_columns)}"
+                v_value = opk.args[0].value
+                temp_v_columns.append(_build_lit(v_value).alias(v_name))
+                opk = data_algebra.expr_rep.Expression(
+                    op=opk.op, 
+                    args=[data_algebra.expr_rep.ColumnReference(column_name=v_name)], 
+                    params=opk.params, 
+                    inline=opk.inline, 
+                    method=opk.method,
+                )
+            fld_k_container = opk.act_on(value_to_send_to_act, expr_walker=self)  # PolarsTerm
             assert isinstance(fld_k_container, PolarsTerm)
-            conditions_from_expressions.observe(fld_k_container)
             fld_k = fld_k_container.polars_term
             produced_columns.append(fld_k.alias(k))
-        if conditions_from_expressions.zero_constant_required:
-            temp_v_columns.append(_build_lit(0).alias(_da_temp_zero_column_name))
-        if conditions_from_expressions.one_constant_required:
-            temp_v_columns.append(_build_lit(1).alias(_da_temp_one_column_name))
-        assert not conditions_from_expressions.collect_required  # implement if needed
         if len(temp_v_columns) > 0:
             res = res.with_columns(temp_v_columns)
         res = res.groupby(group_by).agg(produced_columns)
         if len(temp_v_columns) > 0:
             res = res.select(op.columns_produced())
+        if self.use_lazy_eval and isinstance(res, pl.DataFrame):
+            res = res.lazy()
         return res
     
     def _natural_join_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
@@ -707,9 +743,27 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 "op was supposed to be a data_algebra.data_ops.SelectRowsNode"
             )
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
-        selection = op.expr.act_on(res, data_model=self)  # PolarsTerm
+        temp_v_columns = []
+        # pre-scan expressions
+        er = ExpressionRequirements()
+        for opk in op.ops.values():
+            opk.act_on(None, expr_walker=er)
+        er.add_in_temp_columns(temp_v_columns)
+        value_to_send_to_act = None
+        if er.collect_required:
+            if isinstance(res, pl.LazyFrame):
+                res = res.collect()
+            value_to_send_to_act = res
+        # work on expression
+        if len(temp_v_columns) > 0:
+            res = res.with_columns(temp_v_columns)
+        selection = op.expr.act_on(value_to_send_to_act, expr_walker=self)  # PolarsTerm
         assert isinstance(selection, PolarsTerm)
         res = res.filter(selection.polars_term)
+        if len(temp_v_columns) > 0:
+            res = res.select(op.columns_produced())
+        if self.use_lazy_eval and isinstance(res, pl.DataFrame):
+            res = res.lazy()
         return res
 
     def _sql_proxy_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
@@ -883,10 +937,11 @@ class PolarsModel(data_algebra.data_model.DataModel):
         """
         Action for a column name.
 
-        :param arg: item we are acting on
+        :param arg: None
         :param value: column name
         :return: arg acted on
         """
+        assert isinstance(arg, (pl.DataFrame, type(None)))
         assert isinstance(value, str)
         return PolarsTerm(polars_term=pl.col(value), is_column=True)
     
@@ -894,11 +949,12 @@ class PolarsModel(data_algebra.data_model.DataModel):
         """
         Action for a column name.
 
-        :param arg: item we are acting on
+        :param arg: None
         :param values: list of values to work on
         :param op: operator to apply
         :return: arg acted on
         """
+        assert isinstance(arg, (pl.DataFrame, type(None)))
         assert isinstance(values, List)
         assert isinstance(op, data_algebra.expr_rep.Expression)
         # process inputs
@@ -909,6 +965,20 @@ class PolarsModel(data_algebra.data_model.DataModel):
         # lookup method
         f = None
         arity = len(values)
+        if (f is None) and (arity == 0):
+            if op.op in ["_uniform", "uniform"]:
+                assert isinstance(arg, pl.DataFrame)
+                return PolarsTerm(
+                    polars_term=pl.Series(
+                        values=self._rng.uniform(0.0, 1.0, arg.shape[0]),
+                        dtype=pl.datatypes.Float64,
+                        dtype_if_empty=pl.datatypes.Float64),
+                    inputs=values,
+                )
+        if (f is None): 
+            if op.op in ["_ngroup", "ngroup"]:
+                assert isinstance(arg, pl.DataFrame)
+                raise ValueError(f" {op.op} not implemented for Polars adapter, yet")
         if f is None:
             try:
                 f = self._expr_impl_map[len(values)][op.op]
@@ -919,16 +989,14 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 f = self._impl_map_arbitrary_arity[op.op]
             except KeyError:
                 pass
-        assert f is not None
+        if f is None:
+            raise ValueError(f"failed to lookup {op}")
         # apply method
         res = f(*args)
         # wrap result
         return PolarsTerm(
             polars_term=res,
             inputs=values,
-            one_constant_required=(len(values) == 0) or (op.op in self._needs_one_constant),
-            zero_constant_required=op.op in self._needs_zero_constant,
-            collect_required=op.op in self._collect_required,
         )
 
 

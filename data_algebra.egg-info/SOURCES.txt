@@ -22,6 +22,7 @@ data_algebra/db_space.py
 data_algebra/eval_cache.py
 data_algebra/expr_parse.py
 data_algebra/expr_rep.py
+data_algebra/expression_walker.py
 data_algebra/flow_text.py
 data_algebra/near_sql.py
 data_algebra/op_catalog.py

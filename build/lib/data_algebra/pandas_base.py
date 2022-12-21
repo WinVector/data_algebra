@@ -17,6 +17,7 @@ import data_algebra.expr_rep
 import data_algebra.data_ops_types
 import data_algebra.connected_components
 import data_algebra.cdata
+import data_algebra.expression_walker
 
 
 # also possible, Dask, Nvidia Rapids, Modin, or Datatable versions
@@ -144,7 +145,7 @@ def _where_expr(*args):
 
 
 # base class for Pandas-like API realization
-class PandasModelBase(data_algebra.data_model.DataModel, ABC):
+class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression_walker.ExpressionWalker, ABC):
     """
     Base class for implementing the data algebra on pandas-like APIs
     """
@@ -159,6 +160,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         assert isinstance(pd, types.ModuleType)
         data_algebra.data_model.DataModel.__init__(
             self, presentation_model_name=presentation_model_name, module=pd
+        )
+        data_algebra.expression_walker.ExpressionWalker.__init__(
+            self,
         )
         self.pd = pd
         self.impl_map = self._populate_impl_map()
@@ -654,7 +658,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                 warnings.simplefilter(
                     "ignore"
                 )  # out of range things like arccosh were warning
-                new_cols = {k: opk.act_on(res, data_model=self) for k, opk in op.ops.items()}
+                new_cols = {k: opk.act_on(res, expr_walker=self) for k, opk in op.ops.items()}
             new_frame = self.columns_to_frame_(new_cols, target_rows=res.shape[0])
             res = self.add_data_frame_columns_to_data_frame_(res, new_frame)
         else:
@@ -877,7 +881,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         res = self._eval_value_source(op.sources[0], data_map=data_map)
         if res.shape[0] < 1:
             return res
-        selection = op.expr.act_on(res, data_model=self)
+        selection = op.expr.act_on(res, expr_walker=self)
         res = self.clean_copy(res.loc[selection, :])
         return res
 
@@ -1272,7 +1276,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             pass
         # special zero argument functions
         if len(values) == 0:
-            if op_name == "_uniform":
+            if op_name in ["uniform", "_uniform"]:
                 return numpy.random.uniform(size=arg.shape[0])
             else:
                 KeyError(f"zero-argument function {op_name} not found")
