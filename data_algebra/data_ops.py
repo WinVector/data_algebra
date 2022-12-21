@@ -2229,7 +2229,7 @@ class MapColumnsNode(ViewRepresentation):
             )
         column_names = [
             (k if k not in self.column_remapping.keys() else self.column_remapping[k])
-            for k in source.column_names
+            for k in source.column_names if k not in set(self.column_deletions)
         ]
         self.new_columns = set(new_cols) - set(orig_cols)
         ViewRepresentation.__init__(
