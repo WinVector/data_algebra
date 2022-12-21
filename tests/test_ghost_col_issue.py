@@ -46,5 +46,4 @@ def test_ghost_col_issue():
     )
 
     data_algebra.test_util.check_transform(ops=o2, data=d2, expect=expect,
-        try_on_Polars=False,  # TODO: turn this on
     )

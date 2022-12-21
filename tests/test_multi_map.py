@@ -41,5 +41,4 @@ def test_multi_map():
     assert data_algebra.test_util.equivalent_frames(res, expect)
 
     data_algebra.test_util.check_transform(ops, data={"d": d, "m": m}, expect=expect, valid_for_empty=False,
-        try_on_Polars=False,  # TODO: turn this on
     )

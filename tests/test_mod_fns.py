@@ -46,7 +46,6 @@ def test_mod_fns_one():
             str(data_algebra.MySQL.MySQLModel()),
             str(data_algebra.SparkSQL.SparkSQLModel())
         },
-        try_on_Polars=False,  # TODO: turn this on
         )
 
 
@@ -80,7 +79,6 @@ def test_mod_fns_one_edited():
             str(data_algebra.MySQL.MySQLModel()),  # fn not named REMAINDER
             str(data_algebra.SparkSQL.SparkSQLModel()),  # fn not named REMAINDER
         },
-        try_on_Polars=False,  # TODO: turn this on
     )
 
 
