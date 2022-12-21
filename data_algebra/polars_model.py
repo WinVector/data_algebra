@@ -7,6 +7,7 @@ Note: fully not implemented yet.
 
 from typing import Any, Callable, Dict, Iterable, List, Optional, Set
 
+import numpy as np
 import polars as pl
 
 import data_algebra
@@ -205,6 +206,7 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         #     name="random_nbr",
         #     values=np.random.default_rng().uniform(0.0, 1.0, df.height),
         # )
+        # pl.Series(values=np.random.default_rng().uniform(0.0, 1.0, 10))
     }
     impl_map_1 = {
         "-": lambda x: 0 - x,
@@ -244,7 +246,7 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "floor": lambda x: x.floor(),
         "format_date": lambda x: x.format_date(),
         "format_datetime": lambda x: x.format_datetime(),
-        "is_bad": lambda x: x.is_null() | x.is_infinite() | x.is_nan(),  # TODO: need a different def for numeric v.s. char columns?
+        "is_bad": lambda x: x.is_null() | x.is_infinite() | x.is_nan(),  # recommend only for numeric columns
         "is_inf": lambda x: x.is_infinite(),
         "is_nan": lambda x: x.is_nan(),
         "is_null": lambda x: x.is_null(),
@@ -316,6 +318,7 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
     # could also key the map by grouped, partitioned, regular situation
     return impl_map
 
+
 class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_walker.ExpressionWalker):
     """
     Interface for realizing the data algebra as a sequence of steps over Polars https://www.pola.rs .
@@ -329,6 +332,7 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
     _expr_impl_map: Dict[int, Dict[str, Callable]]
     _impl_map_arbitrary_arity: Dict[str, Callable]
     _collect_required: Set[str]
+    _rng: Any
 
     def __init__(self, *, use_lazy_eval: bool = True):
         data_algebra.data_model.DataModel.__init__(
@@ -337,6 +341,7 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
         data_algebra.expression_walker.ExpressionWalker.__init__(
             self,
         )
+        self._rng = np.random.default_rng()
         assert isinstance(use_lazy_eval, bool)
         self.use_lazy_eval = use_lazy_eval
         self._method_dispatch_table = {
