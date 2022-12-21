@@ -50,10 +50,13 @@ def _reduce_or(*args):
     return res
 
 
+_da_temp_zero_column_name = "_da_temp_zero_column"
+_da_temp_one_column_name = "_da_temp_one_column"
+
+
 class ExpressionRequirements(data_algebra.expression_walker.ExpressionWalker):
     """
     Class to collect what accommodations an expression needs.
-    TODO: move all constant to col promotion into this class.
     """
     collect_required: bool
     zero_constant_required: bool
@@ -117,6 +120,15 @@ class ExpressionRequirements(data_algebra.expression_walker.ExpressionWalker):
             self.zero_constant_required = True
         if op.op in self._collect_required:
             self.one_constant_required = True
+    
+    def add_in_temp_columns(self, temp_v_columns: List):
+        """
+        Add required temp columns to temp_v_columns_list
+        """
+        if self.zero_constant_required:
+            temp_v_columns.append(_build_lit(0).alias(_da_temp_zero_column_name))
+        if self.one_constant_required:
+            temp_v_columns.append(_build_lit(1).alias(_da_temp_one_column_name))
 
 
 class PolarsTerm:
@@ -167,10 +179,6 @@ def _build_lit(v):
         # but ints in lit to Int32. Try to prevent type clashes
         return pl.lit(v, pl.Int64)
     return pl.lit(v)
-
-
-_da_temp_zero_column_name = "_da_temp_zero_column"
-_da_temp_one_column_name = "_da_temp_one_column"
 
 
 def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
@@ -544,10 +552,7 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
         er = ExpressionRequirements()
         for opk in op.ops.values():
             opk.act_on(None, expr_walker=er)
-        if er.zero_constant_required:
-            temp_v_columns.append(_build_lit(0).alias(_da_temp_zero_column_name))
-        if er.one_constant_required:
-            temp_v_columns.append(_build_lit(1).alias(_da_temp_one_column_name))
+        er.add_in_temp_columns(temp_v_columns)
         value_to_send_to_act = None
         if er.collect_required:
             if isinstance(res, pl.LazyFrame):
@@ -569,8 +574,8 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
                         v_value = opk.args[0].value
                         temp_v_columns.append(_build_lit(v_value).alias(v_name))
                         opk = data_algebra.expr_rep.Expression(
-                            op=opk.op, 
-                            args=[data_algebra.expr_rep.ColumnReference(column_name=v_name)], 
+                            op=opk.op,
+                            args=[data_algebra.expr_rep.ColumnReference(column_name=v_name)],
                             params=opk.params,
                             inline=opk.inline,
                             method=opk.method,
@@ -618,10 +623,7 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
         er = ExpressionRequirements()
         for opk in op.ops.values():
             opk.act_on(None, expr_walker=er)
-        if er.zero_constant_required:
-            temp_v_columns.append(_build_lit(0).alias(_da_temp_zero_column_name))
-        if er.one_constant_required:
-            temp_v_columns.append(_build_lit(1).alias(_da_temp_one_column_name))
+        er.add_in_temp_columns(temp_v_columns)
         value_to_send_to_act = None
         if er.collect_required:
             if isinstance(res, pl.LazyFrame):
@@ -767,10 +769,7 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
         er = ExpressionRequirements()
         for opk in op.ops.values():
             opk.act_on(None, expr_walker=er)
-        if er.zero_constant_required:
-            temp_v_columns.append(_build_lit(0).alias(_da_temp_zero_column_name))
-        if er.one_constant_required:
-            temp_v_columns.append(_build_lit(1).alias(_da_temp_one_column_name))
+        er.add_in_temp_columns(temp_v_columns)
         value_to_send_to_act = None
         if er.collect_required:
             if isinstance(res, pl.LazyFrame):
