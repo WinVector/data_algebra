@@ -503,8 +503,10 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.ConcatRowsNode"
             )
+        common_columns = [c for c in op.columns_produced() if c != op.id_column]
         inputs = [self._compose_polars_ops(s, data_map=data_map) for s in op.sources]
         assert len(inputs) == 2
+        inputs = [input_i.select(common_columns) for input_i in inputs]  # get columns in same order
         if op.id_column is not None:
             inputs[0] = inputs[0].with_column(_build_lit(op.a_name).alias(op.id_column))
             inputs[1] = inputs[1].with_column(_build_lit(op.b_name).alias(op.id_column))
