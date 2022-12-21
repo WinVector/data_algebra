@@ -41,7 +41,6 @@ def test_expression_expectations_polars_1():
             'nunique',
             'parse_date',
             'quarter',
-            'shift',
             'std',
             'timestamp_diff',
             'trimstr',

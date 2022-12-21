@@ -275,6 +275,7 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "is_in": lambda a, b: a.is_in(b),
         "mod": lambda a, b: a % b,
         "remainder": lambda a, b: a % b,
+        "shift": lambda a, b: a.shift(b),
         "timestamp_diff": lambda a, b: a.timestamp_diff(b),
         "==": lambda a, b: a == b,
         "<=": lambda a, b: a <= b,
@@ -361,6 +362,7 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
         self._want_literals_unpacked = {
             "around",
             "parse_date", "parse_datetime",
+            "shift",
             }
 
     def data_frame(self, arg=None):
@@ -553,26 +555,19 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
         produced_columns = []
         for k, opk in op.ops.items():
             if op.windowed_situation:
-                # enforce is a simple v.f() expression
-                assert isinstance(opk, data_algebra.expr_rep.Expression)
-                if len(opk.args) == 0:
-                    pass
-                elif len(opk.args) == 1:
-                    assert isinstance(opk.args[0], (data_algebra.expr_rep.Value, data_algebra.expr_rep.ColumnReference))
-                    if isinstance(opk.args[0], data_algebra.expr_rep.Value):
-                        # promote value to column for uniformity of API
-                        v_name = f"_da_extend_temp_v_column_{len(temp_v_columns)}"
-                        v_value = opk.args[0].value
-                        temp_v_columns.append(_build_lit(v_value).alias(v_name))
-                        opk = data_algebra.expr_rep.Expression(
-                            op=opk.op,
-                            args=[data_algebra.expr_rep.ColumnReference(column_name=v_name)],
-                            params=opk.params,
-                            inline=opk.inline,
-                            method=opk.method,
-                        )
-                else:
-                    raise ValueError(f"can't take {len(opk.args)} arity argument in windowed extend")
+                if (len(opk.args) == 1) and isinstance(opk.args[0], data_algebra.expr_rep.Value):
+                    # TODO: move this to leave of nested expressions
+                    # promote value to column for uniformity of API
+                    v_name = f"_da_extend_temp_v_column_{len(temp_v_columns)}"
+                    v_value = opk.args[0].value
+                    temp_v_columns.append(_build_lit(v_value).alias(v_name))
+                    opk = data_algebra.expr_rep.Expression(
+                        op=opk.op,
+                        args=[data_algebra.expr_rep.ColumnReference(column_name=v_name)],
+                        params=opk.params,
+                        inline=opk.inline,
+                        method=opk.method,
+                    )
             fld_k_container = opk.act_on(value_to_send_to_act, expr_walker=self)  # PolarsTerm
             assert isinstance(fld_k_container, PolarsTerm)
             fld_k = fld_k_container.polars_term
@@ -623,26 +618,19 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
         # work on expressions
         produced_columns = []
         for k, opk in op.ops.items():
-            # enforce is a simple v.f() expression
-            assert isinstance(opk, data_algebra.expr_rep.Expression)
-            if len(opk.args) == 0:
-                pass
-            elif len(opk.args) == 1:
-                assert isinstance(opk.args[0], (data_algebra.expr_rep.Value, data_algebra.expr_rep.ColumnReference))
-                if isinstance(opk.args[0], data_algebra.expr_rep.Value):
-                    # promote value to column for uniformity of API
-                    v_name = f"_da_project_temp_v_column_{len(temp_v_columns)}"
-                    v_value = opk.args[0].value
-                    temp_v_columns.append(_build_lit(v_value).alias(v_name))
-                    opk = data_algebra.expr_rep.Expression(
-                        op=opk.op, 
-                        args=[data_algebra.expr_rep.ColumnReference(column_name=v_name)], 
-                        params=opk.params, 
-                        inline=opk.inline, 
-                        method=opk.method,
-                    )
-            else:
-                raise ValueError(f"can't take {len(opk.args)} arity argument in project")
+            if (len(opk.args) == 1) and isinstance(opk.args[0], data_algebra.expr_rep.Value):
+                # TODO: push this into leaves of nested ops
+                # promote value to column for uniformity of API
+                v_name = f"_da_project_temp_v_column_{len(temp_v_columns)}"
+                v_value = opk.args[0].value
+                temp_v_columns.append(_build_lit(v_value).alias(v_name))
+                opk = data_algebra.expr_rep.Expression(
+                    op=opk.op, 
+                    args=[data_algebra.expr_rep.ColumnReference(column_name=v_name)], 
+                    params=opk.params, 
+                    inline=opk.inline, 
+                    method=opk.method,
+                )
             fld_k_container = opk.act_on(value_to_send_to_act, expr_walker=self)  # PolarsTerm
             assert isinstance(fld_k_container, PolarsTerm)
             fld_k = fld_k_container.polars_term
@@ -1001,7 +989,8 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
                 f = self._impl_map_arbitrary_arity[op.op]
             except KeyError:
                 pass
-        assert f is not None
+        if f is None:
+            raise ValueError(f"failed to lookup {op}")
         # apply method
         res = f(*args)
         # wrap result
