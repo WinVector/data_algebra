@@ -633,24 +633,25 @@ def test_polars_table_is_keyed_by_columns():
 
 
 def test_is_inf_polars():
-    d = pl.DataFrame({
-        'a': [1.0, np.inf, np.nan, None, 0.0, -1.0, -np.inf],
-    })
-    ops = (
-        data_algebra.descr(d=d)
-            .extend({
-                'is_inf': 'a.is_inf().if_else(1, 0)',
-                'is_nan': 'a.is_nan().if_else(1, 0)',
-                'is_bad': 'a.is_bad().if_else(1, 0)',
-                'is_null': 'a.is_null().if_else(1, 0)',
-                })
-    )
-    res_polars = ops.transform(d)
-    expect = pl.DataFrame({
-        'a': [1.0, np.inf, np.nan, None, 0.0, -1.0, -np.inf],
-        'is_inf': [0, 1, 0, 0, 0, 0, 1],
-        'is_nan': [0, 0, 1, 0, 0, 0, 0],
-        'is_bad': [0, 1, 1, 1, 0, 0, 1],
-        'is_null': [0, 0, 0, 1, 0, 0, 0],   # Pandas can't tell the difference, Polars can
+    if have_polars:
+        d = pl.DataFrame({
+            'a': [1.0, np.inf, np.nan, None, 0.0, -1.0, -np.inf],
         })
-    assert data_algebra.test_util.equivalent_frames(expect, res_polars)
+        ops = (
+            data_algebra.descr(d=d)
+                .extend({
+                    'is_inf': 'a.is_inf().if_else(1, 0)',
+                    'is_nan': 'a.is_nan().if_else(1, 0)',
+                    'is_bad': 'a.is_bad().if_else(1, 0)',
+                    'is_null': 'a.is_null().if_else(1, 0)',
+                    })
+        )
+        res_polars = ops.transform(d)
+        expect = pl.DataFrame({
+            'a': [1.0, np.inf, np.nan, None, 0.0, -1.0, -np.inf],
+            'is_inf': [0, 1, 0, 0, 0, 0, 1],
+            'is_nan': [0, 0, 1, 0, 0, 0, 0],
+            'is_bad': [0, 1, 1, 1, 0, 0, 1],
+            'is_null': [0, 0, 0, 1, 0, 0, 0],   # Pandas can't tell the difference, Polars can
+            })
+        assert data_algebra.test_util.equivalent_frames(expect, res_polars)
