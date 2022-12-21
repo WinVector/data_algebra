@@ -6,6 +6,7 @@ import abc
 from typing import Any, List, Optional, Set, Union
 
 import data_algebra.util
+from data_algebra.expression_walker import ExpressionWalker
 import data_algebra.data_model
 
 
@@ -162,7 +163,7 @@ class PreTerm(abc.ABC):
     # eval
 
     @abc.abstractmethod
-    def act_on(self, arg, *, data_model: data_algebra.data_model.DataModel):
+    def act_on(self, arg, *, expr_walker: ExpressionWalker):
         """
         Apply expression to argument.
         """
@@ -1044,12 +1045,12 @@ class Value(Term):
             return False
         return self.value == other.value
 
-    def act_on(self, arg, *, data_model: data_algebra.data_model.DataModel):
+    def act_on(self, arg, *, expr_walker: ExpressionWalker):
         """
         Apply expression to argument.
         """
-        assert isinstance(data_model, data_algebra.data_model.DataModel)
-        return data_model.act_on_literal(value=self.value)
+        assert isinstance(expr_walker, ExpressionWalker)
+        return expr_walker.act_on_literal(value=self.value)
 
     def to_python(self, *, want_inline_parens: bool = False) -> PythonText:
         """
@@ -1090,18 +1091,18 @@ class ListTerm(PreTerm):
             return False
         return self.value == other.value
 
-    def act_on(self, arg, *, data_model: data_algebra.data_model.DataModel):
+    def act_on(self, arg, *, expr_walker: ExpressionWalker):
         """
         Apply expression to argument.
         """
-        assert isinstance(data_model, data_algebra.data_model.DataModel)
+        assert isinstance(expr_walker, ExpressionWalker)
         res = [None] * len(self.value)
         for i in range(len(self.value)):
             vi = self.value[i]
             if isinstance(vi, PreTerm):
-                vi = vi.act_on(arg, data_model=data_model)
+                vi = vi.act_on(arg, expr_walker=expr_walker)
             else:
-                vi = data_model.act_on_literal(value=vi)
+                vi = expr_walker.act_on_literal(value=vi)
             res[i] = vi
         return res
 
@@ -1154,12 +1155,12 @@ class DictTerm(PreTerm):
             return False
         return self.value == other.value
 
-    def act_on(self, arg, *, data_model: data_algebra.data_model.DataModel):
+    def act_on(self, arg, *, expr_walker: ExpressionWalker):
         """
         Apply expression to argument.
         """
-        assert isinstance(data_model, data_algebra.data_model.DataModel)
-        return data_model.act_on_literal(value=self.value.copy())
+        assert isinstance(expr_walker, ExpressionWalker)
+        return expr_walker.act_on_literal(value=self.value.copy())
 
     def to_python(self, *, want_inline_parens: bool = False) -> PythonText:
         """
@@ -1204,12 +1205,12 @@ class ColumnReference(Term):
         assert isinstance(column_name, str)
         Term.__init__(self)
 
-    def act_on(self, arg, *, data_model: data_algebra.data_model.DataModel):
+    def act_on(self, arg, *, expr_walker: ExpressionWalker):
         """
         Apply expression to argument.
         """
-        assert isinstance(data_model, data_algebra.data_model.DataModel)
-        return data_model.act_on_column_name(arg=arg, value=self.column_name)
+        assert isinstance(expr_walker, ExpressionWalker)
+        return expr_walker.act_on_column_name(arg=arg, value=self.column_name)
 
     def is_equal(self, other):
         """
@@ -1350,13 +1351,13 @@ class Expression(Term):
         """
         methods_seen.add(self.op)
 
-    def act_on(self, arg, *, data_model: data_algebra.data_model.DataModel):
+    def act_on(self, arg, *, expr_walker: ExpressionWalker):
         """
         Apply expression to argument.
         """
-        assert isinstance(data_model, data_algebra.data_model.DataModel)
-        args = [ai.act_on(arg, data_model=data_model) for ai in self.args]
-        res = data_model.act_on_expression(arg=arg, values=args, op=self)
+        assert isinstance(expr_walker, ExpressionWalker)
+        args = [ai.act_on(arg, expr_walker=expr_walker) for ai in self.args]
+        res = expr_walker.act_on_expression(arg=arg, values=args, op=self)
         return res
 
     def to_python(self, *, want_inline_parens: bool = False) -> PythonText:

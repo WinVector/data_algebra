@@ -15,6 +15,7 @@ import data_algebra.util
 import data_algebra.expr_rep
 import data_algebra.data_ops_types
 import data_algebra.connected_components
+import data_algebra.expression_walker
 
 
 def _reduce_plus(*args):
@@ -55,6 +56,7 @@ class PolarsTerm:
     """
 
     polars_term: Any
+    lit_value: Any
     is_literal: bool
     is_column: bool
     collect_required: bool = False  # property of tree, not node
@@ -269,7 +271,7 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
     # could also key the map by grouped, partitioned, regular situation
     return impl_map
 
-class PolarsModel(data_algebra.data_model.DataModel):
+class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_walker.ExpressionWalker):
     """
     Interface for realizing the data algebra as a sequence of steps over Polars https://www.pola.rs .
 
@@ -286,6 +288,9 @@ class PolarsModel(data_algebra.data_model.DataModel):
     def __init__(self, *, use_lazy_eval: bool = True):
         data_algebra.data_model.DataModel.__init__(
             self, presentation_model_name="pl", module=pl
+        )
+        data_algebra.expression_walker.ExpressionWalker.__init__(
+            self,
         )
         assert isinstance(use_lazy_eval, bool)
         self.use_lazy_eval = use_lazy_eval
@@ -531,7 +536,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
                         )
                 else:
                     raise ValueError(f"can't take {len(opk.args)} arity argument in windowed extend")
-            fld_k_container = opk.act_on(None, data_model=self)  # PolarsTerm
+            fld_k_container = opk.act_on(None, expr_walker=self)  # PolarsTerm
             assert isinstance(fld_k_container, PolarsTerm)
             conditions_from_expressions.observe(fld_k_container)
             fld_k = fld_k_container.polars_term
@@ -598,7 +603,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
                     )
             else:
                 raise ValueError(f"can't take {len(opk.args)} arity argument in project")
-            fld_k_container = opk.act_on(None, data_model=self)  # PolarsTerm
+            fld_k_container = opk.act_on(None, expr_walker=self)  # PolarsTerm
             assert isinstance(fld_k_container, PolarsTerm)
             conditions_from_expressions.observe(fld_k_container)
             fld_k = fld_k_container.polars_term
@@ -717,7 +722,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 "op was supposed to be a data_algebra.data_ops.SelectRowsNode"
             )
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
-        selection = op.expr.act_on(None, data_model=self)  # PolarsTerm
+        selection = op.expr.act_on(None, expr_walker=self)  # PolarsTerm
         assert isinstance(selection, PolarsTerm)
         res = res.filter(selection.polars_term)
         return res
@@ -897,8 +902,8 @@ class PolarsModel(data_algebra.data_model.DataModel):
         :param value: column name
         :return: arg acted on
         """
-        assert isinstance(value, str)
         assert arg is None
+        assert isinstance(value, str)
         return PolarsTerm(polars_term=pl.col(value), is_column=True)
     
     def act_on_expression(self, *, arg, values: List, op):
