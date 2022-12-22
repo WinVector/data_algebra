@@ -93,7 +93,7 @@
 </span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a>
 </span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a><span class="n">have_polars</span> <span class="o">=</span> <span class="kc">False</span>
 </span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a><span class="k">try</span><span class="p">:</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a>    <span class="kn">import</span> <span class="nn">data_algebra.polars_model</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a>    <span class="kn">import</span> <span class="nn">data_algebra.polars_model</span>  <span class="c1"># conditional import</span>
 </span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a>    <span class="n">have_polars</span> <span class="o">=</span> <span class="kc">True</span>
 </span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a><span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
 </span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a>    <span class="k">pass</span>

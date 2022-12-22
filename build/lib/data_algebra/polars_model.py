@@ -19,6 +19,14 @@ import data_algebra.connected_components
 import data_algebra.expression_walker
 
 
+def _build_lit(v):
+    if isinstance(v, int):
+        # Polars defaults ints in constructor to Int64,
+        # but ints in lit to Int32. Try to prevent type clashes
+        return pl.lit(v, pl.Int64)
+    return pl.lit(v)
+
+
 def _reduce_plus(*args):
     assert len(args) > 0
     res = args[0]
@@ -149,7 +157,6 @@ class PolarsTerm:
         polars_term = None, 
         is_literal: bool = False,
         is_column: bool = False,
-        inputs: Optional[List] = None,
         lit_value = None,
         ) -> None:
         """
@@ -163,7 +170,6 @@ class PolarsTerm:
         """
         assert isinstance(is_literal, bool)
         assert isinstance(is_column, bool)
-        assert (is_literal + is_column + (inputs is not None) + (polars_term is None)) == 1
         if lit_value is not None:
             assert is_literal
         self.lit_value = lit_value
@@ -171,12 +177,25 @@ class PolarsTerm:
         self.is_literal = is_literal
 
 
-def _build_lit(v):
-    if isinstance(v, int):
-        # Polars defaults ints in constructor to Int64,
-        # but ints in lit to Int32. Try to prevent type clashes
-        return pl.lit(v, pl.Int64)
-    return pl.lit(v)
+def _unpack_lits(v):
+    if isinstance(v, PolarsTerm):
+        if v.is_literal:
+            return v.lit_value
+        else:
+            return v.polars_term
+    elif isinstance(v, Iterable):
+        return [_unpack_lits(vi) for vi in v]
+    else:
+        raise ValueError(f"unexpected type to _unpack_lits: {type(v)}")
+
+
+def _mapv(a, b: Dict, c):
+    # TODO: find out if there is another way to do this
+    assert isinstance(b, Dict)
+    res = _build_lit(c)
+    for k, v in b.items():
+        res = pl.when(a == _build_lit(k)).then(_build_lit(v)).otherwise(res)
+    return res
 
 
 def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
@@ -245,7 +264,7 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "median": lambda x: x.median(),
         "min": lambda x: x.min(),
         "month": lambda x: x.month(),
-        "nunique": lambda x: x.nunique(),
+        "nunique": lambda x: x.n_unique(),
         "quarter": lambda x: x.quarter(),
         "rank": lambda x: x.rank(),
         "round": lambda x: x.round(decimals=0),
@@ -292,7 +311,7 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
     }
     impl_map_3 = {
         "if_else": lambda a, b, c: pl.when(a).then(b).otherwise(c),
-        "mapv": lambda a, b, c: a.mapv(b, c),
+        "mapv": _mapv,
         "trimstr": lambda a, b, c: a.trimstr(b, c),
         "where": lambda a, b, c: pl.when(a).then(b).otherwise(c),
     }
@@ -361,6 +380,8 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
         }
         self._want_literals_unpacked = {
             "around",
+            "is_in",
+            "mapv",
             "parse_date", "parse_datetime",
             "shift",
             }
@@ -943,7 +964,10 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
         :return: converted result
         """
         assert not isinstance(value, PolarsTerm)
-        return PolarsTerm(polars_term=_build_lit(value), is_literal=True, lit_value=value)
+        if isinstance(value, (Dict, List, Set)):
+            return PolarsTerm(polars_term=None, is_literal=True, lit_value=value)
+        else:
+            return PolarsTerm(polars_term=_build_lit(value), is_literal=True, lit_value=value)
     
     def act_on_column_name(self, *, arg, value):
         """
@@ -971,9 +995,12 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
         assert isinstance(op, data_algebra.expr_rep.Expression)
         # process inputs
         for v in values:
-            assert isinstance(v, PolarsTerm)
-        want_literals_unpacked = op.op in self._want_literals_unpacked
-        args = [v.lit_value if (want_literals_unpacked and v.is_literal) else v.polars_term for v in values]
+            assert isinstance(v, (List, PolarsTerm))
+        want_literals_unpacked = (op.op in self._want_literals_unpacked)
+        if want_literals_unpacked:
+            args = _unpack_lits(values)
+        else:
+            args = [v.polars_term for v in values]
         # lookup method
         f = None
         arity = len(values)
@@ -985,7 +1012,6 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
                         values=self._rng.uniform(0.0, 1.0, arg.shape[0]),
                         dtype=pl.datatypes.Float64,
                         dtype_if_empty=pl.datatypes.Float64),
-                    inputs=values,
                 )
         if (f is None): 
             if op.op in ["_ngroup", "ngroup"]:
@@ -1008,7 +1034,6 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
         # wrap result
         return PolarsTerm(
             polars_term=res,
-            inputs=values,
         )
 
 

@@ -23,7 +23,7 @@ from data_algebra.data_ops import *
 
 have_polars = False
 try:
-    import data_algebra.polars_model
+    import data_algebra.polars_model  # conditional import
     have_polars = True
 except ModuleNotFoundError:
     pass
