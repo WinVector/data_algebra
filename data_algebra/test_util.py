@@ -553,6 +553,7 @@ def check_transform(
     cols_case_sensitive: bool = False,
     check_row_order: bool = False,
     check_parse: bool = True,
+    try_on_DBs: bool = True,
     models_to_skip: Optional[Iterable] = None,
     valid_for_empty: bool = True,
     empty_produces_empty: bool = True,
@@ -571,6 +572,7 @@ def check_transform(
     :param cols_case_sensitive: passed to equivalent_frames()
     :param check_row_order: passed to equivalent_frames()
     :param check_parse: if True check expression parses/formats to self
+    :param try_on_DBs: if true, try on databases
     :param models_to_skip: None or set of model names or models to skip testing
     :param valid_for_empty: logical, if True perform tests on empty inputs
     :param empty_produces_empty: logical, if True assume empty inputs should produce empty output
@@ -583,6 +585,7 @@ def check_transform(
         cols_used = ops.columns_used()
         table_name = [k for k in cols_used.keys()][0]
         data = {table_name: data}
+    assert isinstance(try_on_DBs, bool)
     assert isinstance(try_on_Polars, bool)
     assert expect is not None
     if local_data_model is None:
@@ -619,44 +622,44 @@ def check_transform(
             empty_produces_empty=empty_produces_empty,
             local_data_model=polars_data_model,
         )
-
-    caught: Optional[Any] = None
-    db_handles = [
-        # non-connected handles, lets us test some of the SQL generation path
-        data_algebra.SQLite.SQLiteModel().db_handle(None),
-        data_algebra.BigQuery.BigQueryModel().db_handle(None),
-        data_algebra.PostgreSQL.PostgreSQLModel().db_handle(None),
-        data_algebra.SparkSQL.SparkSQLModel().db_handle(None),
-        data_algebra.MySQL.MySQLModel().db_handle(None),
-    ]
-    try:
-        test_dbs = get_test_dbs()
-        db_handles = db_handles + test_dbs
-        if models_to_skip is not None:
-            models_to_skip = {str(m) for m in models_to_skip}
-            db_handles = [h for h in db_handles if str(h.db_model) not in models_to_skip]
-        _check_transform_on_handles(
-            ops=ops,
-            data=data,
-            expect=expect,
-            float_tol=float_tol,
-            check_column_order=check_column_order,
-            cols_case_sensitive=cols_case_sensitive,
-            check_row_order=check_row_order,
-            db_handles=db_handles,
-            local_data_model=local_data_model,
-        )
-    except AssertionError as ase:
-        traceback.print_exc()
-        caught = ase
-    except Exception as exc:
-        traceback.print_exc()
-        caught = exc
-    for handle in db_handles:
-        # noinspection PyBroadException
+    if try_on_DBs:
+        caught: Optional[Any] = None
+        db_handles = [
+            # non-connected handles, lets us test some of the SQL generation path
+            data_algebra.SQLite.SQLiteModel().db_handle(None),
+            data_algebra.BigQuery.BigQueryModel().db_handle(None),
+            data_algebra.PostgreSQL.PostgreSQLModel().db_handle(None),
+            data_algebra.SparkSQL.SparkSQLModel().db_handle(None),
+            data_algebra.MySQL.MySQLModel().db_handle(None),
+        ]
         try:
-            handle.close()
-        except Exception:
-            pass
-    if caught is not None:
-        raise caught
+            test_dbs = get_test_dbs()
+            db_handles = db_handles + test_dbs
+            if models_to_skip is not None:
+                models_to_skip = {str(m) for m in models_to_skip}
+                db_handles = [h for h in db_handles if str(h.db_model) not in models_to_skip]
+            _check_transform_on_handles(
+                ops=ops,
+                data=data,
+                expect=expect,
+                float_tol=float_tol,
+                check_column_order=check_column_order,
+                cols_case_sensitive=cols_case_sensitive,
+                check_row_order=check_row_order,
+                db_handles=db_handles,
+                local_data_model=local_data_model,
+            )
+        except AssertionError as ase:
+            traceback.print_exc()
+            caught = ase
+        except Exception as exc:
+            traceback.print_exc()
+            caught = exc
+        for handle in db_handles:
+            # noinspection PyBroadException
+            try:
+                handle.close()
+            except Exception:
+                pass
+        if caught is not None:
+            raise caught

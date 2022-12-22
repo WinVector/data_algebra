@@ -6,6 +6,7 @@ import data_algebra
 from data_algebra.data_ops import *
 import data_algebra.test_util
 import data_algebra.db_model
+import data_algebra.MySQL
 import data_algebra.SQLite
 
 
@@ -27,11 +28,16 @@ def test_ops():
     db_handle = data_algebra.db_model.DBHandle(db_model=sql_model, conn=conn)
     tbl_map = {"d": db_handle.insert_table(d, table_name="d")}
 
-    def check_ops(ops, expect=None, *, test_sql=True):
+    def check_ops(ops, expect):
+        data_algebra.test_util.check_transform(
+            ops=ops,
+            data=d,
+            expect=expect,
+            try_on_DBs=False,
+        )
         res_pandas = ops.transform(d)
-        if expect is not None:
-            assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
-        if test_sql:
+        assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
+        if True or test_sql:
             query = ops.to_sql(sql_model)
             res_db = sql_model.read_query(conn, query)
             assert data_algebra.test_util.equivalent_frames(res_db, res_pandas)
@@ -211,7 +217,7 @@ def test_ops():
             "g": [1, 1, 2, 2],
         }
     )
-    check_ops(ops, expect, test_sql=False)
+    check_ops(ops, expect)
 
     ops = td.extend({"x": "2.0 // x"})
     expect = data_algebra.data_model.default_data_model().pd.DataFrame(
@@ -221,7 +227,7 @@ def test_ops():
             "g": [1, 1, 2, 2],
         }
     )
-    check_ops(ops, expect, test_sql=False)
+    check_ops(ops, expect)
 
     ops = td.extend({"x": "x % 2.0"})
     expect = data_algebra.data_model.default_data_model().pd.DataFrame(
@@ -251,7 +257,7 @@ def test_ops():
             "g": [1, 1, 2, 2],
         }
     )
-    check_ops(ops, expect, test_sql=False)  # TODO SQL translation
+    check_ops(ops, expect)
 
     ops = td.extend({"x": "2.0 ** x"})
     expect = data_algebra.data_model.default_data_model().pd.DataFrame(
@@ -261,7 +267,7 @@ def test_ops():
             "g": [1, 1, 2, 2],
         }
     )
-    check_ops(ops, expect, test_sql=False)  # TODO SQL translation
+    check_ops(ops, expect)
 
     ops = td.extend({"x": "-x"})
     expect = data_algebra.data_model.default_data_model().pd.DataFrame(
@@ -293,11 +299,11 @@ def test_ops():
         "cos": numpy.cos,
         "cosh": numpy.cosh,
         "exp": numpy.exp,
-        "expm1": numpy.expm1,
+        # "expm1": numpy.expm1,
         "floor": numpy.floor,
         "log": numpy.log,
         "log10": numpy.log10,
-        "log1p": numpy.log1p,
+        # "log1p": numpy.log1p,
         "round": numpy.round,
         "sin": numpy.sin,
         "sinh": numpy.sinh,
@@ -315,7 +321,7 @@ def test_ops():
                 "x3": [f(xi) for xi in [0.1, 0.2, 0.3, 0.4]],
             }
         )
-        check_ops(ops, expect, test_sql=True)
+        check_ops(ops, expect)
 
     # clean up
     conn.close()
