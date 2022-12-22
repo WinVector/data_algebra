@@ -229,7 +229,7 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "as_int64": lambda x: x.cast(int),
         "as_str": lambda x: x.cast(str),
         "base_Sunday": lambda x: x.base_Sunday(),
-        "bfill": lambda x: x.bfill(),
+        "bfill": lambda x: x.fill_null(strategy='backward'),
         "ceil": lambda x: x.ceil(),
         "coalesce0": lambda x: pl.when(x.is_null()).then(pl.col(_da_temp_zero_column_name)).otherwise(x),
         "cos": lambda x: x.cos(),
@@ -246,7 +246,7 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "dayofyear": lambda x: x.dayofyear(),
         "exp": lambda x: x.exp(),
         "expm1": lambda x: x.expm1(),
-        "ffill": lambda x: x.ffill(),
+        "ffill": lambda x: x.fill_null(strategy='forward'),
         "first": lambda x: x.first(),
         "floor": lambda x: x.floor(),
         "format_date": lambda x: x.format_date(),
@@ -1016,6 +1016,7 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
         if (f is None): 
             if op.op in ["_ngroup", "ngroup"]:
                 assert isinstance(arg, pl.DataFrame)
+                # n_groups = arg.groupby(["x"]).apply(lambda x: x.head(1)).shape[0]
                 raise ValueError(f" {op.op} not implemented for Polars adapter, yet")
         if f is None:
             try:

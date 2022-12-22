@@ -21,7 +21,6 @@ def test_expression_expectations_polars_1():
         known_not_to_work = set([
             'arctan2', 
             'base_Sunday',
-            'bfill',
             'concat',
             'count',  # Pandas null treatment in the wrong
             'cumcount',
@@ -31,14 +30,10 @@ def test_expression_expectations_polars_1():
             'dayofweek',
             'dayofyear',
             'expm1',
-            'ffill',
             'format_date',
             'format_datetime',
-            'is_in',
             'log1p',
             'month',
-            'mapv',
-            'nunique',
             'parse_date',
             'quarter',
             'std',
