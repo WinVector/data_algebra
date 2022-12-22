@@ -456,14 +456,24 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
                 self.pd.isnull(x), numpy.logical_or(numpy.isnan(x), numpy.isinf(x))
             )
         return self.pd.isnull(x)
-
-    def concat_columns(self, frame_list):
+    
+    def concat_rows(self, frame_list: List):
         """
-        Concatinate columns from frame_list
+        Concatenate rows from frame_list
         """
         frame_list = list(frame_list)
-        if len(frame_list) <= 0:
-            return None
+        assert len(frame_list) > 0
+        if len(frame_list) == 1:
+            return self.clean_copy(frame_list[0])
+        res = self.pd.concat(frame_list, axis=0)
+        return res
+
+    def concat_columns(self, frame_list: List):
+        """
+        Concatenate columns from frame_list
+        """
+        frame_list = list(frame_list)
+        assert len(frame_list) > 0
         if len(frame_list) == 1:
             return self.clean_copy(frame_list[0])
         res = self.pd.concat(frame_list, axis=1)

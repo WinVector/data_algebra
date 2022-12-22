@@ -31,5 +31,4 @@ def test_replicate_rows_query():
         ops=ops,
         data={'d': d, 'rt': rt},
         expect=expect,
-        try_on_Polars=False,  # TODO: turn this on
     )

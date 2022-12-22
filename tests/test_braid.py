@@ -12,11 +12,11 @@ import data_algebra.BigQuery
 def test_braid():
     pd = data_algebra.data_model.default_data_model().pd
     d_state = pd.DataFrame({
-        't': [1, 3, 5],
+        't': [1., 3., 5.],
         'state': ['a', 'b', 'c'],
     })
     d_event = pd.DataFrame({
-        't': [1, 4],
+        't': [1., 4.],
         'value': [10, 20],
     })
     ops = data_algebra.solutions.braid_data(
@@ -31,7 +31,7 @@ def test_braid():
     res = ops.eval({'d_state': d_state, 'd_event': d_event})
     # print(data_algebra.util.pandas_to_example_str(res))
     expect = pd.DataFrame({
-        't': [1, 1, 3, 4, 5],
+        't': [1., 1., 3., 4., 5.],
         'state': ['a', 'a', 'b', 'b', 'c'],
         'value': [None, 10, None, 20, None],
         'record_type': ['state_row', 'event_row', 'state_row', 'event_row', 'state_row'],

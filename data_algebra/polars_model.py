@@ -289,7 +289,6 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "%/%": lambda a, b: a / b,
         "around": lambda a, b: a.round(b),
         "coalesce": lambda a, b: pl.when(a.is_null()).then(b).otherwise(a),
-        "concat": lambda a, b: a.concat(b),
         "date_diff": lambda a, b: a.date_diff(b),
         "is_in": lambda a, b: a.is_in(b),
         "mod": lambda a, b: a % b,
@@ -367,6 +366,7 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
         }
         self._expr_impl_map = _populate_expr_impl_map()
         self._impl_map_arbitrary_arity = {
+            "concat": lambda *args: pl.concat_str(args),
             "fmax": lambda *args: pl.max(args),
             "fmin": lambda *args: pl.min(args),
             "maximum": lambda *args: pl.max(args),
@@ -440,9 +440,19 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
         """
         return x.is_null()
 
+    def concat_rows(self, frame_list: List):
+        """
+        Concatenate rows from frame_list
+        """
+        frame_list = list(frame_list)
+        assert len(frame_list) > 0
+        if len(frame_list) == 1:
+            return frame_list[0]
+        pl.concat(frame_list, how="vertical")
+
     def concat_columns(self, frame_list):
         """
-        Concatinate columns from frame_list
+        Concatenate columns from frame_list
         """
         frame_list = list(frame_list)
         if len(frame_list) <= 0:
