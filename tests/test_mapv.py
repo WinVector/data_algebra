@@ -1,5 +1,4 @@
 import numpy
-import pytest
 
 import data_algebra
 from data_algebra.data_ops import *
@@ -37,7 +36,6 @@ def test_mapv_1():
         data=d,
         expect=expect,
         models_to_skip={str(data_algebra.SparkSQL.SparkSQLModel())},
-        try_on_Polars=False,  # TODO: turn this on
     )
 
 
@@ -65,5 +63,4 @@ def test_mapv_1_spark():
     assert data_algebra.test_util.equivalent_frames(transformed, expect)
 
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect,
-        try_on_Polars=False,  # TODO: turn this on
     )
