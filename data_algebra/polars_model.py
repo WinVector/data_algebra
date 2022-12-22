@@ -677,23 +677,46 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
             )
         inputs = [self._compose_polars_ops(s, data_map=data_map) for s in op.sources]
         assert len(inputs) == 2
-        res = inputs[0].join(
-            inputs[1],
-            left_on=op.on_a,
-            right_on=op.on_b,
-            how=op.jointype.lower(),
-            suffix = "_da_right_tmp",
-        )
-        coalesce_columns = set(op.sources[0].columns_produced()).intersection(op.sources[1].columns_produced()) - set(op.on_a)
-        if len(coalesce_columns) > 0:
-            res = res.with_columns([
-                pl.when(pl.col(c).is_null())
-                    .then(pl.col(c + "_da_right_tmp"))
-                    .otherwise(pl.col(c))
-                    .alias(c)
-                for c in coalesce_columns
-            ])
-            res = res.select(op.columns_produced())
+        how = op.jointype.lower()
+        if how == "full":
+            how = "outer"
+        coalesce_columns = (
+            set(op.sources[0].columns_produced()).intersection(op.sources[1].columns_produced()) 
+            - set(op.on_a))
+        if how != "right":
+            res = inputs[0].join(
+                inputs[1],
+                left_on=op.on_a,
+                right_on=op.on_b,
+                how=how,
+                suffix = "_da_right_tmp",
+            )
+            if len(coalesce_columns) > 0:
+                res = res.with_columns([
+                    pl.when(pl.col(c).is_null())
+                        .then(pl.col(c + "_da_right_tmp"))
+                        .otherwise(pl.col(c))
+                        .alias(c)
+                    for c in coalesce_columns
+                ])
+        else:
+            # simulate right join with left join
+            res = inputs[1].join(
+                inputs[0],
+                left_on=op.on_b,
+                right_on=op.on_a,
+                how="left",
+                suffix = "_da_left_tmp",
+            )
+            if len(coalesce_columns) > 0:
+                res = res.with_columns([
+                    pl.when(pl.col(c + "_da_left_tmp").is_null())
+                        .then(pl.col(c))
+                        .otherwise(pl.col(c + "_da_left_tmp"))
+                        .alias(c)
+                    for c in coalesce_columns
+                ])
+        res = res.select(op.columns_produced())
         return res
     
     def _order_rows_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
