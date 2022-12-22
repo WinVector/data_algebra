@@ -139,5 +139,4 @@ def test_if_else_where():
     assert data_algebra.test_util.equivalent_frames(res_sqlite, expect)
     sqlite_handle.close()
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect,
-        try_on_Polars=False,  # TODO: turn this on
     )

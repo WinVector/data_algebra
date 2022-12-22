@@ -309,10 +309,10 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "parse_datetime": lambda x, format : x.cast(str).str.strptime(pl.Datetime, fmt=format, strict=False).cast(pl.Datetime),
     }
     impl_map_3 = {
-        "if_else": lambda a, b, c: pl.when(a).then(b).otherwise(c),
+        "if_else": lambda a, b, c: pl.when(a.is_null()).then(pl.lit(None)).otherwise(pl.when(a).then(b).otherwise(c)),
         "mapv": _mapv,
         "trimstr": lambda a, b, c: a.trimstr(b, c),
-        "where": lambda a, b, c: pl.when(a).then(b).otherwise(c),
+        "where": lambda a, b, c: pl.when(a.is_null()).then(c).otherwise(pl.when(a).then(b).otherwise(c)),
     }
     impl_map = {
         0: impl_map_0,
@@ -436,7 +436,7 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
     
     def bad_column_positions(self, x):
         """
-        Return vector indicating which entries are bad (null or nan) (vectorized).
+        Return vector indicating which entries are null (vectorized).
         """
         return x.is_null()
 

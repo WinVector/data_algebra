@@ -640,10 +640,10 @@ def test_is_inf_polars():
         ops = (
             data_algebra.descr(d=d)
                 .extend({
-                    'is_inf': 'a.is_inf().if_else(1, 0)',
-                    'is_nan': 'a.is_nan().if_else(1, 0)',
-                    'is_bad': 'a.is_bad().if_else(1, 0)',
-                    'is_null': 'a.is_null().if_else(1, 0)',
+                    'is_inf': 'a.is_inf().where(1, 0)',
+                    'is_nan': 'a.is_nan().where(1, 0)',
+                    'is_bad': 'a.is_bad().where(1, 0)',
+                    'is_null': 'a.is_null().where(1, 0)',
                     })
         )
         res_polars = ops.transform(d)
