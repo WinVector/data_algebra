@@ -20,9 +20,6 @@ def test_rename_columns_swap():
         td.rename_columns({"y": "x"})
 
 
-test_rename_columns_swap()  # TODO: remove
-
-
 def test_rename_columns_1():
     d = data_algebra.data_model.default_data_model().pd.DataFrame({"x": [1], "y": [2], "z": ["q"]})
     td = describe_table(d, table_name="d")

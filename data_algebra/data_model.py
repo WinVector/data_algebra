@@ -164,10 +164,10 @@ def lookup_data_model_for_key(key: str) -> DataModel:
     assert isinstance(key, str)
     key_lower = key.lower()
     if (key == "default_data_model") or (key == "default_Pandas_model") or (pandas_regexp.match(key_lower) is not None):
-        import data_algebra.pandas_model
+        import data_algebra.pandas_model  # delayed import
         data_algebra.pandas_model.register_pandas_model(key)
     elif (key == "default_Polars_model") or (polars_regexp.match(key_lower) is not None) or (polars_regexp_lazy.match(key_lower) is not None):
-        import data_algebra.polars_model
+        import data_algebra.polars_model  # delayed import
         data_algebra.polars_model.register_polars_model(key)
     return data_model_type_map[key]
 

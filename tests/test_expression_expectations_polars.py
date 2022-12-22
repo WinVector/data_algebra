@@ -10,7 +10,7 @@ import data_algebra.test_util
 
 have_polars = False
 try:
-    import polars as pl
+    import polars as pl  # conditional import
     have_polars = True
 except ModuleNotFoundError:
     pass
