@@ -1079,7 +1079,7 @@ class ListTerm(PreTerm):
     # derived from PreTerm as this is not combinable
     def __init__(self, value):
         assert isinstance(value, (list, tuple))
-        self.value = [v for v in value]  # copy and standardize to a list
+        self.value = list(value)  # copy and standardize to a list
         PreTerm.__init__(self)
 
     def is_equal(self, other):

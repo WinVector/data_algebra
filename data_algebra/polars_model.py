@@ -179,6 +179,18 @@ def _build_lit(v):
     return pl.lit(v)
 
 
+def _unpack_lits(v):
+    if isinstance(v, PolarsTerm):
+        if v.is_literal:
+            return v.lit_value
+        else:
+            return v.polars_term
+    elif isinstance(v, Iterable):
+        return [_unpack_lits(vi) for vi in v]
+    else:
+        raise ValueError(f"unexpected type to _unpack_lits: {type(v)}")
+
+
 def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
     """
     Map symbols to implementations.
@@ -361,6 +373,7 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
         }
         self._want_literals_unpacked = {
             "around",
+            "is_in",
             "parse_date", "parse_datetime",
             "shift",
             }
@@ -971,9 +984,12 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
         assert isinstance(op, data_algebra.expr_rep.Expression)
         # process inputs
         for v in values:
-            assert isinstance(v, PolarsTerm)
-        want_literals_unpacked = op.op in self._want_literals_unpacked
-        args = [v.lit_value if (want_literals_unpacked and v.is_literal) else v.polars_term for v in values]
+            assert isinstance(v, (List, PolarsTerm))
+        want_literals_unpacked = (op.op in self._want_literals_unpacked)
+        if want_literals_unpacked:
+            args = _unpack_lits(values)
+        else:
+            args = [v.polars_term for v in values]
         # lookup method
         f = None
         arity = len(values)

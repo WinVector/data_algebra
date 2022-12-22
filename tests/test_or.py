@@ -1,13 +1,9 @@
 
-
 import data_algebra
 from data_algebra.data_ops import *
 import data_algebra.util
 import data_algebra.test_util
 import data_algebra.SQLite
-
-
-# TODO: SQL tests for all non-failing steps
 
 
 def test_or_1():
@@ -48,7 +44,6 @@ def test_in_1():
     )
 
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect,
-        try_on_Polars=False,  # TODO: turn this on
     )
 
 
@@ -72,7 +67,6 @@ def test_in_1b():
     )
 
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect,
-        try_on_Polars=False,  # TODO: turn this on
     )
 
 
@@ -96,7 +90,6 @@ def test_in_2():
     )
 
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect,
-        try_on_Polars=False,  # TODO: turn this on
     )
 
 
@@ -116,5 +109,4 @@ def test_in_3():
     )
 
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect,
-        try_on_Polars=False,  # TODO: turn this on
     )
