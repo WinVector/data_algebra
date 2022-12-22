@@ -224,7 +224,7 @@ def xicor_score_variables_plan(
     assert isinstance(n_rep, int)
     record_map = RecordMap(
         blocks_out=RecordSpecification(
-            control_table=data_algebra.data_model.default_data_model().pd.DataFrame(
+            control_table=data_algebra.data_model.default_data_model().data_frame(
                 {
                     "variable_name": x_vars,
                     "x": x_vars,
@@ -237,7 +237,7 @@ def xicor_score_variables_plan(
         ),
         strict=False,
     )
-    rep_frame = data_algebra.data_model.default_data_model().pd.DataFrame({"rep": range(n_rep)})
+    rep_frame = data_algebra.data_model.default_data_model().data_frame({"rep": range(n_rep)})
     grouped_calc = (
         xicor_query(
             d
@@ -529,13 +529,12 @@ def replicate_rows_query(
     assert power_key_colname not in d.column_names
     # get a pandas namespace
     local_data_model = data_algebra.data_model.default_data_model()
-    pd = local_data_model.pd
     # build powers of 2 until max_count is met or exceeded
     powers = list(range(int(numpy.ceil(numpy.log(max_count) / numpy.log(2))) + 1))
     # replicate each power the number of times it specifies
-    count_frame = pd.concat(
+    count_frame = local_data_model.concat_rows(
         [
-            pd.DataFrame(
+            local_data_model.data_frame(
                 {
                     power_key_colname: f"p{p}",
                     seq_column_name: range(int(2**p)),

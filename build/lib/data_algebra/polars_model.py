@@ -229,7 +229,7 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "as_int64": lambda x: x.cast(int),
         "as_str": lambda x: x.cast(str),
         "base_Sunday": lambda x: x.base_Sunday(),
-        "bfill": lambda x: x.bfill(),
+        "bfill": lambda x: x.fill_null(strategy='backward'),
         "ceil": lambda x: x.ceil(),
         "coalesce0": lambda x: pl.when(x.is_null()).then(pl.col(_da_temp_zero_column_name)).otherwise(x),
         "cos": lambda x: x.cos(),
@@ -246,7 +246,7 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "dayofyear": lambda x: x.dayofyear(),
         "exp": lambda x: x.exp(),
         "expm1": lambda x: x.expm1(),
-        "ffill": lambda x: x.ffill(),
+        "ffill": lambda x: x.fill_null(strategy='forward'),
         "first": lambda x: x.first(),
         "floor": lambda x: x.floor(),
         "format_date": lambda x: x.format_date(),
@@ -289,7 +289,6 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "%/%": lambda a, b: a / b,
         "around": lambda a, b: a.round(b),
         "coalesce": lambda a, b: pl.when(a.is_null()).then(b).otherwise(a),
-        "concat": lambda a, b: a.concat(b),
         "date_diff": lambda a, b: a.date_diff(b),
         "is_in": lambda a, b: a.is_in(b),
         "mod": lambda a, b: a % b,
@@ -310,10 +309,10 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
         "parse_datetime": lambda x, format : x.cast(str).str.strptime(pl.Datetime, fmt=format, strict=False).cast(pl.Datetime),
     }
     impl_map_3 = {
-        "if_else": lambda a, b, c: pl.when(a).then(b).otherwise(c),
+        "if_else": lambda a, b, c: pl.when(a.is_null()).then(pl.lit(None)).otherwise(pl.when(a).then(b).otherwise(c)),
         "mapv": _mapv,
         "trimstr": lambda a, b, c: a.trimstr(b, c),
-        "where": lambda a, b, c: pl.when(a).then(b).otherwise(c),
+        "where": lambda a, b, c: pl.when(a.is_null()).then(c).otherwise(pl.when(a).then(b).otherwise(c)),
     }
     impl_map = {
         0: impl_map_0,
@@ -367,6 +366,7 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
         }
         self._expr_impl_map = _populate_expr_impl_map()
         self._impl_map_arbitrary_arity = {
+            "concat": lambda *args: pl.concat_str(args),
             "fmax": lambda *args: pl.max(args),
             "fmin": lambda *args: pl.min(args),
             "maximum": lambda *args: pl.max(args),
@@ -436,13 +436,23 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
     
     def bad_column_positions(self, x):
         """
-        Return vector indicating which entries are bad (null or nan) (vectorized).
+        Return vector indicating which entries are null (vectorized).
         """
         return x.is_null()
 
+    def concat_rows(self, frame_list: List):
+        """
+        Concatenate rows from frame_list
+        """
+        frame_list = list(frame_list)
+        assert len(frame_list) > 0
+        if len(frame_list) == 1:
+            return frame_list[0]
+        pl.concat(frame_list, how="vertical")
+
     def concat_columns(self, frame_list):
         """
-        Concatinate columns from frame_list
+        Concatenate columns from frame_list
         """
         frame_list = list(frame_list)
         if len(frame_list) <= 0:
@@ -677,23 +687,46 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
             )
         inputs = [self._compose_polars_ops(s, data_map=data_map) for s in op.sources]
         assert len(inputs) == 2
-        res = inputs[0].join(
-            inputs[1],
-            left_on=op.on_a,
-            right_on=op.on_b,
-            how=op.jointype.lower(),
-            suffix = "_da_right_tmp",
-        )
-        coalesce_columns = set(op.sources[0].columns_produced()).intersection(op.sources[1].columns_produced()) - set(op.on_a)
-        if len(coalesce_columns) > 0:
-            res = res.with_columns([
-                pl.when(pl.col(c).is_null())
-                    .then(pl.col(c + "_da_right_tmp"))
-                    .otherwise(pl.col(c))
-                    .alias(c)
-                for c in coalesce_columns
-            ])
-            res = res.select(op.columns_produced())
+        how = op.jointype.lower()
+        if how == "full":
+            how = "outer"
+        coalesce_columns = (
+            set(op.sources[0].columns_produced()).intersection(op.sources[1].columns_produced()) 
+            - set(op.on_a))
+        if how != "right":
+            res = inputs[0].join(
+                inputs[1],
+                left_on=op.on_a,
+                right_on=op.on_b,
+                how=how,
+                suffix = "_da_right_tmp",
+            )
+            if len(coalesce_columns) > 0:
+                res = res.with_columns([
+                    pl.when(pl.col(c).is_null())
+                        .then(pl.col(c + "_da_right_tmp"))
+                        .otherwise(pl.col(c))
+                        .alias(c)
+                    for c in coalesce_columns
+                ])
+        else:
+            # simulate right join with left join
+            res = inputs[1].join(
+                inputs[0],
+                left_on=op.on_b,
+                right_on=op.on_a,
+                how="left",
+                suffix = "_da_left_tmp",
+            )
+            if len(coalesce_columns) > 0:
+                res = res.with_columns([
+                    pl.when(pl.col(c + "_da_left_tmp").is_null())
+                        .then(pl.col(c))
+                        .otherwise(pl.col(c + "_da_left_tmp"))
+                        .alias(c)
+                    for c in coalesce_columns
+                ])
+        res = res.select(op.columns_produced())
         return res
     
     def _order_rows_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
@@ -1016,6 +1049,7 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
         if (f is None): 
             if op.op in ["_ngroup", "ngroup"]:
                 assert isinstance(arg, pl.DataFrame)
+                # n_groups = arg.groupby(["x"]).apply(lambda x: x.head(1)).shape[0]
                 raise ValueError(f" {op.op} not implemented for Polars adapter, yet")
         if f is None:
             try:

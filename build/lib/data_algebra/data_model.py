@@ -72,6 +72,18 @@ class DataModel(abc.ABC):
         :return: True if rows are uniquely keyed by values in named columns
         """
 
+    @abc.abstractmethod
+    def concat_rows(self, frame_list: List):
+        """
+        Concatenate rows from frame_list
+        """
+
+    @abc.abstractmethod
+    def concat_columns(self, frame_list):
+        """
+        Concatenate columns from frame_list
+        """
+
     # evaluate
 
     @abc.abstractmethod
