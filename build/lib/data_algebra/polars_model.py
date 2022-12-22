@@ -503,8 +503,10 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.ConcatRowsNode"
             )
+        common_columns = [c for c in op.columns_produced() if c != op.id_column]
         inputs = [self._compose_polars_ops(s, data_map=data_map) for s in op.sources]
         assert len(inputs) == 2
+        inputs = [input_i.select(common_columns) for input_i in inputs]  # get columns in same order
         if op.id_column is not None:
             inputs[0] = inputs[0].with_column(_build_lit(op.a_name).alias(op.id_column))
             inputs[1] = inputs[1].with_column(_build_lit(op.b_name).alias(op.id_column))
@@ -697,8 +699,14 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
                 "op was supposed to be a data_algebra.data_ops.RenameColumnsNode"
             )
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
+        if isinstance(res, pl.LazyFrame):
+            # work around https://github.com/pola-rs/polars/issues/5882#issue-1507040380
+            res = res.collect()
         res = res.rename(op.reverse_mapping)
-        return res  
+        res = res.select(op.columns_produced())
+        if self.use_lazy_eval and isinstance(res, pl.DataFrame):
+            res = res.lazy()
+        return res
 
     def _map_columns_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
         """
@@ -709,9 +717,13 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
                 "op was supposed to be a data_algebra.data_ops.MapColumnsNode"
             )
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
+        if isinstance(res, pl.LazyFrame):
+            # work around https://github.com/pola-rs/polars/issues/5882#issue-1507040380
+            res = res.collect()
         res = res.rename(op.column_remapping)
-        if (op.column_deletions is not None) and (len(op.column_deletions) > 0):
-            res = res.select(op.columns_produced())
+        res = res.select(op.columns_produced())
+        if self.use_lazy_eval and isinstance(res, pl.DataFrame):
+            res = res.lazy()
         return res
 
     def _select_columns_step(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
