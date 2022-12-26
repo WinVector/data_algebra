@@ -1,6 +1,5 @@
 import io
 import re
-import numpy
 
 import data_algebra
 import data_algebra.test_util

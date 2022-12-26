@@ -124,20 +124,20 @@ def test_cdata_tr6_cdata_example_exbb():
     inp1 = rm.example_input()
     assert isinstance(inp1, pd.DataFrame)
     expect_inp1 = pd.DataFrame({
-        "id": ["id", "id", "id"],
+        "id": ["id record key", "id record key", "id record key"],
         "k1": [1, 2, 3],
-        "v1": ["a", "c", "e"],
-        "v2": ["b", "d", "f"],
+        "v1": ["a value", "c value", "e value"],
+        "v2": ["b value", "d value", "f value"],
     })
     assert data_algebra.test_util.equivalent_frames(inp1, expect_inp1)
     out1 = rm.transform(inp1)
     assert isinstance(out1, pd.DataFrame)
     expect_out1 = pd.DataFrame({
-        "id": ["id", "id"],
+        "id": ["id record key", "id record key"],
         "k2": [4, 5],
-        "w1": ["a", "b"],
-        "w2": ["c", "d"],
-        "w3": ["e", "f"],
+        "w1": ["a value", "b value"],
+        "w2": ["c value", "d value"],
+        "w3": ["e value", "f value"],
     })
     assert data_algebra.test_util.equivalent_frames(out1, expect_out1)
     back_1 = rm.inverse().transform(out1)
@@ -177,22 +177,22 @@ def test_cdata_tr6_cdata_example_exbr():
     inp1 = rm.example_input()
     assert isinstance(inp1, pd.DataFrame)
     expect_inp1 = pd.DataFrame({
-        "id": ["id", "id", "id"],
+        "id": ["id record key", "id record key", "id record key"],
         "k1": [1, 2, 3],
-        "v1": ["a", "c", "e"],
-        "v2": ["b", "d", "f"],
+        "v1": ["a value", "c value", "e value"],
+        "v2": ["b value", "d value", "f value"],
     })
     assert data_algebra.test_util.equivalent_frames(inp1, expect_inp1)
     out1 = rm.transform(inp1)
     assert isinstance(out1, pd.DataFrame)
     expect_out1 = pd.DataFrame({
-        "id": ["id"],
-        "a": ["a"],
-        "b": ["b"],
-        "c": ["c"],
-        "d": ["d"],
-        "e": ["e"],
-        "f": ["f"],
+        "id": ["id record key"],
+        "a": ["a value"],
+        "b": ["b value"],
+        "c": ["c value"],
+        "d": ["d value"],
+        "e": ["e value"],
+        "f": ["f value"],
     })
     assert data_algebra.test_util.equivalent_frames(out1, expect_out1)
     back_1 = rm.inverse().transform(out1)
@@ -233,23 +233,23 @@ def test_cdata_tr6_cdata_example_exrb():
     inp1 = rm.example_input()
     assert isinstance(inp1, pd.DataFrame)
     expect_inp1 = pd.DataFrame({
-        "id": ["id"],
-        "a": ["a"],
-        "b": ["b"],
-        "c": ["c"],
-        "d": ["d"],
-        "e": ["e"],
-        "f": ["f"],
+        "id": ["id record key"],
+        "a": ["a value"],
+        "b": ["b value"],
+        "c": ["c value"],
+        "d": ["d value"],
+        "e": ["e value"],
+        "f": ["f value"],
     })
     assert data_algebra.test_util.equivalent_frames(inp1, expect_inp1)
     out1 = rm.transform(inp1)
     assert isinstance(out1, pd.DataFrame)
     expect_out1 = pd.DataFrame({
-        "id": ["id", "id"],
+        "id": ["id record key", "id record key"],
         "k2": [4, 5],
-        "w1": ["a", "b"],
-        "w2": ["c", "d"],
-        "w3": ["e", "f"],
+        "w1": ["a value", "b value"],
+        "w2": ["c value", "d value"],
+        "w3": ["e value", "f value"],
     })
     assert data_algebra.test_util.equivalent_frames(out1, expect_out1)
     back_1 = rm.inverse().transform(out1)
