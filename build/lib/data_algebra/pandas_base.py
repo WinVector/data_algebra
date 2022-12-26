@@ -478,6 +478,15 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
             return self.clean_copy(frame_list[0])
         res = self.pd.concat(frame_list, axis=1)
         return res
+    
+    def get_cell(self, *, d, row: int, colname: str):
+        """get a value from a cell"""
+        return d.loc[row, colname]
+    
+    def set_col(self, *, d, colname: str, values):
+        """set column, return ref"""
+        d.loc[:, colname] = values
+        return d
 
     def table_is_keyed_by_columns(self, table, *, column_names: Iterable[str]) -> bool:
         """

@@ -83,6 +83,14 @@ class DataModel(abc.ABC):
         """
         Concatenate columns from frame_list
         """
+    
+    @abc.abstractmethod
+    def get_cell(self, *, d, row: int, colname: str):
+        """get a value from a cell"""
+    
+    @abc.abstractmethod
+    def set_col(self, *, d, colname: str, values):
+        """set column, return ref"""
 
     # evaluate
 

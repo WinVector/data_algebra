@@ -275,39 +275,68 @@ class RecordMap:
                 return False
         return True
 
-    def record_keys(self):
+    def record_keys(self) -> List[str]:
         """Return keys specifying which set of rows are in a record."""
         if self.blocks_in is not None:
-            return self.blocks_in.record_keys.copy()
+            if self.blocks_in.record_keys is None:
+                return []
+            return list(self.blocks_in.record_keys)
         if self.blocks_out is not None:
-            return self.blocks_out.record_keys.copy()
-        return None
+            if self.blocks_out.record_keys is None:
+                return []
+            return list(self.blocks_out.record_keys)
+        raise ValueError("null transform")
+    
+    def input_control_table_key_columns(self) -> List[str]:
+        if (self.blocks_in is None) or (self.blocks_in.control_table_keys is None):
+            return []
+        return list(self.blocks_in.control_table_keys)
+    
+    def output_control_table_key_columns(self) -> List[str]:
+        if (self.blocks_out is None) or (self.blocks_out.control_table_keys is None):
+            return []
+        return list(self.blocks_out.control_table_keys)
 
-    def example_input(self, *, local_data_model=None):
+    def example_input(
+        self, 
+        *, 
+        local_data_model=None, 
+        value_suffix: str = " value",
+        record_key_suffix: str = " record key",
+        ):
         """
         Return example output record.
 
         :param local_data_model: optional Pandas data model.
+        :param value_suffix: suffix to identify values
+        :param record_key_suffix: suffix to identify record keys
         :return: example result data frame.
         """
+        assert isinstance(value_suffix, str)
+        assert isinstance(record_key_suffix, str)
+        rk = self.record_keys()
         if self.blocks_in is not None:
             if local_data_model is None:
                 local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(self.blocks_in.control_table)
             assert isinstance(local_data_model, data_algebra.data_model.DataModel)
-            example_data = local_data_model.clean_copy(self.blocks_in.control_table)
-            if (self.blocks_in.record_keys is None) or (len(self.blocks_in.record_keys) == 0):
-                return example_data
-            nrow = example_data.shape[0]
-            row_key_frame = local_data_model.data_frame({k: [k] * nrow for k in self.blocks_in.record_keys})
-            example = local_data_model.concat_columns([row_key_frame, example_data])
-            return example
-        if self.blocks_out is not None:
+            example = local_data_model.clean_copy(self.blocks_in.control_table)
+            cols = list(example.columns)
+            for j in range(example.shape[1]):
+                if (self.blocks_in.control_table_keys is None) or (cols[j] not in self.blocks_in.control_table_keys):
+                    renames = [f"{local_data_model.get_cell(d=example, row=i, colname=cols[j])}{value_suffix}" for i in range(example.shape[0])]
+                    example = local_data_model.set_col(d=example, colname=cols[j], values=renames)
+        elif self.blocks_out is not None:
             if local_data_model is None:
                 local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(self.blocks_out.control_table)
             assert isinstance(local_data_model, data_algebra.data_model.DataModel)
-            example = local_data_model.data_frame({k : [k] for k in self.blocks_out.row_columns})
-            return example
-        return None
+            example = local_data_model.data_frame({k : [f"{k}{value_suffix}"] for k in self.blocks_out.row_columns if k not in rk})
+        else:
+            raise ValueError("null transform")
+        if len(rk) > 0:
+            nrow = example.shape[0]
+            row_key_frame = local_data_model.data_frame({k: [f"{k}{record_key_suffix}"] * nrow for k in rk})
+            example = local_data_model.concat_columns([row_key_frame, example])
+        return example
 
     # noinspection PyPep8Naming
     def transform(

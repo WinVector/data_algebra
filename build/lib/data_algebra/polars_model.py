@@ -461,6 +461,15 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
             return frame_list[0]
         res = pl.concat(frame_list, how="horizontal")
         return res
+    
+    def get_cell(self, *, d, row: int, colname: str):
+        """get a value from a cell"""
+        return d[row, colname]
+    
+    def set_col(self, *, d, colname: str, values):
+        """set column, return ref"""
+        d2 = d.with_column(pl.Series(values=values).alias(colname))
+        return d2
 
     def table_is_keyed_by_columns(self, table, *, column_names: Iterable[str]) -> bool:
         """
