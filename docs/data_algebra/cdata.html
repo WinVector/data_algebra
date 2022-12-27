@@ -647,7 +647,7 @@
 </span><span id="L-508"><a href="#L-508"><span class="linenos">508</span></a>    <span class="c1"># noinspection PyUnusedLocal</span>
 </span><span id="L-509"><a href="#L-509"><span class="linenos">509</span></a>    <span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span><span id="L-510"><a href="#L-510"><span class="linenos">510</span></a>        <span class="sd">&quot;&quot;&quot;Return columns produced (sklearn pipeline interface)&quot;&quot;&quot;</span>
-</span><span id="L-511"><a href="#L-511"><span class="linenos">511</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_produced</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</span><span id="L-511"><a href="#L-511"><span class="linenos">511</span></a>        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns_produced</span><span class="p">)</span>
 </span><span id="L-512"><a href="#L-512"><span class="linenos">512</span></a>
 </span><span id="L-513"><a href="#L-513"><span class="linenos">513</span></a>    <span class="c1"># noinspection PyUnusedLocal,PyMethodMayBeStatic</span>
 </span><span id="L-514"><a href="#L-514"><span class="linenos">514</span></a>    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -1639,7 +1639,7 @@ defaults to first column for non-trivial blocks and no columns for rows.</li>
 </span><span id="RecordMap-509"><a href="#RecordMap-509"><span class="linenos">509</span></a>    <span class="c1"># noinspection PyUnusedLocal</span>
 </span><span id="RecordMap-510"><a href="#RecordMap-510"><span class="linenos">510</span></a>    <span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span><span id="RecordMap-511"><a href="#RecordMap-511"><span class="linenos">511</span></a>        <span class="sd">&quot;&quot;&quot;Return columns produced (sklearn pipeline interface)&quot;&quot;&quot;</span>
-</span><span id="RecordMap-512"><a href="#RecordMap-512"><span class="linenos">512</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_produced</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</span><span id="RecordMap-512"><a href="#RecordMap-512"><span class="linenos">512</span></a>        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns_produced</span><span class="p">)</span>
 </span><span id="RecordMap-513"><a href="#RecordMap-513"><span class="linenos">513</span></a>
 </span><span id="RecordMap-514"><a href="#RecordMap-514"><span class="linenos">514</span></a>    <span class="c1"># noinspection PyUnusedLocal,PyMethodMayBeStatic</span>
 </span><span id="RecordMap-515"><a href="#RecordMap-515"><span class="linenos">515</span></a>    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -2175,7 +2175,7 @@ row representations can prevent this).</p>
     <a class="headerlink" href="#RecordMap.get_feature_names"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="RecordMap.get_feature_names-510"><a href="#RecordMap.get_feature_names-510"><span class="linenos">510</span></a>    <span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span><span id="RecordMap.get_feature_names-511"><a href="#RecordMap.get_feature_names-511"><span class="linenos">511</span></a>        <span class="sd">&quot;&quot;&quot;Return columns produced (sklearn pipeline interface)&quot;&quot;&quot;</span>
-</span><span id="RecordMap.get_feature_names-512"><a href="#RecordMap.get_feature_names-512"><span class="linenos">512</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_produced</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</span><span id="RecordMap.get_feature_names-512"><a href="#RecordMap.get_feature_names-512"><span class="linenos">512</span></a>        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns_produced</span><span class="p">)</span>
 </span></pre></div>
 
 
