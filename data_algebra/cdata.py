@@ -508,7 +508,7 @@ class RecordMap:
     # noinspection PyUnusedLocal
     def get_feature_names(self, input_features=None):
         """Return columns produced (sklearn pipeline interface)"""
-        return self.columns_produced.copy()
+        return list(self.columns_produced)
 
     # noinspection PyUnusedLocal,PyMethodMayBeStatic
     def get_params(self, deep=False):
