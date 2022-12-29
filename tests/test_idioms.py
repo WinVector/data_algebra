@@ -68,9 +68,10 @@ def test_idiom_extend_special_count():
     expect = data_algebra.data_model.default_data_model().pd.DataFrame({"count": [4]})
 
     with pytest.warns(UserWarning):
+        # warning is db adapter saying to not use this fn
         data_algebra.test_util.check_transform(
             ops=ops, data=d, expect=expect, empty_produces_empty=False,
-            try_on_Polars=False,  # TODO: turn this on
+            try_on_Polars=False,  # TODO: turn this on, don't use cumsum() in project on Polars
         )
 
 
