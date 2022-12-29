@@ -1,5 +1,5 @@
 numpy
-pandas
+pandas>=1.0.0
 lark
 
 [BigQuery]
@@ -13,7 +13,7 @@ sqlalchemy
 pymysql
 
 [Polars]
-polars
+polars>=0.15.3
 pyarrow
 
 [PostgreSQL]
@@ -32,7 +32,7 @@ sqlalchemy
 psycopg2
 pymysql
 pyspark
-polars
+polars>=0.15.3
 
 [pretty_python]
 black

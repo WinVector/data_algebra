@@ -465,7 +465,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
         assert len(frame_list) > 0
         if len(frame_list) == 1:
             return self.clean_copy(frame_list[0])
-        res = self.pd.concat(frame_list, axis=0)
+        res = self.pd.concat(frame_list, axis=0, ignore_index=True, sort=False)
         return res
 
     def concat_columns(self, frame_list: List):
@@ -496,6 +496,11 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
         :param column_names: list of column names
         :return: True if rows are uniquely keyed by values in named columns
         """
+        # get rid of some corner cases
+        if table.shape[0] < 2:
+            return True
+        if (column_names is None):
+            return False
         # check for ill-condition
         if isinstance(column_names, str):
             column_names = [column_names]
@@ -552,7 +557,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
         """
         assert op.node_name == "SQLNode"
         db_handle = data_map[op.view_name]
-        # would like (but causes cicrular import) assert isinstance(db_handle, data_algebra.db_model.DBHandle)
+        # would like (but causes circular import) assert isinstance(db_handle, data_algebra.db_model.DBHandle)
         res = db_handle.read_query("\n".join(op.sql))
         res = self.data_frame(res[op.columns_produced()])
         assert self.is_appropriate_data_instance(res)
@@ -1085,167 +1090,126 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
     
     # cdata record conversion steps
 
-    def blocks_to_rowrecs(self, data, *, blocks_in: data_algebra.cdata.RecordSpecification):
+    def blocks_to_rowrecs(self, data, *, blocks_in):
         """
         Convert a block record (record spanning multiple rows) into a rowrecord (record in a single row).
 
         :param data: data frame to be transformed
-        :param blocks_in: record specification
+        :param blocks_in: cdata record specification
         :return: transformed data frame
         """
-        assert isinstance(blocks_in, data_algebra.cdata.RecordSpecification)
-        ck = [k for k in blocks_in.content_keys if k is not None]
-        if len(ck) != len(set(ck)):
-            raise ValueError("blocks_in can not have duplicate content keys")
-        data = self.clean_copy(data[blocks_in.block_columns])
+        assert self.is_appropriate_data_instance(data)
+        assert blocks_in is not None
+        assert blocks_in.control_table.shape[0] > 0
+        assert len(blocks_in.control_table_keys) > 0
+        data = data.loc[:, blocks_in.block_columns].reset_index(drop=True, inplace=False)
         assert set(data.columns) == set(blocks_in.block_columns)
         # table must be keyed by record_keys + control_table_keys
+        if data.shape[0] < 1:
+            return self.pd.DataFrame({c: [] for c in blocks_in.row_columns})
         if not self.table_is_keyed_by_columns(
             data, column_names=blocks_in.record_keys + blocks_in.control_table_keys
         ):
             raise ValueError(
                 "table is not keyed by blocks_in.record_keys + blocks_in.control_table_keys"
             )
-        # convert to row-records
-        # regularize/complete records
-        dtemp = data.copy()  # TODO: select down columns
-        dtemp["FALSE_AGG_KEY"] = 1
-        if len(blocks_in.record_keys) > 0:
-            ideal = dtemp[blocks_in.record_keys + ["FALSE_AGG_KEY"]].copy()
-            res = ideal.groupby(blocks_in.record_keys, observed=True)["FALSE_AGG_KEY"].agg("sum")
-            ideal = self.data_frame(res).reset_index(drop=False, inplace=False)
-            ideal["FALSE_AGG_KEY"] = 1
-            ctemp = blocks_in.control_table[blocks_in.control_table_keys].copy()
-            ctemp["FALSE_AGG_KEY"] = 1
-            ideal = ideal.merge(ctemp, how="outer", on="FALSE_AGG_KEY")
-            self.drop_indices(ideal)
-            dtemp = ideal.merge(
-                right=dtemp,
-                how="left",
-                on=blocks_in.record_keys + blocks_in.control_table_keys + ["FALSE_AGG_KEY"],
-            )
-        dtemp = dtemp.sort_values(
-            by=blocks_in.record_keys + blocks_in.control_table_keys, inplace=False, ignore_index=True
-        )
-        self.drop_indices(dtemp)
-        # start building up result frame
-        if len(blocks_in.record_keys) > 0:
-            res = dtemp.groupby(blocks_in.record_keys, observed=True)["FALSE_AGG_KEY"].agg("sum")
+        # split on block keys
+        if len(blocks_in.control_table_keys) != 1:
+            split = [v for k, v in data.groupby(blocks_in.control_table_keys)]
         else:
-            res = dtemp.groupby("FALSE_AGG_KEY", observed=True)["FALSE_AGG_KEY"].agg("sum")
-        res = self.data_frame(res).reset_index(drop=False, inplace=False)
-        res = res.sort_values(by=blocks_in.record_keys, inplace=False, ignore_index=True)
-        self.drop_indices(res)
-        del res["FALSE_AGG_KEY"]
-        # now fill in columns
-        ckeys = blocks_in.control_table_keys
-        value_keys = [k for k in blocks_in.control_table.columns if k not in set(ckeys)]
-        donor_cols = set(dtemp.columns)
-        for i in range(blocks_in.control_table.shape[0]):
-            want = numpy.ones((dtemp.shape[0],), dtype=bool)
-            for ck in ckeys:
-                want = numpy.logical_and(want, dtemp[ck] == blocks_in.control_table[ck][i])
-            if numpy.any(want):
-                for vk in value_keys:
-                    if vk in donor_cols:
-                        dcol = blocks_in.control_table[vk][i]
-                        res[dcol] = numpy.asarray(dtemp.loc[want, vk])
-        # fill in any missed columns
-        colset = set(res.columns)
-        for c in blocks_in.row_version():
-            if c not in colset:
-                res[c] = None
-        if data.shape[0] <= 0:
-            res = res.loc[range(0), :]
-            res = self.clean_copy(res)
-        return res
+            split = [v for k, v in data.groupby(blocks_in.control_table_keys[0])]
+        # check same number of ids for each block
+        # could also double check id columns are identical
+        for i in range(1, len(split)):
+            assert split[i].shape[0] == split[0].shape[0]
+        sk = None
+        if (blocks_in.record_keys is not None) and (len(blocks_in.record_keys) > 0):
+            # ensure sorted in record order
+            split = [s.sort_values(by=blocks_in.record_keys, inplace=False, ignore_index=True) for s in split]
+            # capture the record keys
+            sk = split[0][blocks_in.record_keys]
+        # limit and rename columns
 
+        def limit_and_rename_cols(s):
+            # get keying
+            keying = s.loc[[0], blocks_in.control_table_keys].reset_index(inplace=False, drop=True)
+            keys = keying.merge(
+                self.data_frame(blocks_in.control_table),
+                on=blocks_in.control_table_keys,
+                how="left")
+            assert keys.shape[0] == 1
+            keys = keys.drop(blocks_in.control_table_keys, axis=1, inplace=False)
+            if (blocks_in.record_keys is not None) and (len(blocks_in.record_keys) > 0):
+                s = s.drop(blocks_in.record_keys + blocks_in.control_table_keys, axis=1, inplace=False)
+            else:
+                s = s.drop(blocks_in.control_table_keys, axis=1, inplace=False)
+            assert keys.shape[1] == s.shape[1]
+            s.columns = [keys.iloc[0, i] for i in range(keys.shape[1])]
+            return s
+
+        split = [limit_and_rename_cols(s) for s in split]
+        if sk is not None:
+            res = self.pd.concat([sk] + split, axis=1)
+        else:
+            res = self.pd.concat(split, axis=1)
+        if (blocks_in.record_keys is not None) and (len(blocks_in.record_keys) > 0):
+            res = res.sort_values(by=blocks_in.record_keys, inplace=False, ignore_index=True)
+        return res
+    
     def rowrecs_to_blocks(
         self,
         data,
         *,
-        blocks_out: data_algebra.cdata.RecordSpecification,
+        blocks_out,
     ):
         """
         Convert rowrecs (single row records) into block records (multiple row records).
 
         :param data: data frame to transform.
-        :param blocks_out: record specification.
+        :param blocks_out: cdata record specification.
         :return: transformed data frame
         """
-        assert isinstance(blocks_out, data_algebra.cdata.RecordSpecification)
-        data = self.clean_copy(data[blocks_out.row_columns])
+        assert self.is_appropriate_data_instance(data)
+        assert blocks_out is not None
+        assert blocks_out.control_table.shape[0] > 0
+        assert len(blocks_out.control_table_keys) > 0
+        data = data.loc[:, blocks_out.row_columns].reset_index(drop=True, inplace=False)
         assert set(data.columns) == set(blocks_out.row_columns)
-        missing_cols = set(blocks_out.record_keys) - set(data.columns)
-        if len(missing_cols) > 0:
-            raise KeyError("missing required columns: " + str(missing_cols))
-        # table must be keyed by record_keys
-        if (data.shape[0] > 1) and (not self.table_is_keyed_by_columns(
-            data, column_names=blocks_out.record_keys
-        )):
+        if data.shape[0] < 1:
+            return self.pd.DataFrame({c: [] for c in blocks_out.block_columns})
+        if not self.table_is_keyed_by_columns(data, column_names=blocks_out.record_keys):
             raise ValueError(
                 "table is not keyed by blocks_out.record_keys"
             )
-        # convert to block records, first build up parallel structures
-        rv = [k for k in blocks_out.row_version(include_record_keys=True) if k is not None]
-        if len(rv) != len(set(rv)):
-            raise ValueError("duplicate row columns")
-        dtemp_cols = [
-            k
-            for k in rv
-            if k is not None and k in set(blocks_out.record_keys + blocks_out.content_keys)
-        ]
-        dtemp = data[dtemp_cols].copy()
-        dtemp.sort_values(by=blocks_out.record_keys, inplace=True, ignore_index=True)
-        self.drop_indices(dtemp)
-        if len(dtemp.columns) != len(set(dtemp.columns)):
-            raise ValueError("targeted data columns not unique")
-        ctemp = blocks_out.control_table.copy()
-        dtemp["FALSE_JOIN_KEY"] = 1
-        ctemp["FALSE_JOIN_KEY"] = 1
-        res = dtemp[blocks_out.record_keys + ["FALSE_JOIN_KEY"]].merge(
-            ctemp, how="outer", on=["FALSE_JOIN_KEY"]
-        )
-        del res["FALSE_JOIN_KEY"]
-        ckeys = blocks_out.control_table_keys
-        res = res.sort_values(by=blocks_out.record_keys + ckeys, inplace=False, ignore_index=True)
-        self.drop_indices(res)
-        del ctemp["FALSE_JOIN_KEY"]
-        del dtemp["FALSE_JOIN_KEY"]
-        value_keys = [k for k in ctemp.columns if k not in set(ckeys)]
-        donor_cols = set(dtemp.columns)
-        for vk in value_keys:
-            res[vk] = None
-        # we now have parallel structures to copy between
-        for i in range(ctemp.shape[0]):
-            want = numpy.ones((res.shape[0],), dtype=bool)
-            for ck in ckeys:
-                want = numpy.logical_and(want, res[ck] == ctemp[ck][i])
-            if numpy.any(want):
-                for vk in value_keys:
-                    dcol = ctemp[vk][i]
-                    if dcol in donor_cols:
-                        nvals = numpy.asarray(dtemp[dcol])
-                        if len(nvals) < 1:
-                            nvals = [None] * numpy.sum(want)
-                        if numpy.all(want):
-                            res[vk] = nvals  # get around Pandas future warning
-                        else:
-                            res.loc[want, vk] = nvals
-        # see about promoting composite columns to numeric
-        for vk in set(value_keys):
-            converted = self.to_numeric(res[vk], errors="coerce")
-            if numpy.all(
-                self.isnull(converted) == self.isnull(res[vk])
-            ):
-                res[vk] = converted
-        if data.shape[0] < 1:
-            # empty input produces emtpy output (with different column structure)
-            res = self.clean_copy(res.iloc[range(0), :])
-        if data.shape[0] <= 0:
-            res = res.loc[range(0), :]
-            res = self.clean_copy(res)
+        ct = self.data_frame(blocks_out.control_table)
+        new_names = [ct.columns[j] for j in range(ct.shape[1]) if ct.columns[j] not in set(blocks_out.control_table_keys)]
+
+        def extract_rows(i):
+            ct_keys = ct.loc[[i], blocks_out.control_table_keys].reset_index(drop=True, inplace=False)
+            col_names = [ct.iloc[i, j] for j in range(ct.shape[1]) 
+                if ct.columns[j] not in set(blocks_out.control_table_keys)]
+            new_dat = data.loc[:, col_names].reset_index(inplace=False, drop=True)
+            new_dat.columns = new_names
+            if (blocks_out.record_keys is not None) and (len(blocks_out.record_keys) > 0):
+                row = data.loc[:, blocks_out.record_keys].reset_index(inplace=False, drop=True)
+                for c in ct_keys.columns:
+                    row[c] = ct_keys.loc[0, c]
+            else:
+                row = self.pd.DataFrame({c: [ct_keys.loc[0, c]] * data.shape[0] for c in ct_keys.columns})
+            row = self.pd.concat([
+                row, new_dat],
+                axis=1
+            )
+            return row
+
+        rows = [extract_rows(i) for i in range(ct.shape[0])]
+        res = self.pd.concat(rows, axis=0, ignore_index=True, sort=False)
+        if (blocks_out.record_keys is not None) and (len(blocks_out.record_keys) > 0):
+            res = res.sort_values(by=blocks_out.record_keys + blocks_out.control_table_keys, inplace=False, ignore_index=True)
+        else:
+            res = res.sort_values(by=blocks_out.control_table_keys, inplace=False, ignore_index=True)
         return res
+    
 
     # expression helpers
     
