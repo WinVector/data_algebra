@@ -32,7 +32,6 @@ def test_project_z():
 
     data_algebra.test_util.check_transform(
         ops=ops, data=d, expect=expect, empty_produces_empty=False,
-        try_on_Polars=False,  # TODO: turn this on
     )
 
 

@@ -54,7 +54,6 @@ def test_idiom_extend_one_count():
     )
     data_algebra.test_util.check_transform(
         ops=ops, data=d, expect=expect, empty_produces_empty=False,
-        try_on_Polars=False,  # TODO: turn this on
     )
 
 
@@ -312,7 +311,6 @@ def test_idiom_row_number_3():
     )
 
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect,
-        try_on_Polars=False,  # TODO: turn this on
     )
 
 
@@ -409,5 +407,4 @@ def test_idiom_coalesce_op():
     )
 
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect,
-        try_on_Polars=False,  # TODO: turn this on
     )
