@@ -24,10 +24,7 @@ def test_project_transform_2():
     d = data_algebra.data_model.default_data_model().pd.DataFrame({"x": [1, 2]})
     ops = describe_table(d, table_name="d").project({"y": "x.max()"})
     expect = data_algebra.data_model.default_data_model().pd.DataFrame({"y": [2],})
-    data_algebra.test_util.check_transform(ops, d, expect, valid_for_empty=False)
-    data_algebra.test_util.check_transform(ops, d, expect, empty_produces_empty=False,
-        try_on_Polars=False,  # TODO: turn this on
-    )
+    data_algebra.test_util.check_transform(ops, d, expect, empty_produces_empty=False)
 
 
 def test_natural_join_transform_1():
@@ -129,7 +126,6 @@ def test_convert_records_transform_1():
 
     data = {
         "iris_small": iris_small,
-        # "cdata_temp_record": ops.record_map.blocks_out.control_table,
     }
 
     expect = data_algebra.data_model.default_data_model().pd.DataFrame(
