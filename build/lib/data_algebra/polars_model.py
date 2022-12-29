@@ -20,11 +20,15 @@ import data_algebra.expression_walker
 
 
 def _build_lit(v):
-    if isinstance(v, int):
+    if isinstance(v, bool):
+        # bools return true to isinstance int.
+        return pl.lit(v)
+    elif isinstance(v, int):
         # Polars defaults ints in constructor to Int64,
         # but ints in lit to Int32. Try to prevent type clashes
         return pl.lit(v, pl.Int64)
-    return pl.lit(v)
+    else:
+        return pl.lit(v)
 
 
 def _reduce_plus(*args):
@@ -632,6 +636,7 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
         res = res.with_columns(produced_columns)
         if len(temp_v_columns) > 0:
             res = res.select(op.columns_produced())
+        # get back to lazy type if needed
         if self.use_lazy_eval and isinstance(res, pl.DataFrame):
             res = res.lazy()
         return res
@@ -685,6 +690,14 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
         res = res.groupby(group_by).agg(produced_columns)
         if len(temp_v_columns) > 0:
             res = res.select(op.columns_produced())
+        if (op.group_by is None) or (len(op.group_by) == 0):
+            # see if we have a zero row result
+            if isinstance(res, pl.LazyFrame):
+                res = res.collect()
+            if res.shape[0] <= 0:
+                # make an all None frame
+                res = pl.DataFrame({c: [None] for c in res.columns}, columns=[(res.columns[j], res.dtypes[j]) for j in range(res.shape[1])])
+        # see if we need to convert to lazy type
         if self.use_lazy_eval and isinstance(res, pl.DataFrame):
             res = res.lazy()
         return res
