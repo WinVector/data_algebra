@@ -20,11 +20,15 @@ import data_algebra.expression_walker
 
 
 def _build_lit(v):
-    if isinstance(v, int):
+    if isinstance(v, bool):
+        # bools return true to isinstance int.
+        return pl.lit(v)
+    elif isinstance(v, int):
         # Polars defaults ints in constructor to Int64,
         # but ints in lit to Int32. Try to prevent type clashes
         return pl.lit(v, pl.Int64)
-    return pl.lit(v)
+    else:
+        return pl.lit(v)
 
 
 def _reduce_plus(*args):

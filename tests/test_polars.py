@@ -14,6 +14,21 @@ except ModuleNotFoundError:
     pass
 
 
+def test_polars_const_bool():
+    if have_polars:
+        d = pl.DataFrame({"x": [1, 2]})
+        ops = (
+            data_algebra.descr(d=d)
+                .extend({"y": "False"})
+        )
+        res = ops.transform(d)
+        expect = pl.DataFrame({"x": [1, 2], "y": [False, False]})
+        assert data_algebra.test_util.equivalent_frames(res.to_pandas(), expect.to_pandas())
+
+
+test_polars_const_bool()  # TODO: remove
+
+
 def test_polars_1():
     if have_polars:
         d = pl.DataFrame({"x": range(100),  "y": range(100)})
