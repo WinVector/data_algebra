@@ -28,7 +28,7 @@ setuptools.setup(
     packages=setuptools.find_packages(exclude=['tests', 'Examples']),
     install_requires=[
         "numpy",
-        "pandas",
+        "pandas>=1.0.0",
         "lark"
     ],
     extras_require={
@@ -37,13 +37,17 @@ setuptools.setup(
         'PostgreSQL': ['sqlalchemy', 'psycopg2'],
         'MySQL': ['sqlalchemy', 'pymysql'],
         'Spark': ['pyspark'],
-        'Polars': ['polars', 'pyarrow'],
+        'Polars': [
+            'polars>=0.15.3',
+            'pyarrow'
+            ],
         'all': ['black',
                 'google.cloud', 'pyarrow', 'google-cloud-bigquery',
                 'sqlalchemy', 'psycopg2',
                 'pymysql',
                 'pyspark',
-                'polars', 'pyarrow'
+                'polars>=0.15.3', 
+                'pyarrow'
                 ],
     },
     platforms=['any'],

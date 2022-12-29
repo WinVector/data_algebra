@@ -465,7 +465,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
         assert len(frame_list) > 0
         if len(frame_list) == 1:
             return self.clean_copy(frame_list[0])
-        res = self.pd.concat(frame_list, axis=0)
+        res = self.pd.concat(frame_list, axis=0, ignore_index=True, sort=False)
         return res
 
     def concat_columns(self, frame_list: List):
@@ -552,7 +552,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
         """
         assert op.node_name == "SQLNode"
         db_handle = data_map[op.view_name]
-        # would like (but causes cicrular import) assert isinstance(db_handle, data_algebra.db_model.DBHandle)
+        # would like (but causes circular import) assert isinstance(db_handle, data_algebra.db_model.DBHandle)
         res = db_handle.read_query("\n".join(op.sql))
         res = self.data_frame(res[op.columns_produced()])
         assert self.is_appropriate_data_instance(res)
