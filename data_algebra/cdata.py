@@ -48,6 +48,11 @@ class RecordSpecification:
             raise ValueError("control table should have at least 1 row")
         if len(control_table.columns) != len(set(control_table.columns)):
             raise ValueError("control table columns should be unique")
+        if strict:
+            if control_table.shape[0] > 1:
+                assert control_table_keys is not None
+                assert len(control_table_keys) > 0
+                assert local_data_model.table_is_keyed_by_columns(control_table, column_names=control_table_keys)
         self.control_table = control_table
         assert self.control_table.shape[0] > 0
         if record_keys is None:
@@ -435,7 +440,8 @@ class RecordMap:
         Return inverse transform, if there is such (duplicate value keys or mis-matching
         row representations can prevent this).
         """
-        return RecordMap(blocks_in=self.blocks_out, blocks_out=self.blocks_in, strict=self.strict)
+        assert self.strict
+        return RecordMap(blocks_in=self.blocks_out, blocks_out=self.blocks_in, strict=True)
 
     def fmt(self) -> str:
         """Format for informal presentation."""

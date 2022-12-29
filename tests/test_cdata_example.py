@@ -129,10 +129,10 @@ def test_cdata_block():
 
     record_map = RecordMap(
         blocks_in=RecordSpecification(
-            control_table=incoming_shape, record_keys=record_keys
+            control_table=incoming_shape, record_keys=record_keys, control_table_keys=["row"],
         ),
         blocks_out=RecordSpecification(
-            control_table=outgoing_shape, record_keys=record_keys
+            control_table=outgoing_shape, record_keys=record_keys, control_table_keys=["column_label"],
         ),
     )
 

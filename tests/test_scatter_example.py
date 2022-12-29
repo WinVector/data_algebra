@@ -2,6 +2,7 @@ import data_algebra
 import data_algebra.test_util
 import data_algebra.util
 from data_algebra.cdata import *
+import pytest
 
 # https://github.com/WinVector/cdata
 
@@ -24,7 +25,8 @@ def test_scatter_example():
         strict=False,
     )
 
-    str = format(record_map)
+    record_map_str = format(record_map)
+    assert isinstance(record_map_str, str)
     iris_small = data_algebra.data_model.default_data_model().pd.DataFrame(
         {
             "iris_id": [1, 100],
@@ -246,6 +248,5 @@ def test_scatter_example():
     )
     assert data_algebra.test_util.equivalent_frames(res, expect)
 
-    inv = record_map.inverse()
-    back = inv.transform(expect)
-    assert data_algebra.test_util.equivalent_frames(iris_small, back)
+    with pytest.raises(AssertionError):
+        record_map.inverse()

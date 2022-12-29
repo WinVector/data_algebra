@@ -479,6 +479,11 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
         :param column_names: list of column names
         :return: True if rows are uniquely keyed by values in named columns
         """
+        # get rid of some corner cases
+        if table.shape[0] < 2:
+            return True
+        if (column_names is None):
+            return False
         # check for ill-condition
         if isinstance(column_names, str):
             column_names = [column_names]
@@ -488,8 +493,6 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
         if len(missing_columns) > 0:
             return False
         # get rid of some corner cases
-        if table.shape[0] < 2:
-            return True
         if len(column_names) < 1:
             return False
         mx = (
@@ -890,7 +893,7 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
         assert self.is_appropriate_data_instance(data)
         assert isinstance(data, pl.DataFrame)
         assert blocks_in is not None
-        assert blocks_in.control_table.shape[0] > 1
+        assert blocks_in.control_table.shape[0] > 0
         assert len(blocks_in.control_table_keys) > 0
         data = data.select(blocks_in.block_columns)
         assert set(data.columns) == set(blocks_in.block_columns)
@@ -959,7 +962,7 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
         assert self.is_appropriate_data_instance(data)
         assert isinstance(data, pl.DataFrame)
         assert blocks_out is not None
-        assert blocks_out.control_table.shape[0] > 1
+        assert blocks_out.control_table.shape[0] > 0
         assert len(blocks_out.control_table_keys) > 0
         data = data.select(blocks_out.row_columns)
         assert set(data.columns) == set(blocks_out.row_columns)
