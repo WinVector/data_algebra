@@ -236,6 +236,7 @@ def test_t_test_example_2():
         blocks_in=RecordSpecification(
             control_table=record_in,
             record_keys=['group'],
+            control_table_keys=["sensor"],
         ),
     )
     a_transform = record_map.transform(a)
