@@ -884,12 +884,18 @@ class PolarsModel(data_algebra.data_model.DataModel):
         how = op.jointype.lower()
         if how == "full":
             how = "outer"
-        coalesce_columns = (
-            set(op.sources[0].columns_produced()).intersection(op.sources[1].columns_produced()) 
-            - set(op.on_a))
         if how != "right":
+            coalesce_columns = (
+                set(op.sources[0].columns_produced()).intersection(op.sources[1].columns_produced()) 
+                - set(op.on_a))
+            orphan_keys = [c for c in op.on_b if c not in set(op.on_a)]
+            input_right = inputs[1]
+            if len(orphan_keys) > 0:
+                input_right = input_right.with_columns([
+                    pl.col(c).alias(f"{c}_da_join_tmp_key") for c in orphan_keys
+                ])
             res = inputs[0].join(
-                inputs[1],
+                input_right,
                 left_on=op.on_a,
                 right_on=op.on_b,
                 how=how,
@@ -903,10 +909,21 @@ class PolarsModel(data_algebra.data_model.DataModel):
                         .alias(c)
                     for c in coalesce_columns
                 ])
+            if len(orphan_keys) > 0:
+                res = res.rename({f"{c}_da_join_tmp_key": c for c in orphan_keys})
         else:
             # simulate right join with left join
+            coalesce_columns = (
+                set(op.sources[0].columns_produced()).intersection(op.sources[1].columns_produced()) 
+                - set(op.on_b))
+            orphan_keys = [c for c in op.on_a if c not in set(op.on_b)]
+            input_right = inputs[0]
+            if len(orphan_keys) > 0:
+                input_right = input_right.with_columns([
+                    pl.col(c).alias(f"{c}_da_join_tmp_key") for c in orphan_keys
+                ])
             res = inputs[1].join(
-                inputs[0],
+                input_right,
                 left_on=op.on_b,
                 right_on=op.on_a,
                 how="left",
@@ -920,6 +937,8 @@ class PolarsModel(data_algebra.data_model.DataModel):
                         .alias(c)
                     for c in coalesce_columns
                 ])
+            if len(orphan_keys) > 0:
+                res = res.rename({f"{c}_da_join_tmp_key": c for c in orphan_keys})
         res = res.select(op.columns_produced())
         return res
     
