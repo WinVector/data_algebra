@@ -60,5 +60,4 @@ def test_join_conditions_on_join():
     assert data_algebra.test_util.equivalent_frames(res, expect)
     data_algebra.test_util.check_transform(
         ops=ops, data={"d1": d1, "d2": d2}, expect=expect,
-        try_on_Polars=False,  # TODO: turn this on, to get it to work we have to copy columns with name changes in join conditions
     )

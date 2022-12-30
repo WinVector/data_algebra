@@ -247,7 +247,7 @@ def test_idiom_cross_join():
     )
     data_algebra.test_util.check_transform(
         ops=ops, data={table_name_d: d, table_name_e: e}, expect=expect,
-        try_on_Polars=False,  # TODO: turn this on
+        try_on_Polars=False,  # TODO: get empty case to match and turn this on
     )
 
 
