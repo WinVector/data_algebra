@@ -76,6 +76,7 @@ class PolarsTerm:
     lit_value: Any
     is_literal: bool
     is_column: bool
+    is_series: bool
 
     def __init__(
         self, 
@@ -83,6 +84,7 @@ class PolarsTerm:
         polars_term = None, 
         is_literal: bool = False,
         is_column: bool = False,
+        is_series: bool = False,
         lit_value = None,
         ) -> None:
         """
@@ -96,12 +98,15 @@ class PolarsTerm:
         """
         assert isinstance(is_literal, bool)
         assert isinstance(is_column, bool)
+        assert isinstance(is_series, bool)
+        assert (is_literal + is_column + is_series) <= 1
         if lit_value is not None:
             assert is_literal
         self.lit_value = lit_value
         self.polars_term = polars_term
         self.is_literal = is_literal
         self.is_column = is_column
+        self.is_series = is_series
 
 
 class ExpressionRequirementsCollector(data_algebra.expression_walker.ExpressionWalker):
@@ -132,7 +137,8 @@ class ExpressionRequirementsCollector(data_algebra.expression_walker.ExpressionW
         }
         self._collect_required = {
             "uniform", "_uniform",
-            "ngroup", "_ngroup",
+            "ngroup", "_ngroup",  # number groups
+            "sgroup", "_sgroup",  # size groups
         }
     
     def act_on_literal(self, *, value):
@@ -256,8 +262,8 @@ def _populate_expr_impl_map(extend_context: bool) -> Dict[int, Dict[str, Callabl
         "coalesce0": lambda x: pl.when(x.is_null()).then(pl.col(_da_temp_zero_column_name)).otherwise(x),
         "cos": lambda x: x.cos(),
         "cosh": lambda x: x.cosh(),
-        "count": lambda x: pl.col(_da_temp_one_column_name).cumsum(),
-        "cumcount": lambda x: pl.col(_da_temp_one_column_name).cumsum(),
+        "count": lambda x: pl.when(x.is_null() | x.is_nan()).then(_build_lit(0)).otherwise(_build_lit(1)).sum(),  # not tested yet TODO
+        "cumcount": lambda x: pl.when(x.is_null() | x.is_nan()).then(_build_lit(0)).otherwise(_build_lit(1)).cumsum(),  # not working yet TODO
         "cummax": lambda x: x.cummax(),
         "cummin": lambda x: x.cummin(),
         "cumprod": lambda x: x.cumprod(),
@@ -435,18 +441,34 @@ class PolarsExpressionActor(data_algebra.expression_walker.ExpressionWalker):
                         values=self.polars_model.rng.uniform(0.0, 1.0, arg.shape[0]),
                         dtype=pl.datatypes.Float64,
                         dtype_if_empty=pl.datatypes.Float64),
+                    is_series=True,
                 )
-            elif op.op in ["_ngroup", "ngroup"]:
+            elif op.op in ["_sgroup", "sgroup"]:
                 assert isinstance(arg, pl.DataFrame)
                 n_groups = 0
                 if arg.shape[0] > 0:
                     n_groups = 1
                     if len(self.partition_by) > 0:
-                        n_groups = arg.groupby(self.partition_by).apply(lambda x: x.head(1)).shape[0]
+                        s_groups = arg.groupby(self.partition_by).apply(lambda x: x.head(1)).shape[0]
                 return PolarsTerm(
-                    polars_term=pl.lit(n_groups),
+                    polars_term=pl.lit(s_groups),
                     lit_value=n_groups,
                     is_literal=True,
+                )
+            elif op.op in ["_ngroup", "ngroup"]:
+                assert isinstance(arg, pl.DataFrame)
+                group_labels = []
+                if arg.shape[0] > 0:
+                    n_groups = [0] * arg.shape[0]
+                    if len(self.partition_by) > 0:
+                        # TODO: number the groups, not size them
+                        n_groups = arg.groupby(self.partition_by).apply(lambda x: x.head(1)).shape[0]
+                return PolarsTerm(
+                    polars_term=pl.Series(
+                        values=group_labels,
+                        dtype=pl.datatypes.Int64,
+                        dtype_if_empty=pl.datatypes.Int64),
+                    is_series=True,
                 )
         if f is None:
             try:
@@ -765,7 +787,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 expr_walker=PolarsExpressionActor(polars_model=self, extend_context=True, partition_by=op.partition_by))  # PolarsTerm
             assert isinstance(fld_k_container, PolarsTerm)
             fld_k = fld_k_container.polars_term
-            if op.windowed_situation and (not (fld_k_container.is_literal or fld_k_container.is_column)):
+            if op.windowed_situation and (not (fld_k_container.is_literal or fld_k_container.is_column or fld_k_container.is_series)):
                 fld_k = fld_k.over(partition_by)
             produced_columns.append(fld_k.alias(k))
         if len(temp_v_columns) > 0:

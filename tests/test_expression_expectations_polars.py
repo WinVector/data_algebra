@@ -23,7 +23,7 @@ def test_expression_expectations_polars_1():
             'base_Sunday',
             'concat',
             'count',  # Pandas null treatment in the wrong
-            'cumcount',
+            'cumcount',  # pending implementation
             'date_diff',
             'datetime_to_date',
             'dayofmonth',
@@ -42,7 +42,7 @@ def test_expression_expectations_polars_1():
             'var',
             'weekofyear',
             'year',
-            '_ngroup',
+            '_ngroup',  # pending group numbering implementation
             ])
         dir_path = os.path.dirname(os.path.realpath(__file__))
         # https://github.com/WinVector/data_algebra/blob/main/Examples/Methods/data_algebra_catalog.ipynb 
