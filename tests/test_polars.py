@@ -74,7 +74,7 @@ def test_polars_project_sum():
         assert data_algebra.test_util.equivalent_frames(res, expect)
 
 
-def test_polars_extend_ngroup():
+def test_polars_extend_ngroup_no_partition():
     if have_polars:
         d = pl.DataFrame({"x": [1, 2, 1]})
         ops = (
@@ -82,7 +82,19 @@ def test_polars_extend_ngroup():
                 .extend({"n_in": "(1).sum()", "n_out": "_ngroup()"})
         )
         res = ops.transform(d)
-        expect = pl.DataFrame({"x": [1, 2], "y": [False, False], "z": [True, True]})
+        expect = pl.DataFrame({"x": [1, 2, 1], "n_in": [3, 3, 3], "n_out": [1, 1, 1]})
+        assert data_algebra.test_util.equivalent_frames(res, expect)
+
+
+def test_polars_extend_ngroup_with_partition():
+    if have_polars:
+        d = pl.DataFrame({"x": [1, 2, 1]})
+        ops = (
+            data_algebra.descr(d=d)
+                .extend({"n_in": "(1).sum()", "n_out": "_ngroup()"}, partition_by=["x"])
+        )
+        res = ops.transform(d)
+        expect = pl.DataFrame({"x": [1, 2, 1], "n_in": [2, 1, 2], "n_out": [2, 2, 2]})
         assert data_algebra.test_util.equivalent_frames(res, expect)
 
 

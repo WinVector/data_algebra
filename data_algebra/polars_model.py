@@ -101,6 +101,7 @@ class PolarsTerm:
         self.lit_value = lit_value
         self.polars_term = polars_term
         self.is_literal = is_literal
+        self.is_column = is_column
 
 
 class ExpressionRequirementsCollector(data_algebra.expression_walker.ExpressionWalker):
@@ -350,8 +351,16 @@ class PolarsExpressionActor(data_algebra.expression_walker.ExpressionWalker):
 
     extend_context: bool
     project_context: bool
+    partition_by: List[str]
 
-    def __init__(self, *, polars_model, extend_context: bool = False, project_context: bool = False) -> None:
+    def __init__(
+        self, 
+        *, 
+        polars_model, 
+        extend_context: bool = False, 
+        project_context: bool = False,
+        partition_by: Optional[Iterable[str]] = None
+        ) -> None:
         assert isinstance(extend_context, bool)
         assert isinstance(project_context, bool)
         assert (extend_context + project_context) == 1
@@ -361,6 +370,12 @@ class PolarsExpressionActor(data_algebra.expression_walker.ExpressionWalker):
         self.polars_model = polars_model
         self.extend_context = extend_context
         self.project_context = project_context
+        assert not isinstance(partition_by, str)  # common error
+        if partition_by is None:
+            partition_by = []
+        else:
+            partition_by = list(partition_by)
+        self.partition_by = partition_by
 
    # expression helpers
     
@@ -421,11 +436,18 @@ class PolarsExpressionActor(data_algebra.expression_walker.ExpressionWalker):
                         dtype=pl.datatypes.Float64,
                         dtype_if_empty=pl.datatypes.Float64),
                 )
-        if (f is None): 
-            if op.op in ["_ngroup", "ngroup"]:
+            elif op.op in ["_ngroup", "ngroup"]:
                 assert isinstance(arg, pl.DataFrame)
-                # n_groups = arg.groupby(["x"]).apply(lambda x: x.head(1)).shape[0]
-                raise ValueError(f" {op.op} not implemented for Polars adapter, yet")
+                n_groups = 0
+                if arg.shape[0] > 0:
+                    n_groups = 1
+                    if len(self.partition_by) > 0:
+                        n_groups = arg.groupby(self.partition_by).apply(lambda x: x.head(1)).shape[0]
+                return PolarsTerm(
+                    polars_term=pl.lit(n_groups),
+                    lit_value=n_groups,
+                    is_literal=True,
+                )
         if f is None:
             try:
                 if self.extend_context:
@@ -707,7 +729,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
         partition_by = op.partition_by
         temp_v_columns = []
         # see if we need to make partition non-empty
-        if len(partition_by) <= 0:
+        if (partition_by is None) or (len(partition_by) <= 0):
             v_name = "_da_extend_temp_partition_column"
             partition_by = [v_name]
             temp_v_columns.append(_build_lit(1).alias(v_name))
@@ -740,10 +762,10 @@ class PolarsModel(data_algebra.data_model.DataModel):
                     )
             fld_k_container = opk.act_on(
                 value_to_send_to_act, 
-                expr_walker=PolarsExpressionActor(polars_model=self, extend_context=True))  # PolarsTerm
+                expr_walker=PolarsExpressionActor(polars_model=self, extend_context=True, partition_by=op.partition_by))  # PolarsTerm
             assert isinstance(fld_k_container, PolarsTerm)
             fld_k = fld_k_container.polars_term
-            if op.windowed_situation:
+            if op.windowed_situation and (not (fld_k_container.is_literal or fld_k_container.is_column)):
                 fld_k = fld_k.over(partition_by)
             produced_columns.append(fld_k.alias(k))
         if len(temp_v_columns) > 0:
