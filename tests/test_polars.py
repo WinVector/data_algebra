@@ -4,7 +4,7 @@ import numpy as np
 import data_algebra
 import data_algebra.data_model
 import data_algebra.test_util
-import data_algebra.cdata 
+import data_algebra.cdata
 
 have_polars = False
 try:
@@ -19,14 +19,71 @@ def test_polars_const_bool():
         d = pl.DataFrame({"x": [1, 2]})
         ops = (
             data_algebra.descr(d=d)
-                .extend({"y": "False"})
+                .extend({"y": "False", "z": "True"})
         )
         res = ops.transform(d)
-        expect = pl.DataFrame({"x": [1, 2], "y": [False, False]})
-        assert data_algebra.test_util.equivalent_frames(res.to_pandas(), expect.to_pandas())
+        expect = pl.DataFrame({"x": [1, 2], "y": [False, False], "z": [True, True]})
+        assert data_algebra.test_util.equivalent_frames(res, expect)
 
 
-test_polars_const_bool()  # TODO: remove
+def test_polars_extend_cumsum():
+    if have_polars:
+        d = pl.DataFrame({"x": [1, 2, 1], "y": [1, 2, 3]})
+        ops = (
+            data_algebra.descr(d=d)
+                .extend({"n": "(1).cumsum()"}, partition_by=["x"], order_by=["y"])
+        )
+        res = ops.transform(d)
+        expect = pl.DataFrame({"x": [1, 2, 1], "y": [1, 2, 3], "n": [1, 1, 2]})
+        assert data_algebra.test_util.equivalent_frames(res, expect)
+
+
+def test_polars_extend_count():
+    if have_polars:
+        d = pl.DataFrame({"x": [1, 2, 1], "y": [1, 2, 3]})
+        ops = (
+            data_algebra.descr(d=d)
+                .extend({"n": "_count()"}, partition_by=["x"], order_by=["y"])
+        )
+        res = ops.transform(d)
+        expect = pl.DataFrame({"x": [1, 2, 1], "y": [1, 2, 3], "n": [1, 1, 2]})
+        assert data_algebra.test_util.equivalent_frames(res, expect)
+
+
+def test_polars_project_count():
+    if have_polars:
+        d = pl.DataFrame({"x": [1, 2, 1], "y": [1, 2, 3]})
+        ops = (
+            data_algebra.descr(d=d)
+                .project({"n": "_count()"}, group_by=["x"])
+        )
+        res = ops.transform(d)
+        expect = pl.DataFrame({"x": [1, 2], "n": [2, 1]})
+        assert data_algebra.test_util.equivalent_frames(res, expect)
+
+
+def test_polars_project_sum():
+    if have_polars:
+        d = pl.DataFrame({"x": [1, 2, 1], "y": [1, 2, 3]})
+        ops = (
+            data_algebra.descr(d=d)
+                .project({"n": "(1).sum()"}, group_by=["x"])
+        )
+        res = ops.transform(d)
+        expect = pl.DataFrame({"x": [1, 2], "n": [2, 1]})
+        assert data_algebra.test_util.equivalent_frames(res, expect)
+
+
+def test_polars_extend_ngroup():
+    if have_polars:
+        d = pl.DataFrame({"x": [1, 2, 1]})
+        ops = (
+            data_algebra.descr(d=d)
+                .extend({"n_in": "(1).sum()", "n_out": "_ngroup()"})
+        )
+        res = ops.transform(d)
+        expect = pl.DataFrame({"x": [1, 2], "y": [False, False], "z": [True, True]})
+        assert data_algebra.test_util.equivalent_frames(res, expect)
 
 
 def test_polars_1():
