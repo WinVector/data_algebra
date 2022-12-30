@@ -130,39 +130,6 @@ class DataModel(abc.ABC):
         :param blocks_out: cdata record specification.
         :return: transformed data frame
         """
-    
-    # expression helpers
-
-    @abc.abstractmethod
-    def act_on_literal(self, *, value):
-        """
-        Action for a literal/constant in an expression.
-
-        :param value: literal value being supplied
-        :return: converted result
-        """
-    
-    @abc.abstractmethod
-    def act_on_column_name(self, *, arg, value):
-        """
-        Action for a column name.
-
-        :param arg: item we are acting on
-        :param value: column name
-        :return: converted result
-        """
-    
-    @abc.abstractmethod
-    def act_on_expression(self, *, arg, values: List, op: str):
-        """
-        Action for a column name.
-
-        :param arg: item we are acting on
-        :param values: op arguments already converted
-        :param op: operator to apply
-        :return: converted result
-        """
-
 
 # map type name strings to data models
 data_model_type_map = dict()
