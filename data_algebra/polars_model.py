@@ -67,13 +67,52 @@ _da_temp_zero_column_name = "_da_temp_zero_column"
 _da_temp_one_column_name = "_da_temp_one_column"
 
 
-class ExpressionRequirements(data_algebra.expression_walker.ExpressionWalker):
+class PolarsTerm:
+    """
+    Class to carry Polars expression term and annotations about expression tree.
+    """
+
+    polars_term: Any
+    lit_value: Any
+    is_literal: bool
+    is_column: bool
+
+    def __init__(
+        self, 
+        *, 
+        polars_term = None, 
+        is_literal: bool = False,
+        is_column: bool = False,
+        lit_value = None,
+        ) -> None:
+        """
+        Carry a Polars expression term (polars_term) plus annotations.
+
+        :param polars_term: Optional Polars expression (None means collect info, not a true term)
+        :param is_literal: True if term is a constant
+        :param is_column: True if term is a column name
+        :param lit_value: original value for a literal
+        :param inputs: inputs to expression node
+        """
+        assert isinstance(is_literal, bool)
+        assert isinstance(is_column, bool)
+        if lit_value is not None:
+            assert is_literal
+        self.lit_value = lit_value
+        self.polars_term = polars_term
+        self.is_literal = is_literal
+
+
+class ExpressionRequirementsCollector(data_algebra.expression_walker.ExpressionWalker):
     """
     Class to collect what accommodations an expression needs.
     """
     collect_required: bool
     zero_constant_required: bool
     one_constant_required: bool
+    _needs_zero_constant: Set[str]
+    _needs_one_constant: Set[str]
+    _collect_required: Set[str]
 
     def __init__(self) -> None:
         data_algebra.expression_walker.ExpressionWalker.__init__(
@@ -145,42 +184,6 @@ class ExpressionRequirements(data_algebra.expression_walker.ExpressionWalker):
             temp_v_columns.append(_build_lit(1).alias(_da_temp_one_column_name))
 
 
-class PolarsTerm:
-    """
-    Class to carry Polars expression term and annotations about expression tree.
-    """
-
-    polars_term: Any
-    lit_value: Any
-    is_literal: bool
-    is_column: bool
-
-    def __init__(
-        self, 
-        *, 
-        polars_term = None, 
-        is_literal: bool = False,
-        is_column: bool = False,
-        lit_value = None,
-        ) -> None:
-        """
-        Carry a Polars expression term (polars_term) plus annotations.
-
-        :param polars_term: Optional Polars expression (None means collect info, not a true term)
-        :param is_literal: True if term is a constant
-        :param is_column: True if term is a column name
-        :param lit_value: original value for a literal
-        :param inputs: inputs to expression node
-        """
-        assert isinstance(is_literal, bool)
-        assert isinstance(is_column, bool)
-        if lit_value is not None:
-            assert is_literal
-        self.lit_value = lit_value
-        self.polars_term = polars_term
-        self.is_literal = is_literal
-
-
 def _unpack_lits(v):
     if isinstance(v, PolarsTerm):
         if v.is_literal:
@@ -202,22 +205,36 @@ def _mapv(a, b: Dict, c):
     return res
 
 
-def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
+def _populate_expr_impl_map(extend_context: bool) -> Dict[int, Dict[str, Callable]]:
     """
     Map symbols to implementations.
     """
+    assert isinstance(extend_context, bool)
     # TODO: fill in more
-    impl_map_0 = {
-        "count": lambda : pl.col(_da_temp_one_column_name).cumsum(),  # ugly SQL def
-        "_count": lambda : pl.col(_da_temp_one_column_name).cumsum(),  # ugly SQL def
-        "cumcount": lambda : pl.col(_da_temp_one_column_name).cumsum(),
-        "_cumcount": lambda : pl.col(_da_temp_one_column_name).cumsum(),
-        "row_number": lambda : pl.col(_da_temp_one_column_name).cumsum(),
-        "_row_number": lambda : pl.col(_da_temp_one_column_name).cumsum(),
-        "size": lambda : pl.col(_da_temp_one_column_name).sum(),
-        "_size": lambda : pl.col(_da_temp_one_column_name).sum(),
-    }
+    if extend_context:
+        impl_map_0 = {
+            "count": lambda : pl.col(_da_temp_one_column_name).cumsum(),  # ugly SQL def
+            "_count": lambda : pl.col(_da_temp_one_column_name).cumsum(),  # ugly SQL def
+            "cumcount": lambda : pl.col(_da_temp_one_column_name).cumsum(),
+            "_cumcount": lambda : pl.col(_da_temp_one_column_name).cumsum(),
+            "row_number": lambda : pl.col(_da_temp_one_column_name).cumsum(),
+            "_row_number": lambda : pl.col(_da_temp_one_column_name).cumsum(),
+            "size": lambda : pl.col(_da_temp_one_column_name).sum(),
+            "_size": lambda : pl.col(_da_temp_one_column_name).sum(),
+        }
+    else:
+        impl_map_0 = {
+            "count": lambda : pl.col(_da_temp_one_column_name).sum(),
+            "_count": lambda : pl.col(_da_temp_one_column_name).sum(),
+            "cumcount": lambda : pl.col(_da_temp_one_column_name).sum(),
+            "_cumcount": lambda : pl.col(_da_temp_one_column_name).sum(),
+            "row_number": lambda : pl.col(_da_temp_one_column_name).sum(),
+            "_row_number": lambda : pl.col(_da_temp_one_column_name).sum(),
+            "size": lambda : pl.col(_da_temp_one_column_name).sum(),
+            "_size": lambda : pl.col(_da_temp_one_column_name).sum(),
+        }
     impl_map_1 = {
+        "+": lambda x: x,
         "-": lambda x: 0 - x,
         "abs": lambda x: x.abs(),
         "all": lambda x: x.all(),
@@ -328,7 +345,111 @@ def _populate_expr_impl_map() -> Dict[int, Dict[str, Callable]]:
     return impl_map
 
 
-class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_walker.ExpressionWalker):
+class PolarsExpressionActor(data_algebra.expression_walker.ExpressionWalker):
+    """Act on expressions in Polars context"""
+
+    extend_context: bool
+    project_context: bool
+
+    def __init__(self, *, polars_model, extend_context: bool = False, project_context: bool = False) -> None:
+        assert isinstance(extend_context, bool)
+        assert isinstance(project_context, bool)
+        assert (extend_context + project_context) == 1
+        data_algebra.expression_walker.ExpressionWalker.__init__(
+            self,
+        )
+        self.polars_model = polars_model
+        self.extend_context = extend_context
+        self.project_context = project_context
+
+   # expression helpers
+    
+    def act_on_literal(self, *, value):
+        """
+        Action for a literal/constant in an expression.
+
+        :param value: literal value being supplied
+        :return: converted result
+        """
+        assert not isinstance(value, PolarsTerm)
+        if isinstance(value, (Dict, List, Set)):
+            return PolarsTerm(polars_term=None, is_literal=True, lit_value=value)
+        else:
+            return PolarsTerm(polars_term=_build_lit(value), is_literal=True, lit_value=value)
+    
+    def act_on_column_name(self, *, arg, value):
+        """
+        Action for a column name.
+
+        :param arg: None
+        :param value: column name
+        :return: arg acted on
+        """
+        assert isinstance(arg, (pl.DataFrame, type(None)))
+        assert isinstance(value, str)
+        return PolarsTerm(polars_term=pl.col(value), is_column=True)
+    
+    def act_on_expression(self, *, arg, values: List, op):
+        """
+        Action for a column name.
+
+        :param arg: None
+        :param values: list of values to work on
+        :param op: operator to apply
+        :return: arg acted on
+        """
+        assert isinstance(arg, (pl.DataFrame, type(None)))
+        assert isinstance(values, List)
+        assert isinstance(op, data_algebra.expr_rep.Expression)
+        # process inputs
+        for v in values:
+            assert isinstance(v, (List, PolarsTerm))
+        want_literals_unpacked = (op.op in self.polars_model.want_literals_unpacked)
+        if want_literals_unpacked:
+            args = _unpack_lits(values)
+        else:
+            args = [v.polars_term for v in values]
+        # lookup method
+        f = None
+        arity = len(values)
+        if (f is None) and (arity == 0):
+            if op.op in ["_uniform", "uniform"]:
+                assert isinstance(arg, pl.DataFrame)
+                return PolarsTerm(
+                    polars_term=pl.Series(
+                        values=self.polars_model.rng.uniform(0.0, 1.0, arg.shape[0]),
+                        dtype=pl.datatypes.Float64,
+                        dtype_if_empty=pl.datatypes.Float64),
+                )
+        if (f is None): 
+            if op.op in ["_ngroup", "ngroup"]:
+                assert isinstance(arg, pl.DataFrame)
+                # n_groups = arg.groupby(["x"]).apply(lambda x: x.head(1)).shape[0]
+                raise ValueError(f" {op.op} not implemented for Polars adapter, yet")
+        if f is None:
+            try:
+                if self.extend_context:
+                    f = self.polars_model.extend_expr_impl_map[len(values)][op.op]
+                elif self.project_context:
+                    f = self.polars_model.project_expr_impl_map[len(values)][op.op]
+            except KeyError:
+                pass
+        if (f is None) and (arity > 0):
+            try:
+                f = self.polars_model.impl_map_arbitrary_arity[op.op]
+            except KeyError:
+                pass
+        if f is None:
+            raise ValueError(f"failed to lookup {op}")
+        # apply method
+        res = f(*args)
+        # wrap result
+        return PolarsTerm(
+            polars_term=res,
+        )
+
+
+class PolarsModel(data_algebra.data_model.DataModel):
     """
     Interface for realizing the data algebra as a sequence of steps over Polars https://www.pola.rs .
 
@@ -338,19 +459,18 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
     use_lazy_eval: bool
     presentation_model_name: str
     _method_dispatch_table: Dict[str, Callable]
-    _expr_impl_map: Dict[int, Dict[str, Callable]]
-    _impl_map_arbitrary_arity: Dict[str, Callable]
+    extend_expr_impl_map: Dict[int, Dict[str, Callable]]
+    project_expr_impl_map: Dict[int, Dict[str, Callable]]
+    impl_map_arbitrary_arity: Dict[str, Callable]
     _collect_required: Set[str]
-    _rng: Any
+    want_literals_unpacked: Set[str]
+    rng: Any
 
     def __init__(self, *, use_lazy_eval: bool = True):
         data_algebra.data_model.DataModel.__init__(
             self, presentation_model_name="pl", module=pl
         )
-        data_algebra.expression_walker.ExpressionWalker.__init__(
-            self,
-        )
-        self._rng = np.random.default_rng()
+        self.rng = np.random.default_rng()
         assert isinstance(use_lazy_eval, bool)
         self.use_lazy_eval = use_lazy_eval
         self._method_dispatch_table = {
@@ -368,8 +488,9 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
             "SQLNode": self._sql_proxy_step,
             "TableDescription": self._table_step,
         }
-        self._expr_impl_map = _populate_expr_impl_map()
-        self._impl_map_arbitrary_arity = {
+        self.extend_expr_impl_map = _populate_expr_impl_map(extend_context=True)
+        self.project_expr_impl_map = _populate_expr_impl_map(extend_context=False)
+        self.impl_map_arbitrary_arity = {
             "concat": lambda *args: pl.concat_str(args),
             "fmax": lambda *args: pl.max(args),
             "fmin": lambda *args: pl.min(args),
@@ -382,7 +503,7 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
             "or": _reduce_or,
             "|": _reduce_or,
         }
-        self._want_literals_unpacked = {
+        self.want_literals_unpacked = {
             "around",
             "is_in",
             "mapv",
@@ -591,7 +712,7 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
             partition_by = [v_name]
             temp_v_columns.append(_build_lit(1).alias(v_name))
         # pre-scan expressions
-        er = ExpressionRequirements()
+        er = ExpressionRequirementsCollector()
         for opk in op.ops.values():
             opk.act_on(None, expr_walker=er)
         er.add_in_temp_columns(temp_v_columns)
@@ -617,7 +738,9 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
                         inline=opk.inline,
                         method=opk.method,
                     )
-            fld_k_container = opk.act_on(value_to_send_to_act, expr_walker=self)  # PolarsTerm
+            fld_k_container = opk.act_on(
+                value_to_send_to_act, 
+                expr_walker=PolarsExpressionActor(polars_model=self, extend_context=True))  # PolarsTerm
             assert isinstance(fld_k_container, PolarsTerm)
             fld_k = fld_k_container.polars_term
             if op.windowed_situation:
@@ -656,7 +779,7 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
             group_by = [v_name]
             temp_v_columns.append(_build_lit(1).alias(v_name))
         # pre-scan expressions
-        er = ExpressionRequirements()
+        er = ExpressionRequirementsCollector()
         for opk in op.ops.values():
             opk.act_on(None, expr_walker=er)
         er.add_in_temp_columns(temp_v_columns)
@@ -681,7 +804,9 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
                     inline=opk.inline, 
                     method=opk.method,
                 )
-            fld_k_container = opk.act_on(value_to_send_to_act, expr_walker=self)  # PolarsTerm
+            fld_k_container = opk.act_on(
+                value_to_send_to_act, 
+                expr_walker=PolarsExpressionActor(polars_model=self, project_context=True))  # PolarsTerm
             assert isinstance(fld_k_container, PolarsTerm)
             fld_k = fld_k_container.polars_term
             produced_columns.append(fld_k.alias(k))
@@ -836,7 +961,7 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
         temp_v_columns = []
         # pre-scan expressions
-        er = ExpressionRequirements()
+        er = ExpressionRequirementsCollector()
         for opk in op.ops.values():
             opk.act_on(None, expr_walker=er)
         er.add_in_temp_columns(temp_v_columns)
@@ -848,7 +973,9 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
         # work on expression
         if len(temp_v_columns) > 0:
             res = res.with_columns(temp_v_columns)
-        selection = op.expr.act_on(value_to_send_to_act, expr_walker=self)  # PolarsTerm
+        selection = op.expr.act_on(
+            value_to_send_to_act, 
+            expr_walker=PolarsExpressionActor(polars_model=self, extend_context=True))  # PolarsTerm
         assert isinstance(selection, PolarsTerm)
         res = res.filter(selection.polars_term)
         if len(temp_v_columns) > 0:
@@ -1011,89 +1138,6 @@ class PolarsModel(data_algebra.data_model.DataModel, data_algebra.expression_wal
         else:
             res = res.sort(blocks_out.control_table_keys)
         return res
-    
-    # expression helpers
-    
-    def act_on_literal(self, *, value):
-        """
-        Action for a literal/constant in an expression.
-
-        :param value: literal value being supplied
-        :return: converted result
-        """
-        assert not isinstance(value, PolarsTerm)
-        if isinstance(value, (Dict, List, Set)):
-            return PolarsTerm(polars_term=None, is_literal=True, lit_value=value)
-        else:
-            return PolarsTerm(polars_term=_build_lit(value), is_literal=True, lit_value=value)
-    
-    def act_on_column_name(self, *, arg, value):
-        """
-        Action for a column name.
-
-        :param arg: None
-        :param value: column name
-        :return: arg acted on
-        """
-        assert isinstance(arg, (pl.DataFrame, type(None)))
-        assert isinstance(value, str)
-        return PolarsTerm(polars_term=pl.col(value), is_column=True)
-    
-    def act_on_expression(self, *, arg, values: List, op):
-        """
-        Action for a column name.
-
-        :param arg: None
-        :param values: list of values to work on
-        :param op: operator to apply
-        :return: arg acted on
-        """
-        assert isinstance(arg, (pl.DataFrame, type(None)))
-        assert isinstance(values, List)
-        assert isinstance(op, data_algebra.expr_rep.Expression)
-        # process inputs
-        for v in values:
-            assert isinstance(v, (List, PolarsTerm))
-        want_literals_unpacked = (op.op in self._want_literals_unpacked)
-        if want_literals_unpacked:
-            args = _unpack_lits(values)
-        else:
-            args = [v.polars_term for v in values]
-        # lookup method
-        f = None
-        arity = len(values)
-        if (f is None) and (arity == 0):
-            if op.op in ["_uniform", "uniform"]:
-                assert isinstance(arg, pl.DataFrame)
-                return PolarsTerm(
-                    polars_term=pl.Series(
-                        values=self._rng.uniform(0.0, 1.0, arg.shape[0]),
-                        dtype=pl.datatypes.Float64,
-                        dtype_if_empty=pl.datatypes.Float64),
-                )
-        if (f is None): 
-            if op.op in ["_ngroup", "ngroup"]:
-                assert isinstance(arg, pl.DataFrame)
-                # n_groups = arg.groupby(["x"]).apply(lambda x: x.head(1)).shape[0]
-                raise ValueError(f" {op.op} not implemented for Polars adapter, yet")
-        if f is None:
-            try:
-                f = self._expr_impl_map[len(values)][op.op]
-            except KeyError:
-                pass
-        if (f is None) and (arity > 0):
-            try:
-                f = self._impl_map_arbitrary_arity[op.op]
-            except KeyError:
-                pass
-        if f is None:
-            raise ValueError(f"failed to lookup {op}")
-        # apply method
-        res = f(*args)
-        # wrap result
-        return PolarsTerm(
-            polars_term=res,
-        )
 
 
 def register_polars_model(key:Optional[str] = None):
