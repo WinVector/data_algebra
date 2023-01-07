@@ -93,7 +93,7 @@
 </span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a>
 </span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a>
 </span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="k">class</span> <span class="nc">DBSpace</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_space</span><span class="o">.</span><span class="n">DataSpace</span><span class="p">):</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="sd">    A data space implemented in a database.</span>
 </span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -117,7 +117,7 @@
 </span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">eligable_for_auto_drop_list</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 </span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a>    
 </span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a>    <span class="k">def</span> <span class="nf">model_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">eligible_for_auto_drop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">:</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="sd">        Insert existing table record into data space model.</span>
 </span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a>
 </span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="sd">        :param key: table name and key.</span>
@@ -131,7 +131,7 @@
 </span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a>        <span class="k">return</span> <span class="n">descr</span>
 </span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a>
 </span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>    <span class="k">def</span> <span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">:</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a><span class="sd">        Insert value into data space for key.</span>
 </span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>
 </span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a><span class="sd">        :param key: key</span>
@@ -150,7 +150,7 @@
 </span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_table</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">eligible_for_auto_drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>    
 </span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="sd">        Remove value from data space.</span>
 </span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>
 </span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a><span class="sd">        :param key: key to remove</span>
@@ -162,13 +162,13 @@
 </span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">db_handle</span><span class="o">.</span><span class="n">drop_table</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 </span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>    
 </span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="sd">        Return keys</span>
 </span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">description_map</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 </span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>    
 </span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>    <span class="k">def</span> <span class="nf">retrieve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a><span class="sd">        Retrieve a table value from the DataSpace.</span>
 </span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>
 </span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a><span class="sd">        :param key: key</span>
@@ -186,7 +186,7 @@
 </span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>        <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>        <span class="n">allow_overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 </span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">:</span>
-</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a><span class="sd">        Execute ops in data space, saving result as a side effect and returning a reference.</span>
 </span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>
 </span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a><span class="sd">        :param ops: data algebra operator dag.</span>
@@ -208,7 +208,7 @@
 </span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>        <span class="k">return</span> <span class="n">descr</span>
 </span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>
 </span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>    <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">:</span>
-</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a><span class="sd">        Retrieve a table description from the DataSpace.</span>
 </span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>
 </span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a><span class="sd">        :param key: key</span>
@@ -242,7 +242,7 @@
     </div>
     <a class="headerlink" href="#DBSpace"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DBSpace-11"><a href="#DBSpace-11"><span class="linenos"> 11</span></a><span class="k">class</span> <span class="nc">DBSpace</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_space</span><span class="o">.</span><span class="n">DataSpace</span><span class="p">):</span>
-</span><span id="DBSpace-12"><a href="#DBSpace-12"><span class="linenos"> 12</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="DBSpace-12"><a href="#DBSpace-12"><span class="linenos"> 12</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DBSpace-13"><a href="#DBSpace-13"><span class="linenos"> 13</span></a><span class="sd">    A data space implemented in a database.</span>
 </span><span id="DBSpace-14"><a href="#DBSpace-14"><span class="linenos"> 14</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="DBSpace-15"><a href="#DBSpace-15"><span class="linenos"> 15</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -266,7 +266,7 @@
 </span><span id="DBSpace-33"><a href="#DBSpace-33"><span class="linenos"> 33</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">eligable_for_auto_drop_list</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 </span><span id="DBSpace-34"><a href="#DBSpace-34"><span class="linenos"> 34</span></a>    
 </span><span id="DBSpace-35"><a href="#DBSpace-35"><span class="linenos"> 35</span></a>    <span class="k">def</span> <span class="nf">model_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">eligible_for_auto_drop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">:</span>
-</span><span id="DBSpace-36"><a href="#DBSpace-36"><span class="linenos"> 36</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="DBSpace-36"><a href="#DBSpace-36"><span class="linenos"> 36</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DBSpace-37"><a href="#DBSpace-37"><span class="linenos"> 37</span></a><span class="sd">        Insert existing table record into data space model.</span>
 </span><span id="DBSpace-38"><a href="#DBSpace-38"><span class="linenos"> 38</span></a>
 </span><span id="DBSpace-39"><a href="#DBSpace-39"><span class="linenos"> 39</span></a><span class="sd">        :param key: table name and key.</span>
@@ -280,7 +280,7 @@
 </span><span id="DBSpace-47"><a href="#DBSpace-47"><span class="linenos"> 47</span></a>        <span class="k">return</span> <span class="n">descr</span>
 </span><span id="DBSpace-48"><a href="#DBSpace-48"><span class="linenos"> 48</span></a>
 </span><span id="DBSpace-49"><a href="#DBSpace-49"><span class="linenos"> 49</span></a>    <span class="k">def</span> <span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">:</span>
-</span><span id="DBSpace-50"><a href="#DBSpace-50"><span class="linenos"> 50</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="DBSpace-50"><a href="#DBSpace-50"><span class="linenos"> 50</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DBSpace-51"><a href="#DBSpace-51"><span class="linenos"> 51</span></a><span class="sd">        Insert value into data space for key.</span>
 </span><span id="DBSpace-52"><a href="#DBSpace-52"><span class="linenos"> 52</span></a>
 </span><span id="DBSpace-53"><a href="#DBSpace-53"><span class="linenos"> 53</span></a><span class="sd">        :param key: key</span>
@@ -299,7 +299,7 @@
 </span><span id="DBSpace-66"><a href="#DBSpace-66"><span class="linenos"> 66</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_table</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">eligible_for_auto_drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span><span id="DBSpace-67"><a href="#DBSpace-67"><span class="linenos"> 67</span></a>    
 </span><span id="DBSpace-68"><a href="#DBSpace-68"><span class="linenos"> 68</span></a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="DBSpace-69"><a href="#DBSpace-69"><span class="linenos"> 69</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="DBSpace-69"><a href="#DBSpace-69"><span class="linenos"> 69</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DBSpace-70"><a href="#DBSpace-70"><span class="linenos"> 70</span></a><span class="sd">        Remove value from data space.</span>
 </span><span id="DBSpace-71"><a href="#DBSpace-71"><span class="linenos"> 71</span></a>
 </span><span id="DBSpace-72"><a href="#DBSpace-72"><span class="linenos"> 72</span></a><span class="sd">        :param key: key to remove</span>
@@ -311,13 +311,13 @@
 </span><span id="DBSpace-78"><a href="#DBSpace-78"><span class="linenos"> 78</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">db_handle</span><span class="o">.</span><span class="n">drop_table</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 </span><span id="DBSpace-79"><a href="#DBSpace-79"><span class="linenos"> 79</span></a>    
 </span><span id="DBSpace-80"><a href="#DBSpace-80"><span class="linenos"> 80</span></a>    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="DBSpace-81"><a href="#DBSpace-81"><span class="linenos"> 81</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="DBSpace-81"><a href="#DBSpace-81"><span class="linenos"> 81</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DBSpace-82"><a href="#DBSpace-82"><span class="linenos"> 82</span></a><span class="sd">        Return keys</span>
 </span><span id="DBSpace-83"><a href="#DBSpace-83"><span class="linenos"> 83</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="DBSpace-84"><a href="#DBSpace-84"><span class="linenos"> 84</span></a>        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">description_map</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 </span><span id="DBSpace-85"><a href="#DBSpace-85"><span class="linenos"> 85</span></a>    
 </span><span id="DBSpace-86"><a href="#DBSpace-86"><span class="linenos"> 86</span></a>    <span class="k">def</span> <span class="nf">retrieve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="DBSpace-87"><a href="#DBSpace-87"><span class="linenos"> 87</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="DBSpace-87"><a href="#DBSpace-87"><span class="linenos"> 87</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DBSpace-88"><a href="#DBSpace-88"><span class="linenos"> 88</span></a><span class="sd">        Retrieve a table value from the DataSpace.</span>
 </span><span id="DBSpace-89"><a href="#DBSpace-89"><span class="linenos"> 89</span></a>
 </span><span id="DBSpace-90"><a href="#DBSpace-90"><span class="linenos"> 90</span></a><span class="sd">        :param key: key</span>
@@ -335,7 +335,7 @@
 </span><span id="DBSpace-102"><a href="#DBSpace-102"><span class="linenos">102</span></a>        <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="DBSpace-103"><a href="#DBSpace-103"><span class="linenos">103</span></a>        <span class="n">allow_overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 </span><span id="DBSpace-104"><a href="#DBSpace-104"><span class="linenos">104</span></a>        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">:</span>
-</span><span id="DBSpace-105"><a href="#DBSpace-105"><span class="linenos">105</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="DBSpace-105"><a href="#DBSpace-105"><span class="linenos">105</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DBSpace-106"><a href="#DBSpace-106"><span class="linenos">106</span></a><span class="sd">        Execute ops in data space, saving result as a side effect and returning a reference.</span>
 </span><span id="DBSpace-107"><a href="#DBSpace-107"><span class="linenos">107</span></a>
 </span><span id="DBSpace-108"><a href="#DBSpace-108"><span class="linenos">108</span></a><span class="sd">        :param ops: data algebra operator dag.</span>
@@ -357,7 +357,7 @@
 </span><span id="DBSpace-124"><a href="#DBSpace-124"><span class="linenos">124</span></a>        <span class="k">return</span> <span class="n">descr</span>
 </span><span id="DBSpace-125"><a href="#DBSpace-125"><span class="linenos">125</span></a>
 </span><span id="DBSpace-126"><a href="#DBSpace-126"><span class="linenos">126</span></a>    <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">:</span>
-</span><span id="DBSpace-127"><a href="#DBSpace-127"><span class="linenos">127</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="DBSpace-127"><a href="#DBSpace-127"><span class="linenos">127</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DBSpace-128"><a href="#DBSpace-128"><span class="linenos">128</span></a><span class="sd">        Retrieve a table description from the DataSpace.</span>
 </span><span id="DBSpace-129"><a href="#DBSpace-129"><span class="linenos">129</span></a>
 </span><span id="DBSpace-130"><a href="#DBSpace-130"><span class="linenos">130</span></a><span class="sd">        :param key: key</span>
@@ -429,7 +429,7 @@
     </div>
     <a class="headerlink" href="#DBSpace.model_table"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DBSpace.model_table-35"><a href="#DBSpace.model_table-35"><span class="linenos">35</span></a>    <span class="k">def</span> <span class="nf">model_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">eligible_for_auto_drop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">:</span>
-</span><span id="DBSpace.model_table-36"><a href="#DBSpace.model_table-36"><span class="linenos">36</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="DBSpace.model_table-36"><a href="#DBSpace.model_table-36"><span class="linenos">36</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DBSpace.model_table-37"><a href="#DBSpace.model_table-37"><span class="linenos">37</span></a><span class="sd">        Insert existing table record into data space model.</span>
 </span><span id="DBSpace.model_table-38"><a href="#DBSpace.model_table-38"><span class="linenos">38</span></a>
 </span><span id="DBSpace.model_table-39"><a href="#DBSpace.model_table-39"><span class="linenos">39</span></a><span class="sd">        :param key: table name and key.</span>
@@ -473,7 +473,7 @@
     </div>
     <a class="headerlink" href="#DBSpace.insert"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DBSpace.insert-49"><a href="#DBSpace.insert-49"><span class="linenos">49</span></a>    <span class="k">def</span> <span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">:</span>
-</span><span id="DBSpace.insert-50"><a href="#DBSpace.insert-50"><span class="linenos">50</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="DBSpace.insert-50"><a href="#DBSpace.insert-50"><span class="linenos">50</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DBSpace.insert-51"><a href="#DBSpace.insert-51"><span class="linenos">51</span></a><span class="sd">        Insert value into data space for key.</span>
 </span><span id="DBSpace.insert-52"><a href="#DBSpace.insert-52"><span class="linenos">52</span></a>
 </span><span id="DBSpace.insert-53"><a href="#DBSpace.insert-53"><span class="linenos">53</span></a><span class="sd">        :param key: key</span>
@@ -524,7 +524,7 @@
     </div>
     <a class="headerlink" href="#DBSpace.remove"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DBSpace.remove-68"><a href="#DBSpace.remove-68"><span class="linenos">68</span></a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="DBSpace.remove-69"><a href="#DBSpace.remove-69"><span class="linenos">69</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="DBSpace.remove-69"><a href="#DBSpace.remove-69"><span class="linenos">69</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DBSpace.remove-70"><a href="#DBSpace.remove-70"><span class="linenos">70</span></a><span class="sd">        Remove value from data space.</span>
 </span><span id="DBSpace.remove-71"><a href="#DBSpace.remove-71"><span class="linenos">71</span></a>
 </span><span id="DBSpace.remove-72"><a href="#DBSpace.remove-72"><span class="linenos">72</span></a><span class="sd">        :param key: key to remove</span>
@@ -560,7 +560,7 @@
     </div>
     <a class="headerlink" href="#DBSpace.keys"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DBSpace.keys-80"><a href="#DBSpace.keys-80"><span class="linenos">80</span></a>    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="DBSpace.keys-81"><a href="#DBSpace.keys-81"><span class="linenos">81</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="DBSpace.keys-81"><a href="#DBSpace.keys-81"><span class="linenos">81</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DBSpace.keys-82"><a href="#DBSpace.keys-82"><span class="linenos">82</span></a><span class="sd">        Return keys</span>
 </span><span id="DBSpace.keys-83"><a href="#DBSpace.keys-83"><span class="linenos">83</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="DBSpace.keys-84"><a href="#DBSpace.keys-84"><span class="linenos">84</span></a>        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">description_map</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
@@ -584,7 +584,7 @@
     </div>
     <a class="headerlink" href="#DBSpace.retrieve"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DBSpace.retrieve-86"><a href="#DBSpace.retrieve-86"><span class="linenos">86</span></a>    <span class="k">def</span> <span class="nf">retrieve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="DBSpace.retrieve-87"><a href="#DBSpace.retrieve-87"><span class="linenos">87</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="DBSpace.retrieve-87"><a href="#DBSpace.retrieve-87"><span class="linenos">87</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DBSpace.retrieve-88"><a href="#DBSpace.retrieve-88"><span class="linenos">88</span></a><span class="sd">        Retrieve a table value from the DataSpace.</span>
 </span><span id="DBSpace.retrieve-89"><a href="#DBSpace.retrieve-89"><span class="linenos">89</span></a>
 </span><span id="DBSpace.retrieve-90"><a href="#DBSpace.retrieve-90"><span class="linenos">90</span></a><span class="sd">        :param key: key</span>
@@ -632,7 +632,7 @@
 </span><span id="DBSpace.execute-102"><a href="#DBSpace.execute-102"><span class="linenos">102</span></a>        <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="DBSpace.execute-103"><a href="#DBSpace.execute-103"><span class="linenos">103</span></a>        <span class="n">allow_overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 </span><span id="DBSpace.execute-104"><a href="#DBSpace.execute-104"><span class="linenos">104</span></a>        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">:</span>
-</span><span id="DBSpace.execute-105"><a href="#DBSpace.execute-105"><span class="linenos">105</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="DBSpace.execute-105"><a href="#DBSpace.execute-105"><span class="linenos">105</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DBSpace.execute-106"><a href="#DBSpace.execute-106"><span class="linenos">106</span></a><span class="sd">        Execute ops in data space, saving result as a side effect and returning a reference.</span>
 </span><span id="DBSpace.execute-107"><a href="#DBSpace.execute-107"><span class="linenos">107</span></a>
 </span><span id="DBSpace.execute-108"><a href="#DBSpace.execute-108"><span class="linenos">108</span></a><span class="sd">        :param ops: data algebra operator dag.</span>
@@ -686,7 +686,7 @@
     </div>
     <a class="headerlink" href="#DBSpace.describe"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DBSpace.describe-126"><a href="#DBSpace.describe-126"><span class="linenos">126</span></a>    <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">:</span>
-</span><span id="DBSpace.describe-127"><a href="#DBSpace.describe-127"><span class="linenos">127</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="DBSpace.describe-127"><a href="#DBSpace.describe-127"><span class="linenos">127</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DBSpace.describe-128"><a href="#DBSpace.describe-128"><span class="linenos">128</span></a><span class="sd">        Retrieve a table description from the DataSpace.</span>
 </span><span id="DBSpace.describe-129"><a href="#DBSpace.describe-129"><span class="linenos">129</span></a>
 </span><span id="DBSpace.describe-130"><a href="#DBSpace.describe-130"><span class="linenos">130</span></a><span class="sd">        :param key: key</span>

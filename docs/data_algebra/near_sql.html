@@ -187,7 +187,7 @@
 </span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a>
 </span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a>
 </span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a><span class="k">class</span> <span class="nc">SQLWithList</span><span class="p">:</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="sd">    Carry an ordered sequence of SQL steps for use with a SQL WITH statement.</span>
 </span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a>
@@ -224,7 +224,7 @@
 </span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a>
 </span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>
 </span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a><span class="k">class</span> <span class="nc">NearSQL</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
-</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a><span class="sd">    Represent SQL queries in a mostly string-form</span>
 </span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>
@@ -288,15 +288,15 @@
 </span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>        <span class="n">db_model</span><span class="p">,</span>
 </span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>        <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 </span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>        <span class="sd">&quot;&quot;&quot;export&quot;&quot;&quot;</span>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;export&quot;&quot;&quot;</span>
 </span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>
 </span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 </span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>    <span class="k">def</span> <span class="nf">to_with_form</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">cte_cache</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">SQLWithList</span><span class="p">:</span>
-</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>        <span class="sd">&quot;&quot;&quot;convert ot with form&quot;&quot;&quot;</span>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;convert ot with form&quot;&quot;&quot;</span>
 </span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>
 </span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>
 </span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a><span class="k">class</span> <span class="nc">NearSQLContainer</span><span class="p">:</span>
-</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a><span class="sd">    NearSQL with bound in columns, force_sql</span>
 </span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>
@@ -337,7 +337,7 @@
 </span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a>        <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 </span><span id="L-163"><a href="#L-163"><span class="linenos">163</span></a>        <span class="n">quoted_query_name_annotation</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="L-165"><a href="#L-165"><span class="linenos">165</span></a>        <span class="sd">&quot;&quot;&quot;Convert subsql, possibly adding query name&quot;&quot;&quot;</span>
+</span><span id="L-165"><a href="#L-165"><span class="linenos">165</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert subsql, possibly adding query name&quot;&quot;&quot;</span>
 </span><span id="L-166"><a href="#L-166"><span class="linenos">166</span></a>        <span class="n">non_trivial_annotation</span> <span class="o">=</span> <span class="p">(</span><span class="n">quoted_query_name_annotation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
 </span><span id="L-167"><a href="#L-167"><span class="linenos">167</span></a>            <span class="n">quoted_query_name_annotation</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">quoted_query_name</span>
 </span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a>        <span class="p">)</span>
@@ -440,7 +440,7 @@
 </span><span id="L-265"><a href="#L-265"><span class="linenos">265</span></a>
 </span><span id="L-266"><a href="#L-266"><span class="linenos">266</span></a>
 </span><span id="L-267"><a href="#L-267"><span class="linenos">267</span></a><span class="k">class</span> <span class="nc">NearSQLNamedEntity</span><span class="p">(</span><span class="n">NearSQL</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
-</span><span id="L-268"><a href="#L-268"><span class="linenos">268</span></a>    <span class="sd">&quot;&quot;&quot;Model for tables and common table expressions&quot;&quot;&quot;</span>
+</span><span id="L-268"><a href="#L-268"><span class="linenos">268</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Model for tables and common table expressions&quot;&quot;&quot;</span>
 </span><span id="L-269"><a href="#L-269"><span class="linenos">269</span></a>
 </span><span id="L-270"><a href="#L-270"><span class="linenos">270</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
 </span><span id="L-271"><a href="#L-271"><span class="linenos">271</span></a>        <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">terms</span><span class="p">,</span> <span class="n">query_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">quoted_query_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ops_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
@@ -466,7 +466,7 @@
 </span><span id="L-291"><a href="#L-291"><span class="linenos">291</span></a>        <span class="n">db_model</span><span class="p">,</span>
 </span><span id="L-292"><a href="#L-292"><span class="linenos">292</span></a>        <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 </span><span id="L-293"><a href="#L-293"><span class="linenos">293</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="L-294"><a href="#L-294"><span class="linenos">294</span></a>        <span class="sd">&quot;&quot;&quot;export&quot;&quot;&quot;</span>
+</span><span id="L-294"><a href="#L-294"><span class="linenos">294</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;export&quot;&quot;&quot;</span>
 </span><span id="L-295"><a href="#L-295"><span class="linenos">295</span></a>
 </span><span id="L-296"><a href="#L-296"><span class="linenos">296</span></a>
 </span><span id="L-297"><a href="#L-297"><span class="linenos">297</span></a><span class="k">class</span> <span class="nc">NearSQLCommonTableExpression</span><span class="p">(</span><span class="n">NearSQLNamedEntity</span><span class="p">):</span>
@@ -784,7 +784,7 @@
     </div>
     <a class="headerlink" href="#SQLWithList"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="SQLWithList-15"><a href="#SQLWithList-15"><span class="linenos">15</span></a><span class="k">class</span> <span class="nc">SQLWithList</span><span class="p">:</span>
-</span><span id="SQLWithList-16"><a href="#SQLWithList-16"><span class="linenos">16</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="SQLWithList-16"><a href="#SQLWithList-16"><span class="linenos">16</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="SQLWithList-17"><a href="#SQLWithList-17"><span class="linenos">17</span></a><span class="sd">    Carry an ordered sequence of SQL steps for use with a SQL WITH statement.</span>
 </span><span id="SQLWithList-18"><a href="#SQLWithList-18"><span class="linenos">18</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="SQLWithList-19"><a href="#SQLWithList-19"><span class="linenos">19</span></a>
@@ -881,7 +881,7 @@
     </div>
     <a class="headerlink" href="#NearSQL"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="NearSQL-52"><a href="#NearSQL-52"><span class="linenos"> 52</span></a><span class="k">class</span> <span class="nc">NearSQL</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
-</span><span id="NearSQL-53"><a href="#NearSQL-53"><span class="linenos"> 53</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="NearSQL-53"><a href="#NearSQL-53"><span class="linenos"> 53</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="NearSQL-54"><a href="#NearSQL-54"><span class="linenos"> 54</span></a><span class="sd">    Represent SQL queries in a mostly string-form</span>
 </span><span id="NearSQL-55"><a href="#NearSQL-55"><span class="linenos"> 55</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="NearSQL-56"><a href="#NearSQL-56"><span class="linenos"> 56</span></a>
@@ -945,11 +945,11 @@
 </span><span id="NearSQL-114"><a href="#NearSQL-114"><span class="linenos">114</span></a>        <span class="n">db_model</span><span class="p">,</span>
 </span><span id="NearSQL-115"><a href="#NearSQL-115"><span class="linenos">115</span></a>        <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 </span><span id="NearSQL-116"><a href="#NearSQL-116"><span class="linenos">116</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="NearSQL-117"><a href="#NearSQL-117"><span class="linenos">117</span></a>        <span class="sd">&quot;&quot;&quot;export&quot;&quot;&quot;</span>
+</span><span id="NearSQL-117"><a href="#NearSQL-117"><span class="linenos">117</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;export&quot;&quot;&quot;</span>
 </span><span id="NearSQL-118"><a href="#NearSQL-118"><span class="linenos">118</span></a>
 </span><span id="NearSQL-119"><a href="#NearSQL-119"><span class="linenos">119</span></a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 </span><span id="NearSQL-120"><a href="#NearSQL-120"><span class="linenos">120</span></a>    <span class="k">def</span> <span class="nf">to_with_form</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">cte_cache</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">SQLWithList</span><span class="p">:</span>
-</span><span id="NearSQL-121"><a href="#NearSQL-121"><span class="linenos">121</span></a>        <span class="sd">&quot;&quot;&quot;convert ot with form&quot;&quot;&quot;</span>
+</span><span id="NearSQL-121"><a href="#NearSQL-121"><span class="linenos">121</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;convert ot with form&quot;&quot;&quot;</span>
 </span></pre></div>
 
 
@@ -1010,7 +1010,7 @@
 </span><span id="NearSQL.to_sql_str_list-114"><a href="#NearSQL.to_sql_str_list-114"><span class="linenos">114</span></a>        <span class="n">db_model</span><span class="p">,</span>
 </span><span id="NearSQL.to_sql_str_list-115"><a href="#NearSQL.to_sql_str_list-115"><span class="linenos">115</span></a>        <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 </span><span id="NearSQL.to_sql_str_list-116"><a href="#NearSQL.to_sql_str_list-116"><span class="linenos">116</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="NearSQL.to_sql_str_list-117"><a href="#NearSQL.to_sql_str_list-117"><span class="linenos">117</span></a>        <span class="sd">&quot;&quot;&quot;export&quot;&quot;&quot;</span>
+</span><span id="NearSQL.to_sql_str_list-117"><a href="#NearSQL.to_sql_str_list-117"><span class="linenos">117</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;export&quot;&quot;&quot;</span>
 </span></pre></div>
 
 
@@ -1033,7 +1033,7 @@
     <a class="headerlink" href="#NearSQL.to_with_form"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="NearSQL.to_with_form-119"><a href="#NearSQL.to_with_form-119"><span class="linenos">119</span></a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
 </span><span id="NearSQL.to_with_form-120"><a href="#NearSQL.to_with_form-120"><span class="linenos">120</span></a>    <span class="k">def</span> <span class="nf">to_with_form</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">cte_cache</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">SQLWithList</span><span class="p">:</span>
-</span><span id="NearSQL.to_with_form-121"><a href="#NearSQL.to_with_form-121"><span class="linenos">121</span></a>        <span class="sd">&quot;&quot;&quot;convert ot with form&quot;&quot;&quot;</span>
+</span><span id="NearSQL.to_with_form-121"><a href="#NearSQL.to_with_form-121"><span class="linenos">121</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;convert ot with form&quot;&quot;&quot;</span>
 </span></pre></div>
 
 
@@ -1055,7 +1055,7 @@
     </div>
     <a class="headerlink" href="#NearSQLContainer"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="NearSQLContainer-124"><a href="#NearSQLContainer-124"><span class="linenos">124</span></a><span class="k">class</span> <span class="nc">NearSQLContainer</span><span class="p">:</span>
-</span><span id="NearSQLContainer-125"><a href="#NearSQLContainer-125"><span class="linenos">125</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="NearSQLContainer-125"><a href="#NearSQLContainer-125"><span class="linenos">125</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="NearSQLContainer-126"><a href="#NearSQLContainer-126"><span class="linenos">126</span></a><span class="sd">    NearSQL with bound in columns, force_sql</span>
 </span><span id="NearSQLContainer-127"><a href="#NearSQLContainer-127"><span class="linenos">127</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="NearSQLContainer-128"><a href="#NearSQLContainer-128"><span class="linenos">128</span></a>
@@ -1096,7 +1096,7 @@
 </span><span id="NearSQLContainer-163"><a href="#NearSQLContainer-163"><span class="linenos">163</span></a>        <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 </span><span id="NearSQLContainer-164"><a href="#NearSQLContainer-164"><span class="linenos">164</span></a>        <span class="n">quoted_query_name_annotation</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="NearSQLContainer-165"><a href="#NearSQLContainer-165"><span class="linenos">165</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="NearSQLContainer-166"><a href="#NearSQLContainer-166"><span class="linenos">166</span></a>        <span class="sd">&quot;&quot;&quot;Convert subsql, possibly adding query name&quot;&quot;&quot;</span>
+</span><span id="NearSQLContainer-166"><a href="#NearSQLContainer-166"><span class="linenos">166</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert subsql, possibly adding query name&quot;&quot;&quot;</span>
 </span><span id="NearSQLContainer-167"><a href="#NearSQLContainer-167"><span class="linenos">167</span></a>        <span class="n">non_trivial_annotation</span> <span class="o">=</span> <span class="p">(</span><span class="n">quoted_query_name_annotation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
 </span><span id="NearSQLContainer-168"><a href="#NearSQLContainer-168"><span class="linenos">168</span></a>            <span class="n">quoted_query_name_annotation</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">quoted_query_name</span>
 </span><span id="NearSQLContainer-169"><a href="#NearSQLContainer-169"><span class="linenos">169</span></a>        <span class="p">)</span>
@@ -1260,7 +1260,7 @@
 </span><span id="NearSQLContainer.convert_subsql-163"><a href="#NearSQLContainer.convert_subsql-163"><span class="linenos">163</span></a>        <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 </span><span id="NearSQLContainer.convert_subsql-164"><a href="#NearSQLContainer.convert_subsql-164"><span class="linenos">164</span></a>        <span class="n">quoted_query_name_annotation</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="NearSQLContainer.convert_subsql-165"><a href="#NearSQLContainer.convert_subsql-165"><span class="linenos">165</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="NearSQLContainer.convert_subsql-166"><a href="#NearSQLContainer.convert_subsql-166"><span class="linenos">166</span></a>        <span class="sd">&quot;&quot;&quot;Convert subsql, possibly adding query name&quot;&quot;&quot;</span>
+</span><span id="NearSQLContainer.convert_subsql-166"><a href="#NearSQLContainer.convert_subsql-166"><span class="linenos">166</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert subsql, possibly adding query name&quot;&quot;&quot;</span>
 </span><span id="NearSQLContainer.convert_subsql-167"><a href="#NearSQLContainer.convert_subsql-167"><span class="linenos">167</span></a>        <span class="n">non_trivial_annotation</span> <span class="o">=</span> <span class="p">(</span><span class="n">quoted_query_name_annotation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
 </span><span id="NearSQLContainer.convert_subsql-168"><a href="#NearSQLContainer.convert_subsql-168"><span class="linenos">168</span></a>            <span class="n">quoted_query_name_annotation</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">quoted_query_name</span>
 </span><span id="NearSQLContainer.convert_subsql-169"><a href="#NearSQLContainer.convert_subsql-169"><span class="linenos">169</span></a>        <span class="p">)</span>
@@ -1395,7 +1395,7 @@
     </div>
     <a class="headerlink" href="#NearSQLNamedEntity"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="NearSQLNamedEntity-268"><a href="#NearSQLNamedEntity-268"><span class="linenos">268</span></a><span class="k">class</span> <span class="nc">NearSQLNamedEntity</span><span class="p">(</span><span class="n">NearSQL</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
-</span><span id="NearSQLNamedEntity-269"><a href="#NearSQLNamedEntity-269"><span class="linenos">269</span></a>    <span class="sd">&quot;&quot;&quot;Model for tables and common table expressions&quot;&quot;&quot;</span>
+</span><span id="NearSQLNamedEntity-269"><a href="#NearSQLNamedEntity-269"><span class="linenos">269</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Model for tables and common table expressions&quot;&quot;&quot;</span>
 </span><span id="NearSQLNamedEntity-270"><a href="#NearSQLNamedEntity-270"><span class="linenos">270</span></a>
 </span><span id="NearSQLNamedEntity-271"><a href="#NearSQLNamedEntity-271"><span class="linenos">271</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
 </span><span id="NearSQLNamedEntity-272"><a href="#NearSQLNamedEntity-272"><span class="linenos">272</span></a>        <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">terms</span><span class="p">,</span> <span class="n">query_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">quoted_query_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ops_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
@@ -1421,7 +1421,7 @@
 </span><span id="NearSQLNamedEntity-292"><a href="#NearSQLNamedEntity-292"><span class="linenos">292</span></a>        <span class="n">db_model</span><span class="p">,</span>
 </span><span id="NearSQLNamedEntity-293"><a href="#NearSQLNamedEntity-293"><span class="linenos">293</span></a>        <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 </span><span id="NearSQLNamedEntity-294"><a href="#NearSQLNamedEntity-294"><span class="linenos">294</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="NearSQLNamedEntity-295"><a href="#NearSQLNamedEntity-295"><span class="linenos">295</span></a>        <span class="sd">&quot;&quot;&quot;export&quot;&quot;&quot;</span>
+</span><span id="NearSQLNamedEntity-295"><a href="#NearSQLNamedEntity-295"><span class="linenos">295</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;export&quot;&quot;&quot;</span>
 </span></pre></div>
 
 
@@ -1471,7 +1471,7 @@
 </span><span id="NearSQLNamedEntity.to_sql_str_list-292"><a href="#NearSQLNamedEntity.to_sql_str_list-292"><span class="linenos">292</span></a>        <span class="n">db_model</span><span class="p">,</span>
 </span><span id="NearSQLNamedEntity.to_sql_str_list-293"><a href="#NearSQLNamedEntity.to_sql_str_list-293"><span class="linenos">293</span></a>        <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 </span><span id="NearSQLNamedEntity.to_sql_str_list-294"><a href="#NearSQLNamedEntity.to_sql_str_list-294"><span class="linenos">294</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="NearSQLNamedEntity.to_sql_str_list-295"><a href="#NearSQLNamedEntity.to_sql_str_list-295"><span class="linenos">295</span></a>        <span class="sd">&quot;&quot;&quot;export&quot;&quot;&quot;</span>
+</span><span id="NearSQLNamedEntity.to_sql_str_list-295"><a href="#NearSQLNamedEntity.to_sql_str_list-295"><span class="linenos">295</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;export&quot;&quot;&quot;</span>
 </span></pre></div>
 
 

@@ -169,7 +169,7 @@
 </span><span id="L-24"><a href="#L-24"><span class="linenos">  24</span></a>
 </span><span id="L-25"><a href="#L-25"><span class="linenos">  25</span></a>
 </span><span id="L-26"><a href="#L-26"><span class="linenos">  26</span></a><span class="k">def</span> <span class="nf">none_mark_scalar_or_length</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos">  27</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos">  27</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-28"><a href="#L-28"><span class="linenos">  28</span></a><span class="sd">    Test if item is a scalar (returning None) if it is, else length of object.</span>
 </span><span id="L-29"><a href="#L-29"><span class="linenos">  29</span></a>
 </span><span id="L-30"><a href="#L-30"><span class="linenos">  30</span></a><span class="sd">    :param v: value to test</span>
@@ -186,7 +186,7 @@
 </span><span id="L-41"><a href="#L-41"><span class="linenos">  41</span></a>
 </span><span id="L-42"><a href="#L-42"><span class="linenos">  42</span></a>        
 </span><span id="L-43"><a href="#L-43"><span class="linenos">  43</span></a><span class="k">def</span> <span class="nf">promote_scalar_to_array</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_len</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
-</span><span id="L-44"><a href="#L-44"><span class="linenos">  44</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos">  44</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-45"><a href="#L-45"><span class="linenos">  45</span></a><span class="sd">    Convert a scalar into a vector. Pass a non-trivial array through.</span>
 </span><span id="L-46"><a href="#L-46"><span class="linenos">  46</span></a>
 </span><span id="L-47"><a href="#L-47"><span class="linenos">  47</span></a><span class="sd">    :param vi: value to promote to scalar</span>
@@ -279,7 +279,7 @@
 </span><span id="L-134"><a href="#L-134"><span class="linenos"> 134</span></a>
 </span><span id="L-135"><a href="#L-135"><span class="linenos"> 135</span></a>
 </span><span id="L-136"><a href="#L-136"><span class="linenos"> 136</span></a><span class="k">def</span> <span class="nf">_where_expr</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
-</span><span id="L-137"><a href="#L-137"><span class="linenos"> 137</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-137"><a href="#L-137"><span class="linenos"> 137</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-138"><a href="#L-138"><span class="linenos"> 138</span></a><span class="sd">    where(cond, a, b) returns a for positions where cond is True, b otherwise (including cond None).</span>
 </span><span id="L-139"><a href="#L-139"><span class="linenos"> 139</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-140"><a href="#L-140"><span class="linenos"> 140</span></a>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span>
@@ -291,7 +291,7 @@
 </span><span id="L-146"><a href="#L-146"><span class="linenos"> 146</span></a>
 </span><span id="L-147"><a href="#L-147"><span class="linenos"> 147</span></a><span class="c1"># base class for Pandas-like API realization</span>
 </span><span id="L-148"><a href="#L-148"><span class="linenos"> 148</span></a><span class="k">class</span> <span class="nc">PandasModelBase</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expression_walker</span><span class="o">.</span><span class="n">ExpressionWalker</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
-</span><span id="L-149"><a href="#L-149"><span class="linenos"> 149</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-149"><a href="#L-149"><span class="linenos"> 149</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-150"><a href="#L-150"><span class="linenos"> 150</span></a><span class="sd">    Base class for implementing the data algebra on pandas-like APIs</span>
 </span><span id="L-151"><a href="#L-151"><span class="linenos"> 151</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-152"><a href="#L-152"><span class="linenos"> 152</span></a>
@@ -374,7 +374,7 @@
 </span><span id="L-229"><a href="#L-229"><span class="linenos"> 229</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-230"><a href="#L-230"><span class="linenos"> 230</span></a>
 </span><span id="L-231"><a href="#L-231"><span class="linenos"> 231</span></a>    <span class="k">def</span> <span class="nf">_map_v</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">value_map</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="L-232"><a href="#L-232"><span class="linenos"> 232</span></a>        <span class="sd">&quot;&quot;&quot;Map values to values.&quot;&quot;&quot;</span>
+</span><span id="L-232"><a href="#L-232"><span class="linenos"> 232</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Map values to values.&quot;&quot;&quot;</span>
 </span><span id="L-233"><a href="#L-233"><span class="linenos"> 233</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value_map</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
 </span><span id="L-234"><a href="#L-234"><span class="linenos"> 234</span></a>            <span class="n">type_a</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">guess_carried_scalar_type</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 </span><span id="L-235"><a href="#L-235"><span class="linenos"> 235</span></a>            <span class="n">type_k</span> <span class="o">=</span> <span class="p">{</span>
@@ -402,7 +402,7 @@
 </span><span id="L-257"><a href="#L-257"><span class="linenos"> 257</span></a>        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
 </span><span id="L-258"><a href="#L-258"><span class="linenos"> 258</span></a>
 </span><span id="L-259"><a href="#L-259"><span class="linenos"> 259</span></a>    <span class="k">def</span> <span class="nf">_if_else_expr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-</span><span id="L-260"><a href="#L-260"><span class="linenos"> 260</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-260"><a href="#L-260"><span class="linenos"> 260</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-261"><a href="#L-261"><span class="linenos"> 261</span></a><span class="sd">        if_else(cond, a, b) returns a for positions where cond is True, b when cond is False, None otherwise.</span>
 </span><span id="L-262"><a href="#L-262"><span class="linenos"> 262</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-263"><a href="#L-263"><span class="linenos"> 263</span></a>        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span>
@@ -416,7 +416,7 @@
 </span><span id="L-271"><a href="#L-271"><span class="linenos"> 271</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-272"><a href="#L-272"><span class="linenos"> 272</span></a>
 </span><span id="L-273"><a href="#L-273"><span class="linenos"> 273</span></a>    <span class="k">def</span> <span class="nf">_populate_impl_map</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]:</span>
-</span><span id="L-274"><a href="#L-274"><span class="linenos"> 274</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-274"><a href="#L-274"><span class="linenos"> 274</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-275"><a href="#L-275"><span class="linenos"> 275</span></a><span class="sd">        Map symbols to implementations.</span>
 </span><span id="L-276"><a href="#L-276"><span class="linenos"> 276</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-277"><a href="#L-277"><span class="linenos"> 277</span></a>        <span class="n">impl_map</span> <span class="o">=</span> <span class="p">{</span>
@@ -516,7 +516,7 @@
 </span><span id="L-371"><a href="#L-371"><span class="linenos"> 371</span></a>    <span class="c1"># utils</span>
 </span><span id="L-372"><a href="#L-372"><span class="linenos"> 372</span></a>
 </span><span id="L-373"><a href="#L-373"><span class="linenos"> 373</span></a>    <span class="k">def</span> <span class="nf">data_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="L-374"><a href="#L-374"><span class="linenos"> 374</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-374"><a href="#L-374"><span class="linenos"> 374</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-375"><a href="#L-375"><span class="linenos"> 375</span></a><span class="sd">        Build a new emtpy data frame.</span>
 </span><span id="L-376"><a href="#L-376"><span class="linenos"> 376</span></a>
 </span><span id="L-377"><a href="#L-377"><span class="linenos"> 377</span></a><span class="sd">        :param arg&quot; optional argument passed to constructor.</span>
@@ -529,34 +529,34 @@
 </span><span id="L-384"><a href="#L-384"><span class="linenos"> 384</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
 </span><span id="L-385"><a href="#L-385"><span class="linenos"> 385</span></a>
 </span><span id="L-386"><a href="#L-386"><span class="linenos"> 386</span></a>    <span class="k">def</span> <span class="nf">is_appropriate_data_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
-</span><span id="L-387"><a href="#L-387"><span class="linenos"> 387</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-387"><a href="#L-387"><span class="linenos"> 387</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-388"><a href="#L-388"><span class="linenos"> 388</span></a><span class="sd">        Check if df is our type of data frame.</span>
 </span><span id="L-389"><a href="#L-389"><span class="linenos"> 389</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-390"><a href="#L-390"><span class="linenos"> 390</span></a>        <span class="c1"># noinspection PyUnresolvedReferences</span>
 </span><span id="L-391"><a href="#L-391"><span class="linenos"> 391</span></a>        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span>
 </span><span id="L-392"><a href="#L-392"><span class="linenos"> 392</span></a>    
 </span><span id="L-393"><a href="#L-393"><span class="linenos"> 393</span></a>    <span class="k">def</span> <span class="nf">clean_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
-</span><span id="L-394"><a href="#L-394"><span class="linenos"> 394</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-394"><a href="#L-394"><span class="linenos"> 394</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-395"><a href="#L-395"><span class="linenos"> 395</span></a><span class="sd">        Copy of data frame without indices.</span>
 </span><span id="L-396"><a href="#L-396"><span class="linenos"> 396</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-397"><a href="#L-397"><span class="linenos"> 397</span></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 </span><span id="L-398"><a href="#L-398"><span class="linenos"> 398</span></a>        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </span><span id="L-399"><a href="#L-399"><span class="linenos"> 399</span></a>    
 </span><span id="L-400"><a href="#L-400"><span class="linenos"> 400</span></a>    <span class="k">def</span> <span class="nf">to_pandas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
-</span><span id="L-401"><a href="#L-401"><span class="linenos"> 401</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-401"><a href="#L-401"><span class="linenos"> 401</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-402"><a href="#L-402"><span class="linenos"> 402</span></a><span class="sd">        Convert to Pandas</span>
 </span><span id="L-403"><a href="#L-403"><span class="linenos"> 403</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-404"><a href="#L-404"><span class="linenos"> 404</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clean_copy</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 </span><span id="L-405"><a href="#L-405"><span class="linenos"> 405</span></a>    
 </span><span id="L-406"><a href="#L-406"><span class="linenos"> 406</span></a>    <span class="k">def</span> <span class="nf">drop_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-407"><a href="#L-407"><span class="linenos"> 407</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-407"><a href="#L-407"><span class="linenos"> 407</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-408"><a href="#L-408"><span class="linenos"> 408</span></a><span class="sd">        Drop indices in place.</span>
 </span><span id="L-409"><a href="#L-409"><span class="linenos"> 409</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-410"><a href="#L-410"><span class="linenos"> 410</span></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 </span><span id="L-411"><a href="#L-411"><span class="linenos"> 411</span></a>        <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span><span id="L-412"><a href="#L-412"><span class="linenos"> 412</span></a>
 </span><span id="L-413"><a href="#L-413"><span class="linenos"> 413</span></a>    <span class="k">def</span> <span class="nf">can_convert_col_to_numeric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-</span><span id="L-414"><a href="#L-414"><span class="linenos"> 414</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-414"><a href="#L-414"><span class="linenos"> 414</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-415"><a href="#L-415"><span class="linenos"> 415</span></a><span class="sd">        Return True if column or value can be converted to numeric type.</span>
 </span><span id="L-416"><a href="#L-416"><span class="linenos"> 416</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-417"><a href="#L-417"><span class="linenos"> 417</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">):</span>
@@ -565,34 +565,34 @@
 </span><span id="L-420"><a href="#L-420"><span class="linenos"> 420</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_numeric_dtype</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </span><span id="L-421"><a href="#L-421"><span class="linenos"> 421</span></a>
 </span><span id="L-422"><a href="#L-422"><span class="linenos"> 422</span></a>    <span class="k">def</span> <span class="nf">to_numeric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;coerce&quot;</span><span class="p">):</span>
-</span><span id="L-423"><a href="#L-423"><span class="linenos"> 423</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-423"><a href="#L-423"><span class="linenos"> 423</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-424"><a href="#L-424"><span class="linenos"> 424</span></a><span class="sd">        Convert column to numeric.</span>
 </span><span id="L-425"><a href="#L-425"><span class="linenos"> 425</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-426"><a href="#L-426"><span class="linenos"> 426</span></a>        <span class="c1"># noinspection PyUnresolvedReferences</span>
 </span><span id="L-427"><a href="#L-427"><span class="linenos"> 427</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;coerce&quot;</span><span class="p">)</span>
 </span><span id="L-428"><a href="#L-428"><span class="linenos"> 428</span></a>
 </span><span id="L-429"><a href="#L-429"><span class="linenos"> 429</span></a>    <span class="k">def</span> <span class="nf">isnull</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-</span><span id="L-430"><a href="#L-430"><span class="linenos"> 430</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-430"><a href="#L-430"><span class="linenos"> 430</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-431"><a href="#L-431"><span class="linenos"> 431</span></a><span class="sd">        Return vector indicating which entries are null (vectorized).</span>
 </span><span id="L-432"><a href="#L-432"><span class="linenos"> 432</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-433"><a href="#L-433"><span class="linenos"> 433</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">isnull</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </span><span id="L-434"><a href="#L-434"><span class="linenos"> 434</span></a>
 </span><span id="L-435"><a href="#L-435"><span class="linenos"> 435</span></a>    <span class="k">def</span> <span class="nf">isnan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-</span><span id="L-436"><a href="#L-436"><span class="linenos"> 436</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-436"><a href="#L-436"><span class="linenos"> 436</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-437"><a href="#L-437"><span class="linenos"> 437</span></a><span class="sd">        Return vector indicating which entries are nan (vectorized).</span>
 </span><span id="L-438"><a href="#L-438"><span class="linenos"> 438</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-439"><a href="#L-439"><span class="linenos"> 439</span></a>        <span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
 </span><span id="L-440"><a href="#L-440"><span class="linenos"> 440</span></a>        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </span><span id="L-441"><a href="#L-441"><span class="linenos"> 441</span></a>
 </span><span id="L-442"><a href="#L-442"><span class="linenos"> 442</span></a>    <span class="k">def</span> <span class="nf">isinf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-</span><span id="L-443"><a href="#L-443"><span class="linenos"> 443</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-443"><a href="#L-443"><span class="linenos"> 443</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-444"><a href="#L-444"><span class="linenos"> 444</span></a><span class="sd">        Return vector indicating which entries are nan (vectorized).</span>
 </span><span id="L-445"><a href="#L-445"><span class="linenos"> 445</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-446"><a href="#L-446"><span class="linenos"> 446</span></a>        <span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
 </span><span id="L-447"><a href="#L-447"><span class="linenos"> 447</span></a>        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </span><span id="L-448"><a href="#L-448"><span class="linenos"> 448</span></a>
 </span><span id="L-449"><a href="#L-449"><span class="linenos"> 449</span></a>    <span class="k">def</span> <span class="nf">bad_column_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-</span><span id="L-450"><a href="#L-450"><span class="linenos"> 450</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-450"><a href="#L-450"><span class="linenos"> 450</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-451"><a href="#L-451"><span class="linenos"> 451</span></a><span class="sd">        Return vector indicating which entries are bad (null or nan) (vectorized).</span>
 </span><span id="L-452"><a href="#L-452"><span class="linenos"> 452</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-453"><a href="#L-453"><span class="linenos"> 453</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">can_convert_col_to_numeric</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
@@ -603,7 +603,7 @@
 </span><span id="L-458"><a href="#L-458"><span class="linenos"> 458</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">isnull</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </span><span id="L-459"><a href="#L-459"><span class="linenos"> 459</span></a>    
 </span><span id="L-460"><a href="#L-460"><span class="linenos"> 460</span></a>    <span class="k">def</span> <span class="nf">concat_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame_list</span><span class="p">:</span> <span class="n">List</span><span class="p">):</span>
-</span><span id="L-461"><a href="#L-461"><span class="linenos"> 461</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-461"><a href="#L-461"><span class="linenos"> 461</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-462"><a href="#L-462"><span class="linenos"> 462</span></a><span class="sd">        Concatenate rows from frame_list</span>
 </span><span id="L-463"><a href="#L-463"><span class="linenos"> 463</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-464"><a href="#L-464"><span class="linenos"> 464</span></a>        <span class="n">frame_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">frame_list</span><span class="p">)</span>
@@ -614,7 +614,7 @@
 </span><span id="L-469"><a href="#L-469"><span class="linenos"> 469</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-470"><a href="#L-470"><span class="linenos"> 470</span></a>
 </span><span id="L-471"><a href="#L-471"><span class="linenos"> 471</span></a>    <span class="k">def</span> <span class="nf">concat_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame_list</span><span class="p">:</span> <span class="n">List</span><span class="p">):</span>
-</span><span id="L-472"><a href="#L-472"><span class="linenos"> 472</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-472"><a href="#L-472"><span class="linenos"> 472</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-473"><a href="#L-473"><span class="linenos"> 473</span></a><span class="sd">        Concatenate columns from frame_list</span>
 </span><span id="L-474"><a href="#L-474"><span class="linenos"> 474</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-475"><a href="#L-475"><span class="linenos"> 475</span></a>        <span class="n">frame_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">frame_list</span><span class="p">)</span>
@@ -625,16 +625,16 @@
 </span><span id="L-480"><a href="#L-480"><span class="linenos"> 480</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-481"><a href="#L-481"><span class="linenos"> 481</span></a>    
 </span><span id="L-482"><a href="#L-482"><span class="linenos"> 482</span></a>    <span class="k">def</span> <span class="nf">get_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">colname</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="L-483"><a href="#L-483"><span class="linenos"> 483</span></a>        <span class="sd">&quot;&quot;&quot;get a value from a cell&quot;&quot;&quot;</span>
+</span><span id="L-483"><a href="#L-483"><span class="linenos"> 483</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;get a value from a cell&quot;&quot;&quot;</span>
 </span><span id="L-484"><a href="#L-484"><span class="linenos"> 484</span></a>        <span class="k">return</span> <span class="n">d</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">colname</span><span class="p">]</span>
 </span><span id="L-485"><a href="#L-485"><span class="linenos"> 485</span></a>    
 </span><span id="L-486"><a href="#L-486"><span class="linenos"> 486</span></a>    <span class="k">def</span> <span class="nf">set_col</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">colname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
-</span><span id="L-487"><a href="#L-487"><span class="linenos"> 487</span></a>        <span class="sd">&quot;&quot;&quot;set column, return ref&quot;&quot;&quot;</span>
+</span><span id="L-487"><a href="#L-487"><span class="linenos"> 487</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;set column, return ref&quot;&quot;&quot;</span>
 </span><span id="L-488"><a href="#L-488"><span class="linenos"> 488</span></a>        <span class="n">d</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">colname</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span>
 </span><span id="L-489"><a href="#L-489"><span class="linenos"> 489</span></a>        <span class="k">return</span> <span class="n">d</span>
 </span><span id="L-490"><a href="#L-490"><span class="linenos"> 490</span></a>
 </span><span id="L-491"><a href="#L-491"><span class="linenos"> 491</span></a>    <span class="k">def</span> <span class="nf">table_is_keyed_by_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">column_names</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="L-492"><a href="#L-492"><span class="linenos"> 492</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-492"><a href="#L-492"><span class="linenos"> 492</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-493"><a href="#L-493"><span class="linenos"> 493</span></a><span class="sd">        Check if a table is keyed by a given list of column names.</span>
 </span><span id="L-494"><a href="#L-494"><span class="linenos"> 494</span></a>
 </span><span id="L-495"><a href="#L-495"><span class="linenos"> 495</span></a><span class="sd">        :param table: DataFrame</span>
@@ -666,7 +666,7 @@
 </span><span id="L-521"><a href="#L-521"><span class="linenos"> 521</span></a>
 </span><span id="L-522"><a href="#L-522"><span class="linenos"> 522</span></a>    <span class="c1"># noinspection PyMethodMayBeStatic,PyUnusedLocal</span>
 </span><span id="L-523"><a href="#L-523"><span class="linenos"> 523</span></a>    <span class="k">def</span> <span class="nf">_table_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
-</span><span id="L-524"><a href="#L-524"><span class="linenos"> 524</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-524"><a href="#L-524"><span class="linenos"> 524</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-525"><a href="#L-525"><span class="linenos"> 525</span></a><span class="sd">        Return a copy of data frame from table description and data_map.</span>
 </span><span id="L-526"><a href="#L-526"><span class="linenos"> 526</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-527"><a href="#L-527"><span class="linenos"> 527</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;TableDescription&quot;</span><span class="p">:</span>
@@ -697,7 +697,7 @@
 </span><span id="L-552"><a href="#L-552"><span class="linenos"> 552</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-553"><a href="#L-553"><span class="linenos"> 553</span></a>
 </span><span id="L-554"><a href="#L-554"><span class="linenos"> 554</span></a>    <span class="k">def</span> <span class="nf">_sql_proxy_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
-</span><span id="L-555"><a href="#L-555"><span class="linenos"> 555</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-555"><a href="#L-555"><span class="linenos"> 555</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-556"><a href="#L-556"><span class="linenos"> 556</span></a><span class="sd">        execute SQL</span>
 </span><span id="L-557"><a href="#L-557"><span class="linenos"> 557</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-558"><a href="#L-558"><span class="linenos"> 558</span></a>        <span class="k">assert</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;SQLNode&quot;</span>
@@ -709,7 +709,7 @@
 </span><span id="L-564"><a href="#L-564"><span class="linenos"> 564</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-565"><a href="#L-565"><span class="linenos"> 565</span></a>
 </span><span id="L-566"><a href="#L-566"><span class="linenos"> 566</span></a>    <span class="k">def</span> <span class="nf">columns_to_frame_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_rows</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-</span><span id="L-567"><a href="#L-567"><span class="linenos"> 567</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-567"><a href="#L-567"><span class="linenos"> 567</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-568"><a href="#L-568"><span class="linenos"> 568</span></a><span class="sd">        Convert a dictionary of column names to series-like objects and scalars into a Pandas data frame.</span>
 </span><span id="L-569"><a href="#L-569"><span class="linenos"> 569</span></a><span class="sd">        Deal with special cases, such as some columns coming in as scalars (often from Panda aggregation).</span>
 </span><span id="L-570"><a href="#L-570"><span class="linenos"> 570</span></a>
@@ -754,7 +754,7 @@
 </span><span id="L-609"><a href="#L-609"><span class="linenos"> 609</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">promoted_cols</span><span class="p">)</span>
 </span><span id="L-610"><a href="#L-610"><span class="linenos"> 610</span></a>
 </span><span id="L-611"><a href="#L-611"><span class="linenos"> 611</span></a>    <span class="k">def</span> <span class="nf">add_data_frame_columns_to_data_frame_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">transient_new_frame</span><span class="p">):</span>
-</span><span id="L-612"><a href="#L-612"><span class="linenos"> 612</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-612"><a href="#L-612"><span class="linenos"> 612</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-613"><a href="#L-613"><span class="linenos"> 613</span></a><span class="sd">        Add columns from transient_new_frame to res. Res may be altered, and either of res or</span>
 </span><span id="L-614"><a href="#L-614"><span class="linenos"> 614</span></a><span class="sd">        transient_new_frame may be returned.</span>
 </span><span id="L-615"><a href="#L-615"><span class="linenos"> 615</span></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -781,7 +781,7 @@
 </span><span id="L-636"><a href="#L-636"><span class="linenos"> 636</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-637"><a href="#L-637"><span class="linenos"> 637</span></a>
 </span><span id="L-638"><a href="#L-638"><span class="linenos"> 638</span></a>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="L-639"><a href="#L-639"><span class="linenos"> 639</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-639"><a href="#L-639"><span class="linenos"> 639</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-640"><a href="#L-640"><span class="linenos"> 640</span></a><span class="sd">        Implementation of Pandas evaluation of operators</span>
 </span><span id="L-641"><a href="#L-641"><span class="linenos"> 641</span></a>
 </span><span id="L-642"><a href="#L-642"><span class="linenos"> 642</span></a><span class="sd">        :param op: ViewRepresentation to evaluate</span>
@@ -793,7 +793,7 @@
 </span><span id="L-648"><a href="#L-648"><span class="linenos"> 648</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="n">op</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">)</span>
 </span><span id="L-649"><a href="#L-649"><span class="linenos"> 649</span></a>
 </span><span id="L-650"><a href="#L-650"><span class="linenos"> 650</span></a>    <span class="k">def</span> <span class="nf">_eval_value_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
-</span><span id="L-651"><a href="#L-651"><span class="linenos"> 651</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-651"><a href="#L-651"><span class="linenos"> 651</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-652"><a href="#L-652"><span class="linenos"> 652</span></a><span class="sd">        Evaluate an incoming (or value source) node.</span>
 </span><span id="L-653"><a href="#L-653"><span class="linenos"> 653</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-654"><a href="#L-654"><span class="linenos"> 654</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_method_dispatch_table</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">node_name</span><span class="p">](</span>
@@ -801,7 +801,7 @@
 </span><span id="L-656"><a href="#L-656"><span class="linenos"> 656</span></a>        <span class="p">)</span>
 </span><span id="L-657"><a href="#L-657"><span class="linenos"> 657</span></a>
 </span><span id="L-658"><a href="#L-658"><span class="linenos"> 658</span></a>    <span class="k">def</span> <span class="nf">_extend_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">):</span>
-</span><span id="L-659"><a href="#L-659"><span class="linenos"> 659</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-659"><a href="#L-659"><span class="linenos"> 659</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-660"><a href="#L-660"><span class="linenos"> 660</span></a><span class="sd">        Execute an extend step, returning a data frame.</span>
 </span><span id="L-661"><a href="#L-661"><span class="linenos"> 661</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-662"><a href="#L-662"><span class="linenos"> 662</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ExtendNode&quot;</span><span class="p">:</span>
@@ -951,7 +951,7 @@
 </span><span id="L-806"><a href="#L-806"><span class="linenos"> 806</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-807"><a href="#L-807"><span class="linenos"> 807</span></a>
 </span><span id="L-808"><a href="#L-808"><span class="linenos"> 808</span></a>    <span class="k">def</span> <span class="nf">_project_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">):</span>
-</span><span id="L-809"><a href="#L-809"><span class="linenos"> 809</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-809"><a href="#L-809"><span class="linenos"> 809</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-810"><a href="#L-810"><span class="linenos"> 810</span></a><span class="sd">        Execute a project step, returning a data frame.</span>
 </span><span id="L-811"><a href="#L-811"><span class="linenos"> 811</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-812"><a href="#L-812"><span class="linenos"> 812</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ProjectNode&quot;</span><span class="p">:</span>
@@ -1040,7 +1040,7 @@
 </span><span id="L-895"><a href="#L-895"><span class="linenos"> 895</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-896"><a href="#L-896"><span class="linenos"> 896</span></a>
 </span><span id="L-897"><a href="#L-897"><span class="linenos"> 897</span></a>    <span class="k">def</span> <span class="nf">_select_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">):</span>
-</span><span id="L-898"><a href="#L-898"><span class="linenos"> 898</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-898"><a href="#L-898"><span class="linenos"> 898</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-899"><a href="#L-899"><span class="linenos"> 899</span></a><span class="sd">        Execute a select rows step, returning a data frame.</span>
 </span><span id="L-900"><a href="#L-900"><span class="linenos"> 900</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-901"><a href="#L-901"><span class="linenos"> 901</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;SelectRowsNode&quot;</span><span class="p">:</span>
@@ -1055,7 +1055,7 @@
 </span><span id="L-910"><a href="#L-910"><span class="linenos"> 910</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-911"><a href="#L-911"><span class="linenos"> 911</span></a>
 </span><span id="L-912"><a href="#L-912"><span class="linenos"> 912</span></a>    <span class="k">def</span> <span class="nf">_select_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">):</span>
-</span><span id="L-913"><a href="#L-913"><span class="linenos"> 913</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-913"><a href="#L-913"><span class="linenos"> 913</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-914"><a href="#L-914"><span class="linenos"> 914</span></a><span class="sd">        Execute a select columns step, returning a data frame.</span>
 </span><span id="L-915"><a href="#L-915"><span class="linenos"> 915</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-916"><a href="#L-916"><span class="linenos"> 916</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;SelectColumnsNode&quot;</span><span class="p">:</span>
@@ -1066,7 +1066,7 @@
 </span><span id="L-921"><a href="#L-921"><span class="linenos"> 921</span></a>        <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">column_selection</span><span class="p">]</span>
 </span><span id="L-922"><a href="#L-922"><span class="linenos"> 922</span></a>
 </span><span id="L-923"><a href="#L-923"><span class="linenos"> 923</span></a>    <span class="k">def</span> <span class="nf">_drop_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">):</span>
-</span><span id="L-924"><a href="#L-924"><span class="linenos"> 924</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-924"><a href="#L-924"><span class="linenos"> 924</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-925"><a href="#L-925"><span class="linenos"> 925</span></a><span class="sd">        Execute a drop columns step, returning a data frame.</span>
 </span><span id="L-926"><a href="#L-926"><span class="linenos"> 926</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-927"><a href="#L-927"><span class="linenos"> 927</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;DropColumnsNode&quot;</span><span class="p">:</span>
@@ -1078,7 +1078,7 @@
 </span><span id="L-933"><a href="#L-933"><span class="linenos"> 933</span></a>        <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="n">column_selection</span><span class="p">]</span>
 </span><span id="L-934"><a href="#L-934"><span class="linenos"> 934</span></a>
 </span><span id="L-935"><a href="#L-935"><span class="linenos"> 935</span></a>    <span class="k">def</span> <span class="nf">_order_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">):</span>
-</span><span id="L-936"><a href="#L-936"><span class="linenos"> 936</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-936"><a href="#L-936"><span class="linenos"> 936</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-937"><a href="#L-937"><span class="linenos"> 937</span></a><span class="sd">        Execute an order rows step, returning a data frame.</span>
 </span><span id="L-938"><a href="#L-938"><span class="linenos"> 938</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-939"><a href="#L-939"><span class="linenos"> 939</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;OrderRowsNode&quot;</span><span class="p">:</span>
@@ -1097,7 +1097,7 @@
 </span><span id="L-952"><a href="#L-952"><span class="linenos"> 952</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-953"><a href="#L-953"><span class="linenos"> 953</span></a>
 </span><span id="L-954"><a href="#L-954"><span class="linenos"> 954</span></a>    <span class="k">def</span> <span class="nf">_map_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">):</span>
-</span><span id="L-955"><a href="#L-955"><span class="linenos"> 955</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-955"><a href="#L-955"><span class="linenos"> 955</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-956"><a href="#L-956"><span class="linenos"> 956</span></a><span class="sd">        Execute a map columns step, returning a data frame.</span>
 </span><span id="L-957"><a href="#L-957"><span class="linenos"> 957</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-958"><a href="#L-958"><span class="linenos"> 958</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;MapColumnsNode&quot;</span><span class="p">:</span>
@@ -1112,7 +1112,7 @@
 </span><span id="L-967"><a href="#L-967"><span class="linenos"> 967</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-968"><a href="#L-968"><span class="linenos"> 968</span></a>
 </span><span id="L-969"><a href="#L-969"><span class="linenos"> 969</span></a>    <span class="k">def</span> <span class="nf">_rename_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">):</span>
-</span><span id="L-970"><a href="#L-970"><span class="linenos"> 970</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-970"><a href="#L-970"><span class="linenos"> 970</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-971"><a href="#L-971"><span class="linenos"> 971</span></a><span class="sd">        Execute a rename columns step, returning a data frame.</span>
 </span><span id="L-972"><a href="#L-972"><span class="linenos"> 972</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-973"><a href="#L-973"><span class="linenos"> 973</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;RenameColumnsNode&quot;</span><span class="p">:</span>
@@ -1124,7 +1124,7 @@
 </span><span id="L-979"><a href="#L-979"><span class="linenos"> 979</span></a>
 </span><span id="L-980"><a href="#L-980"><span class="linenos"> 980</span></a>    <span class="c1"># noinspection PyMethodMayBeStatic</span>
 </span><span id="L-981"><a href="#L-981"><span class="linenos"> 981</span></a>    <span class="k">def</span> <span class="nf">standardize_join_code_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jointype</span><span class="p">):</span>
-</span><span id="L-982"><a href="#L-982"><span class="linenos"> 982</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-982"><a href="#L-982"><span class="linenos"> 982</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-983"><a href="#L-983"><span class="linenos"> 983</span></a><span class="sd">        Map join names to Pandas names. Internal method.</span>
 </span><span id="L-984"><a href="#L-984"><span class="linenos"> 984</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-985"><a href="#L-985"><span class="linenos"> 985</span></a>        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">jointype</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
@@ -1140,7 +1140,7 @@
 </span><span id="L-995"><a href="#L-995"><span class="linenos"> 995</span></a>        <span class="k">return</span> <span class="n">jointype</span>
 </span><span id="L-996"><a href="#L-996"><span class="linenos"> 996</span></a>
 </span><span id="L-997"><a href="#L-997"><span class="linenos"> 997</span></a>    <span class="k">def</span> <span class="nf">_natural_join_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">):</span>
-</span><span id="L-998"><a href="#L-998"><span class="linenos"> 998</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-998"><a href="#L-998"><span class="linenos"> 998</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-999"><a href="#L-999"><span class="linenos"> 999</span></a><span class="sd">        Execute a natural join step, returning a data frame.</span>
 </span><span id="L-1000"><a href="#L-1000"><span class="linenos">1000</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-1001"><a href="#L-1001"><span class="linenos">1001</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;NaturalJoinNode&quot;</span><span class="p">:</span>
@@ -1192,7 +1192,7 @@
 </span><span id="L-1047"><a href="#L-1047"><span class="linenos">1047</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-1048"><a href="#L-1048"><span class="linenos">1048</span></a>
 </span><span id="L-1049"><a href="#L-1049"><span class="linenos">1049</span></a>    <span class="k">def</span> <span class="nf">_concat_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">):</span>
-</span><span id="L-1050"><a href="#L-1050"><span class="linenos">1050</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-1050"><a href="#L-1050"><span class="linenos">1050</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-1051"><a href="#L-1051"><span class="linenos">1051</span></a><span class="sd">        Execute a concat rows step, returning a data frame.</span>
 </span><span id="L-1052"><a href="#L-1052"><span class="linenos">1052</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-1053"><a href="#L-1053"><span class="linenos">1053</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ConcatRowsNode&quot;</span><span class="p">:</span>
@@ -1223,7 +1223,7 @@
 </span><span id="L-1078"><a href="#L-1078"><span class="linenos">1078</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-1079"><a href="#L-1079"><span class="linenos">1079</span></a>
 </span><span id="L-1080"><a href="#L-1080"><span class="linenos">1080</span></a>    <span class="k">def</span> <span class="nf">_convert_records_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">):</span>
-</span><span id="L-1081"><a href="#L-1081"><span class="linenos">1081</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-1081"><a href="#L-1081"><span class="linenos">1081</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-1082"><a href="#L-1082"><span class="linenos">1082</span></a><span class="sd">        Execute record conversion step, returning a data frame.</span>
 </span><span id="L-1083"><a href="#L-1083"><span class="linenos">1083</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-1084"><a href="#L-1084"><span class="linenos">1084</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ConvertRecordsNode&quot;</span><span class="p">:</span>
@@ -1236,7 +1236,7 @@
 </span><span id="L-1091"><a href="#L-1091"><span class="linenos">1091</span></a>    <span class="c1"># cdata record conversion steps</span>
 </span><span id="L-1092"><a href="#L-1092"><span class="linenos">1092</span></a>
 </span><span id="L-1093"><a href="#L-1093"><span class="linenos">1093</span></a>    <span class="k">def</span> <span class="nf">blocks_to_rowrecs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">blocks_in</span><span class="p">):</span>
-</span><span id="L-1094"><a href="#L-1094"><span class="linenos">1094</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-1094"><a href="#L-1094"><span class="linenos">1094</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-1095"><a href="#L-1095"><span class="linenos">1095</span></a><span class="sd">        Convert a block record (record spanning multiple rows) into a rowrecord (record in a single row).</span>
 </span><span id="L-1096"><a href="#L-1096"><span class="linenos">1096</span></a>
 </span><span id="L-1097"><a href="#L-1097"><span class="linenos">1097</span></a><span class="sd">        :param data: data frame to be transformed</span>
@@ -1307,7 +1307,7 @@
 </span><span id="L-1162"><a href="#L-1162"><span class="linenos">1162</span></a>        <span class="o">*</span><span class="p">,</span>
 </span><span id="L-1163"><a href="#L-1163"><span class="linenos">1163</span></a>        <span class="n">blocks_out</span><span class="p">,</span>
 </span><span id="L-1164"><a href="#L-1164"><span class="linenos">1164</span></a>    <span class="p">):</span>
-</span><span id="L-1165"><a href="#L-1165"><span class="linenos">1165</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-1165"><a href="#L-1165"><span class="linenos">1165</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-1166"><a href="#L-1166"><span class="linenos">1166</span></a><span class="sd">        Convert rowrecs (single row records) into block records (multiple row records).</span>
 </span><span id="L-1167"><a href="#L-1167"><span class="linenos">1167</span></a>
 </span><span id="L-1168"><a href="#L-1168"><span class="linenos">1168</span></a><span class="sd">        :param data: data frame to transform.</span>
@@ -1359,7 +1359,7 @@
 </span><span id="L-1214"><a href="#L-1214"><span class="linenos">1214</span></a>    <span class="c1"># expression helpers</span>
 </span><span id="L-1215"><a href="#L-1215"><span class="linenos">1215</span></a>    
 </span><span id="L-1216"><a href="#L-1216"><span class="linenos">1216</span></a>    <span class="k">def</span> <span class="nf">act_on_literal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-</span><span id="L-1217"><a href="#L-1217"><span class="linenos">1217</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-1217"><a href="#L-1217"><span class="linenos">1217</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-1218"><a href="#L-1218"><span class="linenos">1218</span></a><span class="sd">        Action for a literal/constant in an expression.</span>
 </span><span id="L-1219"><a href="#L-1219"><span class="linenos">1219</span></a>
 </span><span id="L-1220"><a href="#L-1220"><span class="linenos">1220</span></a><span class="sd">        :param value: literal value being supplied</span>
@@ -1368,7 +1368,7 @@
 </span><span id="L-1223"><a href="#L-1223"><span class="linenos">1223</span></a>        <span class="k">return</span> <span class="n">value</span>
 </span><span id="L-1224"><a href="#L-1224"><span class="linenos">1224</span></a>    
 </span><span id="L-1225"><a href="#L-1225"><span class="linenos">1225</span></a>    <span class="k">def</span> <span class="nf">act_on_column_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">arg</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-</span><span id="L-1226"><a href="#L-1226"><span class="linenos">1226</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-1226"><a href="#L-1226"><span class="linenos">1226</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-1227"><a href="#L-1227"><span class="linenos">1227</span></a><span class="sd">        Action for a column name.</span>
 </span><span id="L-1228"><a href="#L-1228"><span class="linenos">1228</span></a>
 </span><span id="L-1229"><a href="#L-1229"><span class="linenos">1229</span></a><span class="sd">        :param arg: item we are acting on</span>
@@ -1378,7 +1378,7 @@
 </span><span id="L-1233"><a href="#L-1233"><span class="linenos">1233</span></a>        <span class="k">return</span> <span class="n">arg</span><span class="p">[</span><span class="n">value</span><span class="p">]</span>
 </span><span id="L-1234"><a href="#L-1234"><span class="linenos">1234</span></a>    
 </span><span id="L-1235"><a href="#L-1235"><span class="linenos">1235</span></a>    <span class="k">def</span> <span class="nf">act_on_expression</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">arg</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">op</span><span class="p">):</span>
-</span><span id="L-1236"><a href="#L-1236"><span class="linenos">1236</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-1236"><a href="#L-1236"><span class="linenos">1236</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-1237"><a href="#L-1237"><span class="linenos">1237</span></a><span class="sd">        Action for a column name.</span>
 </span><span id="L-1238"><a href="#L-1238"><span class="linenos">1238</span></a>
 </span><span id="L-1239"><a href="#L-1239"><span class="linenos">1239</span></a><span class="sd">        :param arg: item we are acting on</span>
@@ -1440,7 +1440,7 @@
     </div>
     <a class="headerlink" href="#none_mark_scalar_or_length"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="none_mark_scalar_or_length-27"><a href="#none_mark_scalar_or_length-27"><span class="linenos">27</span></a><span class="k">def</span> <span class="nf">none_mark_scalar_or_length</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-</span><span id="none_mark_scalar_or_length-28"><a href="#none_mark_scalar_or_length-28"><span class="linenos">28</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="none_mark_scalar_or_length-28"><a href="#none_mark_scalar_or_length-28"><span class="linenos">28</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="none_mark_scalar_or_length-29"><a href="#none_mark_scalar_or_length-29"><span class="linenos">29</span></a><span class="sd">    Test if item is a scalar (returning None) if it is, else length of object.</span>
 </span><span id="none_mark_scalar_or_length-30"><a href="#none_mark_scalar_or_length-30"><span class="linenos">30</span></a>
 </span><span id="none_mark_scalar_or_length-31"><a href="#none_mark_scalar_or_length-31"><span class="linenos">31</span></a><span class="sd">    :param v: value to test</span>
@@ -1486,7 +1486,7 @@
     </div>
     <a class="headerlink" href="#promote_scalar_to_array"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="promote_scalar_to_array-44"><a href="#promote_scalar_to_array-44"><span class="linenos">44</span></a><span class="k">def</span> <span class="nf">promote_scalar_to_array</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_len</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
-</span><span id="promote_scalar_to_array-45"><a href="#promote_scalar_to_array-45"><span class="linenos">45</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="promote_scalar_to_array-45"><a href="#promote_scalar_to_array-45"><span class="linenos">45</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="promote_scalar_to_array-46"><a href="#promote_scalar_to_array-46"><span class="linenos">46</span></a><span class="sd">    Convert a scalar into a vector. Pass a non-trivial array through.</span>
 </span><span id="promote_scalar_to_array-47"><a href="#promote_scalar_to_array-47"><span class="linenos">47</span></a>
 </span><span id="promote_scalar_to_array-48"><a href="#promote_scalar_to_array-48"><span class="linenos">48</span></a><span class="sd">    :param vi: value to promote to scalar</span>
@@ -1536,7 +1536,7 @@
     </div>
     <a class="headerlink" href="#PandasModelBase"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModelBase-149"><a href="#PandasModelBase-149"><span class="linenos"> 149</span></a><span class="k">class</span> <span class="nc">PandasModelBase</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expression_walker</span><span class="o">.</span><span class="n">ExpressionWalker</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
-</span><span id="PandasModelBase-150"><a href="#PandasModelBase-150"><span class="linenos"> 150</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-150"><a href="#PandasModelBase-150"><span class="linenos"> 150</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-151"><a href="#PandasModelBase-151"><span class="linenos"> 151</span></a><span class="sd">    Base class for implementing the data algebra on pandas-like APIs</span>
 </span><span id="PandasModelBase-152"><a href="#PandasModelBase-152"><span class="linenos"> 152</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-153"><a href="#PandasModelBase-153"><span class="linenos"> 153</span></a>
@@ -1619,7 +1619,7 @@
 </span><span id="PandasModelBase-230"><a href="#PandasModelBase-230"><span class="linenos"> 230</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="PandasModelBase-231"><a href="#PandasModelBase-231"><span class="linenos"> 231</span></a>
 </span><span id="PandasModelBase-232"><a href="#PandasModelBase-232"><span class="linenos"> 232</span></a>    <span class="k">def</span> <span class="nf">_map_v</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">value_map</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="PandasModelBase-233"><a href="#PandasModelBase-233"><span class="linenos"> 233</span></a>        <span class="sd">&quot;&quot;&quot;Map values to values.&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-233"><a href="#PandasModelBase-233"><span class="linenos"> 233</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Map values to values.&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-234"><a href="#PandasModelBase-234"><span class="linenos"> 234</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value_map</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
 </span><span id="PandasModelBase-235"><a href="#PandasModelBase-235"><span class="linenos"> 235</span></a>            <span class="n">type_a</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">guess_carried_scalar_type</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 </span><span id="PandasModelBase-236"><a href="#PandasModelBase-236"><span class="linenos"> 236</span></a>            <span class="n">type_k</span> <span class="o">=</span> <span class="p">{</span>
@@ -1647,7 +1647,7 @@
 </span><span id="PandasModelBase-258"><a href="#PandasModelBase-258"><span class="linenos"> 258</span></a>        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
 </span><span id="PandasModelBase-259"><a href="#PandasModelBase-259"><span class="linenos"> 259</span></a>
 </span><span id="PandasModelBase-260"><a href="#PandasModelBase-260"><span class="linenos"> 260</span></a>    <span class="k">def</span> <span class="nf">_if_else_expr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-</span><span id="PandasModelBase-261"><a href="#PandasModelBase-261"><span class="linenos"> 261</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-261"><a href="#PandasModelBase-261"><span class="linenos"> 261</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-262"><a href="#PandasModelBase-262"><span class="linenos"> 262</span></a><span class="sd">        if_else(cond, a, b) returns a for positions where cond is True, b when cond is False, None otherwise.</span>
 </span><span id="PandasModelBase-263"><a href="#PandasModelBase-263"><span class="linenos"> 263</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-264"><a href="#PandasModelBase-264"><span class="linenos"> 264</span></a>        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span>
@@ -1661,7 +1661,7 @@
 </span><span id="PandasModelBase-272"><a href="#PandasModelBase-272"><span class="linenos"> 272</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="PandasModelBase-273"><a href="#PandasModelBase-273"><span class="linenos"> 273</span></a>
 </span><span id="PandasModelBase-274"><a href="#PandasModelBase-274"><span class="linenos"> 274</span></a>    <span class="k">def</span> <span class="nf">_populate_impl_map</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]:</span>
-</span><span id="PandasModelBase-275"><a href="#PandasModelBase-275"><span class="linenos"> 275</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-275"><a href="#PandasModelBase-275"><span class="linenos"> 275</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-276"><a href="#PandasModelBase-276"><span class="linenos"> 276</span></a><span class="sd">        Map symbols to implementations.</span>
 </span><span id="PandasModelBase-277"><a href="#PandasModelBase-277"><span class="linenos"> 277</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-278"><a href="#PandasModelBase-278"><span class="linenos"> 278</span></a>        <span class="n">impl_map</span> <span class="o">=</span> <span class="p">{</span>
@@ -1761,7 +1761,7 @@
 </span><span id="PandasModelBase-372"><a href="#PandasModelBase-372"><span class="linenos"> 372</span></a>    <span class="c1"># utils</span>
 </span><span id="PandasModelBase-373"><a href="#PandasModelBase-373"><span class="linenos"> 373</span></a>
 </span><span id="PandasModelBase-374"><a href="#PandasModelBase-374"><span class="linenos"> 374</span></a>    <span class="k">def</span> <span class="nf">data_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="PandasModelBase-375"><a href="#PandasModelBase-375"><span class="linenos"> 375</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-375"><a href="#PandasModelBase-375"><span class="linenos"> 375</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-376"><a href="#PandasModelBase-376"><span class="linenos"> 376</span></a><span class="sd">        Build a new emtpy data frame.</span>
 </span><span id="PandasModelBase-377"><a href="#PandasModelBase-377"><span class="linenos"> 377</span></a>
 </span><span id="PandasModelBase-378"><a href="#PandasModelBase-378"><span class="linenos"> 378</span></a><span class="sd">        :param arg&quot; optional argument passed to constructor.</span>
@@ -1774,34 +1774,34 @@
 </span><span id="PandasModelBase-385"><a href="#PandasModelBase-385"><span class="linenos"> 385</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
 </span><span id="PandasModelBase-386"><a href="#PandasModelBase-386"><span class="linenos"> 386</span></a>
 </span><span id="PandasModelBase-387"><a href="#PandasModelBase-387"><span class="linenos"> 387</span></a>    <span class="k">def</span> <span class="nf">is_appropriate_data_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
-</span><span id="PandasModelBase-388"><a href="#PandasModelBase-388"><span class="linenos"> 388</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-388"><a href="#PandasModelBase-388"><span class="linenos"> 388</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-389"><a href="#PandasModelBase-389"><span class="linenos"> 389</span></a><span class="sd">        Check if df is our type of data frame.</span>
 </span><span id="PandasModelBase-390"><a href="#PandasModelBase-390"><span class="linenos"> 390</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-391"><a href="#PandasModelBase-391"><span class="linenos"> 391</span></a>        <span class="c1"># noinspection PyUnresolvedReferences</span>
 </span><span id="PandasModelBase-392"><a href="#PandasModelBase-392"><span class="linenos"> 392</span></a>        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span>
 </span><span id="PandasModelBase-393"><a href="#PandasModelBase-393"><span class="linenos"> 393</span></a>    
 </span><span id="PandasModelBase-394"><a href="#PandasModelBase-394"><span class="linenos"> 394</span></a>    <span class="k">def</span> <span class="nf">clean_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
-</span><span id="PandasModelBase-395"><a href="#PandasModelBase-395"><span class="linenos"> 395</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-395"><a href="#PandasModelBase-395"><span class="linenos"> 395</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-396"><a href="#PandasModelBase-396"><span class="linenos"> 396</span></a><span class="sd">        Copy of data frame without indices.</span>
 </span><span id="PandasModelBase-397"><a href="#PandasModelBase-397"><span class="linenos"> 397</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-398"><a href="#PandasModelBase-398"><span class="linenos"> 398</span></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 </span><span id="PandasModelBase-399"><a href="#PandasModelBase-399"><span class="linenos"> 399</span></a>        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </span><span id="PandasModelBase-400"><a href="#PandasModelBase-400"><span class="linenos"> 400</span></a>    
 </span><span id="PandasModelBase-401"><a href="#PandasModelBase-401"><span class="linenos"> 401</span></a>    <span class="k">def</span> <span class="nf">to_pandas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
-</span><span id="PandasModelBase-402"><a href="#PandasModelBase-402"><span class="linenos"> 402</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-402"><a href="#PandasModelBase-402"><span class="linenos"> 402</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-403"><a href="#PandasModelBase-403"><span class="linenos"> 403</span></a><span class="sd">        Convert to Pandas</span>
 </span><span id="PandasModelBase-404"><a href="#PandasModelBase-404"><span class="linenos"> 404</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-405"><a href="#PandasModelBase-405"><span class="linenos"> 405</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clean_copy</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 </span><span id="PandasModelBase-406"><a href="#PandasModelBase-406"><span class="linenos"> 406</span></a>    
 </span><span id="PandasModelBase-407"><a href="#PandasModelBase-407"><span class="linenos"> 407</span></a>    <span class="k">def</span> <span class="nf">drop_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="PandasModelBase-408"><a href="#PandasModelBase-408"><span class="linenos"> 408</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-408"><a href="#PandasModelBase-408"><span class="linenos"> 408</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-409"><a href="#PandasModelBase-409"><span class="linenos"> 409</span></a><span class="sd">        Drop indices in place.</span>
 </span><span id="PandasModelBase-410"><a href="#PandasModelBase-410"><span class="linenos"> 410</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-411"><a href="#PandasModelBase-411"><span class="linenos"> 411</span></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 </span><span id="PandasModelBase-412"><a href="#PandasModelBase-412"><span class="linenos"> 412</span></a>        <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span><span id="PandasModelBase-413"><a href="#PandasModelBase-413"><span class="linenos"> 413</span></a>
 </span><span id="PandasModelBase-414"><a href="#PandasModelBase-414"><span class="linenos"> 414</span></a>    <span class="k">def</span> <span class="nf">can_convert_col_to_numeric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-</span><span id="PandasModelBase-415"><a href="#PandasModelBase-415"><span class="linenos"> 415</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-415"><a href="#PandasModelBase-415"><span class="linenos"> 415</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-416"><a href="#PandasModelBase-416"><span class="linenos"> 416</span></a><span class="sd">        Return True if column or value can be converted to numeric type.</span>
 </span><span id="PandasModelBase-417"><a href="#PandasModelBase-417"><span class="linenos"> 417</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-418"><a href="#PandasModelBase-418"><span class="linenos"> 418</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">):</span>
@@ -1810,34 +1810,34 @@
 </span><span id="PandasModelBase-421"><a href="#PandasModelBase-421"><span class="linenos"> 421</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_numeric_dtype</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </span><span id="PandasModelBase-422"><a href="#PandasModelBase-422"><span class="linenos"> 422</span></a>
 </span><span id="PandasModelBase-423"><a href="#PandasModelBase-423"><span class="linenos"> 423</span></a>    <span class="k">def</span> <span class="nf">to_numeric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;coerce&quot;</span><span class="p">):</span>
-</span><span id="PandasModelBase-424"><a href="#PandasModelBase-424"><span class="linenos"> 424</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-424"><a href="#PandasModelBase-424"><span class="linenos"> 424</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-425"><a href="#PandasModelBase-425"><span class="linenos"> 425</span></a><span class="sd">        Convert column to numeric.</span>
 </span><span id="PandasModelBase-426"><a href="#PandasModelBase-426"><span class="linenos"> 426</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-427"><a href="#PandasModelBase-427"><span class="linenos"> 427</span></a>        <span class="c1"># noinspection PyUnresolvedReferences</span>
 </span><span id="PandasModelBase-428"><a href="#PandasModelBase-428"><span class="linenos"> 428</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;coerce&quot;</span><span class="p">)</span>
 </span><span id="PandasModelBase-429"><a href="#PandasModelBase-429"><span class="linenos"> 429</span></a>
 </span><span id="PandasModelBase-430"><a href="#PandasModelBase-430"><span class="linenos"> 430</span></a>    <span class="k">def</span> <span class="nf">isnull</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-</span><span id="PandasModelBase-431"><a href="#PandasModelBase-431"><span class="linenos"> 431</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-431"><a href="#PandasModelBase-431"><span class="linenos"> 431</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-432"><a href="#PandasModelBase-432"><span class="linenos"> 432</span></a><span class="sd">        Return vector indicating which entries are null (vectorized).</span>
 </span><span id="PandasModelBase-433"><a href="#PandasModelBase-433"><span class="linenos"> 433</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-434"><a href="#PandasModelBase-434"><span class="linenos"> 434</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">isnull</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </span><span id="PandasModelBase-435"><a href="#PandasModelBase-435"><span class="linenos"> 435</span></a>
 </span><span id="PandasModelBase-436"><a href="#PandasModelBase-436"><span class="linenos"> 436</span></a>    <span class="k">def</span> <span class="nf">isnan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-</span><span id="PandasModelBase-437"><a href="#PandasModelBase-437"><span class="linenos"> 437</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-437"><a href="#PandasModelBase-437"><span class="linenos"> 437</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-438"><a href="#PandasModelBase-438"><span class="linenos"> 438</span></a><span class="sd">        Return vector indicating which entries are nan (vectorized).</span>
 </span><span id="PandasModelBase-439"><a href="#PandasModelBase-439"><span class="linenos"> 439</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-440"><a href="#PandasModelBase-440"><span class="linenos"> 440</span></a>        <span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
 </span><span id="PandasModelBase-441"><a href="#PandasModelBase-441"><span class="linenos"> 441</span></a>        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </span><span id="PandasModelBase-442"><a href="#PandasModelBase-442"><span class="linenos"> 442</span></a>
 </span><span id="PandasModelBase-443"><a href="#PandasModelBase-443"><span class="linenos"> 443</span></a>    <span class="k">def</span> <span class="nf">isinf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-</span><span id="PandasModelBase-444"><a href="#PandasModelBase-444"><span class="linenos"> 444</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-444"><a href="#PandasModelBase-444"><span class="linenos"> 444</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-445"><a href="#PandasModelBase-445"><span class="linenos"> 445</span></a><span class="sd">        Return vector indicating which entries are nan (vectorized).</span>
 </span><span id="PandasModelBase-446"><a href="#PandasModelBase-446"><span class="linenos"> 446</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-447"><a href="#PandasModelBase-447"><span class="linenos"> 447</span></a>        <span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
 </span><span id="PandasModelBase-448"><a href="#PandasModelBase-448"><span class="linenos"> 448</span></a>        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </span><span id="PandasModelBase-449"><a href="#PandasModelBase-449"><span class="linenos"> 449</span></a>
 </span><span id="PandasModelBase-450"><a href="#PandasModelBase-450"><span class="linenos"> 450</span></a>    <span class="k">def</span> <span class="nf">bad_column_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-</span><span id="PandasModelBase-451"><a href="#PandasModelBase-451"><span class="linenos"> 451</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-451"><a href="#PandasModelBase-451"><span class="linenos"> 451</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-452"><a href="#PandasModelBase-452"><span class="linenos"> 452</span></a><span class="sd">        Return vector indicating which entries are bad (null or nan) (vectorized).</span>
 </span><span id="PandasModelBase-453"><a href="#PandasModelBase-453"><span class="linenos"> 453</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-454"><a href="#PandasModelBase-454"><span class="linenos"> 454</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">can_convert_col_to_numeric</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
@@ -1848,7 +1848,7 @@
 </span><span id="PandasModelBase-459"><a href="#PandasModelBase-459"><span class="linenos"> 459</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">isnull</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </span><span id="PandasModelBase-460"><a href="#PandasModelBase-460"><span class="linenos"> 460</span></a>    
 </span><span id="PandasModelBase-461"><a href="#PandasModelBase-461"><span class="linenos"> 461</span></a>    <span class="k">def</span> <span class="nf">concat_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame_list</span><span class="p">:</span> <span class="n">List</span><span class="p">):</span>
-</span><span id="PandasModelBase-462"><a href="#PandasModelBase-462"><span class="linenos"> 462</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-462"><a href="#PandasModelBase-462"><span class="linenos"> 462</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-463"><a href="#PandasModelBase-463"><span class="linenos"> 463</span></a><span class="sd">        Concatenate rows from frame_list</span>
 </span><span id="PandasModelBase-464"><a href="#PandasModelBase-464"><span class="linenos"> 464</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-465"><a href="#PandasModelBase-465"><span class="linenos"> 465</span></a>        <span class="n">frame_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">frame_list</span><span class="p">)</span>
@@ -1859,7 +1859,7 @@
 </span><span id="PandasModelBase-470"><a href="#PandasModelBase-470"><span class="linenos"> 470</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="PandasModelBase-471"><a href="#PandasModelBase-471"><span class="linenos"> 471</span></a>
 </span><span id="PandasModelBase-472"><a href="#PandasModelBase-472"><span class="linenos"> 472</span></a>    <span class="k">def</span> <span class="nf">concat_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame_list</span><span class="p">:</span> <span class="n">List</span><span class="p">):</span>
-</span><span id="PandasModelBase-473"><a href="#PandasModelBase-473"><span class="linenos"> 473</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-473"><a href="#PandasModelBase-473"><span class="linenos"> 473</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-474"><a href="#PandasModelBase-474"><span class="linenos"> 474</span></a><span class="sd">        Concatenate columns from frame_list</span>
 </span><span id="PandasModelBase-475"><a href="#PandasModelBase-475"><span class="linenos"> 475</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-476"><a href="#PandasModelBase-476"><span class="linenos"> 476</span></a>        <span class="n">frame_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">frame_list</span><span class="p">)</span>
@@ -1870,16 +1870,16 @@
 </span><span id="PandasModelBase-481"><a href="#PandasModelBase-481"><span class="linenos"> 481</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="PandasModelBase-482"><a href="#PandasModelBase-482"><span class="linenos"> 482</span></a>    
 </span><span id="PandasModelBase-483"><a href="#PandasModelBase-483"><span class="linenos"> 483</span></a>    <span class="k">def</span> <span class="nf">get_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">colname</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="PandasModelBase-484"><a href="#PandasModelBase-484"><span class="linenos"> 484</span></a>        <span class="sd">&quot;&quot;&quot;get a value from a cell&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-484"><a href="#PandasModelBase-484"><span class="linenos"> 484</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;get a value from a cell&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-485"><a href="#PandasModelBase-485"><span class="linenos"> 485</span></a>        <span class="k">return</span> <span class="n">d</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">colname</span><span class="p">]</span>
 </span><span id="PandasModelBase-486"><a href="#PandasModelBase-486"><span class="linenos"> 486</span></a>    
 </span><span id="PandasModelBase-487"><a href="#PandasModelBase-487"><span class="linenos"> 487</span></a>    <span class="k">def</span> <span class="nf">set_col</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">colname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
-</span><span id="PandasModelBase-488"><a href="#PandasModelBase-488"><span class="linenos"> 488</span></a>        <span class="sd">&quot;&quot;&quot;set column, return ref&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-488"><a href="#PandasModelBase-488"><span class="linenos"> 488</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;set column, return ref&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-489"><a href="#PandasModelBase-489"><span class="linenos"> 489</span></a>        <span class="n">d</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">colname</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span>
 </span><span id="PandasModelBase-490"><a href="#PandasModelBase-490"><span class="linenos"> 490</span></a>        <span class="k">return</span> <span class="n">d</span>
 </span><span id="PandasModelBase-491"><a href="#PandasModelBase-491"><span class="linenos"> 491</span></a>
 </span><span id="PandasModelBase-492"><a href="#PandasModelBase-492"><span class="linenos"> 492</span></a>    <span class="k">def</span> <span class="nf">table_is_keyed_by_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">column_names</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="PandasModelBase-493"><a href="#PandasModelBase-493"><span class="linenos"> 493</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-493"><a href="#PandasModelBase-493"><span class="linenos"> 493</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-494"><a href="#PandasModelBase-494"><span class="linenos"> 494</span></a><span class="sd">        Check if a table is keyed by a given list of column names.</span>
 </span><span id="PandasModelBase-495"><a href="#PandasModelBase-495"><span class="linenos"> 495</span></a>
 </span><span id="PandasModelBase-496"><a href="#PandasModelBase-496"><span class="linenos"> 496</span></a><span class="sd">        :param table: DataFrame</span>
@@ -1911,7 +1911,7 @@
 </span><span id="PandasModelBase-522"><a href="#PandasModelBase-522"><span class="linenos"> 522</span></a>
 </span><span id="PandasModelBase-523"><a href="#PandasModelBase-523"><span class="linenos"> 523</span></a>    <span class="c1"># noinspection PyMethodMayBeStatic,PyUnusedLocal</span>
 </span><span id="PandasModelBase-524"><a href="#PandasModelBase-524"><span class="linenos"> 524</span></a>    <span class="k">def</span> <span class="nf">_table_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
-</span><span id="PandasModelBase-525"><a href="#PandasModelBase-525"><span class="linenos"> 525</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-525"><a href="#PandasModelBase-525"><span class="linenos"> 525</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-526"><a href="#PandasModelBase-526"><span class="linenos"> 526</span></a><span class="sd">        Return a copy of data frame from table description and data_map.</span>
 </span><span id="PandasModelBase-527"><a href="#PandasModelBase-527"><span class="linenos"> 527</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-528"><a href="#PandasModelBase-528"><span class="linenos"> 528</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;TableDescription&quot;</span><span class="p">:</span>
@@ -1942,7 +1942,7 @@
 </span><span id="PandasModelBase-553"><a href="#PandasModelBase-553"><span class="linenos"> 553</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="PandasModelBase-554"><a href="#PandasModelBase-554"><span class="linenos"> 554</span></a>
 </span><span id="PandasModelBase-555"><a href="#PandasModelBase-555"><span class="linenos"> 555</span></a>    <span class="k">def</span> <span class="nf">_sql_proxy_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
-</span><span id="PandasModelBase-556"><a href="#PandasModelBase-556"><span class="linenos"> 556</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-556"><a href="#PandasModelBase-556"><span class="linenos"> 556</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-557"><a href="#PandasModelBase-557"><span class="linenos"> 557</span></a><span class="sd">        execute SQL</span>
 </span><span id="PandasModelBase-558"><a href="#PandasModelBase-558"><span class="linenos"> 558</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-559"><a href="#PandasModelBase-559"><span class="linenos"> 559</span></a>        <span class="k">assert</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;SQLNode&quot;</span>
@@ -1954,7 +1954,7 @@
 </span><span id="PandasModelBase-565"><a href="#PandasModelBase-565"><span class="linenos"> 565</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="PandasModelBase-566"><a href="#PandasModelBase-566"><span class="linenos"> 566</span></a>
 </span><span id="PandasModelBase-567"><a href="#PandasModelBase-567"><span class="linenos"> 567</span></a>    <span class="k">def</span> <span class="nf">columns_to_frame_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_rows</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-</span><span id="PandasModelBase-568"><a href="#PandasModelBase-568"><span class="linenos"> 568</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-568"><a href="#PandasModelBase-568"><span class="linenos"> 568</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-569"><a href="#PandasModelBase-569"><span class="linenos"> 569</span></a><span class="sd">        Convert a dictionary of column names to series-like objects and scalars into a Pandas data frame.</span>
 </span><span id="PandasModelBase-570"><a href="#PandasModelBase-570"><span class="linenos"> 570</span></a><span class="sd">        Deal with special cases, such as some columns coming in as scalars (often from Panda aggregation).</span>
 </span><span id="PandasModelBase-571"><a href="#PandasModelBase-571"><span class="linenos"> 571</span></a>
@@ -1999,7 +1999,7 @@
 </span><span id="PandasModelBase-610"><a href="#PandasModelBase-610"><span class="linenos"> 610</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">promoted_cols</span><span class="p">)</span>
 </span><span id="PandasModelBase-611"><a href="#PandasModelBase-611"><span class="linenos"> 611</span></a>
 </span><span id="PandasModelBase-612"><a href="#PandasModelBase-612"><span class="linenos"> 612</span></a>    <span class="k">def</span> <span class="nf">add_data_frame_columns_to_data_frame_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">transient_new_frame</span><span class="p">):</span>
-</span><span id="PandasModelBase-613"><a href="#PandasModelBase-613"><span class="linenos"> 613</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-613"><a href="#PandasModelBase-613"><span class="linenos"> 613</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-614"><a href="#PandasModelBase-614"><span class="linenos"> 614</span></a><span class="sd">        Add columns from transient_new_frame to res. Res may be altered, and either of res or</span>
 </span><span id="PandasModelBase-615"><a href="#PandasModelBase-615"><span class="linenos"> 615</span></a><span class="sd">        transient_new_frame may be returned.</span>
 </span><span id="PandasModelBase-616"><a href="#PandasModelBase-616"><span class="linenos"> 616</span></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -2026,7 +2026,7 @@
 </span><span id="PandasModelBase-637"><a href="#PandasModelBase-637"><span class="linenos"> 637</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="PandasModelBase-638"><a href="#PandasModelBase-638"><span class="linenos"> 638</span></a>
 </span><span id="PandasModelBase-639"><a href="#PandasModelBase-639"><span class="linenos"> 639</span></a>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="PandasModelBase-640"><a href="#PandasModelBase-640"><span class="linenos"> 640</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-640"><a href="#PandasModelBase-640"><span class="linenos"> 640</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-641"><a href="#PandasModelBase-641"><span class="linenos"> 641</span></a><span class="sd">        Implementation of Pandas evaluation of operators</span>
 </span><span id="PandasModelBase-642"><a href="#PandasModelBase-642"><span class="linenos"> 642</span></a>
 </span><span id="PandasModelBase-643"><a href="#PandasModelBase-643"><span class="linenos"> 643</span></a><span class="sd">        :param op: ViewRepresentation to evaluate</span>
@@ -2038,7 +2038,7 @@
 </span><span id="PandasModelBase-649"><a href="#PandasModelBase-649"><span class="linenos"> 649</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="n">op</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">)</span>
 </span><span id="PandasModelBase-650"><a href="#PandasModelBase-650"><span class="linenos"> 650</span></a>
 </span><span id="PandasModelBase-651"><a href="#PandasModelBase-651"><span class="linenos"> 651</span></a>    <span class="k">def</span> <span class="nf">_eval_value_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
-</span><span id="PandasModelBase-652"><a href="#PandasModelBase-652"><span class="linenos"> 652</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-652"><a href="#PandasModelBase-652"><span class="linenos"> 652</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-653"><a href="#PandasModelBase-653"><span class="linenos"> 653</span></a><span class="sd">        Evaluate an incoming (or value source) node.</span>
 </span><span id="PandasModelBase-654"><a href="#PandasModelBase-654"><span class="linenos"> 654</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-655"><a href="#PandasModelBase-655"><span class="linenos"> 655</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_method_dispatch_table</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">node_name</span><span class="p">](</span>
@@ -2046,7 +2046,7 @@
 </span><span id="PandasModelBase-657"><a href="#PandasModelBase-657"><span class="linenos"> 657</span></a>        <span class="p">)</span>
 </span><span id="PandasModelBase-658"><a href="#PandasModelBase-658"><span class="linenos"> 658</span></a>
 </span><span id="PandasModelBase-659"><a href="#PandasModelBase-659"><span class="linenos"> 659</span></a>    <span class="k">def</span> <span class="nf">_extend_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">):</span>
-</span><span id="PandasModelBase-660"><a href="#PandasModelBase-660"><span class="linenos"> 660</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-660"><a href="#PandasModelBase-660"><span class="linenos"> 660</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-661"><a href="#PandasModelBase-661"><span class="linenos"> 661</span></a><span class="sd">        Execute an extend step, returning a data frame.</span>
 </span><span id="PandasModelBase-662"><a href="#PandasModelBase-662"><span class="linenos"> 662</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-663"><a href="#PandasModelBase-663"><span class="linenos"> 663</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ExtendNode&quot;</span><span class="p">:</span>
@@ -2196,7 +2196,7 @@
 </span><span id="PandasModelBase-807"><a href="#PandasModelBase-807"><span class="linenos"> 807</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="PandasModelBase-808"><a href="#PandasModelBase-808"><span class="linenos"> 808</span></a>
 </span><span id="PandasModelBase-809"><a href="#PandasModelBase-809"><span class="linenos"> 809</span></a>    <span class="k">def</span> <span class="nf">_project_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">):</span>
-</span><span id="PandasModelBase-810"><a href="#PandasModelBase-810"><span class="linenos"> 810</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-810"><a href="#PandasModelBase-810"><span class="linenos"> 810</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-811"><a href="#PandasModelBase-811"><span class="linenos"> 811</span></a><span class="sd">        Execute a project step, returning a data frame.</span>
 </span><span id="PandasModelBase-812"><a href="#PandasModelBase-812"><span class="linenos"> 812</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-813"><a href="#PandasModelBase-813"><span class="linenos"> 813</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ProjectNode&quot;</span><span class="p">:</span>
@@ -2285,7 +2285,7 @@
 </span><span id="PandasModelBase-896"><a href="#PandasModelBase-896"><span class="linenos"> 896</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="PandasModelBase-897"><a href="#PandasModelBase-897"><span class="linenos"> 897</span></a>
 </span><span id="PandasModelBase-898"><a href="#PandasModelBase-898"><span class="linenos"> 898</span></a>    <span class="k">def</span> <span class="nf">_select_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">):</span>
-</span><span id="PandasModelBase-899"><a href="#PandasModelBase-899"><span class="linenos"> 899</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-899"><a href="#PandasModelBase-899"><span class="linenos"> 899</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-900"><a href="#PandasModelBase-900"><span class="linenos"> 900</span></a><span class="sd">        Execute a select rows step, returning a data frame.</span>
 </span><span id="PandasModelBase-901"><a href="#PandasModelBase-901"><span class="linenos"> 901</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-902"><a href="#PandasModelBase-902"><span class="linenos"> 902</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;SelectRowsNode&quot;</span><span class="p">:</span>
@@ -2300,7 +2300,7 @@
 </span><span id="PandasModelBase-911"><a href="#PandasModelBase-911"><span class="linenos"> 911</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="PandasModelBase-912"><a href="#PandasModelBase-912"><span class="linenos"> 912</span></a>
 </span><span id="PandasModelBase-913"><a href="#PandasModelBase-913"><span class="linenos"> 913</span></a>    <span class="k">def</span> <span class="nf">_select_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">):</span>
-</span><span id="PandasModelBase-914"><a href="#PandasModelBase-914"><span class="linenos"> 914</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-914"><a href="#PandasModelBase-914"><span class="linenos"> 914</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-915"><a href="#PandasModelBase-915"><span class="linenos"> 915</span></a><span class="sd">        Execute a select columns step, returning a data frame.</span>
 </span><span id="PandasModelBase-916"><a href="#PandasModelBase-916"><span class="linenos"> 916</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-917"><a href="#PandasModelBase-917"><span class="linenos"> 917</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;SelectColumnsNode&quot;</span><span class="p">:</span>
@@ -2311,7 +2311,7 @@
 </span><span id="PandasModelBase-922"><a href="#PandasModelBase-922"><span class="linenos"> 922</span></a>        <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">column_selection</span><span class="p">]</span>
 </span><span id="PandasModelBase-923"><a href="#PandasModelBase-923"><span class="linenos"> 923</span></a>
 </span><span id="PandasModelBase-924"><a href="#PandasModelBase-924"><span class="linenos"> 924</span></a>    <span class="k">def</span> <span class="nf">_drop_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">):</span>
-</span><span id="PandasModelBase-925"><a href="#PandasModelBase-925"><span class="linenos"> 925</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-925"><a href="#PandasModelBase-925"><span class="linenos"> 925</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-926"><a href="#PandasModelBase-926"><span class="linenos"> 926</span></a><span class="sd">        Execute a drop columns step, returning a data frame.</span>
 </span><span id="PandasModelBase-927"><a href="#PandasModelBase-927"><span class="linenos"> 927</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-928"><a href="#PandasModelBase-928"><span class="linenos"> 928</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;DropColumnsNode&quot;</span><span class="p">:</span>
@@ -2323,7 +2323,7 @@
 </span><span id="PandasModelBase-934"><a href="#PandasModelBase-934"><span class="linenos"> 934</span></a>        <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="n">column_selection</span><span class="p">]</span>
 </span><span id="PandasModelBase-935"><a href="#PandasModelBase-935"><span class="linenos"> 935</span></a>
 </span><span id="PandasModelBase-936"><a href="#PandasModelBase-936"><span class="linenos"> 936</span></a>    <span class="k">def</span> <span class="nf">_order_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">):</span>
-</span><span id="PandasModelBase-937"><a href="#PandasModelBase-937"><span class="linenos"> 937</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-937"><a href="#PandasModelBase-937"><span class="linenos"> 937</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-938"><a href="#PandasModelBase-938"><span class="linenos"> 938</span></a><span class="sd">        Execute an order rows step, returning a data frame.</span>
 </span><span id="PandasModelBase-939"><a href="#PandasModelBase-939"><span class="linenos"> 939</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-940"><a href="#PandasModelBase-940"><span class="linenos"> 940</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;OrderRowsNode&quot;</span><span class="p">:</span>
@@ -2342,7 +2342,7 @@
 </span><span id="PandasModelBase-953"><a href="#PandasModelBase-953"><span class="linenos"> 953</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="PandasModelBase-954"><a href="#PandasModelBase-954"><span class="linenos"> 954</span></a>
 </span><span id="PandasModelBase-955"><a href="#PandasModelBase-955"><span class="linenos"> 955</span></a>    <span class="k">def</span> <span class="nf">_map_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">):</span>
-</span><span id="PandasModelBase-956"><a href="#PandasModelBase-956"><span class="linenos"> 956</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-956"><a href="#PandasModelBase-956"><span class="linenos"> 956</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-957"><a href="#PandasModelBase-957"><span class="linenos"> 957</span></a><span class="sd">        Execute a map columns step, returning a data frame.</span>
 </span><span id="PandasModelBase-958"><a href="#PandasModelBase-958"><span class="linenos"> 958</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-959"><a href="#PandasModelBase-959"><span class="linenos"> 959</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;MapColumnsNode&quot;</span><span class="p">:</span>
@@ -2357,7 +2357,7 @@
 </span><span id="PandasModelBase-968"><a href="#PandasModelBase-968"><span class="linenos"> 968</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="PandasModelBase-969"><a href="#PandasModelBase-969"><span class="linenos"> 969</span></a>
 </span><span id="PandasModelBase-970"><a href="#PandasModelBase-970"><span class="linenos"> 970</span></a>    <span class="k">def</span> <span class="nf">_rename_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">):</span>
-</span><span id="PandasModelBase-971"><a href="#PandasModelBase-971"><span class="linenos"> 971</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-971"><a href="#PandasModelBase-971"><span class="linenos"> 971</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-972"><a href="#PandasModelBase-972"><span class="linenos"> 972</span></a><span class="sd">        Execute a rename columns step, returning a data frame.</span>
 </span><span id="PandasModelBase-973"><a href="#PandasModelBase-973"><span class="linenos"> 973</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-974"><a href="#PandasModelBase-974"><span class="linenos"> 974</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;RenameColumnsNode&quot;</span><span class="p">:</span>
@@ -2369,7 +2369,7 @@
 </span><span id="PandasModelBase-980"><a href="#PandasModelBase-980"><span class="linenos"> 980</span></a>
 </span><span id="PandasModelBase-981"><a href="#PandasModelBase-981"><span class="linenos"> 981</span></a>    <span class="c1"># noinspection PyMethodMayBeStatic</span>
 </span><span id="PandasModelBase-982"><a href="#PandasModelBase-982"><span class="linenos"> 982</span></a>    <span class="k">def</span> <span class="nf">standardize_join_code_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jointype</span><span class="p">):</span>
-</span><span id="PandasModelBase-983"><a href="#PandasModelBase-983"><span class="linenos"> 983</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-983"><a href="#PandasModelBase-983"><span class="linenos"> 983</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-984"><a href="#PandasModelBase-984"><span class="linenos"> 984</span></a><span class="sd">        Map join names to Pandas names. Internal method.</span>
 </span><span id="PandasModelBase-985"><a href="#PandasModelBase-985"><span class="linenos"> 985</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-986"><a href="#PandasModelBase-986"><span class="linenos"> 986</span></a>        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">jointype</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
@@ -2385,7 +2385,7 @@
 </span><span id="PandasModelBase-996"><a href="#PandasModelBase-996"><span class="linenos"> 996</span></a>        <span class="k">return</span> <span class="n">jointype</span>
 </span><span id="PandasModelBase-997"><a href="#PandasModelBase-997"><span class="linenos"> 997</span></a>
 </span><span id="PandasModelBase-998"><a href="#PandasModelBase-998"><span class="linenos"> 998</span></a>    <span class="k">def</span> <span class="nf">_natural_join_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">):</span>
-</span><span id="PandasModelBase-999"><a href="#PandasModelBase-999"><span class="linenos"> 999</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-999"><a href="#PandasModelBase-999"><span class="linenos"> 999</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-1000"><a href="#PandasModelBase-1000"><span class="linenos">1000</span></a><span class="sd">        Execute a natural join step, returning a data frame.</span>
 </span><span id="PandasModelBase-1001"><a href="#PandasModelBase-1001"><span class="linenos">1001</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-1002"><a href="#PandasModelBase-1002"><span class="linenos">1002</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;NaturalJoinNode&quot;</span><span class="p">:</span>
@@ -2437,7 +2437,7 @@
 </span><span id="PandasModelBase-1048"><a href="#PandasModelBase-1048"><span class="linenos">1048</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="PandasModelBase-1049"><a href="#PandasModelBase-1049"><span class="linenos">1049</span></a>
 </span><span id="PandasModelBase-1050"><a href="#PandasModelBase-1050"><span class="linenos">1050</span></a>    <span class="k">def</span> <span class="nf">_concat_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">):</span>
-</span><span id="PandasModelBase-1051"><a href="#PandasModelBase-1051"><span class="linenos">1051</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-1051"><a href="#PandasModelBase-1051"><span class="linenos">1051</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-1052"><a href="#PandasModelBase-1052"><span class="linenos">1052</span></a><span class="sd">        Execute a concat rows step, returning a data frame.</span>
 </span><span id="PandasModelBase-1053"><a href="#PandasModelBase-1053"><span class="linenos">1053</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-1054"><a href="#PandasModelBase-1054"><span class="linenos">1054</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ConcatRowsNode&quot;</span><span class="p">:</span>
@@ -2468,7 +2468,7 @@
 </span><span id="PandasModelBase-1079"><a href="#PandasModelBase-1079"><span class="linenos">1079</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="PandasModelBase-1080"><a href="#PandasModelBase-1080"><span class="linenos">1080</span></a>
 </span><span id="PandasModelBase-1081"><a href="#PandasModelBase-1081"><span class="linenos">1081</span></a>    <span class="k">def</span> <span class="nf">_convert_records_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">):</span>
-</span><span id="PandasModelBase-1082"><a href="#PandasModelBase-1082"><span class="linenos">1082</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-1082"><a href="#PandasModelBase-1082"><span class="linenos">1082</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-1083"><a href="#PandasModelBase-1083"><span class="linenos">1083</span></a><span class="sd">        Execute record conversion step, returning a data frame.</span>
 </span><span id="PandasModelBase-1084"><a href="#PandasModelBase-1084"><span class="linenos">1084</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-1085"><a href="#PandasModelBase-1085"><span class="linenos">1085</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ConvertRecordsNode&quot;</span><span class="p">:</span>
@@ -2481,7 +2481,7 @@
 </span><span id="PandasModelBase-1092"><a href="#PandasModelBase-1092"><span class="linenos">1092</span></a>    <span class="c1"># cdata record conversion steps</span>
 </span><span id="PandasModelBase-1093"><a href="#PandasModelBase-1093"><span class="linenos">1093</span></a>
 </span><span id="PandasModelBase-1094"><a href="#PandasModelBase-1094"><span class="linenos">1094</span></a>    <span class="k">def</span> <span class="nf">blocks_to_rowrecs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">blocks_in</span><span class="p">):</span>
-</span><span id="PandasModelBase-1095"><a href="#PandasModelBase-1095"><span class="linenos">1095</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-1095"><a href="#PandasModelBase-1095"><span class="linenos">1095</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-1096"><a href="#PandasModelBase-1096"><span class="linenos">1096</span></a><span class="sd">        Convert a block record (record spanning multiple rows) into a rowrecord (record in a single row).</span>
 </span><span id="PandasModelBase-1097"><a href="#PandasModelBase-1097"><span class="linenos">1097</span></a>
 </span><span id="PandasModelBase-1098"><a href="#PandasModelBase-1098"><span class="linenos">1098</span></a><span class="sd">        :param data: data frame to be transformed</span>
@@ -2552,7 +2552,7 @@
 </span><span id="PandasModelBase-1163"><a href="#PandasModelBase-1163"><span class="linenos">1163</span></a>        <span class="o">*</span><span class="p">,</span>
 </span><span id="PandasModelBase-1164"><a href="#PandasModelBase-1164"><span class="linenos">1164</span></a>        <span class="n">blocks_out</span><span class="p">,</span>
 </span><span id="PandasModelBase-1165"><a href="#PandasModelBase-1165"><span class="linenos">1165</span></a>    <span class="p">):</span>
-</span><span id="PandasModelBase-1166"><a href="#PandasModelBase-1166"><span class="linenos">1166</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-1166"><a href="#PandasModelBase-1166"><span class="linenos">1166</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-1167"><a href="#PandasModelBase-1167"><span class="linenos">1167</span></a><span class="sd">        Convert rowrecs (single row records) into block records (multiple row records).</span>
 </span><span id="PandasModelBase-1168"><a href="#PandasModelBase-1168"><span class="linenos">1168</span></a>
 </span><span id="PandasModelBase-1169"><a href="#PandasModelBase-1169"><span class="linenos">1169</span></a><span class="sd">        :param data: data frame to transform.</span>
@@ -2604,7 +2604,7 @@
 </span><span id="PandasModelBase-1215"><a href="#PandasModelBase-1215"><span class="linenos">1215</span></a>    <span class="c1"># expression helpers</span>
 </span><span id="PandasModelBase-1216"><a href="#PandasModelBase-1216"><span class="linenos">1216</span></a>    
 </span><span id="PandasModelBase-1217"><a href="#PandasModelBase-1217"><span class="linenos">1217</span></a>    <span class="k">def</span> <span class="nf">act_on_literal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-</span><span id="PandasModelBase-1218"><a href="#PandasModelBase-1218"><span class="linenos">1218</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-1218"><a href="#PandasModelBase-1218"><span class="linenos">1218</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-1219"><a href="#PandasModelBase-1219"><span class="linenos">1219</span></a><span class="sd">        Action for a literal/constant in an expression.</span>
 </span><span id="PandasModelBase-1220"><a href="#PandasModelBase-1220"><span class="linenos">1220</span></a>
 </span><span id="PandasModelBase-1221"><a href="#PandasModelBase-1221"><span class="linenos">1221</span></a><span class="sd">        :param value: literal value being supplied</span>
@@ -2613,7 +2613,7 @@
 </span><span id="PandasModelBase-1224"><a href="#PandasModelBase-1224"><span class="linenos">1224</span></a>        <span class="k">return</span> <span class="n">value</span>
 </span><span id="PandasModelBase-1225"><a href="#PandasModelBase-1225"><span class="linenos">1225</span></a>    
 </span><span id="PandasModelBase-1226"><a href="#PandasModelBase-1226"><span class="linenos">1226</span></a>    <span class="k">def</span> <span class="nf">act_on_column_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">arg</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-</span><span id="PandasModelBase-1227"><a href="#PandasModelBase-1227"><span class="linenos">1227</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-1227"><a href="#PandasModelBase-1227"><span class="linenos">1227</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-1228"><a href="#PandasModelBase-1228"><span class="linenos">1228</span></a><span class="sd">        Action for a column name.</span>
 </span><span id="PandasModelBase-1229"><a href="#PandasModelBase-1229"><span class="linenos">1229</span></a>
 </span><span id="PandasModelBase-1230"><a href="#PandasModelBase-1230"><span class="linenos">1230</span></a><span class="sd">        :param arg: item we are acting on</span>
@@ -2623,7 +2623,7 @@
 </span><span id="PandasModelBase-1234"><a href="#PandasModelBase-1234"><span class="linenos">1234</span></a>        <span class="k">return</span> <span class="n">arg</span><span class="p">[</span><span class="n">value</span><span class="p">]</span>
 </span><span id="PandasModelBase-1235"><a href="#PandasModelBase-1235"><span class="linenos">1235</span></a>    
 </span><span id="PandasModelBase-1236"><a href="#PandasModelBase-1236"><span class="linenos">1236</span></a>    <span class="k">def</span> <span class="nf">act_on_expression</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">arg</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">op</span><span class="p">):</span>
-</span><span id="PandasModelBase-1237"><a href="#PandasModelBase-1237"><span class="linenos">1237</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase-1237"><a href="#PandasModelBase-1237"><span class="linenos">1237</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase-1238"><a href="#PandasModelBase-1238"><span class="linenos">1238</span></a><span class="sd">        Action for a column name.</span>
 </span><span id="PandasModelBase-1239"><a href="#PandasModelBase-1239"><span class="linenos">1239</span></a>
 </span><span id="PandasModelBase-1240"><a href="#PandasModelBase-1240"><span class="linenos">1240</span></a><span class="sd">        :param arg: item we are acting on</span>
@@ -2731,7 +2731,7 @@
     </div>
     <a class="headerlink" href="#PandasModelBase.data_frame"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModelBase.data_frame-374"><a href="#PandasModelBase.data_frame-374"><span class="linenos">374</span></a>    <span class="k">def</span> <span class="nf">data_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="PandasModelBase.data_frame-375"><a href="#PandasModelBase.data_frame-375"><span class="linenos">375</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase.data_frame-375"><a href="#PandasModelBase.data_frame-375"><span class="linenos">375</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.data_frame-376"><a href="#PandasModelBase.data_frame-376"><span class="linenos">376</span></a><span class="sd">        Build a new emtpy data frame.</span>
 </span><span id="PandasModelBase.data_frame-377"><a href="#PandasModelBase.data_frame-377"><span class="linenos">377</span></a>
 </span><span id="PandasModelBase.data_frame-378"><a href="#PandasModelBase.data_frame-378"><span class="linenos">378</span></a><span class="sd">        :param arg&quot; optional argument passed to constructor.</span>
@@ -2770,7 +2770,7 @@
     </div>
     <a class="headerlink" href="#PandasModelBase.is_appropriate_data_instance"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModelBase.is_appropriate_data_instance-387"><a href="#PandasModelBase.is_appropriate_data_instance-387"><span class="linenos">387</span></a>    <span class="k">def</span> <span class="nf">is_appropriate_data_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
-</span><span id="PandasModelBase.is_appropriate_data_instance-388"><a href="#PandasModelBase.is_appropriate_data_instance-388"><span class="linenos">388</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase.is_appropriate_data_instance-388"><a href="#PandasModelBase.is_appropriate_data_instance-388"><span class="linenos">388</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.is_appropriate_data_instance-389"><a href="#PandasModelBase.is_appropriate_data_instance-389"><span class="linenos">389</span></a><span class="sd">        Check if df is our type of data frame.</span>
 </span><span id="PandasModelBase.is_appropriate_data_instance-390"><a href="#PandasModelBase.is_appropriate_data_instance-390"><span class="linenos">390</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.is_appropriate_data_instance-391"><a href="#PandasModelBase.is_appropriate_data_instance-391"><span class="linenos">391</span></a>        <span class="c1"># noinspection PyUnresolvedReferences</span>
@@ -2795,7 +2795,7 @@
     </div>
     <a class="headerlink" href="#PandasModelBase.clean_copy"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModelBase.clean_copy-394"><a href="#PandasModelBase.clean_copy-394"><span class="linenos">394</span></a>    <span class="k">def</span> <span class="nf">clean_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
-</span><span id="PandasModelBase.clean_copy-395"><a href="#PandasModelBase.clean_copy-395"><span class="linenos">395</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase.clean_copy-395"><a href="#PandasModelBase.clean_copy-395"><span class="linenos">395</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.clean_copy-396"><a href="#PandasModelBase.clean_copy-396"><span class="linenos">396</span></a><span class="sd">        Copy of data frame without indices.</span>
 </span><span id="PandasModelBase.clean_copy-397"><a href="#PandasModelBase.clean_copy-397"><span class="linenos">397</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.clean_copy-398"><a href="#PandasModelBase.clean_copy-398"><span class="linenos">398</span></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
@@ -2820,7 +2820,7 @@
     </div>
     <a class="headerlink" href="#PandasModelBase.to_pandas"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModelBase.to_pandas-401"><a href="#PandasModelBase.to_pandas-401"><span class="linenos">401</span></a>    <span class="k">def</span> <span class="nf">to_pandas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
-</span><span id="PandasModelBase.to_pandas-402"><a href="#PandasModelBase.to_pandas-402"><span class="linenos">402</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase.to_pandas-402"><a href="#PandasModelBase.to_pandas-402"><span class="linenos">402</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.to_pandas-403"><a href="#PandasModelBase.to_pandas-403"><span class="linenos">403</span></a><span class="sd">        Convert to Pandas</span>
 </span><span id="PandasModelBase.to_pandas-404"><a href="#PandasModelBase.to_pandas-404"><span class="linenos">404</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.to_pandas-405"><a href="#PandasModelBase.to_pandas-405"><span class="linenos">405</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clean_copy</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
@@ -2844,7 +2844,7 @@
     </div>
     <a class="headerlink" href="#PandasModelBase.drop_indices"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModelBase.drop_indices-407"><a href="#PandasModelBase.drop_indices-407"><span class="linenos">407</span></a>    <span class="k">def</span> <span class="nf">drop_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="PandasModelBase.drop_indices-408"><a href="#PandasModelBase.drop_indices-408"><span class="linenos">408</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase.drop_indices-408"><a href="#PandasModelBase.drop_indices-408"><span class="linenos">408</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.drop_indices-409"><a href="#PandasModelBase.drop_indices-409"><span class="linenos">409</span></a><span class="sd">        Drop indices in place.</span>
 </span><span id="PandasModelBase.drop_indices-410"><a href="#PandasModelBase.drop_indices-410"><span class="linenos">410</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.drop_indices-411"><a href="#PandasModelBase.drop_indices-411"><span class="linenos">411</span></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
@@ -2869,7 +2869,7 @@
     </div>
     <a class="headerlink" href="#PandasModelBase.can_convert_col_to_numeric"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModelBase.can_convert_col_to_numeric-414"><a href="#PandasModelBase.can_convert_col_to_numeric-414"><span class="linenos">414</span></a>    <span class="k">def</span> <span class="nf">can_convert_col_to_numeric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-</span><span id="PandasModelBase.can_convert_col_to_numeric-415"><a href="#PandasModelBase.can_convert_col_to_numeric-415"><span class="linenos">415</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase.can_convert_col_to_numeric-415"><a href="#PandasModelBase.can_convert_col_to_numeric-415"><span class="linenos">415</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.can_convert_col_to_numeric-416"><a href="#PandasModelBase.can_convert_col_to_numeric-416"><span class="linenos">416</span></a><span class="sd">        Return True if column or value can be converted to numeric type.</span>
 </span><span id="PandasModelBase.can_convert_col_to_numeric-417"><a href="#PandasModelBase.can_convert_col_to_numeric-417"><span class="linenos">417</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.can_convert_col_to_numeric-418"><a href="#PandasModelBase.can_convert_col_to_numeric-418"><span class="linenos">418</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">):</span>
@@ -2896,7 +2896,7 @@
     </div>
     <a class="headerlink" href="#PandasModelBase.to_numeric"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModelBase.to_numeric-423"><a href="#PandasModelBase.to_numeric-423"><span class="linenos">423</span></a>    <span class="k">def</span> <span class="nf">to_numeric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;coerce&quot;</span><span class="p">):</span>
-</span><span id="PandasModelBase.to_numeric-424"><a href="#PandasModelBase.to_numeric-424"><span class="linenos">424</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase.to_numeric-424"><a href="#PandasModelBase.to_numeric-424"><span class="linenos">424</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.to_numeric-425"><a href="#PandasModelBase.to_numeric-425"><span class="linenos">425</span></a><span class="sd">        Convert column to numeric.</span>
 </span><span id="PandasModelBase.to_numeric-426"><a href="#PandasModelBase.to_numeric-426"><span class="linenos">426</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.to_numeric-427"><a href="#PandasModelBase.to_numeric-427"><span class="linenos">427</span></a>        <span class="c1"># noinspection PyUnresolvedReferences</span>
@@ -2921,7 +2921,7 @@
     </div>
     <a class="headerlink" href="#PandasModelBase.isnull"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModelBase.isnull-430"><a href="#PandasModelBase.isnull-430"><span class="linenos">430</span></a>    <span class="k">def</span> <span class="nf">isnull</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-</span><span id="PandasModelBase.isnull-431"><a href="#PandasModelBase.isnull-431"><span class="linenos">431</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase.isnull-431"><a href="#PandasModelBase.isnull-431"><span class="linenos">431</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.isnull-432"><a href="#PandasModelBase.isnull-432"><span class="linenos">432</span></a><span class="sd">        Return vector indicating which entries are null (vectorized).</span>
 </span><span id="PandasModelBase.isnull-433"><a href="#PandasModelBase.isnull-433"><span class="linenos">433</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.isnull-434"><a href="#PandasModelBase.isnull-434"><span class="linenos">434</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">isnull</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -2945,7 +2945,7 @@
     </div>
     <a class="headerlink" href="#PandasModelBase.isnan"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModelBase.isnan-436"><a href="#PandasModelBase.isnan-436"><span class="linenos">436</span></a>    <span class="k">def</span> <span class="nf">isnan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-</span><span id="PandasModelBase.isnan-437"><a href="#PandasModelBase.isnan-437"><span class="linenos">437</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase.isnan-437"><a href="#PandasModelBase.isnan-437"><span class="linenos">437</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.isnan-438"><a href="#PandasModelBase.isnan-438"><span class="linenos">438</span></a><span class="sd">        Return vector indicating which entries are nan (vectorized).</span>
 </span><span id="PandasModelBase.isnan-439"><a href="#PandasModelBase.isnan-439"><span class="linenos">439</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.isnan-440"><a href="#PandasModelBase.isnan-440"><span class="linenos">440</span></a>        <span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
@@ -2970,7 +2970,7 @@
     </div>
     <a class="headerlink" href="#PandasModelBase.isinf"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModelBase.isinf-443"><a href="#PandasModelBase.isinf-443"><span class="linenos">443</span></a>    <span class="k">def</span> <span class="nf">isinf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-</span><span id="PandasModelBase.isinf-444"><a href="#PandasModelBase.isinf-444"><span class="linenos">444</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase.isinf-444"><a href="#PandasModelBase.isinf-444"><span class="linenos">444</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.isinf-445"><a href="#PandasModelBase.isinf-445"><span class="linenos">445</span></a><span class="sd">        Return vector indicating which entries are nan (vectorized).</span>
 </span><span id="PandasModelBase.isinf-446"><a href="#PandasModelBase.isinf-446"><span class="linenos">446</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.isinf-447"><a href="#PandasModelBase.isinf-447"><span class="linenos">447</span></a>        <span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
@@ -2995,7 +2995,7 @@
     </div>
     <a class="headerlink" href="#PandasModelBase.bad_column_positions"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModelBase.bad_column_positions-450"><a href="#PandasModelBase.bad_column_positions-450"><span class="linenos">450</span></a>    <span class="k">def</span> <span class="nf">bad_column_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-</span><span id="PandasModelBase.bad_column_positions-451"><a href="#PandasModelBase.bad_column_positions-451"><span class="linenos">451</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase.bad_column_positions-451"><a href="#PandasModelBase.bad_column_positions-451"><span class="linenos">451</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.bad_column_positions-452"><a href="#PandasModelBase.bad_column_positions-452"><span class="linenos">452</span></a><span class="sd">        Return vector indicating which entries are bad (null or nan) (vectorized).</span>
 </span><span id="PandasModelBase.bad_column_positions-453"><a href="#PandasModelBase.bad_column_positions-453"><span class="linenos">453</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.bad_column_positions-454"><a href="#PandasModelBase.bad_column_positions-454"><span class="linenos">454</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">can_convert_col_to_numeric</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
@@ -3024,7 +3024,7 @@
     </div>
     <a class="headerlink" href="#PandasModelBase.concat_rows"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModelBase.concat_rows-461"><a href="#PandasModelBase.concat_rows-461"><span class="linenos">461</span></a>    <span class="k">def</span> <span class="nf">concat_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame_list</span><span class="p">:</span> <span class="n">List</span><span class="p">):</span>
-</span><span id="PandasModelBase.concat_rows-462"><a href="#PandasModelBase.concat_rows-462"><span class="linenos">462</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase.concat_rows-462"><a href="#PandasModelBase.concat_rows-462"><span class="linenos">462</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.concat_rows-463"><a href="#PandasModelBase.concat_rows-463"><span class="linenos">463</span></a><span class="sd">        Concatenate rows from frame_list</span>
 </span><span id="PandasModelBase.concat_rows-464"><a href="#PandasModelBase.concat_rows-464"><span class="linenos">464</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.concat_rows-465"><a href="#PandasModelBase.concat_rows-465"><span class="linenos">465</span></a>        <span class="n">frame_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">frame_list</span><span class="p">)</span>
@@ -3053,7 +3053,7 @@
     </div>
     <a class="headerlink" href="#PandasModelBase.concat_columns"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModelBase.concat_columns-472"><a href="#PandasModelBase.concat_columns-472"><span class="linenos">472</span></a>    <span class="k">def</span> <span class="nf">concat_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame_list</span><span class="p">:</span> <span class="n">List</span><span class="p">):</span>
-</span><span id="PandasModelBase.concat_columns-473"><a href="#PandasModelBase.concat_columns-473"><span class="linenos">473</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase.concat_columns-473"><a href="#PandasModelBase.concat_columns-473"><span class="linenos">473</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.concat_columns-474"><a href="#PandasModelBase.concat_columns-474"><span class="linenos">474</span></a><span class="sd">        Concatenate columns from frame_list</span>
 </span><span id="PandasModelBase.concat_columns-475"><a href="#PandasModelBase.concat_columns-475"><span class="linenos">475</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.concat_columns-476"><a href="#PandasModelBase.concat_columns-476"><span class="linenos">476</span></a>        <span class="n">frame_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">frame_list</span><span class="p">)</span>
@@ -3082,7 +3082,7 @@
     </div>
     <a class="headerlink" href="#PandasModelBase.get_cell"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModelBase.get_cell-483"><a href="#PandasModelBase.get_cell-483"><span class="linenos">483</span></a>    <span class="k">def</span> <span class="nf">get_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">colname</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="PandasModelBase.get_cell-484"><a href="#PandasModelBase.get_cell-484"><span class="linenos">484</span></a>        <span class="sd">&quot;&quot;&quot;get a value from a cell&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase.get_cell-484"><a href="#PandasModelBase.get_cell-484"><span class="linenos">484</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;get a value from a cell&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.get_cell-485"><a href="#PandasModelBase.get_cell-485"><span class="linenos">485</span></a>        <span class="k">return</span> <span class="n">d</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">colname</span><span class="p">]</span>
 </span></pre></div>
 
@@ -3104,7 +3104,7 @@
     </div>
     <a class="headerlink" href="#PandasModelBase.set_col"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModelBase.set_col-487"><a href="#PandasModelBase.set_col-487"><span class="linenos">487</span></a>    <span class="k">def</span> <span class="nf">set_col</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">colname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
-</span><span id="PandasModelBase.set_col-488"><a href="#PandasModelBase.set_col-488"><span class="linenos">488</span></a>        <span class="sd">&quot;&quot;&quot;set column, return ref&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase.set_col-488"><a href="#PandasModelBase.set_col-488"><span class="linenos">488</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;set column, return ref&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.set_col-489"><a href="#PandasModelBase.set_col-489"><span class="linenos">489</span></a>        <span class="n">d</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">colname</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span>
 </span><span id="PandasModelBase.set_col-490"><a href="#PandasModelBase.set_col-490"><span class="linenos">490</span></a>        <span class="k">return</span> <span class="n">d</span>
 </span></pre></div>
@@ -3127,7 +3127,7 @@
     </div>
     <a class="headerlink" href="#PandasModelBase.table_is_keyed_by_columns"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModelBase.table_is_keyed_by_columns-492"><a href="#PandasModelBase.table_is_keyed_by_columns-492"><span class="linenos">492</span></a>    <span class="k">def</span> <span class="nf">table_is_keyed_by_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">column_names</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="PandasModelBase.table_is_keyed_by_columns-493"><a href="#PandasModelBase.table_is_keyed_by_columns-493"><span class="linenos">493</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase.table_is_keyed_by_columns-493"><a href="#PandasModelBase.table_is_keyed_by_columns-493"><span class="linenos">493</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.table_is_keyed_by_columns-494"><a href="#PandasModelBase.table_is_keyed_by_columns-494"><span class="linenos">494</span></a><span class="sd">        Check if a table is keyed by a given list of column names.</span>
 </span><span id="PandasModelBase.table_is_keyed_by_columns-495"><a href="#PandasModelBase.table_is_keyed_by_columns-495"><span class="linenos">495</span></a>
 </span><span id="PandasModelBase.table_is_keyed_by_columns-496"><a href="#PandasModelBase.table_is_keyed_by_columns-496"><span class="linenos">496</span></a><span class="sd">        :param table: DataFrame</span>
@@ -3187,7 +3187,7 @@
     </div>
     <a class="headerlink" href="#PandasModelBase.columns_to_frame_"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModelBase.columns_to_frame_-567"><a href="#PandasModelBase.columns_to_frame_-567"><span class="linenos">567</span></a>    <span class="k">def</span> <span class="nf">columns_to_frame_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_rows</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-</span><span id="PandasModelBase.columns_to_frame_-568"><a href="#PandasModelBase.columns_to_frame_-568"><span class="linenos">568</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase.columns_to_frame_-568"><a href="#PandasModelBase.columns_to_frame_-568"><span class="linenos">568</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.columns_to_frame_-569"><a href="#PandasModelBase.columns_to_frame_-569"><span class="linenos">569</span></a><span class="sd">        Convert a dictionary of column names to series-like objects and scalars into a Pandas data frame.</span>
 </span><span id="PandasModelBase.columns_to_frame_-570"><a href="#PandasModelBase.columns_to_frame_-570"><span class="linenos">570</span></a><span class="sd">        Deal with special cases, such as some columns coming in as scalars (often from Panda aggregation).</span>
 </span><span id="PandasModelBase.columns_to_frame_-571"><a href="#PandasModelBase.columns_to_frame_-571"><span class="linenos">571</span></a>
@@ -3264,7 +3264,7 @@ Deal with special cases, such as some columns coming in as scalars (often from P
     </div>
     <a class="headerlink" href="#PandasModelBase.add_data_frame_columns_to_data_frame_"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModelBase.add_data_frame_columns_to_data_frame_-612"><a href="#PandasModelBase.add_data_frame_columns_to_data_frame_-612"><span class="linenos">612</span></a>    <span class="k">def</span> <span class="nf">add_data_frame_columns_to_data_frame_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">transient_new_frame</span><span class="p">):</span>
-</span><span id="PandasModelBase.add_data_frame_columns_to_data_frame_-613"><a href="#PandasModelBase.add_data_frame_columns_to_data_frame_-613"><span class="linenos">613</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase.add_data_frame_columns_to_data_frame_-613"><a href="#PandasModelBase.add_data_frame_columns_to_data_frame_-613"><span class="linenos">613</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.add_data_frame_columns_to_data_frame_-614"><a href="#PandasModelBase.add_data_frame_columns_to_data_frame_-614"><span class="linenos">614</span></a><span class="sd">        Add columns from transient_new_frame to res. Res may be altered, and either of res or</span>
 </span><span id="PandasModelBase.add_data_frame_columns_to_data_frame_-615"><a href="#PandasModelBase.add_data_frame_columns_to_data_frame_-615"><span class="linenos">615</span></a><span class="sd">        transient_new_frame may be returned.</span>
 </span><span id="PandasModelBase.add_data_frame_columns_to_data_frame_-616"><a href="#PandasModelBase.add_data_frame_columns_to_data_frame_-616"><span class="linenos">616</span></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -3310,7 +3310,7 @@ transient_new_frame may be returned.</p>
     </div>
     <a class="headerlink" href="#PandasModelBase.eval"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModelBase.eval-639"><a href="#PandasModelBase.eval-639"><span class="linenos">639</span></a>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="PandasModelBase.eval-640"><a href="#PandasModelBase.eval-640"><span class="linenos">640</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase.eval-640"><a href="#PandasModelBase.eval-640"><span class="linenos">640</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.eval-641"><a href="#PandasModelBase.eval-641"><span class="linenos">641</span></a><span class="sd">        Implementation of Pandas evaluation of operators</span>
 </span><span id="PandasModelBase.eval-642"><a href="#PandasModelBase.eval-642"><span class="linenos">642</span></a>
 </span><span id="PandasModelBase.eval-643"><a href="#PandasModelBase.eval-643"><span class="linenos">643</span></a><span class="sd">        :param op: ViewRepresentation to evaluate</span>
@@ -3353,7 +3353,7 @@ transient_new_frame may be returned.</p>
     </div>
     <a class="headerlink" href="#PandasModelBase.standardize_join_code_"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModelBase.standardize_join_code_-982"><a href="#PandasModelBase.standardize_join_code_-982"><span class="linenos">982</span></a>    <span class="k">def</span> <span class="nf">standardize_join_code_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jointype</span><span class="p">):</span>
-</span><span id="PandasModelBase.standardize_join_code_-983"><a href="#PandasModelBase.standardize_join_code_-983"><span class="linenos">983</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase.standardize_join_code_-983"><a href="#PandasModelBase.standardize_join_code_-983"><span class="linenos">983</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.standardize_join_code_-984"><a href="#PandasModelBase.standardize_join_code_-984"><span class="linenos">984</span></a><span class="sd">        Map join names to Pandas names. Internal method.</span>
 </span><span id="PandasModelBase.standardize_join_code_-985"><a href="#PandasModelBase.standardize_join_code_-985"><span class="linenos">985</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.standardize_join_code_-986"><a href="#PandasModelBase.standardize_join_code_-986"><span class="linenos">986</span></a>        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">jointype</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
@@ -3387,7 +3387,7 @@ transient_new_frame may be returned.</p>
     </div>
     <a class="headerlink" href="#PandasModelBase.blocks_to_rowrecs"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModelBase.blocks_to_rowrecs-1094"><a href="#PandasModelBase.blocks_to_rowrecs-1094"><span class="linenos">1094</span></a>    <span class="k">def</span> <span class="nf">blocks_to_rowrecs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">blocks_in</span><span class="p">):</span>
-</span><span id="PandasModelBase.blocks_to_rowrecs-1095"><a href="#PandasModelBase.blocks_to_rowrecs-1095"><span class="linenos">1095</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase.blocks_to_rowrecs-1095"><a href="#PandasModelBase.blocks_to_rowrecs-1095"><span class="linenos">1095</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.blocks_to_rowrecs-1096"><a href="#PandasModelBase.blocks_to_rowrecs-1096"><span class="linenos">1096</span></a><span class="sd">        Convert a block record (record spanning multiple rows) into a rowrecord (record in a single row).</span>
 </span><span id="PandasModelBase.blocks_to_rowrecs-1097"><a href="#PandasModelBase.blocks_to_rowrecs-1097"><span class="linenos">1097</span></a>
 </span><span id="PandasModelBase.blocks_to_rowrecs-1098"><a href="#PandasModelBase.blocks_to_rowrecs-1098"><span class="linenos">1098</span></a><span class="sd">        :param data: data frame to be transformed</span>
@@ -3489,7 +3489,7 @@ transient_new_frame may be returned.</p>
 </span><span id="PandasModelBase.rowrecs_to_blocks-1163"><a href="#PandasModelBase.rowrecs_to_blocks-1163"><span class="linenos">1163</span></a>        <span class="o">*</span><span class="p">,</span>
 </span><span id="PandasModelBase.rowrecs_to_blocks-1164"><a href="#PandasModelBase.rowrecs_to_blocks-1164"><span class="linenos">1164</span></a>        <span class="n">blocks_out</span><span class="p">,</span>
 </span><span id="PandasModelBase.rowrecs_to_blocks-1165"><a href="#PandasModelBase.rowrecs_to_blocks-1165"><span class="linenos">1165</span></a>    <span class="p">):</span>
-</span><span id="PandasModelBase.rowrecs_to_blocks-1166"><a href="#PandasModelBase.rowrecs_to_blocks-1166"><span class="linenos">1166</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase.rowrecs_to_blocks-1166"><a href="#PandasModelBase.rowrecs_to_blocks-1166"><span class="linenos">1166</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.rowrecs_to_blocks-1167"><a href="#PandasModelBase.rowrecs_to_blocks-1167"><span class="linenos">1167</span></a><span class="sd">        Convert rowrecs (single row records) into block records (multiple row records).</span>
 </span><span id="PandasModelBase.rowrecs_to_blocks-1168"><a href="#PandasModelBase.rowrecs_to_blocks-1168"><span class="linenos">1168</span></a>
 </span><span id="PandasModelBase.rowrecs_to_blocks-1169"><a href="#PandasModelBase.rowrecs_to_blocks-1169"><span class="linenos">1169</span></a><span class="sd">        :param data: data frame to transform.</span>
@@ -3569,7 +3569,7 @@ transient_new_frame may be returned.</p>
     </div>
     <a class="headerlink" href="#PandasModelBase.act_on_literal"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModelBase.act_on_literal-1217"><a href="#PandasModelBase.act_on_literal-1217"><span class="linenos">1217</span></a>    <span class="k">def</span> <span class="nf">act_on_literal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-</span><span id="PandasModelBase.act_on_literal-1218"><a href="#PandasModelBase.act_on_literal-1218"><span class="linenos">1218</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase.act_on_literal-1218"><a href="#PandasModelBase.act_on_literal-1218"><span class="linenos">1218</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.act_on_literal-1219"><a href="#PandasModelBase.act_on_literal-1219"><span class="linenos">1219</span></a><span class="sd">        Action for a literal/constant in an expression.</span>
 </span><span id="PandasModelBase.act_on_literal-1220"><a href="#PandasModelBase.act_on_literal-1220"><span class="linenos">1220</span></a>
 </span><span id="PandasModelBase.act_on_literal-1221"><a href="#PandasModelBase.act_on_literal-1221"><span class="linenos">1221</span></a><span class="sd">        :param value: literal value being supplied</span>
@@ -3608,7 +3608,7 @@ transient_new_frame may be returned.</p>
     </div>
     <a class="headerlink" href="#PandasModelBase.act_on_column_name"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModelBase.act_on_column_name-1226"><a href="#PandasModelBase.act_on_column_name-1226"><span class="linenos">1226</span></a>    <span class="k">def</span> <span class="nf">act_on_column_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">arg</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-</span><span id="PandasModelBase.act_on_column_name-1227"><a href="#PandasModelBase.act_on_column_name-1227"><span class="linenos">1227</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase.act_on_column_name-1227"><a href="#PandasModelBase.act_on_column_name-1227"><span class="linenos">1227</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.act_on_column_name-1228"><a href="#PandasModelBase.act_on_column_name-1228"><span class="linenos">1228</span></a><span class="sd">        Action for a column name.</span>
 </span><span id="PandasModelBase.act_on_column_name-1229"><a href="#PandasModelBase.act_on_column_name-1229"><span class="linenos">1229</span></a>
 </span><span id="PandasModelBase.act_on_column_name-1230"><a href="#PandasModelBase.act_on_column_name-1230"><span class="linenos">1230</span></a><span class="sd">        :param arg: item we are acting on</span>
@@ -3649,7 +3649,7 @@ transient_new_frame may be returned.</p>
     </div>
     <a class="headerlink" href="#PandasModelBase.act_on_expression"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PandasModelBase.act_on_expression-1236"><a href="#PandasModelBase.act_on_expression-1236"><span class="linenos">1236</span></a>    <span class="k">def</span> <span class="nf">act_on_expression</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">arg</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">op</span><span class="p">):</span>
-</span><span id="PandasModelBase.act_on_expression-1237"><a href="#PandasModelBase.act_on_expression-1237"><span class="linenos">1237</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PandasModelBase.act_on_expression-1237"><a href="#PandasModelBase.act_on_expression-1237"><span class="linenos">1237</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PandasModelBase.act_on_expression-1238"><a href="#PandasModelBase.act_on_expression-1238"><span class="linenos">1238</span></a><span class="sd">        Action for a column name.</span>
 </span><span id="PandasModelBase.act_on_expression-1239"><a href="#PandasModelBase.act_on_expression-1239"><span class="linenos">1239</span></a>
 </span><span id="PandasModelBase.act_on_expression-1240"><a href="#PandasModelBase.act_on_expression-1240"><span class="linenos">1240</span></a><span class="sd">        :param arg: item we are acting on</span>

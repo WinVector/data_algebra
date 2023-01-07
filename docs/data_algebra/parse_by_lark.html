@@ -118,7 +118,7 @@
 </span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a>
 </span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>
 </span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a><span class="k">def</span> <span class="nf">_walk_lark_tree</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_def</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Term</span><span class="p">:</span>
-</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a><span class="sd">    Walk a lark parse tree and return our own representation.</span>
 </span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>
 </span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="sd">    :param op: lark parse tree</span>
@@ -129,7 +129,7 @@
 </span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>        <span class="n">data_def</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 </span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>
 </span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>    <span class="k">def</span> <span class="nf">lookup_symbol</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
-</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>        <span class="sd">&quot;&quot;&quot;look for symbol&quot;&quot;&quot;</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;look for symbol&quot;&quot;&quot;</span>
 </span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>        <span class="k">try</span><span class="p">:</span>
 </span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>            <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">enc_value</span><span class="p">(</span><span class="n">data_def</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
 </span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
@@ -327,7 +327,7 @@
 </span><span id="L-269"><a href="#L-269"><span class="linenos">269</span></a>
 </span><span id="L-270"><a href="#L-270"><span class="linenos">270</span></a>
 </span><span id="L-271"><a href="#L-271"><span class="linenos">271</span></a><span class="k">def</span> <span class="nf">parse_by_lark</span><span class="p">(</span><span class="n">source_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_def</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Term</span><span class="p">:</span>
-</span><span id="L-272"><a href="#L-272"><span class="linenos">272</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-272"><a href="#L-272"><span class="linenos">272</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-273"><a href="#L-273"><span class="linenos">273</span></a><span class="sd">    Parse an expression in terms of data views and values.</span>
 </span><span id="L-274"><a href="#L-274"><span class="linenos">274</span></a>
 </span><span id="L-275"><a href="#L-275"><span class="linenos">275</span></a><span class="sd">    :param source_str: string to parse</span>
@@ -358,7 +358,7 @@
     </div>
     <a class="headerlink" href="#parse_by_lark"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="parse_by_lark-272"><a href="#parse_by_lark-272"><span class="linenos">272</span></a><span class="k">def</span> <span class="nf">parse_by_lark</span><span class="p">(</span><span class="n">source_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_def</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Term</span><span class="p">:</span>
-</span><span id="parse_by_lark-273"><a href="#parse_by_lark-273"><span class="linenos">273</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="parse_by_lark-273"><a href="#parse_by_lark-273"><span class="linenos">273</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="parse_by_lark-274"><a href="#parse_by_lark-274"><span class="linenos">274</span></a><span class="sd">    Parse an expression in terms of data views and values.</span>
 </span><span id="parse_by_lark-275"><a href="#parse_by_lark-275"><span class="linenos">275</span></a>
 </span><span id="parse_by_lark-276"><a href="#parse_by_lark-276"><span class="linenos">276</span></a><span class="sd">    :param source_str: string to parse</span>

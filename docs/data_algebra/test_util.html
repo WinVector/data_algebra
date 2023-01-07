@@ -112,7 +112,7 @@
 </span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>
 </span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>
 </span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="k">def</span> <span class="nf">_re_parse</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="sd">    Return copy of object made by dumping to string via repr() and then evaluating that string.</span>
 </span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>    <span class="n">str1</span> <span class="o">=</span> <span class="nb">repr</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
@@ -126,7 +126,7 @@
 </span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>
 </span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>
 </span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a><span class="k">def</span> <span class="nf">formats_to_self</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model_map</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="sd">    Check a operator dag formats and parses back to itself.</span>
 </span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="sd">    Can raise exceptions. Also checks pickling.</span>
 </span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>
@@ -157,7 +157,7 @@
 </span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>    <span class="n">cols_case_sensitive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 </span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>    <span class="n">check_row_order</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 </span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>    <span class="sd">&quot;&quot;&quot;return False if the frames are equivalent (up to column re-ordering and possible row-reordering).</span>
+</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;return False if the frames are equivalent (up to column re-ordering and possible row-reordering).</span>
 </span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a><span class="sd">    Ignores indexing. None and nan are considered equivalent in numeric contexts.&quot;&quot;&quot;</span>
 </span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>    <span class="c1"># leave in extra checks as this is usually used by test code</span>
 </span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>    <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">lookup_data_model_for_dataframe</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
@@ -275,7 +275,7 @@
 </span><span id="L-205"><a href="#L-205"><span class="linenos">205</span></a>    <span class="n">alter_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 </span><span id="L-206"><a href="#L-206"><span class="linenos">206</span></a>    <span class="n">test_direct_ops_path</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 </span><span id="L-207"><a href="#L-207"><span class="linenos">207</span></a><span class="p">):</span>
-</span><span id="L-208"><a href="#L-208"><span class="linenos">208</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-208"><a href="#L-208"><span class="linenos">208</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-209"><a href="#L-209"><span class="linenos">209</span></a><span class="sd">    Run ops and sql_statements on db_handle, checking if result matches expect.</span>
 </span><span id="L-210"><a href="#L-210"><span class="linenos">210</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-211"><a href="#L-211"><span class="linenos">211</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_handle</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBHandle</span><span class="p">)</span>
@@ -378,7 +378,7 @@
 </span><span id="L-308"><a href="#L-308"><span class="linenos">308</span></a>    <span class="n">valid_for_empty</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 </span><span id="L-309"><a href="#L-309"><span class="linenos">309</span></a>    <span class="n">empty_produces_empty</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 </span><span id="L-310"><a href="#L-310"><span class="linenos">310</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-311"><a href="#L-311"><span class="linenos">311</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-311"><a href="#L-311"><span class="linenos">311</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-312"><a href="#L-312"><span class="linenos">312</span></a><span class="sd">    Test an operator dag produces the expected result, and parses correctly.</span>
 </span><span id="L-313"><a href="#L-313"><span class="linenos">313</span></a><span class="sd">    Asserts if there are issues</span>
 </span><span id="L-314"><a href="#L-314"><span class="linenos">314</span></a>
@@ -515,7 +515,7 @@
 </span><span id="L-445"><a href="#L-445"><span class="linenos">445</span></a>    <span class="n">check_row_order</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 </span><span id="L-446"><a href="#L-446"><span class="linenos">446</span></a>    <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 </span><span id="L-447"><a href="#L-447"><span class="linenos">447</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-448"><a href="#L-448"><span class="linenos">448</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-448"><a href="#L-448"><span class="linenos">448</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-449"><a href="#L-449"><span class="linenos">449</span></a><span class="sd">    Test an operator dag produces the expected result, and parses correctly.</span>
 </span><span id="L-450"><a href="#L-450"><span class="linenos">450</span></a><span class="sd">    Asserts if there are issues</span>
 </span><span id="L-451"><a href="#L-451"><span class="linenos">451</span></a>
@@ -580,7 +580,7 @@
 </span><span id="L-510"><a href="#L-510"><span class="linenos">510</span></a>
 </span><span id="L-511"><a href="#L-511"><span class="linenos">511</span></a>
 </span><span id="L-512"><a href="#L-512"><span class="linenos">512</span></a><span class="k">def</span> <span class="nf">get_test_dbs</span><span class="p">():</span>
-</span><span id="L-513"><a href="#L-513"><span class="linenos">513</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-513"><a href="#L-513"><span class="linenos">513</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-514"><a href="#L-514"><span class="linenos">514</span></a><span class="sd">    handles connected to databases for testing.</span>
 </span><span id="L-515"><a href="#L-515"><span class="linenos">515</span></a>
 </span><span id="L-516"><a href="#L-516"><span class="linenos">516</span></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -630,7 +630,7 @@
 </span><span id="L-560"><a href="#L-560"><span class="linenos">560</span></a>    <span class="n">local_data_model</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="L-561"><a href="#L-561"><span class="linenos">561</span></a>    <span class="n">try_on_Polars</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 </span><span id="L-562"><a href="#L-562"><span class="linenos">562</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-563"><a href="#L-563"><span class="linenos">563</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-563"><a href="#L-563"><span class="linenos">563</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-564"><a href="#L-564"><span class="linenos">564</span></a><span class="sd">    Test an operator dag produces the expected result, and parses correctly.</span>
 </span><span id="L-565"><a href="#L-565"><span class="linenos">565</span></a><span class="sd">    Assert/raise if there are issues.</span>
 </span><span id="L-566"><a href="#L-566"><span class="linenos">566</span></a>
@@ -749,7 +749,7 @@
     </div>
     <a class="headerlink" href="#formats_to_self"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="formats_to_self-59"><a href="#formats_to_self-59"><span class="linenos">59</span></a><span class="k">def</span> <span class="nf">formats_to_self</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model_map</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="formats_to_self-60"><a href="#formats_to_self-60"><span class="linenos">60</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="formats_to_self-60"><a href="#formats_to_self-60"><span class="linenos">60</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="formats_to_self-61"><a href="#formats_to_self-61"><span class="linenos">61</span></a><span class="sd">    Check a operator dag formats and parses back to itself.</span>
 </span><span id="formats_to_self-62"><a href="#formats_to_self-62"><span class="linenos">62</span></a><span class="sd">    Can raise exceptions. Also checks pickling.</span>
 </span><span id="formats_to_self-63"><a href="#formats_to_self-63"><span class="linenos">63</span></a>
@@ -811,7 +811,7 @@ Can raise exceptions. Also checks pickling.</p>
 </span><span id="equivalent_frames-88"><a href="#equivalent_frames-88"><span class="linenos"> 88</span></a>    <span class="n">cols_case_sensitive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 </span><span id="equivalent_frames-89"><a href="#equivalent_frames-89"><span class="linenos"> 89</span></a>    <span class="n">check_row_order</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 </span><span id="equivalent_frames-90"><a href="#equivalent_frames-90"><span class="linenos"> 90</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="equivalent_frames-91"><a href="#equivalent_frames-91"><span class="linenos"> 91</span></a>    <span class="sd">&quot;&quot;&quot;return False if the frames are equivalent (up to column re-ordering and possible row-reordering).</span>
+</span><span id="equivalent_frames-91"><a href="#equivalent_frames-91"><span class="linenos"> 91</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;return False if the frames are equivalent (up to column re-ordering and possible row-reordering).</span>
 </span><span id="equivalent_frames-92"><a href="#equivalent_frames-92"><span class="linenos"> 92</span></a><span class="sd">    Ignores indexing. None and nan are considered equivalent in numeric contexts.&quot;&quot;&quot;</span>
 </span><span id="equivalent_frames-93"><a href="#equivalent_frames-93"><span class="linenos"> 93</span></a>    <span class="c1"># leave in extra checks as this is usually used by test code</span>
 </span><span id="equivalent_frames-94"><a href="#equivalent_frames-94"><span class="linenos"> 94</span></a>    <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">lookup_data_model_for_dataframe</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
@@ -946,7 +946,7 @@ Ignores indexing. None and nan are considered equivalent in numeric contexts.</p
 </span><span id="check_transform_on_data_model-309"><a href="#check_transform_on_data_model-309"><span class="linenos">309</span></a>    <span class="n">valid_for_empty</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 </span><span id="check_transform_on_data_model-310"><a href="#check_transform_on_data_model-310"><span class="linenos">310</span></a>    <span class="n">empty_produces_empty</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 </span><span id="check_transform_on_data_model-311"><a href="#check_transform_on_data_model-311"><span class="linenos">311</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="check_transform_on_data_model-312"><a href="#check_transform_on_data_model-312"><span class="linenos">312</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="check_transform_on_data_model-312"><a href="#check_transform_on_data_model-312"><span class="linenos">312</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="check_transform_on_data_model-313"><a href="#check_transform_on_data_model-313"><span class="linenos">313</span></a><span class="sd">    Test an operator dag produces the expected result, and parses correctly.</span>
 </span><span id="check_transform_on_data_model-314"><a href="#check_transform_on_data_model-314"><span class="linenos">314</span></a><span class="sd">    Asserts if there are issues</span>
 </span><span id="check_transform_on_data_model-315"><a href="#check_transform_on_data_model-315"><span class="linenos">315</span></a>
@@ -1112,7 +1112,7 @@ Asserts if there are issues</p>
     </div>
     <a class="headerlink" href="#get_test_dbs"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="get_test_dbs-513"><a href="#get_test_dbs-513"><span class="linenos">513</span></a><span class="k">def</span> <span class="nf">get_test_dbs</span><span class="p">():</span>
-</span><span id="get_test_dbs-514"><a href="#get_test_dbs-514"><span class="linenos">514</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="get_test_dbs-514"><a href="#get_test_dbs-514"><span class="linenos">514</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="get_test_dbs-515"><a href="#get_test_dbs-515"><span class="linenos">515</span></a><span class="sd">    handles connected to databases for testing.</span>
 </span><span id="get_test_dbs-516"><a href="#get_test_dbs-516"><span class="linenos">516</span></a>
 </span><span id="get_test_dbs-517"><a href="#get_test_dbs-517"><span class="linenos">517</span></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -1178,7 +1178,7 @@ Asserts if there are issues</p>
 </span><span id="check_transform-561"><a href="#check_transform-561"><span class="linenos">561</span></a>    <span class="n">local_data_model</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="check_transform-562"><a href="#check_transform-562"><span class="linenos">562</span></a>    <span class="n">try_on_Polars</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 </span><span id="check_transform-563"><a href="#check_transform-563"><span class="linenos">563</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="check_transform-564"><a href="#check_transform-564"><span class="linenos">564</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="check_transform-564"><a href="#check_transform-564"><span class="linenos">564</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="check_transform-565"><a href="#check_transform-565"><span class="linenos">565</span></a><span class="sd">    Test an operator dag produces the expected result, and parses correctly.</span>
 </span><span id="check_transform-566"><a href="#check_transform-566"><span class="linenos">566</span></a><span class="sd">    Assert/raise if there are issues.</span>
 </span><span id="check_transform-567"><a href="#check_transform-567"><span class="linenos">567</span></a>

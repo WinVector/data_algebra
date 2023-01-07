@@ -104,7 +104,7 @@
 </span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a>
 </span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a>
 </span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="k">class</span> <span class="nc">OrderedSet</span><span class="p">(</span><span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">MutableSet</span><span class="p">):</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="sd">    Ordered set to enhance presentation of column names.</span>
 </span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a>
@@ -118,7 +118,7 @@
 </span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
 </span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a>
 </span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a>        <span class="sd">&quot;&quot;&quot;add/replace elements&quot;&quot;&quot;</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;add/replace elements&quot;&quot;&quot;</span>
 </span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a>        <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
 </span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a>            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;update() takes no keyword arguments&quot;</span><span class="p">)</span>
 </span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a>
@@ -128,11 +128,11 @@
 </span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 </span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>
 </span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elem</span><span class="p">):</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a>        <span class="sd">&quot;&quot;&quot;add an element&quot;&quot;&quot;</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;add an element&quot;&quot;&quot;</span>
 </span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">impl</span><span class="p">[</span><span class="n">elem</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 </span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>
 </span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a>    <span class="k">def</span> <span class="nf">discard</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elem</span><span class="p">):</span>
-</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a>        <span class="sd">&quot;&quot;&quot;delete an element&quot;&quot;&quot;</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;delete an element&quot;&quot;&quot;</span>
 </span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 </span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>
 </span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>    <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -178,7 +178,7 @@
 </span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>        <span class="k">return</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
 </span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>
 </span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>    <span class="k">def</span> <span class="nf">union</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>        <span class="sd">&quot;&quot;&quot;create new set union&quot;&quot;&quot;</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;create new set union&quot;&quot;&quot;</span>
 </span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">()</span>
 </span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
 </span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>            <span class="n">res</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
@@ -191,7 +191,7 @@
 </span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>
 </span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>
 </span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a><span class="k">def</span> <span class="nf">ordered_intersect</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OrderedSet</span><span class="p">:</span>
-</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a><span class="sd">    Intersection of two iterables, ordered by a.</span>
 </span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>  <span class="c1"># treat string as atomic, not iterable</span>
@@ -201,7 +201,7 @@
 </span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>
 </span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>
 </span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a><span class="k">def</span> <span class="nf">ordered_union</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OrderedSet</span><span class="p">:</span>
-</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a><span class="sd">    Union of two iterables, ordered by a first, then b.</span>
 </span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>  <span class="c1"># treat string as atomic, not iterable</span>
@@ -214,7 +214,7 @@
 </span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>
 </span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>
 </span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a><span class="k">def</span> <span class="nf">ordered_diff</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OrderedSet</span><span class="p">:</span>
-</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a><span class="sd">    a with b removed, a order preserved.</span>
 </span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>  <span class="c1"># treat string as atomic, not iterable</span>
@@ -238,7 +238,7 @@
     </div>
     <a class="headerlink" href="#OrderedSet"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="OrderedSet-17"><a href="#OrderedSet-17"><span class="linenos"> 17</span></a><span class="k">class</span> <span class="nc">OrderedSet</span><span class="p">(</span><span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">MutableSet</span><span class="p">):</span>
-</span><span id="OrderedSet-18"><a href="#OrderedSet-18"><span class="linenos"> 18</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="OrderedSet-18"><a href="#OrderedSet-18"><span class="linenos"> 18</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="OrderedSet-19"><a href="#OrderedSet-19"><span class="linenos"> 19</span></a><span class="sd">    Ordered set to enhance presentation of column names.</span>
 </span><span id="OrderedSet-20"><a href="#OrderedSet-20"><span class="linenos"> 20</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="OrderedSet-21"><a href="#OrderedSet-21"><span class="linenos"> 21</span></a>
@@ -252,7 +252,7 @@
 </span><span id="OrderedSet-29"><a href="#OrderedSet-29"><span class="linenos"> 29</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
 </span><span id="OrderedSet-30"><a href="#OrderedSet-30"><span class="linenos"> 30</span></a>
 </span><span id="OrderedSet-31"><a href="#OrderedSet-31"><span class="linenos"> 31</span></a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span id="OrderedSet-32"><a href="#OrderedSet-32"><span class="linenos"> 32</span></a>        <span class="sd">&quot;&quot;&quot;add/replace elements&quot;&quot;&quot;</span>
+</span><span id="OrderedSet-32"><a href="#OrderedSet-32"><span class="linenos"> 32</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;add/replace elements&quot;&quot;&quot;</span>
 </span><span id="OrderedSet-33"><a href="#OrderedSet-33"><span class="linenos"> 33</span></a>        <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
 </span><span id="OrderedSet-34"><a href="#OrderedSet-34"><span class="linenos"> 34</span></a>            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;update() takes no keyword arguments&quot;</span><span class="p">)</span>
 </span><span id="OrderedSet-35"><a href="#OrderedSet-35"><span class="linenos"> 35</span></a>
@@ -262,11 +262,11 @@
 </span><span id="OrderedSet-39"><a href="#OrderedSet-39"><span class="linenos"> 39</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 </span><span id="OrderedSet-40"><a href="#OrderedSet-40"><span class="linenos"> 40</span></a>
 </span><span id="OrderedSet-41"><a href="#OrderedSet-41"><span class="linenos"> 41</span></a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elem</span><span class="p">):</span>
-</span><span id="OrderedSet-42"><a href="#OrderedSet-42"><span class="linenos"> 42</span></a>        <span class="sd">&quot;&quot;&quot;add an element&quot;&quot;&quot;</span>
+</span><span id="OrderedSet-42"><a href="#OrderedSet-42"><span class="linenos"> 42</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;add an element&quot;&quot;&quot;</span>
 </span><span id="OrderedSet-43"><a href="#OrderedSet-43"><span class="linenos"> 43</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">impl</span><span class="p">[</span><span class="n">elem</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 </span><span id="OrderedSet-44"><a href="#OrderedSet-44"><span class="linenos"> 44</span></a>
 </span><span id="OrderedSet-45"><a href="#OrderedSet-45"><span class="linenos"> 45</span></a>    <span class="k">def</span> <span class="nf">discard</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elem</span><span class="p">):</span>
-</span><span id="OrderedSet-46"><a href="#OrderedSet-46"><span class="linenos"> 46</span></a>        <span class="sd">&quot;&quot;&quot;delete an element&quot;&quot;&quot;</span>
+</span><span id="OrderedSet-46"><a href="#OrderedSet-46"><span class="linenos"> 46</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;delete an element&quot;&quot;&quot;</span>
 </span><span id="OrderedSet-47"><a href="#OrderedSet-47"><span class="linenos"> 47</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 </span><span id="OrderedSet-48"><a href="#OrderedSet-48"><span class="linenos"> 48</span></a>
 </span><span id="OrderedSet-49"><a href="#OrderedSet-49"><span class="linenos"> 49</span></a>    <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -312,7 +312,7 @@
 </span><span id="OrderedSet-89"><a href="#OrderedSet-89"><span class="linenos"> 89</span></a>        <span class="k">return</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
 </span><span id="OrderedSet-90"><a href="#OrderedSet-90"><span class="linenos"> 90</span></a>
 </span><span id="OrderedSet-91"><a href="#OrderedSet-91"><span class="linenos"> 91</span></a>    <span class="k">def</span> <span class="nf">union</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-</span><span id="OrderedSet-92"><a href="#OrderedSet-92"><span class="linenos"> 92</span></a>        <span class="sd">&quot;&quot;&quot;create new set union&quot;&quot;&quot;</span>
+</span><span id="OrderedSet-92"><a href="#OrderedSet-92"><span class="linenos"> 92</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;create new set union&quot;&quot;&quot;</span>
 </span><span id="OrderedSet-93"><a href="#OrderedSet-93"><span class="linenos"> 93</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">()</span>
 </span><span id="OrderedSet-94"><a href="#OrderedSet-94"><span class="linenos"> 94</span></a>        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
 </span><span id="OrderedSet-95"><a href="#OrderedSet-95"><span class="linenos"> 95</span></a>            <span class="n">res</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
@@ -363,7 +363,7 @@
     </div>
     <a class="headerlink" href="#OrderedSet.update"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="OrderedSet.update-31"><a href="#OrderedSet.update-31"><span class="linenos">31</span></a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span id="OrderedSet.update-32"><a href="#OrderedSet.update-32"><span class="linenos">32</span></a>        <span class="sd">&quot;&quot;&quot;add/replace elements&quot;&quot;&quot;</span>
+</span><span id="OrderedSet.update-32"><a href="#OrderedSet.update-32"><span class="linenos">32</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;add/replace elements&quot;&quot;&quot;</span>
 </span><span id="OrderedSet.update-33"><a href="#OrderedSet.update-33"><span class="linenos">33</span></a>        <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
 </span><span id="OrderedSet.update-34"><a href="#OrderedSet.update-34"><span class="linenos">34</span></a>            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;update() takes no keyword arguments&quot;</span><span class="p">)</span>
 </span><span id="OrderedSet.update-35"><a href="#OrderedSet.update-35"><span class="linenos">35</span></a>
@@ -391,7 +391,7 @@
     </div>
     <a class="headerlink" href="#OrderedSet.add"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="OrderedSet.add-41"><a href="#OrderedSet.add-41"><span class="linenos">41</span></a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elem</span><span class="p">):</span>
-</span><span id="OrderedSet.add-42"><a href="#OrderedSet.add-42"><span class="linenos">42</span></a>        <span class="sd">&quot;&quot;&quot;add an element&quot;&quot;&quot;</span>
+</span><span id="OrderedSet.add-42"><a href="#OrderedSet.add-42"><span class="linenos">42</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;add an element&quot;&quot;&quot;</span>
 </span><span id="OrderedSet.add-43"><a href="#OrderedSet.add-43"><span class="linenos">43</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">impl</span><span class="p">[</span><span class="n">elem</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 </span></pre></div>
 
@@ -413,7 +413,7 @@
     </div>
     <a class="headerlink" href="#OrderedSet.discard"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="OrderedSet.discard-45"><a href="#OrderedSet.discard-45"><span class="linenos">45</span></a>    <span class="k">def</span> <span class="nf">discard</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elem</span><span class="p">):</span>
-</span><span id="OrderedSet.discard-46"><a href="#OrderedSet.discard-46"><span class="linenos">46</span></a>        <span class="sd">&quot;&quot;&quot;delete an element&quot;&quot;&quot;</span>
+</span><span id="OrderedSet.discard-46"><a href="#OrderedSet.discard-46"><span class="linenos">46</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;delete an element&quot;&quot;&quot;</span>
 </span><span id="OrderedSet.discard-47"><a href="#OrderedSet.discard-47"><span class="linenos">47</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 </span></pre></div>
 
@@ -454,7 +454,7 @@
     </div>
     <a class="headerlink" href="#OrderedSet.union"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="OrderedSet.union-91"><a href="#OrderedSet.union-91"><span class="linenos"> 91</span></a>    <span class="k">def</span> <span class="nf">union</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-</span><span id="OrderedSet.union-92"><a href="#OrderedSet.union-92"><span class="linenos"> 92</span></a>        <span class="sd">&quot;&quot;&quot;create new set union&quot;&quot;&quot;</span>
+</span><span id="OrderedSet.union-92"><a href="#OrderedSet.union-92"><span class="linenos"> 92</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;create new set union&quot;&quot;&quot;</span>
 </span><span id="OrderedSet.union-93"><a href="#OrderedSet.union-93"><span class="linenos"> 93</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">()</span>
 </span><span id="OrderedSet.union-94"><a href="#OrderedSet.union-94"><span class="linenos"> 94</span></a>        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
 </span><span id="OrderedSet.union-95"><a href="#OrderedSet.union-95"><span class="linenos"> 95</span></a>            <span class="n">res</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
@@ -500,7 +500,7 @@
     </div>
     <a class="headerlink" href="#ordered_intersect"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="ordered_intersect-104"><a href="#ordered_intersect-104"><span class="linenos">104</span></a><span class="k">def</span> <span class="nf">ordered_intersect</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OrderedSet</span><span class="p">:</span>
-</span><span id="ordered_intersect-105"><a href="#ordered_intersect-105"><span class="linenos">105</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ordered_intersect-105"><a href="#ordered_intersect-105"><span class="linenos">105</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="ordered_intersect-106"><a href="#ordered_intersect-106"><span class="linenos">106</span></a><span class="sd">    Intersection of two iterables, ordered by a.</span>
 </span><span id="ordered_intersect-107"><a href="#ordered_intersect-107"><span class="linenos">107</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="ordered_intersect-108"><a href="#ordered_intersect-108"><span class="linenos">108</span></a>    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>  <span class="c1"># treat string as atomic, not iterable</span>
@@ -527,7 +527,7 @@
     </div>
     <a class="headerlink" href="#ordered_union"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="ordered_union-114"><a href="#ordered_union-114"><span class="linenos">114</span></a><span class="k">def</span> <span class="nf">ordered_union</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OrderedSet</span><span class="p">:</span>
-</span><span id="ordered_union-115"><a href="#ordered_union-115"><span class="linenos">115</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ordered_union-115"><a href="#ordered_union-115"><span class="linenos">115</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="ordered_union-116"><a href="#ordered_union-116"><span class="linenos">116</span></a><span class="sd">    Union of two iterables, ordered by a first, then b.</span>
 </span><span id="ordered_union-117"><a href="#ordered_union-117"><span class="linenos">117</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="ordered_union-118"><a href="#ordered_union-118"><span class="linenos">118</span></a>    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>  <span class="c1"># treat string as atomic, not iterable</span>
@@ -557,7 +557,7 @@
     </div>
     <a class="headerlink" href="#ordered_diff"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="ordered_diff-127"><a href="#ordered_diff-127"><span class="linenos">127</span></a><span class="k">def</span> <span class="nf">ordered_diff</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OrderedSet</span><span class="p">:</span>
-</span><span id="ordered_diff-128"><a href="#ordered_diff-128"><span class="linenos">128</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ordered_diff-128"><a href="#ordered_diff-128"><span class="linenos">128</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="ordered_diff-129"><a href="#ordered_diff-129"><span class="linenos">129</span></a><span class="sd">    a with b removed, a order preserved.</span>
 </span><span id="ordered_diff-130"><a href="#ordered_diff-130"><span class="linenos">130</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="ordered_diff-131"><a href="#ordered_diff-131"><span class="linenos">131</span></a>    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>  <span class="c1"># treat string as atomic, not iterable</span>

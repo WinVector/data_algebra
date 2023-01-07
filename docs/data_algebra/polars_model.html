@@ -226,7 +226,7 @@
 </span><span id="L-67"><a href="#L-67"><span class="linenos">  67</span></a>
 </span><span id="L-68"><a href="#L-68"><span class="linenos">  68</span></a>
 </span><span id="L-69"><a href="#L-69"><span class="linenos">  69</span></a><span class="k">class</span> <span class="nc">PolarsTerm</span><span class="p">:</span>
-</span><span id="L-70"><a href="#L-70"><span class="linenos">  70</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos">  70</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-71"><a href="#L-71"><span class="linenos">  71</span></a><span class="sd">    Class to carry Polars expression term and annotations about expression tree.</span>
 </span><span id="L-72"><a href="#L-72"><span class="linenos">  72</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-73"><a href="#L-73"><span class="linenos">  73</span></a>
@@ -245,7 +245,7 @@
 </span><span id="L-86"><a href="#L-86"><span class="linenos">  86</span></a>        <span class="n">is_series</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 </span><span id="L-87"><a href="#L-87"><span class="linenos">  87</span></a>        <span class="n">lit_value</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="L-88"><a href="#L-88"><span class="linenos">  88</span></a>        <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-89"><a href="#L-89"><span class="linenos">  89</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-89"><a href="#L-89"><span class="linenos">  89</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-90"><a href="#L-90"><span class="linenos">  90</span></a><span class="sd">        Carry a Polars expression term (polars_term) plus annotations.</span>
 </span><span id="L-91"><a href="#L-91"><span class="linenos">  91</span></a>
 </span><span id="L-92"><a href="#L-92"><span class="linenos">  92</span></a><span class="sd">        :param polars_term: Optional Polars expression (None means collect info, not a true term)</span>
@@ -268,7 +268,7 @@
 </span><span id="L-109"><a href="#L-109"><span class="linenos"> 109</span></a>
 </span><span id="L-110"><a href="#L-110"><span class="linenos"> 110</span></a>
 </span><span id="L-111"><a href="#L-111"><span class="linenos"> 111</span></a><span class="k">class</span> <span class="nc">ExpressionRequirementsCollector</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">expression_walker</span><span class="o">.</span><span class="n">ExpressionWalker</span><span class="p">):</span>
-</span><span id="L-112"><a href="#L-112"><span class="linenos"> 112</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-112"><a href="#L-112"><span class="linenos"> 112</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-113"><a href="#L-113"><span class="linenos"> 113</span></a><span class="sd">    Class to collect what accommodations an expression needs.</span>
 </span><span id="L-114"><a href="#L-114"><span class="linenos"> 114</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-115"><a href="#L-115"><span class="linenos"> 115</span></a>    <span class="n">collect_required</span><span class="p">:</span> <span class="nb">bool</span>
@@ -300,7 +300,7 @@
 </span><span id="L-141"><a href="#L-141"><span class="linenos"> 141</span></a>        <span class="p">}</span>
 </span><span id="L-142"><a href="#L-142"><span class="linenos"> 142</span></a>    
 </span><span id="L-143"><a href="#L-143"><span class="linenos"> 143</span></a>    <span class="k">def</span> <span class="nf">act_on_literal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-</span><span id="L-144"><a href="#L-144"><span class="linenos"> 144</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-144"><a href="#L-144"><span class="linenos"> 144</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-145"><a href="#L-145"><span class="linenos"> 145</span></a><span class="sd">        Action for a literal/constant in an expression.</span>
 </span><span id="L-146"><a href="#L-146"><span class="linenos"> 146</span></a>
 </span><span id="L-147"><a href="#L-147"><span class="linenos"> 147</span></a><span class="sd">        :param value: literal value being supplied</span>
@@ -309,7 +309,7 @@
 </span><span id="L-150"><a href="#L-150"><span class="linenos"> 150</span></a>        <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">PolarsTerm</span><span class="p">)</span>
 </span><span id="L-151"><a href="#L-151"><span class="linenos"> 151</span></a>    
 </span><span id="L-152"><a href="#L-152"><span class="linenos"> 152</span></a>    <span class="k">def</span> <span class="nf">act_on_column_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">arg</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-</span><span id="L-153"><a href="#L-153"><span class="linenos"> 153</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-153"><a href="#L-153"><span class="linenos"> 153</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-154"><a href="#L-154"><span class="linenos"> 154</span></a><span class="sd">        Action for a column name.</span>
 </span><span id="L-155"><a href="#L-155"><span class="linenos"> 155</span></a>
 </span><span id="L-156"><a href="#L-156"><span class="linenos"> 156</span></a><span class="sd">        :param arg: None</span>
@@ -320,7 +320,7 @@
 </span><span id="L-161"><a href="#L-161"><span class="linenos"> 161</span></a>        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
 </span><span id="L-162"><a href="#L-162"><span class="linenos"> 162</span></a>    
 </span><span id="L-163"><a href="#L-163"><span class="linenos"> 163</span></a>    <span class="k">def</span> <span class="nf">act_on_expression</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">arg</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">op</span><span class="p">):</span>
-</span><span id="L-164"><a href="#L-164"><span class="linenos"> 164</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-164"><a href="#L-164"><span class="linenos"> 164</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-165"><a href="#L-165"><span class="linenos"> 165</span></a><span class="sd">        Action for a column name.</span>
 </span><span id="L-166"><a href="#L-166"><span class="linenos"> 166</span></a>
 </span><span id="L-167"><a href="#L-167"><span class="linenos"> 167</span></a><span class="sd">        :param arg: None</span>
@@ -340,7 +340,7 @@
 </span><span id="L-181"><a href="#L-181"><span class="linenos"> 181</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">collect_required</span> <span class="o">=</span> <span class="kc">True</span>
 </span><span id="L-182"><a href="#L-182"><span class="linenos"> 182</span></a>    
 </span><span id="L-183"><a href="#L-183"><span class="linenos"> 183</span></a>    <span class="k">def</span> <span class="nf">add_in_temp_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temp_v_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">):</span>
-</span><span id="L-184"><a href="#L-184"><span class="linenos"> 184</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-184"><a href="#L-184"><span class="linenos"> 184</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-185"><a href="#L-185"><span class="linenos"> 185</span></a><span class="sd">        Add required temp columns to temp_v_columns_list</span>
 </span><span id="L-186"><a href="#L-186"><span class="linenos"> 186</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-187"><a href="#L-187"><span class="linenos"> 187</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">zero_constant_required</span><span class="p">:</span>
@@ -371,7 +371,7 @@
 </span><span id="L-212"><a href="#L-212"><span class="linenos"> 212</span></a>
 </span><span id="L-213"><a href="#L-213"><span class="linenos"> 213</span></a>
 </span><span id="L-214"><a href="#L-214"><span class="linenos"> 214</span></a><span class="k">def</span> <span class="nf">_populate_expr_impl_map</span><span class="p">(</span><span class="n">extend_context</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]]:</span>
-</span><span id="L-215"><a href="#L-215"><span class="linenos"> 215</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-215"><a href="#L-215"><span class="linenos"> 215</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-216"><a href="#L-216"><span class="linenos"> 216</span></a><span class="sd">    Map symbols to implementations.</span>
 </span><span id="L-217"><a href="#L-217"><span class="linenos"> 217</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-218"><a href="#L-218"><span class="linenos"> 218</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">extend_context</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
@@ -511,7 +511,7 @@
 </span><span id="L-352"><a href="#L-352"><span class="linenos"> 352</span></a>
 </span><span id="L-353"><a href="#L-353"><span class="linenos"> 353</span></a>
 </span><span id="L-354"><a href="#L-354"><span class="linenos"> 354</span></a><span class="k">class</span> <span class="nc">PolarsExpressionActor</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">expression_walker</span><span class="o">.</span><span class="n">ExpressionWalker</span><span class="p">):</span>
-</span><span id="L-355"><a href="#L-355"><span class="linenos"> 355</span></a>    <span class="sd">&quot;&quot;&quot;Act on expressions in Polars context&quot;&quot;&quot;</span>
+</span><span id="L-355"><a href="#L-355"><span class="linenos"> 355</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Act on expressions in Polars context&quot;&quot;&quot;</span>
 </span><span id="L-356"><a href="#L-356"><span class="linenos"> 356</span></a>
 </span><span id="L-357"><a href="#L-357"><span class="linenos"> 357</span></a>    <span class="n">extend_context</span><span class="p">:</span> <span class="nb">bool</span>
 </span><span id="L-358"><a href="#L-358"><span class="linenos"> 358</span></a>    <span class="n">project_context</span><span class="p">:</span> <span class="nb">bool</span>
@@ -544,7 +544,7 @@
 </span><span id="L-385"><a href="#L-385"><span class="linenos"> 385</span></a>   <span class="c1"># expression helpers</span>
 </span><span id="L-386"><a href="#L-386"><span class="linenos"> 386</span></a>    
 </span><span id="L-387"><a href="#L-387"><span class="linenos"> 387</span></a>    <span class="k">def</span> <span class="nf">act_on_literal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-</span><span id="L-388"><a href="#L-388"><span class="linenos"> 388</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-388"><a href="#L-388"><span class="linenos"> 388</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-389"><a href="#L-389"><span class="linenos"> 389</span></a><span class="sd">        Action for a literal/constant in an expression.</span>
 </span><span id="L-390"><a href="#L-390"><span class="linenos"> 390</span></a>
 </span><span id="L-391"><a href="#L-391"><span class="linenos"> 391</span></a><span class="sd">        :param value: literal value being supplied</span>
@@ -557,7 +557,7 @@
 </span><span id="L-398"><a href="#L-398"><span class="linenos"> 398</span></a>            <span class="k">return</span> <span class="n">PolarsTerm</span><span class="p">(</span><span class="n">polars_term</span><span class="o">=</span><span class="n">_build_lit</span><span class="p">(</span><span class="n">value</span><span class="p">),</span> <span class="n">is_literal</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lit_value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
 </span><span id="L-399"><a href="#L-399"><span class="linenos"> 399</span></a>    
 </span><span id="L-400"><a href="#L-400"><span class="linenos"> 400</span></a>    <span class="k">def</span> <span class="nf">act_on_column_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">arg</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-</span><span id="L-401"><a href="#L-401"><span class="linenos"> 401</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-401"><a href="#L-401"><span class="linenos"> 401</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-402"><a href="#L-402"><span class="linenos"> 402</span></a><span class="sd">        Action for a column name.</span>
 </span><span id="L-403"><a href="#L-403"><span class="linenos"> 403</span></a>
 </span><span id="L-404"><a href="#L-404"><span class="linenos"> 404</span></a><span class="sd">        :param arg: None</span>
@@ -569,7 +569,7 @@
 </span><span id="L-410"><a href="#L-410"><span class="linenos"> 410</span></a>        <span class="k">return</span> <span class="n">PolarsTerm</span><span class="p">(</span><span class="n">polars_term</span><span class="o">=</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="n">value</span><span class="p">),</span> <span class="n">is_column</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span><span id="L-411"><a href="#L-411"><span class="linenos"> 411</span></a>    
 </span><span id="L-412"><a href="#L-412"><span class="linenos"> 412</span></a>    <span class="k">def</span> <span class="nf">act_on_expression</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">arg</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">op</span><span class="p">):</span>
-</span><span id="L-413"><a href="#L-413"><span class="linenos"> 413</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-413"><a href="#L-413"><span class="linenos"> 413</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-414"><a href="#L-414"><span class="linenos"> 414</span></a><span class="sd">        Action for a column name.</span>
 </span><span id="L-415"><a href="#L-415"><span class="linenos"> 415</span></a>
 </span><span id="L-416"><a href="#L-416"><span class="linenos"> 416</span></a><span class="sd">        :param arg: None</span>
@@ -652,7 +652,7 @@
 </span><span id="L-493"><a href="#L-493"><span class="linenos"> 493</span></a>
 </span><span id="L-494"><a href="#L-494"><span class="linenos"> 494</span></a>
 </span><span id="L-495"><a href="#L-495"><span class="linenos"> 495</span></a><span class="k">class</span> <span class="nc">PolarsModel</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="p">):</span>
-</span><span id="L-496"><a href="#L-496"><span class="linenos"> 496</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-496"><a href="#L-496"><span class="linenos"> 496</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-497"><a href="#L-497"><span class="linenos"> 497</span></a><span class="sd">    Interface for realizing the data algebra as a sequence of steps over Polars https://www.pola.rs .</span>
 </span><span id="L-498"><a href="#L-498"><span class="linenos"> 498</span></a>
 </span><span id="L-499"><a href="#L-499"><span class="linenos"> 499</span></a><span class="sd">    Note: not fully implemented yet.</span>
@@ -714,7 +714,7 @@
 </span><span id="L-555"><a href="#L-555"><span class="linenos"> 555</span></a>            <span class="p">}</span>
 </span><span id="L-556"><a href="#L-556"><span class="linenos"> 556</span></a>
 </span><span id="L-557"><a href="#L-557"><span class="linenos"> 557</span></a>    <span class="k">def</span> <span class="nf">data_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="L-558"><a href="#L-558"><span class="linenos"> 558</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-558"><a href="#L-558"><span class="linenos"> 558</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-559"><a href="#L-559"><span class="linenos"> 559</span></a><span class="sd">        Build a new data frame.</span>
 </span><span id="L-560"><a href="#L-560"><span class="linenos"> 560</span></a>
 </span><span id="L-561"><a href="#L-561"><span class="linenos"> 561</span></a><span class="sd">        :param arg: optional argument passed to constructor.</span>
@@ -729,13 +729,13 @@
 </span><span id="L-570"><a href="#L-570"><span class="linenos"> 570</span></a>        <span class="k">return</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
 </span><span id="L-571"><a href="#L-571"><span class="linenos"> 571</span></a>
 </span><span id="L-572"><a href="#L-572"><span class="linenos"> 572</span></a>    <span class="k">def</span> <span class="nf">is_appropriate_data_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="L-573"><a href="#L-573"><span class="linenos"> 573</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-573"><a href="#L-573"><span class="linenos"> 573</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-574"><a href="#L-574"><span class="linenos"> 574</span></a><span class="sd">        Check if df is our type of data frame.</span>
 </span><span id="L-575"><a href="#L-575"><span class="linenos"> 575</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-576"><a href="#L-576"><span class="linenos"> 576</span></a>        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">pl</span><span class="o">.</span><span class="n">LazyFrame</span><span class="p">)</span>
 </span><span id="L-577"><a href="#L-577"><span class="linenos"> 577</span></a>    
 </span><span id="L-578"><a href="#L-578"><span class="linenos"> 578</span></a>    <span class="k">def</span> <span class="nf">clean_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
-</span><span id="L-579"><a href="#L-579"><span class="linenos"> 579</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-579"><a href="#L-579"><span class="linenos"> 579</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-580"><a href="#L-580"><span class="linenos"> 580</span></a><span class="sd">        Copy of data frame without indices.</span>
 </span><span id="L-581"><a href="#L-581"><span class="linenos"> 581</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-582"><a href="#L-582"><span class="linenos"> 582</span></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
@@ -745,7 +745,7 @@
 </span><span id="L-586"><a href="#L-586"><span class="linenos"> 586</span></a>        <span class="k">return</span> <span class="n">df</span>
 </span><span id="L-587"><a href="#L-587"><span class="linenos"> 587</span></a>    
 </span><span id="L-588"><a href="#L-588"><span class="linenos"> 588</span></a>    <span class="k">def</span> <span class="nf">to_pandas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
-</span><span id="L-589"><a href="#L-589"><span class="linenos"> 589</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-589"><a href="#L-589"><span class="linenos"> 589</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-590"><a href="#L-590"><span class="linenos"> 590</span></a><span class="sd">        Convert to Pandas</span>
 </span><span id="L-591"><a href="#L-591"><span class="linenos"> 591</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-592"><a href="#L-592"><span class="linenos"> 592</span></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
@@ -755,20 +755,20 @@
 </span><span id="L-596"><a href="#L-596"><span class="linenos"> 596</span></a>        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
 </span><span id="L-597"><a href="#L-597"><span class="linenos"> 597</span></a>    
 </span><span id="L-598"><a href="#L-598"><span class="linenos"> 598</span></a>    <span class="k">def</span> <span class="nf">drop_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-599"><a href="#L-599"><span class="linenos"> 599</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-599"><a href="#L-599"><span class="linenos"> 599</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-600"><a href="#L-600"><span class="linenos"> 600</span></a><span class="sd">        Drop indices in place.</span>
 </span><span id="L-601"><a href="#L-601"><span class="linenos"> 601</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-602"><a href="#L-602"><span class="linenos"> 602</span></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 </span><span id="L-603"><a href="#L-603"><span class="linenos"> 603</span></a>        <span class="c1"># no operation needed</span>
 </span><span id="L-604"><a href="#L-604"><span class="linenos"> 604</span></a>    
 </span><span id="L-605"><a href="#L-605"><span class="linenos"> 605</span></a>    <span class="k">def</span> <span class="nf">bad_column_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-</span><span id="L-606"><a href="#L-606"><span class="linenos"> 606</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-606"><a href="#L-606"><span class="linenos"> 606</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-607"><a href="#L-607"><span class="linenos"> 607</span></a><span class="sd">        Return vector indicating which entries are null (vectorized).</span>
 </span><span id="L-608"><a href="#L-608"><span class="linenos"> 608</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-609"><a href="#L-609"><span class="linenos"> 609</span></a>        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">is_null</span><span class="p">()</span>
 </span><span id="L-610"><a href="#L-610"><span class="linenos"> 610</span></a>
 </span><span id="L-611"><a href="#L-611"><span class="linenos"> 611</span></a>    <span class="k">def</span> <span class="nf">concat_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame_list</span><span class="p">:</span> <span class="n">List</span><span class="p">):</span>
-</span><span id="L-612"><a href="#L-612"><span class="linenos"> 612</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-612"><a href="#L-612"><span class="linenos"> 612</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-613"><a href="#L-613"><span class="linenos"> 613</span></a><span class="sd">        Concatenate rows from frame_list</span>
 </span><span id="L-614"><a href="#L-614"><span class="linenos"> 614</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-615"><a href="#L-615"><span class="linenos"> 615</span></a>        <span class="n">frame_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">frame_list</span><span class="p">)</span>
@@ -778,7 +778,7 @@
 </span><span id="L-619"><a href="#L-619"><span class="linenos"> 619</span></a>        <span class="n">pl</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">frame_list</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;vertical&quot;</span><span class="p">)</span>
 </span><span id="L-620"><a href="#L-620"><span class="linenos"> 620</span></a>
 </span><span id="L-621"><a href="#L-621"><span class="linenos"> 621</span></a>    <span class="k">def</span> <span class="nf">concat_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame_list</span><span class="p">):</span>
-</span><span id="L-622"><a href="#L-622"><span class="linenos"> 622</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-622"><a href="#L-622"><span class="linenos"> 622</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-623"><a href="#L-623"><span class="linenos"> 623</span></a><span class="sd">        Concatenate columns from frame_list</span>
 </span><span id="L-624"><a href="#L-624"><span class="linenos"> 624</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-625"><a href="#L-625"><span class="linenos"> 625</span></a>        <span class="n">frame_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">frame_list</span><span class="p">)</span>
@@ -790,16 +790,16 @@
 </span><span id="L-631"><a href="#L-631"><span class="linenos"> 631</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-632"><a href="#L-632"><span class="linenos"> 632</span></a>    
 </span><span id="L-633"><a href="#L-633"><span class="linenos"> 633</span></a>    <span class="k">def</span> <span class="nf">get_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">colname</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="L-634"><a href="#L-634"><span class="linenos"> 634</span></a>        <span class="sd">&quot;&quot;&quot;get a value from a cell&quot;&quot;&quot;</span>
+</span><span id="L-634"><a href="#L-634"><span class="linenos"> 634</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;get a value from a cell&quot;&quot;&quot;</span>
 </span><span id="L-635"><a href="#L-635"><span class="linenos"> 635</span></a>        <span class="k">return</span> <span class="n">d</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">colname</span><span class="p">]</span>
 </span><span id="L-636"><a href="#L-636"><span class="linenos"> 636</span></a>    
 </span><span id="L-637"><a href="#L-637"><span class="linenos"> 637</span></a>    <span class="k">def</span> <span class="nf">set_col</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">colname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
-</span><span id="L-638"><a href="#L-638"><span class="linenos"> 638</span></a>        <span class="sd">&quot;&quot;&quot;set column, return ref&quot;&quot;&quot;</span>
+</span><span id="L-638"><a href="#L-638"><span class="linenos"> 638</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;set column, return ref&quot;&quot;&quot;</span>
 </span><span id="L-639"><a href="#L-639"><span class="linenos"> 639</span></a>        <span class="n">d2</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">with_column</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="n">colname</span><span class="p">))</span>
 </span><span id="L-640"><a href="#L-640"><span class="linenos"> 640</span></a>        <span class="k">return</span> <span class="n">d2</span>
 </span><span id="L-641"><a href="#L-641"><span class="linenos"> 641</span></a>
 </span><span id="L-642"><a href="#L-642"><span class="linenos"> 642</span></a>    <span class="k">def</span> <span class="nf">table_is_keyed_by_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">column_names</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="L-643"><a href="#L-643"><span class="linenos"> 643</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-643"><a href="#L-643"><span class="linenos"> 643</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-644"><a href="#L-644"><span class="linenos"> 644</span></a><span class="sd">        Check if a table is keyed by a given list of column names.</span>
 </span><span id="L-645"><a href="#L-645"><span class="linenos"> 645</span></a>
 </span><span id="L-646"><a href="#L-646"><span class="linenos"> 646</span></a><span class="sd">        :param table: DataFrame</span>
@@ -835,7 +835,7 @@
 </span><span id="L-676"><a href="#L-676"><span class="linenos"> 676</span></a>    <span class="c1"># evaluate</span>
 </span><span id="L-677"><a href="#L-677"><span class="linenos"> 677</span></a>
 </span><span id="L-678"><a href="#L-678"><span class="linenos"> 678</span></a>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-</span><span id="L-679"><a href="#L-679"><span class="linenos"> 679</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-679"><a href="#L-679"><span class="linenos"> 679</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-680"><a href="#L-680"><span class="linenos"> 680</span></a><span class="sd">        Implementation of Polars evaluation of data algebra operators</span>
 </span><span id="L-681"><a href="#L-681"><span class="linenos"> 681</span></a>
 </span><span id="L-682"><a href="#L-682"><span class="linenos"> 682</span></a><span class="sd">        :param op: ViewRepresentation to evaluate</span>
@@ -851,7 +851,7 @@
 </span><span id="L-692"><a href="#L-692"><span class="linenos"> 692</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-693"><a href="#L-693"><span class="linenos"> 693</span></a>
 </span><span id="L-694"><a href="#L-694"><span class="linenos"> 694</span></a>    <span class="k">def</span> <span class="nf">_compose_polars_ops</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="L-695"><a href="#L-695"><span class="linenos"> 695</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-695"><a href="#L-695"><span class="linenos"> 695</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-696"><a href="#L-696"><span class="linenos"> 696</span></a><span class="sd">        Convert to polars operators</span>
 </span><span id="L-697"><a href="#L-697"><span class="linenos"> 697</span></a>
 </span><span id="L-698"><a href="#L-698"><span class="linenos"> 698</span></a><span class="sd">        :param op: ViewRepresentation to evaluate</span>
@@ -866,7 +866,7 @@
 </span><span id="L-707"><a href="#L-707"><span class="linenos"> 707</span></a>    <span class="c1"># operator step realizations</span>
 </span><span id="L-708"><a href="#L-708"><span class="linenos"> 708</span></a>
 </span><span id="L-709"><a href="#L-709"><span class="linenos"> 709</span></a>    <span class="k">def</span> <span class="nf">_concat_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="L-710"><a href="#L-710"><span class="linenos"> 710</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-710"><a href="#L-710"><span class="linenos"> 710</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-711"><a href="#L-711"><span class="linenos"> 711</span></a><span class="sd">        Execute a concat rows step, returning a data frame.</span>
 </span><span id="L-712"><a href="#L-712"><span class="linenos"> 712</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-713"><a href="#L-713"><span class="linenos"> 713</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ConcatRowsNode&quot;</span><span class="p">:</span>
@@ -884,7 +884,7 @@
 </span><span id="L-725"><a href="#L-725"><span class="linenos"> 725</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-726"><a href="#L-726"><span class="linenos"> 726</span></a>    
 </span><span id="L-727"><a href="#L-727"><span class="linenos"> 727</span></a>    <span class="k">def</span> <span class="nf">_convert_records_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="L-728"><a href="#L-728"><span class="linenos"> 728</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-728"><a href="#L-728"><span class="linenos"> 728</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-729"><a href="#L-729"><span class="linenos"> 729</span></a><span class="sd">        Execute record conversion step, returning a data frame.</span>
 </span><span id="L-730"><a href="#L-730"><span class="linenos"> 730</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-731"><a href="#L-731"><span class="linenos"> 731</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ConvertRecordsNode&quot;</span><span class="p">:</span>
@@ -900,7 +900,7 @@
 </span><span id="L-741"><a href="#L-741"><span class="linenos"> 741</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-742"><a href="#L-742"><span class="linenos"> 742</span></a>    
 </span><span id="L-743"><a href="#L-743"><span class="linenos"> 743</span></a>    <span class="k">def</span> <span class="nf">_extend_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="L-744"><a href="#L-744"><span class="linenos"> 744</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-744"><a href="#L-744"><span class="linenos"> 744</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-745"><a href="#L-745"><span class="linenos"> 745</span></a><span class="sd">        Execute an extend step, returning a data frame.</span>
 </span><span id="L-746"><a href="#L-746"><span class="linenos"> 746</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-747"><a href="#L-747"><span class="linenos"> 747</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ExtendNode&quot;</span><span class="p">:</span>
@@ -967,7 +967,7 @@
 </span><span id="L-808"><a href="#L-808"><span class="linenos"> 808</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-809"><a href="#L-809"><span class="linenos"> 809</span></a>
 </span><span id="L-810"><a href="#L-810"><span class="linenos"> 810</span></a>    <span class="k">def</span> <span class="nf">_project_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="L-811"><a href="#L-811"><span class="linenos"> 811</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-811"><a href="#L-811"><span class="linenos"> 811</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-812"><a href="#L-812"><span class="linenos"> 812</span></a><span class="sd">        Execute a project step, returning a data frame.</span>
 </span><span id="L-813"><a href="#L-813"><span class="linenos"> 813</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-814"><a href="#L-814"><span class="linenos"> 814</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ProjectNode&quot;</span><span class="p">:</span>
@@ -1030,7 +1030,7 @@
 </span><span id="L-871"><a href="#L-871"><span class="linenos"> 871</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-872"><a href="#L-872"><span class="linenos"> 872</span></a>    
 </span><span id="L-873"><a href="#L-873"><span class="linenos"> 873</span></a>    <span class="k">def</span> <span class="nf">_natural_join_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="L-874"><a href="#L-874"><span class="linenos"> 874</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-874"><a href="#L-874"><span class="linenos"> 874</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-875"><a href="#L-875"><span class="linenos"> 875</span></a><span class="sd">        Execute a natural join step, returning a data frame.</span>
 </span><span id="L-876"><a href="#L-876"><span class="linenos"> 876</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-877"><a href="#L-877"><span class="linenos"> 877</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;NaturalJoinNode&quot;</span><span class="p">:</span>
@@ -1101,7 +1101,7 @@
 </span><span id="L-942"><a href="#L-942"><span class="linenos"> 942</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-943"><a href="#L-943"><span class="linenos"> 943</span></a>    
 </span><span id="L-944"><a href="#L-944"><span class="linenos"> 944</span></a>    <span class="k">def</span> <span class="nf">_order_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="L-945"><a href="#L-945"><span class="linenos"> 945</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-945"><a href="#L-945"><span class="linenos"> 945</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-946"><a href="#L-946"><span class="linenos"> 946</span></a><span class="sd">        Execute an order rows step, returning a data frame.</span>
 </span><span id="L-947"><a href="#L-947"><span class="linenos"> 947</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-948"><a href="#L-948"><span class="linenos"> 948</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;OrderRowsNode&quot;</span><span class="p">:</span>
@@ -1116,7 +1116,7 @@
 </span><span id="L-957"><a href="#L-957"><span class="linenos"> 957</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-958"><a href="#L-958"><span class="linenos"> 958</span></a>
 </span><span id="L-959"><a href="#L-959"><span class="linenos"> 959</span></a>    <span class="k">def</span> <span class="nf">_rename_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="L-960"><a href="#L-960"><span class="linenos"> 960</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-960"><a href="#L-960"><span class="linenos"> 960</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-961"><a href="#L-961"><span class="linenos"> 961</span></a><span class="sd">        Execute a rename columns step, returning a data frame.</span>
 </span><span id="L-962"><a href="#L-962"><span class="linenos"> 962</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-963"><a href="#L-963"><span class="linenos"> 963</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;RenameColumnsNode&quot;</span><span class="p">:</span>
@@ -1134,7 +1134,7 @@
 </span><span id="L-975"><a href="#L-975"><span class="linenos"> 975</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-976"><a href="#L-976"><span class="linenos"> 976</span></a>
 </span><span id="L-977"><a href="#L-977"><span class="linenos"> 977</span></a>    <span class="k">def</span> <span class="nf">_map_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="L-978"><a href="#L-978"><span class="linenos"> 978</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-978"><a href="#L-978"><span class="linenos"> 978</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-979"><a href="#L-979"><span class="linenos"> 979</span></a><span class="sd">        Execute a map columns step, returning a data frame.</span>
 </span><span id="L-980"><a href="#L-980"><span class="linenos"> 980</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-981"><a href="#L-981"><span class="linenos"> 981</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;MapColumnsNode&quot;</span><span class="p">:</span>
@@ -1152,7 +1152,7 @@
 </span><span id="L-993"><a href="#L-993"><span class="linenos"> 993</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-994"><a href="#L-994"><span class="linenos"> 994</span></a>
 </span><span id="L-995"><a href="#L-995"><span class="linenos"> 995</span></a>    <span class="k">def</span> <span class="nf">_select_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="L-996"><a href="#L-996"><span class="linenos"> 996</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-996"><a href="#L-996"><span class="linenos"> 996</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-997"><a href="#L-997"><span class="linenos"> 997</span></a><span class="sd">        Execute a select columns step, returning a data frame.</span>
 </span><span id="L-998"><a href="#L-998"><span class="linenos"> 998</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-999"><a href="#L-999"><span class="linenos"> 999</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;SelectColumnsNode&quot;</span><span class="p">:</span>
@@ -1164,7 +1164,7 @@
 </span><span id="L-1005"><a href="#L-1005"><span class="linenos">1005</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-1006"><a href="#L-1006"><span class="linenos">1006</span></a>
 </span><span id="L-1007"><a href="#L-1007"><span class="linenos">1007</span></a>    <span class="k">def</span> <span class="nf">_drop_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="L-1008"><a href="#L-1008"><span class="linenos">1008</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-1008"><a href="#L-1008"><span class="linenos">1008</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-1009"><a href="#L-1009"><span class="linenos">1009</span></a><span class="sd">        Execute a drop columns step, returning a data frame.</span>
 </span><span id="L-1010"><a href="#L-1010"><span class="linenos">1010</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-1011"><a href="#L-1011"><span class="linenos">1011</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compose_polars_ops</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">)</span>
@@ -1172,7 +1172,7 @@
 </span><span id="L-1013"><a href="#L-1013"><span class="linenos">1013</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-1014"><a href="#L-1014"><span class="linenos">1014</span></a>
 </span><span id="L-1015"><a href="#L-1015"><span class="linenos">1015</span></a>    <span class="k">def</span> <span class="nf">_select_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="L-1016"><a href="#L-1016"><span class="linenos">1016</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-1016"><a href="#L-1016"><span class="linenos">1016</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-1017"><a href="#L-1017"><span class="linenos">1017</span></a><span class="sd">        Execute a select rows step, returning a data frame.</span>
 </span><span id="L-1018"><a href="#L-1018"><span class="linenos">1018</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-1019"><a href="#L-1019"><span class="linenos">1019</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;SelectRowsNode&quot;</span><span class="p">:</span>
@@ -1206,7 +1206,7 @@
 </span><span id="L-1047"><a href="#L-1047"><span class="linenos">1047</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-1048"><a href="#L-1048"><span class="linenos">1048</span></a>
 </span><span id="L-1049"><a href="#L-1049"><span class="linenos">1049</span></a>    <span class="k">def</span> <span class="nf">_sql_proxy_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="L-1050"><a href="#L-1050"><span class="linenos">1050</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-1050"><a href="#L-1050"><span class="linenos">1050</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-1051"><a href="#L-1051"><span class="linenos">1051</span></a><span class="sd">        execute SQL</span>
 </span><span id="L-1052"><a href="#L-1052"><span class="linenos">1052</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-1053"><a href="#L-1053"><span class="linenos">1053</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;SQLNode&quot;</span><span class="p">:</span>
@@ -1224,7 +1224,7 @@
 </span><span id="L-1065"><a href="#L-1065"><span class="linenos">1065</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-1066"><a href="#L-1066"><span class="linenos">1066</span></a>    
 </span><span id="L-1067"><a href="#L-1067"><span class="linenos">1067</span></a>    <span class="k">def</span> <span class="nf">_table_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="L-1068"><a href="#L-1068"><span class="linenos">1068</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-1068"><a href="#L-1068"><span class="linenos">1068</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-1069"><a href="#L-1069"><span class="linenos">1069</span></a><span class="sd">        Return a data frame from table description and data_map.</span>
 </span><span id="L-1070"><a href="#L-1070"><span class="linenos">1070</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-1071"><a href="#L-1071"><span class="linenos">1071</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;TableDescription&quot;</span><span class="p">:</span>
@@ -1244,7 +1244,7 @@
 </span><span id="L-1085"><a href="#L-1085"><span class="linenos">1085</span></a>    <span class="c1"># cdata transforms</span>
 </span><span id="L-1086"><a href="#L-1086"><span class="linenos">1086</span></a>
 </span><span id="L-1087"><a href="#L-1087"><span class="linenos">1087</span></a>    <span class="k">def</span> <span class="nf">blocks_to_rowrecs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">blocks_in</span><span class="p">):</span>
-</span><span id="L-1088"><a href="#L-1088"><span class="linenos">1088</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-1088"><a href="#L-1088"><span class="linenos">1088</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-1089"><a href="#L-1089"><span class="linenos">1089</span></a><span class="sd">        Convert a block record (record spanning multiple rows) into a rowrecord (record in a single row).</span>
 </span><span id="L-1090"><a href="#L-1090"><span class="linenos">1090</span></a>
 </span><span id="L-1091"><a href="#L-1091"><span class="linenos">1091</span></a><span class="sd">        :param data: data frame to be transformed</span>
@@ -1313,7 +1313,7 @@
 </span><span id="L-1154"><a href="#L-1154"><span class="linenos">1154</span></a>        <span class="o">*</span><span class="p">,</span>
 </span><span id="L-1155"><a href="#L-1155"><span class="linenos">1155</span></a>        <span class="n">blocks_out</span><span class="p">,</span>
 </span><span id="L-1156"><a href="#L-1156"><span class="linenos">1156</span></a>    <span class="p">):</span>
-</span><span id="L-1157"><a href="#L-1157"><span class="linenos">1157</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-1157"><a href="#L-1157"><span class="linenos">1157</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-1158"><a href="#L-1158"><span class="linenos">1158</span></a><span class="sd">        Convert rowrecs (single row records) into block records (multiple row records).</span>
 </span><span id="L-1159"><a href="#L-1159"><span class="linenos">1159</span></a>
 </span><span id="L-1160"><a href="#L-1160"><span class="linenos">1160</span></a><span class="sd">        :param data: data frame to transform.</span>
@@ -1390,7 +1390,7 @@
     </div>
     <a class="headerlink" href="#PolarsTerm"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PolarsTerm-71"><a href="#PolarsTerm-71"><span class="linenos"> 71</span></a><span class="k">class</span> <span class="nc">PolarsTerm</span><span class="p">:</span>
-</span><span id="PolarsTerm-72"><a href="#PolarsTerm-72"><span class="linenos"> 72</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsTerm-72"><a href="#PolarsTerm-72"><span class="linenos"> 72</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsTerm-73"><a href="#PolarsTerm-73"><span class="linenos"> 73</span></a><span class="sd">    Class to carry Polars expression term and annotations about expression tree.</span>
 </span><span id="PolarsTerm-74"><a href="#PolarsTerm-74"><span class="linenos"> 74</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="PolarsTerm-75"><a href="#PolarsTerm-75"><span class="linenos"> 75</span></a>
@@ -1409,7 +1409,7 @@
 </span><span id="PolarsTerm-88"><a href="#PolarsTerm-88"><span class="linenos"> 88</span></a>        <span class="n">is_series</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 </span><span id="PolarsTerm-89"><a href="#PolarsTerm-89"><span class="linenos"> 89</span></a>        <span class="n">lit_value</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="PolarsTerm-90"><a href="#PolarsTerm-90"><span class="linenos"> 90</span></a>        <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="PolarsTerm-91"><a href="#PolarsTerm-91"><span class="linenos"> 91</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsTerm-91"><a href="#PolarsTerm-91"><span class="linenos"> 91</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsTerm-92"><a href="#PolarsTerm-92"><span class="linenos"> 92</span></a><span class="sd">        Carry a Polars expression term (polars_term) plus annotations.</span>
 </span><span id="PolarsTerm-93"><a href="#PolarsTerm-93"><span class="linenos"> 93</span></a>
 </span><span id="PolarsTerm-94"><a href="#PolarsTerm-94"><span class="linenos"> 94</span></a><span class="sd">        :param polars_term: Optional Polars expression (None means collect info, not a true term)</span>
@@ -1455,7 +1455,7 @@
 </span><span id="PolarsTerm.__init__-88"><a href="#PolarsTerm.__init__-88"><span class="linenos"> 88</span></a>        <span class="n">is_series</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 </span><span id="PolarsTerm.__init__-89"><a href="#PolarsTerm.__init__-89"><span class="linenos"> 89</span></a>        <span class="n">lit_value</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="PolarsTerm.__init__-90"><a href="#PolarsTerm.__init__-90"><span class="linenos"> 90</span></a>        <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="PolarsTerm.__init__-91"><a href="#PolarsTerm.__init__-91"><span class="linenos"> 91</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsTerm.__init__-91"><a href="#PolarsTerm.__init__-91"><span class="linenos"> 91</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsTerm.__init__-92"><a href="#PolarsTerm.__init__-92"><span class="linenos"> 92</span></a><span class="sd">        Carry a Polars expression term (polars_term) plus annotations.</span>
 </span><span id="PolarsTerm.__init__-93"><a href="#PolarsTerm.__init__-93"><span class="linenos"> 93</span></a>
 </span><span id="PolarsTerm.__init__-94"><a href="#PolarsTerm.__init__-94"><span class="linenos"> 94</span></a><span class="sd">        :param polars_term: Optional Polars expression (None means collect info, not a true term)</span>
@@ -1506,7 +1506,7 @@
     </div>
     <a class="headerlink" href="#ExpressionRequirementsCollector"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="ExpressionRequirementsCollector-113"><a href="#ExpressionRequirementsCollector-113"><span class="linenos">113</span></a><span class="k">class</span> <span class="nc">ExpressionRequirementsCollector</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">expression_walker</span><span class="o">.</span><span class="n">ExpressionWalker</span><span class="p">):</span>
-</span><span id="ExpressionRequirementsCollector-114"><a href="#ExpressionRequirementsCollector-114"><span class="linenos">114</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ExpressionRequirementsCollector-114"><a href="#ExpressionRequirementsCollector-114"><span class="linenos">114</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="ExpressionRequirementsCollector-115"><a href="#ExpressionRequirementsCollector-115"><span class="linenos">115</span></a><span class="sd">    Class to collect what accommodations an expression needs.</span>
 </span><span id="ExpressionRequirementsCollector-116"><a href="#ExpressionRequirementsCollector-116"><span class="linenos">116</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="ExpressionRequirementsCollector-117"><a href="#ExpressionRequirementsCollector-117"><span class="linenos">117</span></a>    <span class="n">collect_required</span><span class="p">:</span> <span class="nb">bool</span>
@@ -1538,7 +1538,7 @@
 </span><span id="ExpressionRequirementsCollector-143"><a href="#ExpressionRequirementsCollector-143"><span class="linenos">143</span></a>        <span class="p">}</span>
 </span><span id="ExpressionRequirementsCollector-144"><a href="#ExpressionRequirementsCollector-144"><span class="linenos">144</span></a>    
 </span><span id="ExpressionRequirementsCollector-145"><a href="#ExpressionRequirementsCollector-145"><span class="linenos">145</span></a>    <span class="k">def</span> <span class="nf">act_on_literal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-</span><span id="ExpressionRequirementsCollector-146"><a href="#ExpressionRequirementsCollector-146"><span class="linenos">146</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ExpressionRequirementsCollector-146"><a href="#ExpressionRequirementsCollector-146"><span class="linenos">146</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="ExpressionRequirementsCollector-147"><a href="#ExpressionRequirementsCollector-147"><span class="linenos">147</span></a><span class="sd">        Action for a literal/constant in an expression.</span>
 </span><span id="ExpressionRequirementsCollector-148"><a href="#ExpressionRequirementsCollector-148"><span class="linenos">148</span></a>
 </span><span id="ExpressionRequirementsCollector-149"><a href="#ExpressionRequirementsCollector-149"><span class="linenos">149</span></a><span class="sd">        :param value: literal value being supplied</span>
@@ -1547,7 +1547,7 @@
 </span><span id="ExpressionRequirementsCollector-152"><a href="#ExpressionRequirementsCollector-152"><span class="linenos">152</span></a>        <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">PolarsTerm</span><span class="p">)</span>
 </span><span id="ExpressionRequirementsCollector-153"><a href="#ExpressionRequirementsCollector-153"><span class="linenos">153</span></a>    
 </span><span id="ExpressionRequirementsCollector-154"><a href="#ExpressionRequirementsCollector-154"><span class="linenos">154</span></a>    <span class="k">def</span> <span class="nf">act_on_column_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">arg</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-</span><span id="ExpressionRequirementsCollector-155"><a href="#ExpressionRequirementsCollector-155"><span class="linenos">155</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ExpressionRequirementsCollector-155"><a href="#ExpressionRequirementsCollector-155"><span class="linenos">155</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="ExpressionRequirementsCollector-156"><a href="#ExpressionRequirementsCollector-156"><span class="linenos">156</span></a><span class="sd">        Action for a column name.</span>
 </span><span id="ExpressionRequirementsCollector-157"><a href="#ExpressionRequirementsCollector-157"><span class="linenos">157</span></a>
 </span><span id="ExpressionRequirementsCollector-158"><a href="#ExpressionRequirementsCollector-158"><span class="linenos">158</span></a><span class="sd">        :param arg: None</span>
@@ -1558,7 +1558,7 @@
 </span><span id="ExpressionRequirementsCollector-163"><a href="#ExpressionRequirementsCollector-163"><span class="linenos">163</span></a>        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
 </span><span id="ExpressionRequirementsCollector-164"><a href="#ExpressionRequirementsCollector-164"><span class="linenos">164</span></a>    
 </span><span id="ExpressionRequirementsCollector-165"><a href="#ExpressionRequirementsCollector-165"><span class="linenos">165</span></a>    <span class="k">def</span> <span class="nf">act_on_expression</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">arg</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">op</span><span class="p">):</span>
-</span><span id="ExpressionRequirementsCollector-166"><a href="#ExpressionRequirementsCollector-166"><span class="linenos">166</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ExpressionRequirementsCollector-166"><a href="#ExpressionRequirementsCollector-166"><span class="linenos">166</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="ExpressionRequirementsCollector-167"><a href="#ExpressionRequirementsCollector-167"><span class="linenos">167</span></a><span class="sd">        Action for a column name.</span>
 </span><span id="ExpressionRequirementsCollector-168"><a href="#ExpressionRequirementsCollector-168"><span class="linenos">168</span></a>
 </span><span id="ExpressionRequirementsCollector-169"><a href="#ExpressionRequirementsCollector-169"><span class="linenos">169</span></a><span class="sd">        :param arg: None</span>
@@ -1578,7 +1578,7 @@
 </span><span id="ExpressionRequirementsCollector-183"><a href="#ExpressionRequirementsCollector-183"><span class="linenos">183</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">collect_required</span> <span class="o">=</span> <span class="kc">True</span>
 </span><span id="ExpressionRequirementsCollector-184"><a href="#ExpressionRequirementsCollector-184"><span class="linenos">184</span></a>    
 </span><span id="ExpressionRequirementsCollector-185"><a href="#ExpressionRequirementsCollector-185"><span class="linenos">185</span></a>    <span class="k">def</span> <span class="nf">add_in_temp_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temp_v_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">):</span>
-</span><span id="ExpressionRequirementsCollector-186"><a href="#ExpressionRequirementsCollector-186"><span class="linenos">186</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ExpressionRequirementsCollector-186"><a href="#ExpressionRequirementsCollector-186"><span class="linenos">186</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="ExpressionRequirementsCollector-187"><a href="#ExpressionRequirementsCollector-187"><span class="linenos">187</span></a><span class="sd">        Add required temp columns to temp_v_columns_list</span>
 </span><span id="ExpressionRequirementsCollector-188"><a href="#ExpressionRequirementsCollector-188"><span class="linenos">188</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="ExpressionRequirementsCollector-189"><a href="#ExpressionRequirementsCollector-189"><span class="linenos">189</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">zero_constant_required</span><span class="p">:</span>
@@ -1640,7 +1640,7 @@
     </div>
     <a class="headerlink" href="#ExpressionRequirementsCollector.act_on_literal"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="ExpressionRequirementsCollector.act_on_literal-145"><a href="#ExpressionRequirementsCollector.act_on_literal-145"><span class="linenos">145</span></a>    <span class="k">def</span> <span class="nf">act_on_literal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-</span><span id="ExpressionRequirementsCollector.act_on_literal-146"><a href="#ExpressionRequirementsCollector.act_on_literal-146"><span class="linenos">146</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ExpressionRequirementsCollector.act_on_literal-146"><a href="#ExpressionRequirementsCollector.act_on_literal-146"><span class="linenos">146</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="ExpressionRequirementsCollector.act_on_literal-147"><a href="#ExpressionRequirementsCollector.act_on_literal-147"><span class="linenos">147</span></a><span class="sd">        Action for a literal/constant in an expression.</span>
 </span><span id="ExpressionRequirementsCollector.act_on_literal-148"><a href="#ExpressionRequirementsCollector.act_on_literal-148"><span class="linenos">148</span></a>
 </span><span id="ExpressionRequirementsCollector.act_on_literal-149"><a href="#ExpressionRequirementsCollector.act_on_literal-149"><span class="linenos">149</span></a><span class="sd">        :param value: literal value being supplied</span>
@@ -1679,7 +1679,7 @@
     </div>
     <a class="headerlink" href="#ExpressionRequirementsCollector.act_on_column_name"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="ExpressionRequirementsCollector.act_on_column_name-154"><a href="#ExpressionRequirementsCollector.act_on_column_name-154"><span class="linenos">154</span></a>    <span class="k">def</span> <span class="nf">act_on_column_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">arg</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-</span><span id="ExpressionRequirementsCollector.act_on_column_name-155"><a href="#ExpressionRequirementsCollector.act_on_column_name-155"><span class="linenos">155</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ExpressionRequirementsCollector.act_on_column_name-155"><a href="#ExpressionRequirementsCollector.act_on_column_name-155"><span class="linenos">155</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="ExpressionRequirementsCollector.act_on_column_name-156"><a href="#ExpressionRequirementsCollector.act_on_column_name-156"><span class="linenos">156</span></a><span class="sd">        Action for a column name.</span>
 </span><span id="ExpressionRequirementsCollector.act_on_column_name-157"><a href="#ExpressionRequirementsCollector.act_on_column_name-157"><span class="linenos">157</span></a>
 </span><span id="ExpressionRequirementsCollector.act_on_column_name-158"><a href="#ExpressionRequirementsCollector.act_on_column_name-158"><span class="linenos">158</span></a><span class="sd">        :param arg: None</span>
@@ -1721,7 +1721,7 @@
     </div>
     <a class="headerlink" href="#ExpressionRequirementsCollector.act_on_expression"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="ExpressionRequirementsCollector.act_on_expression-165"><a href="#ExpressionRequirementsCollector.act_on_expression-165"><span class="linenos">165</span></a>    <span class="k">def</span> <span class="nf">act_on_expression</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">arg</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">op</span><span class="p">):</span>
-</span><span id="ExpressionRequirementsCollector.act_on_expression-166"><a href="#ExpressionRequirementsCollector.act_on_expression-166"><span class="linenos">166</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ExpressionRequirementsCollector.act_on_expression-166"><a href="#ExpressionRequirementsCollector.act_on_expression-166"><span class="linenos">166</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="ExpressionRequirementsCollector.act_on_expression-167"><a href="#ExpressionRequirementsCollector.act_on_expression-167"><span class="linenos">167</span></a><span class="sd">        Action for a column name.</span>
 </span><span id="ExpressionRequirementsCollector.act_on_expression-168"><a href="#ExpressionRequirementsCollector.act_on_expression-168"><span class="linenos">168</span></a>
 </span><span id="ExpressionRequirementsCollector.act_on_expression-169"><a href="#ExpressionRequirementsCollector.act_on_expression-169"><span class="linenos">169</span></a><span class="sd">        :param arg: None</span>
@@ -1773,7 +1773,7 @@
     </div>
     <a class="headerlink" href="#ExpressionRequirementsCollector.add_in_temp_columns"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="ExpressionRequirementsCollector.add_in_temp_columns-185"><a href="#ExpressionRequirementsCollector.add_in_temp_columns-185"><span class="linenos">185</span></a>    <span class="k">def</span> <span class="nf">add_in_temp_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temp_v_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">):</span>
-</span><span id="ExpressionRequirementsCollector.add_in_temp_columns-186"><a href="#ExpressionRequirementsCollector.add_in_temp_columns-186"><span class="linenos">186</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ExpressionRequirementsCollector.add_in_temp_columns-186"><a href="#ExpressionRequirementsCollector.add_in_temp_columns-186"><span class="linenos">186</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="ExpressionRequirementsCollector.add_in_temp_columns-187"><a href="#ExpressionRequirementsCollector.add_in_temp_columns-187"><span class="linenos">187</span></a><span class="sd">        Add required temp columns to temp_v_columns_list</span>
 </span><span id="ExpressionRequirementsCollector.add_in_temp_columns-188"><a href="#ExpressionRequirementsCollector.add_in_temp_columns-188"><span class="linenos">188</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="ExpressionRequirementsCollector.add_in_temp_columns-189"><a href="#ExpressionRequirementsCollector.add_in_temp_columns-189"><span class="linenos">189</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">zero_constant_required</span><span class="p">:</span>
@@ -1801,7 +1801,7 @@
     </div>
     <a class="headerlink" href="#PolarsExpressionActor"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PolarsExpressionActor-356"><a href="#PolarsExpressionActor-356"><span class="linenos">356</span></a><span class="k">class</span> <span class="nc">PolarsExpressionActor</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">expression_walker</span><span class="o">.</span><span class="n">ExpressionWalker</span><span class="p">):</span>
-</span><span id="PolarsExpressionActor-357"><a href="#PolarsExpressionActor-357"><span class="linenos">357</span></a>    <span class="sd">&quot;&quot;&quot;Act on expressions in Polars context&quot;&quot;&quot;</span>
+</span><span id="PolarsExpressionActor-357"><a href="#PolarsExpressionActor-357"><span class="linenos">357</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Act on expressions in Polars context&quot;&quot;&quot;</span>
 </span><span id="PolarsExpressionActor-358"><a href="#PolarsExpressionActor-358"><span class="linenos">358</span></a>
 </span><span id="PolarsExpressionActor-359"><a href="#PolarsExpressionActor-359"><span class="linenos">359</span></a>    <span class="n">extend_context</span><span class="p">:</span> <span class="nb">bool</span>
 </span><span id="PolarsExpressionActor-360"><a href="#PolarsExpressionActor-360"><span class="linenos">360</span></a>    <span class="n">project_context</span><span class="p">:</span> <span class="nb">bool</span>
@@ -1834,7 +1834,7 @@
 </span><span id="PolarsExpressionActor-387"><a href="#PolarsExpressionActor-387"><span class="linenos">387</span></a>   <span class="c1"># expression helpers</span>
 </span><span id="PolarsExpressionActor-388"><a href="#PolarsExpressionActor-388"><span class="linenos">388</span></a>    
 </span><span id="PolarsExpressionActor-389"><a href="#PolarsExpressionActor-389"><span class="linenos">389</span></a>    <span class="k">def</span> <span class="nf">act_on_literal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-</span><span id="PolarsExpressionActor-390"><a href="#PolarsExpressionActor-390"><span class="linenos">390</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsExpressionActor-390"><a href="#PolarsExpressionActor-390"><span class="linenos">390</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsExpressionActor-391"><a href="#PolarsExpressionActor-391"><span class="linenos">391</span></a><span class="sd">        Action for a literal/constant in an expression.</span>
 </span><span id="PolarsExpressionActor-392"><a href="#PolarsExpressionActor-392"><span class="linenos">392</span></a>
 </span><span id="PolarsExpressionActor-393"><a href="#PolarsExpressionActor-393"><span class="linenos">393</span></a><span class="sd">        :param value: literal value being supplied</span>
@@ -1847,7 +1847,7 @@
 </span><span id="PolarsExpressionActor-400"><a href="#PolarsExpressionActor-400"><span class="linenos">400</span></a>            <span class="k">return</span> <span class="n">PolarsTerm</span><span class="p">(</span><span class="n">polars_term</span><span class="o">=</span><span class="n">_build_lit</span><span class="p">(</span><span class="n">value</span><span class="p">),</span> <span class="n">is_literal</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lit_value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
 </span><span id="PolarsExpressionActor-401"><a href="#PolarsExpressionActor-401"><span class="linenos">401</span></a>    
 </span><span id="PolarsExpressionActor-402"><a href="#PolarsExpressionActor-402"><span class="linenos">402</span></a>    <span class="k">def</span> <span class="nf">act_on_column_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">arg</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-</span><span id="PolarsExpressionActor-403"><a href="#PolarsExpressionActor-403"><span class="linenos">403</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsExpressionActor-403"><a href="#PolarsExpressionActor-403"><span class="linenos">403</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsExpressionActor-404"><a href="#PolarsExpressionActor-404"><span class="linenos">404</span></a><span class="sd">        Action for a column name.</span>
 </span><span id="PolarsExpressionActor-405"><a href="#PolarsExpressionActor-405"><span class="linenos">405</span></a>
 </span><span id="PolarsExpressionActor-406"><a href="#PolarsExpressionActor-406"><span class="linenos">406</span></a><span class="sd">        :param arg: None</span>
@@ -1859,7 +1859,7 @@
 </span><span id="PolarsExpressionActor-412"><a href="#PolarsExpressionActor-412"><span class="linenos">412</span></a>        <span class="k">return</span> <span class="n">PolarsTerm</span><span class="p">(</span><span class="n">polars_term</span><span class="o">=</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="n">value</span><span class="p">),</span> <span class="n">is_column</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span><span id="PolarsExpressionActor-413"><a href="#PolarsExpressionActor-413"><span class="linenos">413</span></a>    
 </span><span id="PolarsExpressionActor-414"><a href="#PolarsExpressionActor-414"><span class="linenos">414</span></a>    <span class="k">def</span> <span class="nf">act_on_expression</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">arg</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">op</span><span class="p">):</span>
-</span><span id="PolarsExpressionActor-415"><a href="#PolarsExpressionActor-415"><span class="linenos">415</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsExpressionActor-415"><a href="#PolarsExpressionActor-415"><span class="linenos">415</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsExpressionActor-416"><a href="#PolarsExpressionActor-416"><span class="linenos">416</span></a><span class="sd">        Action for a column name.</span>
 </span><span id="PolarsExpressionActor-417"><a href="#PolarsExpressionActor-417"><span class="linenos">417</span></a>
 </span><span id="PolarsExpressionActor-418"><a href="#PolarsExpressionActor-418"><span class="linenos">418</span></a><span class="sd">        :param arg: None</span>
@@ -1997,7 +1997,7 @@
     </div>
     <a class="headerlink" href="#PolarsExpressionActor.act_on_literal"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PolarsExpressionActor.act_on_literal-389"><a href="#PolarsExpressionActor.act_on_literal-389"><span class="linenos">389</span></a>    <span class="k">def</span> <span class="nf">act_on_literal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-</span><span id="PolarsExpressionActor.act_on_literal-390"><a href="#PolarsExpressionActor.act_on_literal-390"><span class="linenos">390</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsExpressionActor.act_on_literal-390"><a href="#PolarsExpressionActor.act_on_literal-390"><span class="linenos">390</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsExpressionActor.act_on_literal-391"><a href="#PolarsExpressionActor.act_on_literal-391"><span class="linenos">391</span></a><span class="sd">        Action for a literal/constant in an expression.</span>
 </span><span id="PolarsExpressionActor.act_on_literal-392"><a href="#PolarsExpressionActor.act_on_literal-392"><span class="linenos">392</span></a>
 </span><span id="PolarsExpressionActor.act_on_literal-393"><a href="#PolarsExpressionActor.act_on_literal-393"><span class="linenos">393</span></a><span class="sd">        :param value: literal value being supplied</span>
@@ -2040,7 +2040,7 @@
     </div>
     <a class="headerlink" href="#PolarsExpressionActor.act_on_column_name"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PolarsExpressionActor.act_on_column_name-402"><a href="#PolarsExpressionActor.act_on_column_name-402"><span class="linenos">402</span></a>    <span class="k">def</span> <span class="nf">act_on_column_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">arg</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-</span><span id="PolarsExpressionActor.act_on_column_name-403"><a href="#PolarsExpressionActor.act_on_column_name-403"><span class="linenos">403</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsExpressionActor.act_on_column_name-403"><a href="#PolarsExpressionActor.act_on_column_name-403"><span class="linenos">403</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsExpressionActor.act_on_column_name-404"><a href="#PolarsExpressionActor.act_on_column_name-404"><span class="linenos">404</span></a><span class="sd">        Action for a column name.</span>
 </span><span id="PolarsExpressionActor.act_on_column_name-405"><a href="#PolarsExpressionActor.act_on_column_name-405"><span class="linenos">405</span></a>
 </span><span id="PolarsExpressionActor.act_on_column_name-406"><a href="#PolarsExpressionActor.act_on_column_name-406"><span class="linenos">406</span></a><span class="sd">        :param arg: None</span>
@@ -2083,7 +2083,7 @@
     </div>
     <a class="headerlink" href="#PolarsExpressionActor.act_on_expression"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PolarsExpressionActor.act_on_expression-414"><a href="#PolarsExpressionActor.act_on_expression-414"><span class="linenos">414</span></a>    <span class="k">def</span> <span class="nf">act_on_expression</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">arg</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">op</span><span class="p">):</span>
-</span><span id="PolarsExpressionActor.act_on_expression-415"><a href="#PolarsExpressionActor.act_on_expression-415"><span class="linenos">415</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsExpressionActor.act_on_expression-415"><a href="#PolarsExpressionActor.act_on_expression-415"><span class="linenos">415</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsExpressionActor.act_on_expression-416"><a href="#PolarsExpressionActor.act_on_expression-416"><span class="linenos">416</span></a><span class="sd">        Action for a column name.</span>
 </span><span id="PolarsExpressionActor.act_on_expression-417"><a href="#PolarsExpressionActor.act_on_expression-417"><span class="linenos">417</span></a>
 </span><span id="PolarsExpressionActor.act_on_expression-418"><a href="#PolarsExpressionActor.act_on_expression-418"><span class="linenos">418</span></a><span class="sd">        :param arg: None</span>
@@ -2198,7 +2198,7 @@
     </div>
     <a class="headerlink" href="#PolarsModel"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PolarsModel-497"><a href="#PolarsModel-497"><span class="linenos"> 497</span></a><span class="k">class</span> <span class="nc">PolarsModel</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="p">):</span>
-</span><span id="PolarsModel-498"><a href="#PolarsModel-498"><span class="linenos"> 498</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-498"><a href="#PolarsModel-498"><span class="linenos"> 498</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-499"><a href="#PolarsModel-499"><span class="linenos"> 499</span></a><span class="sd">    Interface for realizing the data algebra as a sequence of steps over Polars https://www.pola.rs .</span>
 </span><span id="PolarsModel-500"><a href="#PolarsModel-500"><span class="linenos"> 500</span></a>
 </span><span id="PolarsModel-501"><a href="#PolarsModel-501"><span class="linenos"> 501</span></a><span class="sd">    Note: not fully implemented yet.</span>
@@ -2260,7 +2260,7 @@
 </span><span id="PolarsModel-557"><a href="#PolarsModel-557"><span class="linenos"> 557</span></a>            <span class="p">}</span>
 </span><span id="PolarsModel-558"><a href="#PolarsModel-558"><span class="linenos"> 558</span></a>
 </span><span id="PolarsModel-559"><a href="#PolarsModel-559"><span class="linenos"> 559</span></a>    <span class="k">def</span> <span class="nf">data_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="PolarsModel-560"><a href="#PolarsModel-560"><span class="linenos"> 560</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-560"><a href="#PolarsModel-560"><span class="linenos"> 560</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-561"><a href="#PolarsModel-561"><span class="linenos"> 561</span></a><span class="sd">        Build a new data frame.</span>
 </span><span id="PolarsModel-562"><a href="#PolarsModel-562"><span class="linenos"> 562</span></a>
 </span><span id="PolarsModel-563"><a href="#PolarsModel-563"><span class="linenos"> 563</span></a><span class="sd">        :param arg: optional argument passed to constructor.</span>
@@ -2275,13 +2275,13 @@
 </span><span id="PolarsModel-572"><a href="#PolarsModel-572"><span class="linenos"> 572</span></a>        <span class="k">return</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
 </span><span id="PolarsModel-573"><a href="#PolarsModel-573"><span class="linenos"> 573</span></a>
 </span><span id="PolarsModel-574"><a href="#PolarsModel-574"><span class="linenos"> 574</span></a>    <span class="k">def</span> <span class="nf">is_appropriate_data_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="PolarsModel-575"><a href="#PolarsModel-575"><span class="linenos"> 575</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-575"><a href="#PolarsModel-575"><span class="linenos"> 575</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-576"><a href="#PolarsModel-576"><span class="linenos"> 576</span></a><span class="sd">        Check if df is our type of data frame.</span>
 </span><span id="PolarsModel-577"><a href="#PolarsModel-577"><span class="linenos"> 577</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PolarsModel-578"><a href="#PolarsModel-578"><span class="linenos"> 578</span></a>        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">pl</span><span class="o">.</span><span class="n">LazyFrame</span><span class="p">)</span>
 </span><span id="PolarsModel-579"><a href="#PolarsModel-579"><span class="linenos"> 579</span></a>    
 </span><span id="PolarsModel-580"><a href="#PolarsModel-580"><span class="linenos"> 580</span></a>    <span class="k">def</span> <span class="nf">clean_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
-</span><span id="PolarsModel-581"><a href="#PolarsModel-581"><span class="linenos"> 581</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-581"><a href="#PolarsModel-581"><span class="linenos"> 581</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-582"><a href="#PolarsModel-582"><span class="linenos"> 582</span></a><span class="sd">        Copy of data frame without indices.</span>
 </span><span id="PolarsModel-583"><a href="#PolarsModel-583"><span class="linenos"> 583</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PolarsModel-584"><a href="#PolarsModel-584"><span class="linenos"> 584</span></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
@@ -2291,7 +2291,7 @@
 </span><span id="PolarsModel-588"><a href="#PolarsModel-588"><span class="linenos"> 588</span></a>        <span class="k">return</span> <span class="n">df</span>
 </span><span id="PolarsModel-589"><a href="#PolarsModel-589"><span class="linenos"> 589</span></a>    
 </span><span id="PolarsModel-590"><a href="#PolarsModel-590"><span class="linenos"> 590</span></a>    <span class="k">def</span> <span class="nf">to_pandas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
-</span><span id="PolarsModel-591"><a href="#PolarsModel-591"><span class="linenos"> 591</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-591"><a href="#PolarsModel-591"><span class="linenos"> 591</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-592"><a href="#PolarsModel-592"><span class="linenos"> 592</span></a><span class="sd">        Convert to Pandas</span>
 </span><span id="PolarsModel-593"><a href="#PolarsModel-593"><span class="linenos"> 593</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PolarsModel-594"><a href="#PolarsModel-594"><span class="linenos"> 594</span></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
@@ -2301,20 +2301,20 @@
 </span><span id="PolarsModel-598"><a href="#PolarsModel-598"><span class="linenos"> 598</span></a>        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
 </span><span id="PolarsModel-599"><a href="#PolarsModel-599"><span class="linenos"> 599</span></a>    
 </span><span id="PolarsModel-600"><a href="#PolarsModel-600"><span class="linenos"> 600</span></a>    <span class="k">def</span> <span class="nf">drop_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="PolarsModel-601"><a href="#PolarsModel-601"><span class="linenos"> 601</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-601"><a href="#PolarsModel-601"><span class="linenos"> 601</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-602"><a href="#PolarsModel-602"><span class="linenos"> 602</span></a><span class="sd">        Drop indices in place.</span>
 </span><span id="PolarsModel-603"><a href="#PolarsModel-603"><span class="linenos"> 603</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PolarsModel-604"><a href="#PolarsModel-604"><span class="linenos"> 604</span></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 </span><span id="PolarsModel-605"><a href="#PolarsModel-605"><span class="linenos"> 605</span></a>        <span class="c1"># no operation needed</span>
 </span><span id="PolarsModel-606"><a href="#PolarsModel-606"><span class="linenos"> 606</span></a>    
 </span><span id="PolarsModel-607"><a href="#PolarsModel-607"><span class="linenos"> 607</span></a>    <span class="k">def</span> <span class="nf">bad_column_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-</span><span id="PolarsModel-608"><a href="#PolarsModel-608"><span class="linenos"> 608</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-608"><a href="#PolarsModel-608"><span class="linenos"> 608</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-609"><a href="#PolarsModel-609"><span class="linenos"> 609</span></a><span class="sd">        Return vector indicating which entries are null (vectorized).</span>
 </span><span id="PolarsModel-610"><a href="#PolarsModel-610"><span class="linenos"> 610</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PolarsModel-611"><a href="#PolarsModel-611"><span class="linenos"> 611</span></a>        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">is_null</span><span class="p">()</span>
 </span><span id="PolarsModel-612"><a href="#PolarsModel-612"><span class="linenos"> 612</span></a>
 </span><span id="PolarsModel-613"><a href="#PolarsModel-613"><span class="linenos"> 613</span></a>    <span class="k">def</span> <span class="nf">concat_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame_list</span><span class="p">:</span> <span class="n">List</span><span class="p">):</span>
-</span><span id="PolarsModel-614"><a href="#PolarsModel-614"><span class="linenos"> 614</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-614"><a href="#PolarsModel-614"><span class="linenos"> 614</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-615"><a href="#PolarsModel-615"><span class="linenos"> 615</span></a><span class="sd">        Concatenate rows from frame_list</span>
 </span><span id="PolarsModel-616"><a href="#PolarsModel-616"><span class="linenos"> 616</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PolarsModel-617"><a href="#PolarsModel-617"><span class="linenos"> 617</span></a>        <span class="n">frame_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">frame_list</span><span class="p">)</span>
@@ -2324,7 +2324,7 @@
 </span><span id="PolarsModel-621"><a href="#PolarsModel-621"><span class="linenos"> 621</span></a>        <span class="n">pl</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">frame_list</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;vertical&quot;</span><span class="p">)</span>
 </span><span id="PolarsModel-622"><a href="#PolarsModel-622"><span class="linenos"> 622</span></a>
 </span><span id="PolarsModel-623"><a href="#PolarsModel-623"><span class="linenos"> 623</span></a>    <span class="k">def</span> <span class="nf">concat_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame_list</span><span class="p">):</span>
-</span><span id="PolarsModel-624"><a href="#PolarsModel-624"><span class="linenos"> 624</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-624"><a href="#PolarsModel-624"><span class="linenos"> 624</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-625"><a href="#PolarsModel-625"><span class="linenos"> 625</span></a><span class="sd">        Concatenate columns from frame_list</span>
 </span><span id="PolarsModel-626"><a href="#PolarsModel-626"><span class="linenos"> 626</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PolarsModel-627"><a href="#PolarsModel-627"><span class="linenos"> 627</span></a>        <span class="n">frame_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">frame_list</span><span class="p">)</span>
@@ -2336,16 +2336,16 @@
 </span><span id="PolarsModel-633"><a href="#PolarsModel-633"><span class="linenos"> 633</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="PolarsModel-634"><a href="#PolarsModel-634"><span class="linenos"> 634</span></a>    
 </span><span id="PolarsModel-635"><a href="#PolarsModel-635"><span class="linenos"> 635</span></a>    <span class="k">def</span> <span class="nf">get_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">colname</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="PolarsModel-636"><a href="#PolarsModel-636"><span class="linenos"> 636</span></a>        <span class="sd">&quot;&quot;&quot;get a value from a cell&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-636"><a href="#PolarsModel-636"><span class="linenos"> 636</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;get a value from a cell&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-637"><a href="#PolarsModel-637"><span class="linenos"> 637</span></a>        <span class="k">return</span> <span class="n">d</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">colname</span><span class="p">]</span>
 </span><span id="PolarsModel-638"><a href="#PolarsModel-638"><span class="linenos"> 638</span></a>    
 </span><span id="PolarsModel-639"><a href="#PolarsModel-639"><span class="linenos"> 639</span></a>    <span class="k">def</span> <span class="nf">set_col</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">colname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
-</span><span id="PolarsModel-640"><a href="#PolarsModel-640"><span class="linenos"> 640</span></a>        <span class="sd">&quot;&quot;&quot;set column, return ref&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-640"><a href="#PolarsModel-640"><span class="linenos"> 640</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;set column, return ref&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-641"><a href="#PolarsModel-641"><span class="linenos"> 641</span></a>        <span class="n">d2</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">with_column</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="n">colname</span><span class="p">))</span>
 </span><span id="PolarsModel-642"><a href="#PolarsModel-642"><span class="linenos"> 642</span></a>        <span class="k">return</span> <span class="n">d2</span>
 </span><span id="PolarsModel-643"><a href="#PolarsModel-643"><span class="linenos"> 643</span></a>
 </span><span id="PolarsModel-644"><a href="#PolarsModel-644"><span class="linenos"> 644</span></a>    <span class="k">def</span> <span class="nf">table_is_keyed_by_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">column_names</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="PolarsModel-645"><a href="#PolarsModel-645"><span class="linenos"> 645</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-645"><a href="#PolarsModel-645"><span class="linenos"> 645</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-646"><a href="#PolarsModel-646"><span class="linenos"> 646</span></a><span class="sd">        Check if a table is keyed by a given list of column names.</span>
 </span><span id="PolarsModel-647"><a href="#PolarsModel-647"><span class="linenos"> 647</span></a>
 </span><span id="PolarsModel-648"><a href="#PolarsModel-648"><span class="linenos"> 648</span></a><span class="sd">        :param table: DataFrame</span>
@@ -2381,7 +2381,7 @@
 </span><span id="PolarsModel-678"><a href="#PolarsModel-678"><span class="linenos"> 678</span></a>    <span class="c1"># evaluate</span>
 </span><span id="PolarsModel-679"><a href="#PolarsModel-679"><span class="linenos"> 679</span></a>
 </span><span id="PolarsModel-680"><a href="#PolarsModel-680"><span class="linenos"> 680</span></a>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-</span><span id="PolarsModel-681"><a href="#PolarsModel-681"><span class="linenos"> 681</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-681"><a href="#PolarsModel-681"><span class="linenos"> 681</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-682"><a href="#PolarsModel-682"><span class="linenos"> 682</span></a><span class="sd">        Implementation of Polars evaluation of data algebra operators</span>
 </span><span id="PolarsModel-683"><a href="#PolarsModel-683"><span class="linenos"> 683</span></a>
 </span><span id="PolarsModel-684"><a href="#PolarsModel-684"><span class="linenos"> 684</span></a><span class="sd">        :param op: ViewRepresentation to evaluate</span>
@@ -2397,7 +2397,7 @@
 </span><span id="PolarsModel-694"><a href="#PolarsModel-694"><span class="linenos"> 694</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="PolarsModel-695"><a href="#PolarsModel-695"><span class="linenos"> 695</span></a>
 </span><span id="PolarsModel-696"><a href="#PolarsModel-696"><span class="linenos"> 696</span></a>    <span class="k">def</span> <span class="nf">_compose_polars_ops</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="PolarsModel-697"><a href="#PolarsModel-697"><span class="linenos"> 697</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-697"><a href="#PolarsModel-697"><span class="linenos"> 697</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-698"><a href="#PolarsModel-698"><span class="linenos"> 698</span></a><span class="sd">        Convert to polars operators</span>
 </span><span id="PolarsModel-699"><a href="#PolarsModel-699"><span class="linenos"> 699</span></a>
 </span><span id="PolarsModel-700"><a href="#PolarsModel-700"><span class="linenos"> 700</span></a><span class="sd">        :param op: ViewRepresentation to evaluate</span>
@@ -2412,7 +2412,7 @@
 </span><span id="PolarsModel-709"><a href="#PolarsModel-709"><span class="linenos"> 709</span></a>    <span class="c1"># operator step realizations</span>
 </span><span id="PolarsModel-710"><a href="#PolarsModel-710"><span class="linenos"> 710</span></a>
 </span><span id="PolarsModel-711"><a href="#PolarsModel-711"><span class="linenos"> 711</span></a>    <span class="k">def</span> <span class="nf">_concat_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="PolarsModel-712"><a href="#PolarsModel-712"><span class="linenos"> 712</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-712"><a href="#PolarsModel-712"><span class="linenos"> 712</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-713"><a href="#PolarsModel-713"><span class="linenos"> 713</span></a><span class="sd">        Execute a concat rows step, returning a data frame.</span>
 </span><span id="PolarsModel-714"><a href="#PolarsModel-714"><span class="linenos"> 714</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PolarsModel-715"><a href="#PolarsModel-715"><span class="linenos"> 715</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ConcatRowsNode&quot;</span><span class="p">:</span>
@@ -2430,7 +2430,7 @@
 </span><span id="PolarsModel-727"><a href="#PolarsModel-727"><span class="linenos"> 727</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="PolarsModel-728"><a href="#PolarsModel-728"><span class="linenos"> 728</span></a>    
 </span><span id="PolarsModel-729"><a href="#PolarsModel-729"><span class="linenos"> 729</span></a>    <span class="k">def</span> <span class="nf">_convert_records_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="PolarsModel-730"><a href="#PolarsModel-730"><span class="linenos"> 730</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-730"><a href="#PolarsModel-730"><span class="linenos"> 730</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-731"><a href="#PolarsModel-731"><span class="linenos"> 731</span></a><span class="sd">        Execute record conversion step, returning a data frame.</span>
 </span><span id="PolarsModel-732"><a href="#PolarsModel-732"><span class="linenos"> 732</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PolarsModel-733"><a href="#PolarsModel-733"><span class="linenos"> 733</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ConvertRecordsNode&quot;</span><span class="p">:</span>
@@ -2446,7 +2446,7 @@
 </span><span id="PolarsModel-743"><a href="#PolarsModel-743"><span class="linenos"> 743</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="PolarsModel-744"><a href="#PolarsModel-744"><span class="linenos"> 744</span></a>    
 </span><span id="PolarsModel-745"><a href="#PolarsModel-745"><span class="linenos"> 745</span></a>    <span class="k">def</span> <span class="nf">_extend_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="PolarsModel-746"><a href="#PolarsModel-746"><span class="linenos"> 746</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-746"><a href="#PolarsModel-746"><span class="linenos"> 746</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-747"><a href="#PolarsModel-747"><span class="linenos"> 747</span></a><span class="sd">        Execute an extend step, returning a data frame.</span>
 </span><span id="PolarsModel-748"><a href="#PolarsModel-748"><span class="linenos"> 748</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PolarsModel-749"><a href="#PolarsModel-749"><span class="linenos"> 749</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ExtendNode&quot;</span><span class="p">:</span>
@@ -2513,7 +2513,7 @@
 </span><span id="PolarsModel-810"><a href="#PolarsModel-810"><span class="linenos"> 810</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="PolarsModel-811"><a href="#PolarsModel-811"><span class="linenos"> 811</span></a>
 </span><span id="PolarsModel-812"><a href="#PolarsModel-812"><span class="linenos"> 812</span></a>    <span class="k">def</span> <span class="nf">_project_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="PolarsModel-813"><a href="#PolarsModel-813"><span class="linenos"> 813</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-813"><a href="#PolarsModel-813"><span class="linenos"> 813</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-814"><a href="#PolarsModel-814"><span class="linenos"> 814</span></a><span class="sd">        Execute a project step, returning a data frame.</span>
 </span><span id="PolarsModel-815"><a href="#PolarsModel-815"><span class="linenos"> 815</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PolarsModel-816"><a href="#PolarsModel-816"><span class="linenos"> 816</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ProjectNode&quot;</span><span class="p">:</span>
@@ -2576,7 +2576,7 @@
 </span><span id="PolarsModel-873"><a href="#PolarsModel-873"><span class="linenos"> 873</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="PolarsModel-874"><a href="#PolarsModel-874"><span class="linenos"> 874</span></a>    
 </span><span id="PolarsModel-875"><a href="#PolarsModel-875"><span class="linenos"> 875</span></a>    <span class="k">def</span> <span class="nf">_natural_join_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="PolarsModel-876"><a href="#PolarsModel-876"><span class="linenos"> 876</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-876"><a href="#PolarsModel-876"><span class="linenos"> 876</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-877"><a href="#PolarsModel-877"><span class="linenos"> 877</span></a><span class="sd">        Execute a natural join step, returning a data frame.</span>
 </span><span id="PolarsModel-878"><a href="#PolarsModel-878"><span class="linenos"> 878</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PolarsModel-879"><a href="#PolarsModel-879"><span class="linenos"> 879</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;NaturalJoinNode&quot;</span><span class="p">:</span>
@@ -2647,7 +2647,7 @@
 </span><span id="PolarsModel-944"><a href="#PolarsModel-944"><span class="linenos"> 944</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="PolarsModel-945"><a href="#PolarsModel-945"><span class="linenos"> 945</span></a>    
 </span><span id="PolarsModel-946"><a href="#PolarsModel-946"><span class="linenos"> 946</span></a>    <span class="k">def</span> <span class="nf">_order_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="PolarsModel-947"><a href="#PolarsModel-947"><span class="linenos"> 947</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-947"><a href="#PolarsModel-947"><span class="linenos"> 947</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-948"><a href="#PolarsModel-948"><span class="linenos"> 948</span></a><span class="sd">        Execute an order rows step, returning a data frame.</span>
 </span><span id="PolarsModel-949"><a href="#PolarsModel-949"><span class="linenos"> 949</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PolarsModel-950"><a href="#PolarsModel-950"><span class="linenos"> 950</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;OrderRowsNode&quot;</span><span class="p">:</span>
@@ -2662,7 +2662,7 @@
 </span><span id="PolarsModel-959"><a href="#PolarsModel-959"><span class="linenos"> 959</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="PolarsModel-960"><a href="#PolarsModel-960"><span class="linenos"> 960</span></a>
 </span><span id="PolarsModel-961"><a href="#PolarsModel-961"><span class="linenos"> 961</span></a>    <span class="k">def</span> <span class="nf">_rename_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="PolarsModel-962"><a href="#PolarsModel-962"><span class="linenos"> 962</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-962"><a href="#PolarsModel-962"><span class="linenos"> 962</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-963"><a href="#PolarsModel-963"><span class="linenos"> 963</span></a><span class="sd">        Execute a rename columns step, returning a data frame.</span>
 </span><span id="PolarsModel-964"><a href="#PolarsModel-964"><span class="linenos"> 964</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PolarsModel-965"><a href="#PolarsModel-965"><span class="linenos"> 965</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;RenameColumnsNode&quot;</span><span class="p">:</span>
@@ -2680,7 +2680,7 @@
 </span><span id="PolarsModel-977"><a href="#PolarsModel-977"><span class="linenos"> 977</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="PolarsModel-978"><a href="#PolarsModel-978"><span class="linenos"> 978</span></a>
 </span><span id="PolarsModel-979"><a href="#PolarsModel-979"><span class="linenos"> 979</span></a>    <span class="k">def</span> <span class="nf">_map_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="PolarsModel-980"><a href="#PolarsModel-980"><span class="linenos"> 980</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-980"><a href="#PolarsModel-980"><span class="linenos"> 980</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-981"><a href="#PolarsModel-981"><span class="linenos"> 981</span></a><span class="sd">        Execute a map columns step, returning a data frame.</span>
 </span><span id="PolarsModel-982"><a href="#PolarsModel-982"><span class="linenos"> 982</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PolarsModel-983"><a href="#PolarsModel-983"><span class="linenos"> 983</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;MapColumnsNode&quot;</span><span class="p">:</span>
@@ -2698,7 +2698,7 @@
 </span><span id="PolarsModel-995"><a href="#PolarsModel-995"><span class="linenos"> 995</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="PolarsModel-996"><a href="#PolarsModel-996"><span class="linenos"> 996</span></a>
 </span><span id="PolarsModel-997"><a href="#PolarsModel-997"><span class="linenos"> 997</span></a>    <span class="k">def</span> <span class="nf">_select_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="PolarsModel-998"><a href="#PolarsModel-998"><span class="linenos"> 998</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-998"><a href="#PolarsModel-998"><span class="linenos"> 998</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-999"><a href="#PolarsModel-999"><span class="linenos"> 999</span></a><span class="sd">        Execute a select columns step, returning a data frame.</span>
 </span><span id="PolarsModel-1000"><a href="#PolarsModel-1000"><span class="linenos">1000</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PolarsModel-1001"><a href="#PolarsModel-1001"><span class="linenos">1001</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;SelectColumnsNode&quot;</span><span class="p">:</span>
@@ -2710,7 +2710,7 @@
 </span><span id="PolarsModel-1007"><a href="#PolarsModel-1007"><span class="linenos">1007</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="PolarsModel-1008"><a href="#PolarsModel-1008"><span class="linenos">1008</span></a>
 </span><span id="PolarsModel-1009"><a href="#PolarsModel-1009"><span class="linenos">1009</span></a>    <span class="k">def</span> <span class="nf">_drop_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="PolarsModel-1010"><a href="#PolarsModel-1010"><span class="linenos">1010</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-1010"><a href="#PolarsModel-1010"><span class="linenos">1010</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-1011"><a href="#PolarsModel-1011"><span class="linenos">1011</span></a><span class="sd">        Execute a drop columns step, returning a data frame.</span>
 </span><span id="PolarsModel-1012"><a href="#PolarsModel-1012"><span class="linenos">1012</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PolarsModel-1013"><a href="#PolarsModel-1013"><span class="linenos">1013</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compose_polars_ops</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">)</span>
@@ -2718,7 +2718,7 @@
 </span><span id="PolarsModel-1015"><a href="#PolarsModel-1015"><span class="linenos">1015</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="PolarsModel-1016"><a href="#PolarsModel-1016"><span class="linenos">1016</span></a>
 </span><span id="PolarsModel-1017"><a href="#PolarsModel-1017"><span class="linenos">1017</span></a>    <span class="k">def</span> <span class="nf">_select_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="PolarsModel-1018"><a href="#PolarsModel-1018"><span class="linenos">1018</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-1018"><a href="#PolarsModel-1018"><span class="linenos">1018</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-1019"><a href="#PolarsModel-1019"><span class="linenos">1019</span></a><span class="sd">        Execute a select rows step, returning a data frame.</span>
 </span><span id="PolarsModel-1020"><a href="#PolarsModel-1020"><span class="linenos">1020</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PolarsModel-1021"><a href="#PolarsModel-1021"><span class="linenos">1021</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;SelectRowsNode&quot;</span><span class="p">:</span>
@@ -2752,7 +2752,7 @@
 </span><span id="PolarsModel-1049"><a href="#PolarsModel-1049"><span class="linenos">1049</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="PolarsModel-1050"><a href="#PolarsModel-1050"><span class="linenos">1050</span></a>
 </span><span id="PolarsModel-1051"><a href="#PolarsModel-1051"><span class="linenos">1051</span></a>    <span class="k">def</span> <span class="nf">_sql_proxy_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="PolarsModel-1052"><a href="#PolarsModel-1052"><span class="linenos">1052</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-1052"><a href="#PolarsModel-1052"><span class="linenos">1052</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-1053"><a href="#PolarsModel-1053"><span class="linenos">1053</span></a><span class="sd">        execute SQL</span>
 </span><span id="PolarsModel-1054"><a href="#PolarsModel-1054"><span class="linenos">1054</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PolarsModel-1055"><a href="#PolarsModel-1055"><span class="linenos">1055</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;SQLNode&quot;</span><span class="p">:</span>
@@ -2770,7 +2770,7 @@
 </span><span id="PolarsModel-1067"><a href="#PolarsModel-1067"><span class="linenos">1067</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="PolarsModel-1068"><a href="#PolarsModel-1068"><span class="linenos">1068</span></a>    
 </span><span id="PolarsModel-1069"><a href="#PolarsModel-1069"><span class="linenos">1069</span></a>    <span class="k">def</span> <span class="nf">_table_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-</span><span id="PolarsModel-1070"><a href="#PolarsModel-1070"><span class="linenos">1070</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-1070"><a href="#PolarsModel-1070"><span class="linenos">1070</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-1071"><a href="#PolarsModel-1071"><span class="linenos">1071</span></a><span class="sd">        Return a data frame from table description and data_map.</span>
 </span><span id="PolarsModel-1072"><a href="#PolarsModel-1072"><span class="linenos">1072</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PolarsModel-1073"><a href="#PolarsModel-1073"><span class="linenos">1073</span></a>        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;TableDescription&quot;</span><span class="p">:</span>
@@ -2790,7 +2790,7 @@
 </span><span id="PolarsModel-1087"><a href="#PolarsModel-1087"><span class="linenos">1087</span></a>    <span class="c1"># cdata transforms</span>
 </span><span id="PolarsModel-1088"><a href="#PolarsModel-1088"><span class="linenos">1088</span></a>
 </span><span id="PolarsModel-1089"><a href="#PolarsModel-1089"><span class="linenos">1089</span></a>    <span class="k">def</span> <span class="nf">blocks_to_rowrecs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">blocks_in</span><span class="p">):</span>
-</span><span id="PolarsModel-1090"><a href="#PolarsModel-1090"><span class="linenos">1090</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-1090"><a href="#PolarsModel-1090"><span class="linenos">1090</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-1091"><a href="#PolarsModel-1091"><span class="linenos">1091</span></a><span class="sd">        Convert a block record (record spanning multiple rows) into a rowrecord (record in a single row).</span>
 </span><span id="PolarsModel-1092"><a href="#PolarsModel-1092"><span class="linenos">1092</span></a>
 </span><span id="PolarsModel-1093"><a href="#PolarsModel-1093"><span class="linenos">1093</span></a><span class="sd">        :param data: data frame to be transformed</span>
@@ -2859,7 +2859,7 @@
 </span><span id="PolarsModel-1156"><a href="#PolarsModel-1156"><span class="linenos">1156</span></a>        <span class="o">*</span><span class="p">,</span>
 </span><span id="PolarsModel-1157"><a href="#PolarsModel-1157"><span class="linenos">1157</span></a>        <span class="n">blocks_out</span><span class="p">,</span>
 </span><span id="PolarsModel-1158"><a href="#PolarsModel-1158"><span class="linenos">1158</span></a>    <span class="p">):</span>
-</span><span id="PolarsModel-1159"><a href="#PolarsModel-1159"><span class="linenos">1159</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel-1159"><a href="#PolarsModel-1159"><span class="linenos">1159</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel-1160"><a href="#PolarsModel-1160"><span class="linenos">1160</span></a><span class="sd">        Convert rowrecs (single row records) into block records (multiple row records).</span>
 </span><span id="PolarsModel-1161"><a href="#PolarsModel-1161"><span class="linenos">1161</span></a>
 </span><span id="PolarsModel-1162"><a href="#PolarsModel-1162"><span class="linenos">1162</span></a><span class="sd">        :param data: data frame to transform.</span>
@@ -2986,7 +2986,7 @@
     </div>
     <a class="headerlink" href="#PolarsModel.data_frame"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PolarsModel.data_frame-559"><a href="#PolarsModel.data_frame-559"><span class="linenos">559</span></a>    <span class="k">def</span> <span class="nf">data_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="PolarsModel.data_frame-560"><a href="#PolarsModel.data_frame-560"><span class="linenos">560</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel.data_frame-560"><a href="#PolarsModel.data_frame-560"><span class="linenos">560</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel.data_frame-561"><a href="#PolarsModel.data_frame-561"><span class="linenos">561</span></a><span class="sd">        Build a new data frame.</span>
 </span><span id="PolarsModel.data_frame-562"><a href="#PolarsModel.data_frame-562"><span class="linenos">562</span></a>
 </span><span id="PolarsModel.data_frame-563"><a href="#PolarsModel.data_frame-563"><span class="linenos">563</span></a><span class="sd">        :param arg: optional argument passed to constructor.</span>
@@ -3031,7 +3031,7 @@
     </div>
     <a class="headerlink" href="#PolarsModel.is_appropriate_data_instance"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PolarsModel.is_appropriate_data_instance-574"><a href="#PolarsModel.is_appropriate_data_instance-574"><span class="linenos">574</span></a>    <span class="k">def</span> <span class="nf">is_appropriate_data_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="PolarsModel.is_appropriate_data_instance-575"><a href="#PolarsModel.is_appropriate_data_instance-575"><span class="linenos">575</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel.is_appropriate_data_instance-575"><a href="#PolarsModel.is_appropriate_data_instance-575"><span class="linenos">575</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel.is_appropriate_data_instance-576"><a href="#PolarsModel.is_appropriate_data_instance-576"><span class="linenos">576</span></a><span class="sd">        Check if df is our type of data frame.</span>
 </span><span id="PolarsModel.is_appropriate_data_instance-577"><a href="#PolarsModel.is_appropriate_data_instance-577"><span class="linenos">577</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PolarsModel.is_appropriate_data_instance-578"><a href="#PolarsModel.is_appropriate_data_instance-578"><span class="linenos">578</span></a>        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">pl</span><span class="o">.</span><span class="n">LazyFrame</span><span class="p">)</span>
@@ -3055,7 +3055,7 @@
     </div>
     <a class="headerlink" href="#PolarsModel.clean_copy"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PolarsModel.clean_copy-580"><a href="#PolarsModel.clean_copy-580"><span class="linenos">580</span></a>    <span class="k">def</span> <span class="nf">clean_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
-</span><span id="PolarsModel.clean_copy-581"><a href="#PolarsModel.clean_copy-581"><span class="linenos">581</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel.clean_copy-581"><a href="#PolarsModel.clean_copy-581"><span class="linenos">581</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel.clean_copy-582"><a href="#PolarsModel.clean_copy-582"><span class="linenos">582</span></a><span class="sd">        Copy of data frame without indices.</span>
 </span><span id="PolarsModel.clean_copy-583"><a href="#PolarsModel.clean_copy-583"><span class="linenos">583</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PolarsModel.clean_copy-584"><a href="#PolarsModel.clean_copy-584"><span class="linenos">584</span></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
@@ -3083,7 +3083,7 @@
     </div>
     <a class="headerlink" href="#PolarsModel.to_pandas"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PolarsModel.to_pandas-590"><a href="#PolarsModel.to_pandas-590"><span class="linenos">590</span></a>    <span class="k">def</span> <span class="nf">to_pandas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
-</span><span id="PolarsModel.to_pandas-591"><a href="#PolarsModel.to_pandas-591"><span class="linenos">591</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel.to_pandas-591"><a href="#PolarsModel.to_pandas-591"><span class="linenos">591</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel.to_pandas-592"><a href="#PolarsModel.to_pandas-592"><span class="linenos">592</span></a><span class="sd">        Convert to Pandas</span>
 </span><span id="PolarsModel.to_pandas-593"><a href="#PolarsModel.to_pandas-593"><span class="linenos">593</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PolarsModel.to_pandas-594"><a href="#PolarsModel.to_pandas-594"><span class="linenos">594</span></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
@@ -3111,7 +3111,7 @@
     </div>
     <a class="headerlink" href="#PolarsModel.drop_indices"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PolarsModel.drop_indices-600"><a href="#PolarsModel.drop_indices-600"><span class="linenos">600</span></a>    <span class="k">def</span> <span class="nf">drop_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="PolarsModel.drop_indices-601"><a href="#PolarsModel.drop_indices-601"><span class="linenos">601</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel.drop_indices-601"><a href="#PolarsModel.drop_indices-601"><span class="linenos">601</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel.drop_indices-602"><a href="#PolarsModel.drop_indices-602"><span class="linenos">602</span></a><span class="sd">        Drop indices in place.</span>
 </span><span id="PolarsModel.drop_indices-603"><a href="#PolarsModel.drop_indices-603"><span class="linenos">603</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PolarsModel.drop_indices-604"><a href="#PolarsModel.drop_indices-604"><span class="linenos">604</span></a>        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
@@ -3136,7 +3136,7 @@
     </div>
     <a class="headerlink" href="#PolarsModel.bad_column_positions"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PolarsModel.bad_column_positions-607"><a href="#PolarsModel.bad_column_positions-607"><span class="linenos">607</span></a>    <span class="k">def</span> <span class="nf">bad_column_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-</span><span id="PolarsModel.bad_column_positions-608"><a href="#PolarsModel.bad_column_positions-608"><span class="linenos">608</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel.bad_column_positions-608"><a href="#PolarsModel.bad_column_positions-608"><span class="linenos">608</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel.bad_column_positions-609"><a href="#PolarsModel.bad_column_positions-609"><span class="linenos">609</span></a><span class="sd">        Return vector indicating which entries are null (vectorized).</span>
 </span><span id="PolarsModel.bad_column_positions-610"><a href="#PolarsModel.bad_column_positions-610"><span class="linenos">610</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PolarsModel.bad_column_positions-611"><a href="#PolarsModel.bad_column_positions-611"><span class="linenos">611</span></a>        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">is_null</span><span class="p">()</span>
@@ -3160,7 +3160,7 @@
     </div>
     <a class="headerlink" href="#PolarsModel.concat_rows"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PolarsModel.concat_rows-613"><a href="#PolarsModel.concat_rows-613"><span class="linenos">613</span></a>    <span class="k">def</span> <span class="nf">concat_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame_list</span><span class="p">:</span> <span class="n">List</span><span class="p">):</span>
-</span><span id="PolarsModel.concat_rows-614"><a href="#PolarsModel.concat_rows-614"><span class="linenos">614</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel.concat_rows-614"><a href="#PolarsModel.concat_rows-614"><span class="linenos">614</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel.concat_rows-615"><a href="#PolarsModel.concat_rows-615"><span class="linenos">615</span></a><span class="sd">        Concatenate rows from frame_list</span>
 </span><span id="PolarsModel.concat_rows-616"><a href="#PolarsModel.concat_rows-616"><span class="linenos">616</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PolarsModel.concat_rows-617"><a href="#PolarsModel.concat_rows-617"><span class="linenos">617</span></a>        <span class="n">frame_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">frame_list</span><span class="p">)</span>
@@ -3188,7 +3188,7 @@
     </div>
     <a class="headerlink" href="#PolarsModel.concat_columns"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PolarsModel.concat_columns-623"><a href="#PolarsModel.concat_columns-623"><span class="linenos">623</span></a>    <span class="k">def</span> <span class="nf">concat_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame_list</span><span class="p">):</span>
-</span><span id="PolarsModel.concat_columns-624"><a href="#PolarsModel.concat_columns-624"><span class="linenos">624</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel.concat_columns-624"><a href="#PolarsModel.concat_columns-624"><span class="linenos">624</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel.concat_columns-625"><a href="#PolarsModel.concat_columns-625"><span class="linenos">625</span></a><span class="sd">        Concatenate columns from frame_list</span>
 </span><span id="PolarsModel.concat_columns-626"><a href="#PolarsModel.concat_columns-626"><span class="linenos">626</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="PolarsModel.concat_columns-627"><a href="#PolarsModel.concat_columns-627"><span class="linenos">627</span></a>        <span class="n">frame_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">frame_list</span><span class="p">)</span>
@@ -3218,7 +3218,7 @@
     </div>
     <a class="headerlink" href="#PolarsModel.get_cell"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PolarsModel.get_cell-635"><a href="#PolarsModel.get_cell-635"><span class="linenos">635</span></a>    <span class="k">def</span> <span class="nf">get_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">colname</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="PolarsModel.get_cell-636"><a href="#PolarsModel.get_cell-636"><span class="linenos">636</span></a>        <span class="sd">&quot;&quot;&quot;get a value from a cell&quot;&quot;&quot;</span>
+</span><span id="PolarsModel.get_cell-636"><a href="#PolarsModel.get_cell-636"><span class="linenos">636</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;get a value from a cell&quot;&quot;&quot;</span>
 </span><span id="PolarsModel.get_cell-637"><a href="#PolarsModel.get_cell-637"><span class="linenos">637</span></a>        <span class="k">return</span> <span class="n">d</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">colname</span><span class="p">]</span>
 </span></pre></div>
 
@@ -3240,7 +3240,7 @@
     </div>
     <a class="headerlink" href="#PolarsModel.set_col"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PolarsModel.set_col-639"><a href="#PolarsModel.set_col-639"><span class="linenos">639</span></a>    <span class="k">def</span> <span class="nf">set_col</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">colname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
-</span><span id="PolarsModel.set_col-640"><a href="#PolarsModel.set_col-640"><span class="linenos">640</span></a>        <span class="sd">&quot;&quot;&quot;set column, return ref&quot;&quot;&quot;</span>
+</span><span id="PolarsModel.set_col-640"><a href="#PolarsModel.set_col-640"><span class="linenos">640</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;set column, return ref&quot;&quot;&quot;</span>
 </span><span id="PolarsModel.set_col-641"><a href="#PolarsModel.set_col-641"><span class="linenos">641</span></a>        <span class="n">d2</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">with_column</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="n">colname</span><span class="p">))</span>
 </span><span id="PolarsModel.set_col-642"><a href="#PolarsModel.set_col-642"><span class="linenos">642</span></a>        <span class="k">return</span> <span class="n">d2</span>
 </span></pre></div>
@@ -3263,7 +3263,7 @@
     </div>
     <a class="headerlink" href="#PolarsModel.table_is_keyed_by_columns"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PolarsModel.table_is_keyed_by_columns-644"><a href="#PolarsModel.table_is_keyed_by_columns-644"><span class="linenos">644</span></a>    <span class="k">def</span> <span class="nf">table_is_keyed_by_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">column_names</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="PolarsModel.table_is_keyed_by_columns-645"><a href="#PolarsModel.table_is_keyed_by_columns-645"><span class="linenos">645</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel.table_is_keyed_by_columns-645"><a href="#PolarsModel.table_is_keyed_by_columns-645"><span class="linenos">645</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel.table_is_keyed_by_columns-646"><a href="#PolarsModel.table_is_keyed_by_columns-646"><span class="linenos">646</span></a><span class="sd">        Check if a table is keyed by a given list of column names.</span>
 </span><span id="PolarsModel.table_is_keyed_by_columns-647"><a href="#PolarsModel.table_is_keyed_by_columns-647"><span class="linenos">647</span></a>
 </span><span id="PolarsModel.table_is_keyed_by_columns-648"><a href="#PolarsModel.table_is_keyed_by_columns-648"><span class="linenos">648</span></a><span class="sd">        :param table: DataFrame</span>
@@ -3328,7 +3328,7 @@
     </div>
     <a class="headerlink" href="#PolarsModel.eval"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PolarsModel.eval-680"><a href="#PolarsModel.eval-680"><span class="linenos">680</span></a>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-</span><span id="PolarsModel.eval-681"><a href="#PolarsModel.eval-681"><span class="linenos">681</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel.eval-681"><a href="#PolarsModel.eval-681"><span class="linenos">681</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel.eval-682"><a href="#PolarsModel.eval-682"><span class="linenos">682</span></a><span class="sd">        Implementation of Polars evaluation of data algebra operators</span>
 </span><span id="PolarsModel.eval-683"><a href="#PolarsModel.eval-683"><span class="linenos">683</span></a>
 </span><span id="PolarsModel.eval-684"><a href="#PolarsModel.eval-684"><span class="linenos">684</span></a><span class="sd">        :param op: ViewRepresentation to evaluate</span>
@@ -3375,7 +3375,7 @@
     </div>
     <a class="headerlink" href="#PolarsModel.blocks_to_rowrecs"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="PolarsModel.blocks_to_rowrecs-1089"><a href="#PolarsModel.blocks_to_rowrecs-1089"><span class="linenos">1089</span></a>    <span class="k">def</span> <span class="nf">blocks_to_rowrecs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">blocks_in</span><span class="p">):</span>
-</span><span id="PolarsModel.blocks_to_rowrecs-1090"><a href="#PolarsModel.blocks_to_rowrecs-1090"><span class="linenos">1090</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel.blocks_to_rowrecs-1090"><a href="#PolarsModel.blocks_to_rowrecs-1090"><span class="linenos">1090</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel.blocks_to_rowrecs-1091"><a href="#PolarsModel.blocks_to_rowrecs-1091"><span class="linenos">1091</span></a><span class="sd">        Convert a block record (record spanning multiple rows) into a rowrecord (record in a single row).</span>
 </span><span id="PolarsModel.blocks_to_rowrecs-1092"><a href="#PolarsModel.blocks_to_rowrecs-1092"><span class="linenos">1092</span></a>
 </span><span id="PolarsModel.blocks_to_rowrecs-1093"><a href="#PolarsModel.blocks_to_rowrecs-1093"><span class="linenos">1093</span></a><span class="sd">        :param data: data frame to be transformed</span>
@@ -3475,7 +3475,7 @@
 </span><span id="PolarsModel.rowrecs_to_blocks-1156"><a href="#PolarsModel.rowrecs_to_blocks-1156"><span class="linenos">1156</span></a>        <span class="o">*</span><span class="p">,</span>
 </span><span id="PolarsModel.rowrecs_to_blocks-1157"><a href="#PolarsModel.rowrecs_to_blocks-1157"><span class="linenos">1157</span></a>        <span class="n">blocks_out</span><span class="p">,</span>
 </span><span id="PolarsModel.rowrecs_to_blocks-1158"><a href="#PolarsModel.rowrecs_to_blocks-1158"><span class="linenos">1158</span></a>    <span class="p">):</span>
-</span><span id="PolarsModel.rowrecs_to_blocks-1159"><a href="#PolarsModel.rowrecs_to_blocks-1159"><span class="linenos">1159</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="PolarsModel.rowrecs_to_blocks-1159"><a href="#PolarsModel.rowrecs_to_blocks-1159"><span class="linenos">1159</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="PolarsModel.rowrecs_to_blocks-1160"><a href="#PolarsModel.rowrecs_to_blocks-1160"><span class="linenos">1160</span></a><span class="sd">        Convert rowrecs (single row records) into block records (multiple row records).</span>
 </span><span id="PolarsModel.rowrecs_to_blocks-1161"><a href="#PolarsModel.rowrecs_to_blocks-1161"><span class="linenos">1161</span></a>
 </span><span id="PolarsModel.rowrecs_to_blocks-1162"><a href="#PolarsModel.rowrecs_to_blocks-1162"><span class="linenos">1162</span></a><span class="sd">        :param data: data frame to transform.</span>

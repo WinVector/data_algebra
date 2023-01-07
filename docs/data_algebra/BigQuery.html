@@ -206,7 +206,7 @@
 </span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>
 </span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>
 </span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a><span class="k">class</span> <span class="nc">BigQueryModel</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">):</span>
-</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>    <span class="sd">&quot;&quot;&quot;A model of how SQL should be generated for BigQuery</span>
+</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;A model of how SQL should be generated for BigQuery</span>
 </span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a><span class="sd">    connection should be google.cloud.bigquery.client.Client&quot;&quot;&quot;</span>
 </span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>
 </span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">table_prefix</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
@@ -245,7 +245,7 @@
 </span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>
 </span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a>    <span class="c1"># noinspection PyMethodMayBeStatic</span>
 </span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
-</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a>
 </span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a><span class="sd">        :param conn: database connection</span>
 </span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a><span class="sd">        :param q: sql query</span>
@@ -260,7 +260,7 @@
 </span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a>        <span class="n">conn</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
 </span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a>
 </span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a>    <span class="k">def</span> <span class="nf">read_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
-</span><span id="L-163"><a href="#L-163"><span class="linenos">163</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-163"><a href="#L-163"><span class="linenos">163</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a>
 </span><span id="L-165"><a href="#L-165"><span class="linenos">165</span></a><span class="sd">        :param conn: database connection</span>
 </span><span id="L-166"><a href="#L-166"><span class="linenos">166</span></a><span class="sd">        :param q: sql query</span>
@@ -344,7 +344,7 @@
 </span><span id="L-244"><a href="#L-244"><span class="linenos">244</span></a>        <span class="k">return</span> <span class="n">td</span>
 </span><span id="L-245"><a href="#L-245"><span class="linenos">245</span></a>
 </span><span id="L-246"><a href="#L-246"><span class="linenos">246</span></a>    <span class="k">def</span> <span class="nf">query_to_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">res_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-247"><a href="#L-247"><span class="linenos">247</span></a>        <span class="sd">&quot;&quot;&quot;Write query to csv&quot;&quot;&quot;</span>
+</span><span id="L-247"><a href="#L-247"><span class="linenos">247</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write query to csv&quot;&quot;&quot;</span>
 </span><span id="L-248"><a href="#L-248"><span class="linenos">248</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">):</span>
 </span><span id="L-249"><a href="#L-249"><span class="linenos">249</span></a>            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_model</span><span class="p">)</span>
 </span><span id="L-250"><a href="#L-250"><span class="linenos">250</span></a>        <span class="k">else</span><span class="p">:</span>
@@ -362,7 +362,7 @@
 </span><span id="L-262"><a href="#L-262"><span class="linenos">262</span></a>
 </span><span id="L-263"><a href="#L-263"><span class="linenos">263</span></a>
 </span><span id="L-264"><a href="#L-264"><span class="linenos">264</span></a><span class="k">def</span> <span class="nf">example_handle</span><span class="p">():</span>
-</span><span id="L-265"><a href="#L-265"><span class="linenos">265</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-265"><a href="#L-265"><span class="linenos">265</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-266"><a href="#L-266"><span class="linenos">266</span></a><span class="sd">    Return an example db handle for testing. Returns None if helper packages not present.</span>
 </span><span id="L-267"><a href="#L-267"><span class="linenos">267</span></a><span class="sd">    Note: binds in a data_catalog and data schema prefix. So this handle is specific</span>
 </span><span id="L-268"><a href="#L-268"><span class="linenos">268</span></a><span class="sd">    to one database.</span>
@@ -401,7 +401,7 @@
     </div>
     <a class="headerlink" href="#BigQueryModel"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="BigQueryModel-109"><a href="#BigQueryModel-109"><span class="linenos">109</span></a><span class="k">class</span> <span class="nc">BigQueryModel</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">):</span>
-</span><span id="BigQueryModel-110"><a href="#BigQueryModel-110"><span class="linenos">110</span></a>    <span class="sd">&quot;&quot;&quot;A model of how SQL should be generated for BigQuery</span>
+</span><span id="BigQueryModel-110"><a href="#BigQueryModel-110"><span class="linenos">110</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;A model of how SQL should be generated for BigQuery</span>
 </span><span id="BigQueryModel-111"><a href="#BigQueryModel-111"><span class="linenos">111</span></a><span class="sd">    connection should be google.cloud.bigquery.client.Client&quot;&quot;&quot;</span>
 </span><span id="BigQueryModel-112"><a href="#BigQueryModel-112"><span class="linenos">112</span></a>
 </span><span id="BigQueryModel-113"><a href="#BigQueryModel-113"><span class="linenos">113</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">table_prefix</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
@@ -440,7 +440,7 @@
 </span><span id="BigQueryModel-146"><a href="#BigQueryModel-146"><span class="linenos">146</span></a>
 </span><span id="BigQueryModel-147"><a href="#BigQueryModel-147"><span class="linenos">147</span></a>    <span class="c1"># noinspection PyMethodMayBeStatic</span>
 </span><span id="BigQueryModel-148"><a href="#BigQueryModel-148"><span class="linenos">148</span></a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
-</span><span id="BigQueryModel-149"><a href="#BigQueryModel-149"><span class="linenos">149</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="BigQueryModel-149"><a href="#BigQueryModel-149"><span class="linenos">149</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="BigQueryModel-150"><a href="#BigQueryModel-150"><span class="linenos">150</span></a>
 </span><span id="BigQueryModel-151"><a href="#BigQueryModel-151"><span class="linenos">151</span></a><span class="sd">        :param conn: database connection</span>
 </span><span id="BigQueryModel-152"><a href="#BigQueryModel-152"><span class="linenos">152</span></a><span class="sd">        :param q: sql query</span>
@@ -455,7 +455,7 @@
 </span><span id="BigQueryModel-161"><a href="#BigQueryModel-161"><span class="linenos">161</span></a>        <span class="n">conn</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
 </span><span id="BigQueryModel-162"><a href="#BigQueryModel-162"><span class="linenos">162</span></a>
 </span><span id="BigQueryModel-163"><a href="#BigQueryModel-163"><span class="linenos">163</span></a>    <span class="k">def</span> <span class="nf">read_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
-</span><span id="BigQueryModel-164"><a href="#BigQueryModel-164"><span class="linenos">164</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="BigQueryModel-164"><a href="#BigQueryModel-164"><span class="linenos">164</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="BigQueryModel-165"><a href="#BigQueryModel-165"><span class="linenos">165</span></a>
 </span><span id="BigQueryModel-166"><a href="#BigQueryModel-166"><span class="linenos">166</span></a><span class="sd">        :param conn: database connection</span>
 </span><span id="BigQueryModel-167"><a href="#BigQueryModel-167"><span class="linenos">167</span></a><span class="sd">        :param q: sql query</span>
@@ -600,7 +600,7 @@ connection should be google.cloud.bigquery.client.Client</p>
     </div>
     <a class="headerlink" href="#BigQueryModel.execute"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="BigQueryModel.execute-148"><a href="#BigQueryModel.execute-148"><span class="linenos">148</span></a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
-</span><span id="BigQueryModel.execute-149"><a href="#BigQueryModel.execute-149"><span class="linenos">149</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="BigQueryModel.execute-149"><a href="#BigQueryModel.execute-149"><span class="linenos">149</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="BigQueryModel.execute-150"><a href="#BigQueryModel.execute-150"><span class="linenos">150</span></a>
 </span><span id="BigQueryModel.execute-151"><a href="#BigQueryModel.execute-151"><span class="linenos">151</span></a><span class="sd">        :param conn: database connection</span>
 </span><span id="BigQueryModel.execute-152"><a href="#BigQueryModel.execute-152"><span class="linenos">152</span></a><span class="sd">        :param q: sql query</span>
@@ -638,7 +638,7 @@ connection should be google.cloud.bigquery.client.Client</p>
     </div>
     <a class="headerlink" href="#BigQueryModel.read_query"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="BigQueryModel.read_query-163"><a href="#BigQueryModel.read_query-163"><span class="linenos">163</span></a>    <span class="k">def</span> <span class="nf">read_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
-</span><span id="BigQueryModel.read_query-164"><a href="#BigQueryModel.read_query-164"><span class="linenos">164</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="BigQueryModel.read_query-164"><a href="#BigQueryModel.read_query-164"><span class="linenos">164</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="BigQueryModel.read_query-165"><a href="#BigQueryModel.read_query-165"><span class="linenos">165</span></a>
 </span><span id="BigQueryModel.read_query-166"><a href="#BigQueryModel.read_query-166"><span class="linenos">166</span></a><span class="sd">        :param conn: database connection</span>
 </span><span id="BigQueryModel.read_query-167"><a href="#BigQueryModel.read_query-167"><span class="linenos">167</span></a><span class="sd">        :param q: sql query</span>
@@ -842,7 +842,7 @@ connection should be google.cloud.bigquery.client.Client</p>
 </span><span id="BigQuery_DBHandle-245"><a href="#BigQuery_DBHandle-245"><span class="linenos">245</span></a>        <span class="k">return</span> <span class="n">td</span>
 </span><span id="BigQuery_DBHandle-246"><a href="#BigQuery_DBHandle-246"><span class="linenos">246</span></a>
 </span><span id="BigQuery_DBHandle-247"><a href="#BigQuery_DBHandle-247"><span class="linenos">247</span></a>    <span class="k">def</span> <span class="nf">query_to_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">res_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="BigQuery_DBHandle-248"><a href="#BigQuery_DBHandle-248"><span class="linenos">248</span></a>        <span class="sd">&quot;&quot;&quot;Write query to csv&quot;&quot;&quot;</span>
+</span><span id="BigQuery_DBHandle-248"><a href="#BigQuery_DBHandle-248"><span class="linenos">248</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write query to csv&quot;&quot;&quot;</span>
 </span><span id="BigQuery_DBHandle-249"><a href="#BigQuery_DBHandle-249"><span class="linenos">249</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">):</span>
 </span><span id="BigQuery_DBHandle-250"><a href="#BigQuery_DBHandle-250"><span class="linenos">250</span></a>            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_model</span><span class="p">)</span>
 </span><span id="BigQuery_DBHandle-251"><a href="#BigQuery_DBHandle-251"><span class="linenos">251</span></a>        <span class="k">else</span><span class="p">:</span>
@@ -953,7 +953,7 @@ connection should be google.cloud.bigquery.client.Client</p>
     </div>
     <a class="headerlink" href="#BigQuery_DBHandle.query_to_csv"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="BigQuery_DBHandle.query_to_csv-247"><a href="#BigQuery_DBHandle.query_to_csv-247"><span class="linenos">247</span></a>    <span class="k">def</span> <span class="nf">query_to_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">res_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="BigQuery_DBHandle.query_to_csv-248"><a href="#BigQuery_DBHandle.query_to_csv-248"><span class="linenos">248</span></a>        <span class="sd">&quot;&quot;&quot;Write query to csv&quot;&quot;&quot;</span>
+</span><span id="BigQuery_DBHandle.query_to_csv-248"><a href="#BigQuery_DBHandle.query_to_csv-248"><span class="linenos">248</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write query to csv&quot;&quot;&quot;</span>
 </span><span id="BigQuery_DBHandle.query_to_csv-249"><a href="#BigQuery_DBHandle.query_to_csv-249"><span class="linenos">249</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">):</span>
 </span><span id="BigQuery_DBHandle.query_to_csv-250"><a href="#BigQuery_DBHandle.query_to_csv-250"><span class="linenos">250</span></a>            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_model</span><span class="p">)</span>
 </span><span id="BigQuery_DBHandle.query_to_csv-251"><a href="#BigQuery_DBHandle.query_to_csv-251"><span class="linenos">251</span></a>        <span class="k">else</span><span class="p">:</span>
@@ -1007,7 +1007,7 @@ connection should be google.cloud.bigquery.client.Client</p>
     </div>
     <a class="headerlink" href="#example_handle"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="example_handle-265"><a href="#example_handle-265"><span class="linenos">265</span></a><span class="k">def</span> <span class="nf">example_handle</span><span class="p">():</span>
-</span><span id="example_handle-266"><a href="#example_handle-266"><span class="linenos">266</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="example_handle-266"><a href="#example_handle-266"><span class="linenos">266</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="example_handle-267"><a href="#example_handle-267"><span class="linenos">267</span></a><span class="sd">    Return an example db handle for testing. Returns None if helper packages not present.</span>
 </span><span id="example_handle-268"><a href="#example_handle-268"><span class="linenos">268</span></a><span class="sd">    Note: binds in a data_catalog and data schema prefix. So this handle is specific</span>
 </span><span id="example_handle-269"><a href="#example_handle-269"><span class="linenos">269</span></a><span class="sd">    to one database.</span>

@@ -101,7 +101,7 @@
 </span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a>
 </span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a>
 </span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="k">def</span> <span class="nf">hash_data_frame</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="sd">    Get a hash code representing a data frame.</span>
 </span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a>
 </span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a><span class="sd">    :param d: data frame</span>
@@ -115,7 +115,7 @@
 </span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a>
 </span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a>
 </span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a><span class="k">class</span> <span class="nc">EvalKey</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a>    <span class="sd">&quot;&quot;&quot;Carry description of data transform key&quot;&quot;&quot;</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Carry description of data transform key&quot;&quot;&quot;</span>
 </span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a>
 </span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a>    <span class="n">db_model_name</span><span class="p">:</span> <span class="nb">str</span>
 </span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a>    <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span>
@@ -128,7 +128,7 @@
 </span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a>    <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 </span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a>    <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="p">):</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a><span class="sd">    Create an immutable, hashable key.</span>
 </span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">)</span>
@@ -147,7 +147,7 @@
 </span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>
 </span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>
 </span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a><span class="k">class</span> <span class="nc">ResultCache</span><span class="p">:</span>
-</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>    <span class="sd">&quot;&quot;&quot;Cache for test results. Maps keys to data frames.&quot;&quot;&quot;</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Cache for test results. Maps keys to data frames.&quot;&quot;&quot;</span>
 </span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>
 </span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>    <span class="n">dirty</span><span class="p">:</span> <span class="nb">bool</span>
 </span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>    <span class="n">data_cache</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
@@ -165,7 +165,7 @@
 </span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>        <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 </span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>        <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>    <span class="p">):</span>
-</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>        <span class="sd">&quot;&quot;&quot;get result from cache, raise KeyError if not present&quot;&quot;&quot;</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;get result from cache, raise KeyError if not present&quot;&quot;&quot;</span>
 </span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>        <span class="n">k</span> <span class="o">=</span> <span class="n">make_cache_key</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">)</span>
 </span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_cache</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
 </span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>        <span class="k">assert</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">default_data_model</span><span class="p">()</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
@@ -179,7 +179,7 @@
 </span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>        <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>        <span class="n">res</span><span class="p">,</span>
 </span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>        <span class="sd">&quot;&quot;&quot;Store result to cache, mark dirty if change.&quot;&quot;&quot;</span>
+</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Store result to cache, mark dirty if change.&quot;&quot;&quot;</span>
 </span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>        <span class="k">assert</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">default_data_model</span><span class="p">()</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
 </span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>        <span class="n">op_key</span> <span class="o">=</span> <span class="n">make_cache_key</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">)</span>
 </span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>        <span class="k">try</span><span class="p">:</span>
@@ -213,7 +213,7 @@
     </div>
     <a class="headerlink" href="#hash_data_frame"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="hash_data_frame-10"><a href="#hash_data_frame-10"><span class="linenos">10</span></a><span class="k">def</span> <span class="nf">hash_data_frame</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="hash_data_frame-11"><a href="#hash_data_frame-11"><span class="linenos">11</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="hash_data_frame-11"><a href="#hash_data_frame-11"><span class="linenos">11</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="hash_data_frame-12"><a href="#hash_data_frame-12"><span class="linenos">12</span></a><span class="sd">    Get a hash code representing a data frame.</span>
 </span><span id="hash_data_frame-13"><a href="#hash_data_frame-13"><span class="linenos">13</span></a>
 </span><span id="hash_data_frame-14"><a href="#hash_data_frame-14"><span class="linenos">14</span></a><span class="sd">    :param d: data frame</span>
@@ -256,7 +256,7 @@
     </div>
     <a class="headerlink" href="#EvalKey"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="EvalKey-24"><a href="#EvalKey-24"><span class="linenos">24</span></a><span class="k">class</span> <span class="nc">EvalKey</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
-</span><span id="EvalKey-25"><a href="#EvalKey-25"><span class="linenos">25</span></a>    <span class="sd">&quot;&quot;&quot;Carry description of data transform key&quot;&quot;&quot;</span>
+</span><span id="EvalKey-25"><a href="#EvalKey-25"><span class="linenos">25</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Carry description of data transform key&quot;&quot;&quot;</span>
 </span><span id="EvalKey-26"><a href="#EvalKey-26"><span class="linenos">26</span></a>
 </span><span id="EvalKey-27"><a href="#EvalKey-27"><span class="linenos">27</span></a>    <span class="n">db_model_name</span><span class="p">:</span> <span class="nb">str</span>
 </span><span id="EvalKey-28"><a href="#EvalKey-28"><span class="linenos">28</span></a>    <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span>
@@ -349,7 +349,7 @@
 </span><span id="make_cache_key-35"><a href="#make_cache_key-35"><span class="linenos">35</span></a>    <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 </span><span id="make_cache_key-36"><a href="#make_cache_key-36"><span class="linenos">36</span></a>    <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="make_cache_key-37"><a href="#make_cache_key-37"><span class="linenos">37</span></a><span class="p">):</span>
-</span><span id="make_cache_key-38"><a href="#make_cache_key-38"><span class="linenos">38</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="make_cache_key-38"><a href="#make_cache_key-38"><span class="linenos">38</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="make_cache_key-39"><a href="#make_cache_key-39"><span class="linenos">39</span></a><span class="sd">    Create an immutable, hashable key.</span>
 </span><span id="make_cache_key-40"><a href="#make_cache_key-40"><span class="linenos">40</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="make_cache_key-41"><a href="#make_cache_key-41"><span class="linenos">41</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">)</span>
@@ -385,7 +385,7 @@
     </div>
     <a class="headerlink" href="#ResultCache"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="ResultCache-56"><a href="#ResultCache-56"><span class="linenos"> 56</span></a><span class="k">class</span> <span class="nc">ResultCache</span><span class="p">:</span>
-</span><span id="ResultCache-57"><a href="#ResultCache-57"><span class="linenos"> 57</span></a>    <span class="sd">&quot;&quot;&quot;Cache for test results. Maps keys to data frames.&quot;&quot;&quot;</span>
+</span><span id="ResultCache-57"><a href="#ResultCache-57"><span class="linenos"> 57</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Cache for test results. Maps keys to data frames.&quot;&quot;&quot;</span>
 </span><span id="ResultCache-58"><a href="#ResultCache-58"><span class="linenos"> 58</span></a>
 </span><span id="ResultCache-59"><a href="#ResultCache-59"><span class="linenos"> 59</span></a>    <span class="n">dirty</span><span class="p">:</span> <span class="nb">bool</span>
 </span><span id="ResultCache-60"><a href="#ResultCache-60"><span class="linenos"> 60</span></a>    <span class="n">data_cache</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
@@ -403,7 +403,7 @@
 </span><span id="ResultCache-72"><a href="#ResultCache-72"><span class="linenos"> 72</span></a>        <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 </span><span id="ResultCache-73"><a href="#ResultCache-73"><span class="linenos"> 73</span></a>        <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="ResultCache-74"><a href="#ResultCache-74"><span class="linenos"> 74</span></a>    <span class="p">):</span>
-</span><span id="ResultCache-75"><a href="#ResultCache-75"><span class="linenos"> 75</span></a>        <span class="sd">&quot;&quot;&quot;get result from cache, raise KeyError if not present&quot;&quot;&quot;</span>
+</span><span id="ResultCache-75"><a href="#ResultCache-75"><span class="linenos"> 75</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;get result from cache, raise KeyError if not present&quot;&quot;&quot;</span>
 </span><span id="ResultCache-76"><a href="#ResultCache-76"><span class="linenos"> 76</span></a>        <span class="n">k</span> <span class="o">=</span> <span class="n">make_cache_key</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">)</span>
 </span><span id="ResultCache-77"><a href="#ResultCache-77"><span class="linenos"> 77</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_cache</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
 </span><span id="ResultCache-78"><a href="#ResultCache-78"><span class="linenos"> 78</span></a>        <span class="k">assert</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">default_data_model</span><span class="p">()</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
@@ -417,7 +417,7 @@
 </span><span id="ResultCache-86"><a href="#ResultCache-86"><span class="linenos"> 86</span></a>        <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="ResultCache-87"><a href="#ResultCache-87"><span class="linenos"> 87</span></a>        <span class="n">res</span><span class="p">,</span>
 </span><span id="ResultCache-88"><a href="#ResultCache-88"><span class="linenos"> 88</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="ResultCache-89"><a href="#ResultCache-89"><span class="linenos"> 89</span></a>        <span class="sd">&quot;&quot;&quot;Store result to cache, mark dirty if change.&quot;&quot;&quot;</span>
+</span><span id="ResultCache-89"><a href="#ResultCache-89"><span class="linenos"> 89</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Store result to cache, mark dirty if change.&quot;&quot;&quot;</span>
 </span><span id="ResultCache-90"><a href="#ResultCache-90"><span class="linenos"> 90</span></a>        <span class="k">assert</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">default_data_model</span><span class="p">()</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
 </span><span id="ResultCache-91"><a href="#ResultCache-91"><span class="linenos"> 91</span></a>        <span class="n">op_key</span> <span class="o">=</span> <span class="n">make_cache_key</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">)</span>
 </span><span id="ResultCache-92"><a href="#ResultCache-92"><span class="linenos"> 92</span></a>        <span class="k">try</span><span class="p">:</span>
@@ -480,7 +480,7 @@
 </span><span id="ResultCache.get-72"><a href="#ResultCache.get-72"><span class="linenos">72</span></a>        <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 </span><span id="ResultCache.get-73"><a href="#ResultCache.get-73"><span class="linenos">73</span></a>        <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="ResultCache.get-74"><a href="#ResultCache.get-74"><span class="linenos">74</span></a>    <span class="p">):</span>
-</span><span id="ResultCache.get-75"><a href="#ResultCache.get-75"><span class="linenos">75</span></a>        <span class="sd">&quot;&quot;&quot;get result from cache, raise KeyError if not present&quot;&quot;&quot;</span>
+</span><span id="ResultCache.get-75"><a href="#ResultCache.get-75"><span class="linenos">75</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;get result from cache, raise KeyError if not present&quot;&quot;&quot;</span>
 </span><span id="ResultCache.get-76"><a href="#ResultCache.get-76"><span class="linenos">76</span></a>        <span class="n">k</span> <span class="o">=</span> <span class="n">make_cache_key</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">)</span>
 </span><span id="ResultCache.get-77"><a href="#ResultCache.get-77"><span class="linenos">77</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_cache</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
 </span><span id="ResultCache.get-78"><a href="#ResultCache.get-78"><span class="linenos">78</span></a>        <span class="k">assert</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">default_data_model</span><span class="p">()</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
@@ -512,7 +512,7 @@
 </span><span id="ResultCache.store-86"><a href="#ResultCache.store-86"><span class="linenos"> 86</span></a>        <span class="n">data_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="ResultCache.store-87"><a href="#ResultCache.store-87"><span class="linenos"> 87</span></a>        <span class="n">res</span><span class="p">,</span>
 </span><span id="ResultCache.store-88"><a href="#ResultCache.store-88"><span class="linenos"> 88</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="ResultCache.store-89"><a href="#ResultCache.store-89"><span class="linenos"> 89</span></a>        <span class="sd">&quot;&quot;&quot;Store result to cache, mark dirty if change.&quot;&quot;&quot;</span>
+</span><span id="ResultCache.store-89"><a href="#ResultCache.store-89"><span class="linenos"> 89</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Store result to cache, mark dirty if change.&quot;&quot;&quot;</span>
 </span><span id="ResultCache.store-90"><a href="#ResultCache.store-90"><span class="linenos"> 90</span></a>        <span class="k">assert</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">default_data_model</span><span class="p">()</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
 </span><span id="ResultCache.store-91"><a href="#ResultCache.store-91"><span class="linenos"> 91</span></a>        <span class="n">op_key</span> <span class="o">=</span> <span class="n">make_cache_key</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">)</span>
 </span><span id="ResultCache.store-92"><a href="#ResultCache.store-92"><span class="linenos"> 92</span></a>        <span class="k">try</span><span class="p">:</span>

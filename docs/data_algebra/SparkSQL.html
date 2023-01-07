@@ -134,12 +134,12 @@
 </span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a>
 </span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="c1"># treat NaN as NULL, as Pandas has a hard time distinguishing the two</span>
 </span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="k">def</span> <span class="nf">_sparksql_coalesce_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a><span class="sd">    Return coalesce expression.</span>
 </span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>
 </span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>    <span class="k">def</span> <span class="nf">coalesce_step</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a><span class="sd">        Return one caes of coalesce.</span>
 </span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
@@ -212,7 +212,7 @@
 </span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>
 </span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>
 </span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a><span class="k">class</span> <span class="nc">SparkConnection</span><span class="p">:</span>
-</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a><span class="sd">    Holder for spark conext and session as a connection (defines close).</span>
 </span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>
@@ -224,7 +224,7 @@
 </span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">spark_session</span> <span class="o">=</span> <span class="n">spark_session</span>
 </span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a>
 </span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a><span class="sd">        Stop context and release reference to context and session.</span>
 </span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spark_context</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -235,7 +235,7 @@
 </span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a>
 </span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a>
 </span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a><span class="k">class</span> <span class="nc">SparkSQLModel</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">):</span>
-</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a>    <span class="sd">&quot;&quot;&quot;A model of how SQL should be generated for SparkSQL.</span>
+</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;A model of how SQL should be generated for SparkSQL.</span>
 </span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a>
 </span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a><span class="sd">    Known issue: doesn&#39;t coalesce NaN</span>
 </span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -252,7 +252,7 @@
 </span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a>
 </span><span id="L-165"><a href="#L-165"><span class="linenos">165</span></a>    <span class="c1"># noinspection PyMethodMayBeStatic</span>
 </span><span id="L-166"><a href="#L-166"><span class="linenos">166</span></a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
-</span><span id="L-167"><a href="#L-167"><span class="linenos">167</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-167"><a href="#L-167"><span class="linenos">167</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a><span class="sd">        Execute a SQL query or operator dag.</span>
 </span><span id="L-169"><a href="#L-169"><span class="linenos">169</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a>        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">SparkConnection</span><span class="p">)</span>
@@ -260,7 +260,7 @@
 </span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a>        <span class="n">conn</span><span class="o">.</span><span class="n">spark_session</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
 </span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a>
 </span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a>    <span class="k">def</span> <span class="nf">read_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
-</span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-176"><a href="#L-176"><span class="linenos">176</span></a><span class="sd">        Execute a SQL query or operator dag, return result as Pandas data frame.</span>
 </span><span id="L-177"><a href="#L-177"><span class="linenos">177</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-178"><a href="#L-178"><span class="linenos">178</span></a>        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">SparkConnection</span><span class="p">)</span>
@@ -276,7 +276,7 @@
 </span><span id="L-188"><a href="#L-188"><span class="linenos">188</span></a>    <span class="k">def</span> <span class="nf">insert_table</span><span class="p">(</span>
 </span><span id="L-189"><a href="#L-189"><span class="linenos">189</span></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">False</span>
 </span><span id="L-190"><a href="#L-190"><span class="linenos">190</span></a>    <span class="p">):</span>
-</span><span id="L-191"><a href="#L-191"><span class="linenos">191</span></a>        <span class="sd">&quot;&quot;&quot;Insert table into database.&quot;&quot;&quot;</span>
+</span><span id="L-191"><a href="#L-191"><span class="linenos">191</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Insert table into database.&quot;&quot;&quot;</span>
 </span><span id="L-192"><a href="#L-192"><span class="linenos">192</span></a>        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">SparkConnection</span><span class="p">)</span>
 </span><span id="L-193"><a href="#L-193"><span class="linenos">193</span></a>        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
 </span><span id="L-194"><a href="#L-194"><span class="linenos">194</span></a>        <span class="k">if</span> <span class="n">qualifiers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -299,7 +299,7 @@
 </span><span id="L-211"><a href="#L-211"><span class="linenos">211</span></a>
 </span><span id="L-212"><a href="#L-212"><span class="linenos">212</span></a>
 </span><span id="L-213"><a href="#L-213"><span class="linenos">213</span></a><span class="k">def</span> <span class="nf">example_handle</span><span class="p">():</span>
-</span><span id="L-214"><a href="#L-214"><span class="linenos">214</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-214"><a href="#L-214"><span class="linenos">214</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-215"><a href="#L-215"><span class="linenos">215</span></a><span class="sd">    Return an example db handle for testing. Returns None if helper packages not present.</span>
 </span><span id="L-216"><a href="#L-216"><span class="linenos">216</span></a>
 </span><span id="L-217"><a href="#L-217"><span class="linenos">217</span></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -332,7 +332,7 @@
     </div>
     <a class="headerlink" href="#SparkConnection"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="SparkConnection-127"><a href="#SparkConnection-127"><span class="linenos">127</span></a><span class="k">class</span> <span class="nc">SparkConnection</span><span class="p">:</span>
-</span><span id="SparkConnection-128"><a href="#SparkConnection-128"><span class="linenos">128</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="SparkConnection-128"><a href="#SparkConnection-128"><span class="linenos">128</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="SparkConnection-129"><a href="#SparkConnection-129"><span class="linenos">129</span></a><span class="sd">    Holder for spark conext and session as a connection (defines close).</span>
 </span><span id="SparkConnection-130"><a href="#SparkConnection-130"><span class="linenos">130</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="SparkConnection-131"><a href="#SparkConnection-131"><span class="linenos">131</span></a>
@@ -344,7 +344,7 @@
 </span><span id="SparkConnection-137"><a href="#SparkConnection-137"><span class="linenos">137</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">spark_session</span> <span class="o">=</span> <span class="n">spark_session</span>
 </span><span id="SparkConnection-138"><a href="#SparkConnection-138"><span class="linenos">138</span></a>
 </span><span id="SparkConnection-139"><a href="#SparkConnection-139"><span class="linenos">139</span></a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="SparkConnection-140"><a href="#SparkConnection-140"><span class="linenos">140</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="SparkConnection-140"><a href="#SparkConnection-140"><span class="linenos">140</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="SparkConnection-141"><a href="#SparkConnection-141"><span class="linenos">141</span></a><span class="sd">        Stop context and release reference to context and session.</span>
 </span><span id="SparkConnection-142"><a href="#SparkConnection-142"><span class="linenos">142</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="SparkConnection-143"><a href="#SparkConnection-143"><span class="linenos">143</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spark_context</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -393,7 +393,7 @@
     </div>
     <a class="headerlink" href="#SparkConnection.close"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="SparkConnection.close-139"><a href="#SparkConnection.close-139"><span class="linenos">139</span></a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="SparkConnection.close-140"><a href="#SparkConnection.close-140"><span class="linenos">140</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="SparkConnection.close-140"><a href="#SparkConnection.close-140"><span class="linenos">140</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="SparkConnection.close-141"><a href="#SparkConnection.close-141"><span class="linenos">141</span></a><span class="sd">        Stop context and release reference to context and session.</span>
 </span><span id="SparkConnection.close-142"><a href="#SparkConnection.close-142"><span class="linenos">142</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="SparkConnection.close-143"><a href="#SparkConnection.close-143"><span class="linenos">143</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spark_context</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -422,7 +422,7 @@
     </div>
     <a class="headerlink" href="#SparkSQLModel"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="SparkSQLModel-150"><a href="#SparkSQLModel-150"><span class="linenos">150</span></a><span class="k">class</span> <span class="nc">SparkSQLModel</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">):</span>
-</span><span id="SparkSQLModel-151"><a href="#SparkSQLModel-151"><span class="linenos">151</span></a>    <span class="sd">&quot;&quot;&quot;A model of how SQL should be generated for SparkSQL.</span>
+</span><span id="SparkSQLModel-151"><a href="#SparkSQLModel-151"><span class="linenos">151</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;A model of how SQL should be generated for SparkSQL.</span>
 </span><span id="SparkSQLModel-152"><a href="#SparkSQLModel-152"><span class="linenos">152</span></a>
 </span><span id="SparkSQLModel-153"><a href="#SparkSQLModel-153"><span class="linenos">153</span></a><span class="sd">    Known issue: doesn&#39;t coalesce NaN</span>
 </span><span id="SparkSQLModel-154"><a href="#SparkSQLModel-154"><span class="linenos">154</span></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -439,7 +439,7 @@
 </span><span id="SparkSQLModel-165"><a href="#SparkSQLModel-165"><span class="linenos">165</span></a>
 </span><span id="SparkSQLModel-166"><a href="#SparkSQLModel-166"><span class="linenos">166</span></a>    <span class="c1"># noinspection PyMethodMayBeStatic</span>
 </span><span id="SparkSQLModel-167"><a href="#SparkSQLModel-167"><span class="linenos">167</span></a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
-</span><span id="SparkSQLModel-168"><a href="#SparkSQLModel-168"><span class="linenos">168</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="SparkSQLModel-168"><a href="#SparkSQLModel-168"><span class="linenos">168</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="SparkSQLModel-169"><a href="#SparkSQLModel-169"><span class="linenos">169</span></a><span class="sd">        Execute a SQL query or operator dag.</span>
 </span><span id="SparkSQLModel-170"><a href="#SparkSQLModel-170"><span class="linenos">170</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="SparkSQLModel-171"><a href="#SparkSQLModel-171"><span class="linenos">171</span></a>        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">SparkConnection</span><span class="p">)</span>
@@ -447,7 +447,7 @@
 </span><span id="SparkSQLModel-173"><a href="#SparkSQLModel-173"><span class="linenos">173</span></a>        <span class="n">conn</span><span class="o">.</span><span class="n">spark_session</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
 </span><span id="SparkSQLModel-174"><a href="#SparkSQLModel-174"><span class="linenos">174</span></a>
 </span><span id="SparkSQLModel-175"><a href="#SparkSQLModel-175"><span class="linenos">175</span></a>    <span class="k">def</span> <span class="nf">read_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
-</span><span id="SparkSQLModel-176"><a href="#SparkSQLModel-176"><span class="linenos">176</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="SparkSQLModel-176"><a href="#SparkSQLModel-176"><span class="linenos">176</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="SparkSQLModel-177"><a href="#SparkSQLModel-177"><span class="linenos">177</span></a><span class="sd">        Execute a SQL query or operator dag, return result as Pandas data frame.</span>
 </span><span id="SparkSQLModel-178"><a href="#SparkSQLModel-178"><span class="linenos">178</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="SparkSQLModel-179"><a href="#SparkSQLModel-179"><span class="linenos">179</span></a>        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">SparkConnection</span><span class="p">)</span>
@@ -463,7 +463,7 @@
 </span><span id="SparkSQLModel-189"><a href="#SparkSQLModel-189"><span class="linenos">189</span></a>    <span class="k">def</span> <span class="nf">insert_table</span><span class="p">(</span>
 </span><span id="SparkSQLModel-190"><a href="#SparkSQLModel-190"><span class="linenos">190</span></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">False</span>
 </span><span id="SparkSQLModel-191"><a href="#SparkSQLModel-191"><span class="linenos">191</span></a>    <span class="p">):</span>
-</span><span id="SparkSQLModel-192"><a href="#SparkSQLModel-192"><span class="linenos">192</span></a>        <span class="sd">&quot;&quot;&quot;Insert table into database.&quot;&quot;&quot;</span>
+</span><span id="SparkSQLModel-192"><a href="#SparkSQLModel-192"><span class="linenos">192</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Insert table into database.&quot;&quot;&quot;</span>
 </span><span id="SparkSQLModel-193"><a href="#SparkSQLModel-193"><span class="linenos">193</span></a>        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">SparkConnection</span><span class="p">)</span>
 </span><span id="SparkSQLModel-194"><a href="#SparkSQLModel-194"><span class="linenos">194</span></a>        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
 </span><span id="SparkSQLModel-195"><a href="#SparkSQLModel-195"><span class="linenos">195</span></a>        <span class="k">if</span> <span class="n">qualifiers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -526,7 +526,7 @@
     </div>
     <a class="headerlink" href="#SparkSQLModel.execute"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="SparkSQLModel.execute-167"><a href="#SparkSQLModel.execute-167"><span class="linenos">167</span></a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
-</span><span id="SparkSQLModel.execute-168"><a href="#SparkSQLModel.execute-168"><span class="linenos">168</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="SparkSQLModel.execute-168"><a href="#SparkSQLModel.execute-168"><span class="linenos">168</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="SparkSQLModel.execute-169"><a href="#SparkSQLModel.execute-169"><span class="linenos">169</span></a><span class="sd">        Execute a SQL query or operator dag.</span>
 </span><span id="SparkSQLModel.execute-170"><a href="#SparkSQLModel.execute-170"><span class="linenos">170</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="SparkSQLModel.execute-171"><a href="#SparkSQLModel.execute-171"><span class="linenos">171</span></a>        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">SparkConnection</span><span class="p">)</span>
@@ -552,7 +552,7 @@
     </div>
     <a class="headerlink" href="#SparkSQLModel.read_query"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="SparkSQLModel.read_query-175"><a href="#SparkSQLModel.read_query-175"><span class="linenos">175</span></a>    <span class="k">def</span> <span class="nf">read_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
-</span><span id="SparkSQLModel.read_query-176"><a href="#SparkSQLModel.read_query-176"><span class="linenos">176</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="SparkSQLModel.read_query-176"><a href="#SparkSQLModel.read_query-176"><span class="linenos">176</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="SparkSQLModel.read_query-177"><a href="#SparkSQLModel.read_query-177"><span class="linenos">177</span></a><span class="sd">        Execute a SQL query or operator dag, return result as Pandas data frame.</span>
 </span><span id="SparkSQLModel.read_query-178"><a href="#SparkSQLModel.read_query-178"><span class="linenos">178</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="SparkSQLModel.read_query-179"><a href="#SparkSQLModel.read_query-179"><span class="linenos">179</span></a>        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">SparkConnection</span><span class="p">)</span>
@@ -585,7 +585,7 @@
             <div class="pdoc-code codehilite"><pre><span></span><span id="SparkSQLModel.insert_table-189"><a href="#SparkSQLModel.insert_table-189"><span class="linenos">189</span></a>    <span class="k">def</span> <span class="nf">insert_table</span><span class="p">(</span>
 </span><span id="SparkSQLModel.insert_table-190"><a href="#SparkSQLModel.insert_table-190"><span class="linenos">190</span></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">False</span>
 </span><span id="SparkSQLModel.insert_table-191"><a href="#SparkSQLModel.insert_table-191"><span class="linenos">191</span></a>    <span class="p">):</span>
-</span><span id="SparkSQLModel.insert_table-192"><a href="#SparkSQLModel.insert_table-192"><span class="linenos">192</span></a>        <span class="sd">&quot;&quot;&quot;Insert table into database.&quot;&quot;&quot;</span>
+</span><span id="SparkSQLModel.insert_table-192"><a href="#SparkSQLModel.insert_table-192"><span class="linenos">192</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Insert table into database.&quot;&quot;&quot;</span>
 </span><span id="SparkSQLModel.insert_table-193"><a href="#SparkSQLModel.insert_table-193"><span class="linenos">193</span></a>        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">SparkConnection</span><span class="p">)</span>
 </span><span id="SparkSQLModel.insert_table-194"><a href="#SparkSQLModel.insert_table-194"><span class="linenos">194</span></a>        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
 </span><span id="SparkSQLModel.insert_table-195"><a href="#SparkSQLModel.insert_table-195"><span class="linenos">195</span></a>        <span class="k">if</span> <span class="n">qualifiers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -665,7 +665,7 @@
     </div>
     <a class="headerlink" href="#example_handle"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="example_handle-214"><a href="#example_handle-214"><span class="linenos">214</span></a><span class="k">def</span> <span class="nf">example_handle</span><span class="p">():</span>
-</span><span id="example_handle-215"><a href="#example_handle-215"><span class="linenos">215</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="example_handle-215"><a href="#example_handle-215"><span class="linenos">215</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="example_handle-216"><a href="#example_handle-216"><span class="linenos">216</span></a><span class="sd">    Return an example db handle for testing. Returns None if helper packages not present.</span>
 </span><span id="example_handle-217"><a href="#example_handle-217"><span class="linenos">217</span></a>
 </span><span id="example_handle-218"><a href="#example_handle-218"><span class="linenos">218</span></a><span class="sd">    &quot;&quot;&quot;</span>
