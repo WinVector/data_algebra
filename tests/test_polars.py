@@ -723,9 +723,11 @@ def test_polars_arrow_table_narrows():
         d = pl.DataFrame({"x": [1, 2], "y": [3, 4]})
         ops = data_algebra.TableDescription(column_names=["x"])
         res = ops.transform(d)
+        assert isinstance(res, pl.DataFrame)
         expect = pl.DataFrame({"x": [1, 2]})
         assert data_algebra.test_util.equivalent_frames(res, expect)
         with pytest.raises(AssertionError):
             d >> ops
         res2 = d[["x"]] >> ops
+        assert isinstance(res2, pl.DataFrame)
         assert data_algebra.test_util.equivalent_frames(res2, expect)
