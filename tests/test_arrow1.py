@@ -259,3 +259,16 @@ def test_arrow_assoc_guard_table():
     res_wide = ops_b.replace_leaves({"data_frame": ops}).transform(d)  # widens column def
     res_narrow = ops_b.transform(ops.transform(d))  # would want to match this
     assert len(res_wide.columns) != len(res_narrow.columns)
+
+
+def test_arrow_table_narrows():
+    pd = data_algebra.data_model.default_data_model().pd
+    d = pd.DataFrame({"x": [1, 2], "y": [3, 4]})
+    ops = data_algebra.TableDescription(column_names=["x"])
+    res = ops.transform(d)
+    expect = pd.DataFrame({"x": [1, 2]})
+    assert data_algebra.test_util.equivalent_frames(res, expect)
+    with pytest.raises(AssertionError):
+        d >> ops
+    res2 = d.loc[:, ["x"]] >> ops
+    assert data_algebra.test_util.equivalent_frames(res2, expect)

@@ -5,6 +5,7 @@ import data_algebra
 import data_algebra.data_model
 import data_algebra.test_util
 import data_algebra.cdata
+import pytest
 
 have_polars = False
 try:
@@ -715,3 +716,16 @@ def test_is_inf_polars():
             'is_null': [0, 0, 0, 1, 0, 0, 0],   # Pandas can't tell the difference, Polars can
             })
         assert data_algebra.test_util.equivalent_frames(expect, res_polars)
+
+
+def test_polars_arrow_table_narrows():
+    if have_polars:
+        d = pl.DataFrame({"x": [1, 2], "y": [3, 4]})
+        ops = data_algebra.TableDescription(column_names=["x"])
+        res = ops.transform(d)
+        expect = pl.DataFrame({"x": [1, 2]})
+        assert data_algebra.test_util.equivalent_frames(res, expect)
+        with pytest.raises(AssertionError):
+            d >> ops
+        res2 = d[["x"]] >> ops
+        assert data_algebra.test_util.equivalent_frames(res2, expect)
