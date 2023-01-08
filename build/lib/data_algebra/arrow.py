@@ -80,11 +80,11 @@ class DataOpArrow(Arrow):
     """
 
     def __init__(
-        self, pipeline, *, free_table_key=None, strict=False, forbidden_to_produce=None
+        self, pipeline, *, free_table_key=None, forbidden_to_produce=None
     ):
         assert isinstance(pipeline, data_algebra.data_ops.ViewRepresentation)
         self.pipeline = pipeline
-        self.strict = strict
+        self.strict = True
         t_used = pipeline.get_tables()
         if forbidden_to_produce is None:
             forbidden_to_produce = []
@@ -154,6 +154,8 @@ class DataOpArrow(Arrow):
         if len(missing) > 0:
             raise ValueError("missing required columns: " + str(missing))
         excess = cols - set(self.incoming_columns)
+        if self.strict:
+            assert len(excess) == 0
         if len(excess) > 0:
             X = X[self.incoming_columns]
         return self.pipeline.act_on(X)
