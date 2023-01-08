@@ -19,29 +19,28 @@ except ModuleNotFoundError:
 def test_expression_expectations_polars_1():
     if have_polars:
         known_not_to_work = set([
-            'arctan2', 
-            'base_Sunday',
-            'concat',
+            'arctan2',
+            'expm1',
+            'log1p',
             'count',  # Pandas null treatment in the wrong
             'cumcount',  # pending implementation
+            'base_Sunday',
             'date_diff',
             'datetime_to_date',
             'dayofmonth',
             'dayofweek',
             'dayofyear',
-            'expm1',
             'format_date',
             'format_datetime',
-            'log1p',
             'month',
             'parse_date',
             'quarter',
-            'std',
-            'timestamp_diff',
-            'trimstr',
-            'var',
             'weekofyear',
             'year',
+            'timestamp_diff',
+            'trimstr',
+            'std',
+            'var',
             '_ngroup',  # pending group numbering implementation
             ])
         dir_path = os.path.dirname(os.path.realpath(__file__))
