@@ -272,3 +272,20 @@ def test_arrow_table_narrows():
         d >> ops
     res2 = d.loc[:, ["x"]] >> ops
     assert data_algebra.test_util.equivalent_frames(res2, expect)
+
+
+def test_arrow_identity():
+    pd = data_algebra.data_model.default_data_model().pd
+    d = pd.DataFrame({"x": [1, 2]})
+    ops = data_algebra.descr(d=d).extend({"y": "x + 1"})
+    dl = data_algebra.TableDescription(table_name="d", column_names=["x"])
+    ops_2 = dl >> ops
+    assert ops_2 == ops
+    dr = data_algebra.TableDescription(table_name="d2", column_names=["x", "y"])
+    ops_3 = ops >> dr
+    assert ops_3 == ops
+    assert (dl >> dl) == dl
+    assert (dr >> dr) == dr
+    assert dl != dr
+    res = d >> dl
+    assert data_algebra.test_util.equivalent_frames(d, res)
