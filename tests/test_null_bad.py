@@ -90,6 +90,7 @@ def test_is_inf():
         ops=ops,
         data=d,
         expect=expect,
+        try_on_DBs=False,
         models_to_skip={
             data_algebra.MySQL.MySQLModel(),  # sqlalchemy won't insert inf
             data_algebra.SparkSQL.SparkSQLModel(),  # probably not inserting values

@@ -111,6 +111,13 @@ def _spark_std_expr(dbmodel, expression):
     )
 
 
+def _as_int(dbmodel, expression):
+    return (
+        "CAST("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + " AS INT)"
+    )
+
 # map from op-name to special SQL formatting code
 SparkSQL_formatters = {
     "___": lambda dbmodel, expression: str(expression.to_python()),
@@ -120,6 +127,7 @@ SparkSQL_formatters = {
     "mapv": _sparksql_db_mapv,
     "var": _spark_var_expr,
     "std": _spark_std_expr,
+    "as_int64": _as_int,
 }
 
 

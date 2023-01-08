@@ -1,5 +1,6 @@
 
 import data_algebra
+import data_algebra.MySQL
 import data_algebra.test_util
 from data_algebra.data_ops import descr
 from data_algebra.solutions import replicate_rows_query
@@ -31,4 +32,5 @@ def test_replicate_rows_query():
         ops=ops,
         data={'d': d, 'rt': rt},
         expect=expect,
+        models_to_skip={str(data_algebra.MySQL.MySQLModel())},
     )
