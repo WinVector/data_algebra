@@ -30,10 +30,10 @@ except ModuleNotFoundError:
 
 
 # controls
-test_PostgreSQL = False  # causes an external dependency
-test_BigQuery = False  # causes an external dependency
-test_MySQL = False  # causes an external dependency
-test_Spark = False  # causes an external dependency
+test_PostgreSQL = True  # causes an external dependency
+test_BigQuery = True  # causes an external dependency
+test_MySQL = True  # causes an external dependency
+test_Spark = True  # causes an external dependency
 
 run_direct_ops_path_tests = False
 
@@ -203,7 +203,7 @@ def _run_handle_experiments(
     check_row_order: bool = False,
     test_result_cache: Optional[data_algebra.eval_cache.ResultCache] = None,
     alter_cache: bool = True,
-    test_direct_ops_path=False,
+    test_direct_ops_path: bool = False,
 ):
     """
     Run ops and sql_statements on db_handle, checking if result matches expect.
@@ -211,6 +211,7 @@ def _run_handle_experiments(
     assert isinstance(db_handle, data_algebra.db_model.DBHandle)
     assert isinstance(db_handle.db_model, data_algebra.db_model.DBModel)
     assert isinstance(ops, ViewRepresentation)
+    assert isinstance(test_direct_ops_path, bool)
     assert db_handle.conn is not None
     if isinstance(db_handle.db_model, data_algebra.SQLite.SQLiteModel):
         test_direct_ops_path = True
@@ -242,7 +243,7 @@ def _run_handle_experiments(
             db_handle.insert_table(v, table_name=k, allow_overwrite=True)
             to_del.add(k)
         try:
-            if test_direct_ops_path is None:
+            if test_direct_ops_path:
                 res_db_ops = db_handle.read_query(ops)
                 assert res_db_ops is not None
             for i in range(len(sql_statements)):
