@@ -18,8 +18,6 @@ def test_arrow1():
         }
     )
 
-    d
-
     table_description = TableDescription(
         table_name="d", column_names=["g", "x", "v", "i"]
     )
@@ -37,12 +35,10 @@ def test_arrow1():
     # needs
     id_ops_b.columns_used()
 
-    
-
     # produced
     id_ops_b.column_names
 
-    a1 = data_algebra.arrow.DataOpArrow(id_ops_b, strict=True)
+    a1 = data_algebra.arrow.DataOpArrow(id_ops_b)
 
     # check identity relns
     ri = a1.cod()
@@ -72,15 +68,11 @@ def test_arrow1():
         order_by=["x"],
         partition_by=["g"],
     )
-    a2 = data_algebra.arrow.DataOpArrow(ordered_ops, strict=True)
+    a2 = data_algebra.arrow.DataOpArrow(ordered_ops)
     # print(a2)
-
-    
 
     with pytest.raises(ValueError):
         a1 >> a2
-
-    
 
     cols2_too_large = list(id_ops_b.column_names) + ["q"]
     ordered_ops = TableDescription(
@@ -93,12 +85,8 @@ def test_arrow1():
     a2 = data_algebra.arrow.DataOpArrow(ordered_ops)
     # print(a2)
 
-    
-
     with pytest.raises(ValueError):
         a1 >> a2
-
-    
 
     ordered_ops = TableDescription(
         table_name="d2", column_names=id_ops_b.column_names
@@ -109,11 +97,7 @@ def test_arrow1():
     )
     a2 = data_algebra.arrow.DataOpArrow(ordered_ops)
 
-    
-
     a2.fit(a1.transform(d))
-
-    
 
     unordered_ops = TableDescription(
         table_name="d3", column_names=ordered_ops.column_names
@@ -132,30 +116,20 @@ def test_arrow1():
     a3 = data_algebra.arrow.DataOpArrow(unordered_ops)
     # print(a3)
 
-    
-
     a3.fit(a2.transform(a1.transform(d)))
-
-    
 
     f0 = (a3.apply_to(a2.apply_to(a1))).pipeline.__repr__()
     f1 = (a1 >> a2 >> a3).pipeline.__repr__()
 
     assert f1 == f0
 
-    
-
     f2 = ((a1 >> a2) >> a3).pipeline.__repr__()
 
     assert f2 == f1
 
-    
-
     f3 = (a1 >> (a2 >> a3)).pipeline.__repr__()
 
     assert f3 == f1
-
-    
 
     a1 >> (a2 >> a3)
 
@@ -207,3 +181,81 @@ def test_arrow_compose_2():
     )
     ops = b1 >> b2
     assert isinstance(ops.pipeline.sources[0], TableDescription)
+
+
+def test_arrow_assoc_with_data():
+    pd = data_algebra.data_model.default_data_model().pd
+    d = pd.DataFrame({"x": [1, 2]})
+    ops = DataOpArrow(data_algebra.descr(d=d).extend({"x": "x + 5"}))
+    res_1 = d >> ops
+    expect_1 = pd.DataFrame({"x": [6, 7]})
+    assert data_algebra.test_util.equivalent_frames(res_1, expect_1)
+    ops_b = DataOpArrow(data_algebra.TableDescription(column_names=["x"]).extend({"x": "2 * x - 1"}))
+    composite = ops >> ops_b
+    assert isinstance(composite, DataOpArrow)
+    expect_2 = pd.DataFrame({"x": [11, 13]})
+    r_1 = d >> composite
+    assert data_algebra.test_util.equivalent_frames(r_1, expect_2)
+    r_2 = d >> (ops >> ops_b)
+    assert data_algebra.test_util.equivalent_frames(r_2, expect_2)
+    r_3 = (d >> ops) >> ops_b
+    assert data_algebra.test_util.equivalent_frames(r_3, expect_2)
+    r_4 = d >> ops >> ops_b
+    assert data_algebra.test_util.equivalent_frames(r_4, expect_2)
+
+
+def test_arrow_assoc_with_data_ops():
+    pd = data_algebra.data_model.default_data_model().pd
+    d = pd.DataFrame({"x": [1, 2]})
+    ops = data_algebra.descr(d=d).extend({"x": "x + 5"})
+    res_1 = d >> ops
+    expect_1 = pd.DataFrame({"x": [6, 7]})
+    assert data_algebra.test_util.equivalent_frames(res_1, expect_1)
+    ops_b = data_algebra.TableDescription(column_names=["x"]).extend({"x": "2 * x - 1"})
+    composite = ops >> ops_b
+    assert isinstance(composite, OperatorPlatform)
+    expect_2 = pd.DataFrame({"x": [11, 13]})
+    r_1 = d >> composite
+    assert data_algebra.test_util.equivalent_frames(r_1, expect_2)
+    r_2 = d >> (ops >> ops_b)
+    assert data_algebra.test_util.equivalent_frames(r_2, expect_2)
+    r_3 = (d >> ops) >> ops_b
+    assert data_algebra.test_util.equivalent_frames(r_3, expect_2)
+    r_4 = d >> ops >> ops_b
+    assert data_algebra.test_util.equivalent_frames(r_4, expect_2)
+
+
+def test_arrow_assoc_guard():
+    pd = data_algebra.data_model.default_data_model().pd
+    d = pd.DataFrame({"x": [1, 2], "y": [3, 4]})
+    ops = DataOpArrow(data_algebra.descr(d=d).extend({"z": "x + y"}))
+    res_1 = d >> ops
+    expect_1 = pd.DataFrame({"x": [1, 2], "y": [3, 4], "z": [4, 6]})
+    assert data_algebra.test_util.equivalent_frames(res_1, expect_1)
+    ops_b = DataOpArrow(data_algebra.TableDescription(column_names=["x"]).extend({"x": "2 * x - 1"}))
+    with pytest.raises(ValueError):
+        ops >> ops_b
+    with pytest.raises(ValueError):
+        ops_b >> ops
+    with pytest.raises(AssertionError):
+        d >> ops_b
+
+
+def test_arrow_assoc_guard_table():
+    pd = data_algebra.data_model.default_data_model().pd
+    d = pd.DataFrame({"x": [1, 2], "y": [3, 4]})
+    ops = data_algebra.descr(d=d).extend({"z": "x + y"})
+    res_1 = d >> ops
+    expect_1 = pd.DataFrame({"x": [1, 2], "y": [3, 4], "z": [4, 6]})
+    assert data_algebra.test_util.equivalent_frames(res_1, expect_1)
+    ops_b = data_algebra.TableDescription(column_names=["x"]).extend({"x": "2 * x - 1"})
+    with pytest.raises(AssertionError):
+        ops >> ops_b
+    with pytest.raises(AssertionError):
+        ops_b >> ops
+    with pytest.raises(AssertionError):
+        d >> ops_b
+    # the non-associativity we are defending against
+    res_wide = ops_b.replace_leaves({"data_frame": ops}).transform(d)  # widens column def
+    res_narrow = ops_b.transform(ops.transform(d))  # would want to match this
+    assert len(res_wide.columns) != len(res_narrow.columns)

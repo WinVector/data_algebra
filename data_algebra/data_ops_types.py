@@ -63,21 +63,6 @@ class OperatorPlatform(abc.ABC):
         :return: transformed data frame
         """
 
-    # noinspection PyPep8Naming
-    def act_on(self, X, *, data_model=None):
-        """
-        apply self to data frame X, must commute with composition
-
-        :param X: input data frame
-        :param data_model implementation to use
-        :return: transformed dataframe
-        """
-        return self.transform(
-            X=X,
-            data_model=data_model,
-            strict=True
-        )
-
     @abc.abstractmethod
     def replace_leaves(self, replacement_map: Dict[str, Any]):
         """
@@ -87,6 +72,24 @@ class OperatorPlatform(abc.ABC):
         :param replacement_map, table/sqlkeys mapped to replacement Operator platforms
         :return: new operator DAG
         """
+
+    # noinspection PyPep8Naming
+    @abc.abstractmethod
+    def act_on(self, X, *, data_model=None):
+        """
+        apply self to X, must associate with composition
+        Operator is strict about column names.
+
+        :param X: input data frame
+        :param data_model implementation to use
+        :return: transformed result
+        """
+
+    def __rshift__(self, other):  # override self >> other
+        return other.act_on(self)
+
+    def __rrshift__(self, other):  # override other >> self
+        return self.act_on(other)
 
     # imitate a method
     def use(self, user_function, *args, **kwargs):

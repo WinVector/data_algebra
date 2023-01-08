@@ -57,7 +57,7 @@ def test_calc_interface():
     data_algebra.test_util.check_transform(ops=ops, data=d_good, expect=expect)
 
     # act on interface should be strict
-    with pytest.raises(ValueError):
+    with pytest.raises(AssertionError):
         ops.act_on(d_extra)
 
     # allowed through normal path

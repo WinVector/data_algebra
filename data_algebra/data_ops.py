@@ -392,6 +392,33 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+    
+    # composition
+
+    # noinspection PyPep8Naming
+    def act_on(self, X, *, data_model=None):
+        """
+        apply self to X, must associate with composition
+        Operator is strict about column names.
+
+        :param X: input data frame
+        :param data_model implementation to use
+        :return: transformed result
+        """
+        tables = self.get_tables()
+        assert len(tables) == 1
+        key = list(tables.keys())[0]
+        old = tables[key]
+        if isinstance(X, ViewRepresentation):
+            assert set(X.column_names) == set(old.column_names)  # this is defending associativity
+            return self.replace_leaves({key: X})
+        # assume a table
+        assert set(X.columns) == set(old.column_names)
+        return self.transform(
+            X=X,
+            data_model=data_model,
+            strict=True,
+        )
 
     # query generation
 
