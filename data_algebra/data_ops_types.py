@@ -329,36 +329,3 @@ class OperatorPlatform(abc.ABC):
         return self.convert_records(
             data_algebra.cdata.RecordMap(blocks_in=blocks_in, blocks_out=blocks_out),
         )
-
-    # sklearn step style interface
-
-    # noinspection PyPep8Naming, PyUnusedLocal
-    def fit(self, X, y=None):
-        """sklearn interface, fit() is a noop"""
-
-    # noinspection PyPep8Naming, PyUnusedLocal
-    def fit_transform(self, X, y=None):
-        """sklearn interface, fit() is a noop"""
-        self.fit(X, y=y)
-        return self.transform(X)
-
-    def get_feature_names(self, input_features=None):
-        """sklearn interface, return columns"""
-        cp = self.columns_produced()
-        if input_features is not None:
-            cp_set = set(cp)
-            cp = cp + [f for f in input_features if f not in cp_set]
-        return cp
-
-    # noinspection PyMethodMayBeStatic
-    def get_params(self, deep=False):
-        """sklearn interface, noop"""
-        return dict()
-
-    def set_params(self, **params):
-        """sklearn interface, noop"""
-
-    # noinspection PyPep8Naming
-    def inverse_transform(self, X):
-        """sklearn interface, raise"""
-        raise TypeError("data_algebra does not support inverse_transform")

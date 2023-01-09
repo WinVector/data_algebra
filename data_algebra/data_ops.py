@@ -301,30 +301,6 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             columns_used[k] = vi.copy()
         return columns_used
 
-    def forbidden_columns(
-        self, *, forbidden: Optional[Set[str]] = None
-    ) -> Dict[str, Set[str]]:
-        """
-        Determine which columns should not be in source tables
-        (were not in declared structure, and interfere with column production).
-
-        :param forbidden: optional incoming forbids.
-        :return: dictionary operator keys to forbidden sets.
-        """
-        if forbidden is None:
-            forbidden = set()
-        res: Dict[str, Set[str]] = dict()
-        for source in self.sources:
-            forbidden_i = source.forbidden_columns(forbidden=forbidden)
-            for (tk, f) in forbidden_i.items():
-                try:
-                    have = res[tk]
-                except KeyError:
-                    have = set()
-                    res[tk] = have
-                have.update(f)
-        return res
-
     # printing
 
     def to_python_src_(self, *, indent=0, strict=True, print_sources=True) -> str:
@@ -460,14 +436,14 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
 
     # Pandas realization
 
-    def check_constraints(self, data_map, *, strict=True):
+    def check_constraints(self, data_map, *, strict: bool = True):
         """
         Check tables supplied meet data consistency constraints.
 
         data_map: dictionary of column name lists.
         """
+        assert isinstance(strict, bool)
         self.columns_used()  # for table consistency check/raise
-        forbidden = self.forbidden_columns()
         tables = self.get_tables()
         missing_tables = set(tables.keys()) - set(data_map.keys())
         if len(missing_tables) > 0:
@@ -475,17 +451,17 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         for k in tables.keys():
             have = set(data_map[k])
             td = tables[k]
-            missing = set(td.column_names) - have
+            require = set(td.column_names)
+            missing = require - have
             if len(missing) > 0:
                 raise ValueError(
                     "Table " + k + " missing required columns: " + str(missing)
                 )
             if strict:
-                cf = set(forbidden[k])
-                excess = cf.intersection(have)
+                excess = have - require
                 if len(excess) > 0:
                     raise ValueError(
-                        "Table " + k + " has forbidden columns: " + str(excess)
+                        "Table " + k + " excess columns columns: " + str(excess)
                     )
 
     def eval(
@@ -1025,20 +1001,6 @@ class TableDescription(ViewRepresentation):
         String key for lookups.
         """
         return "table_" + str(self.key)
-
-    def forbidden_columns(
-        self, *, forbidden: Optional[Set[str]] = None
-    ) -> Dict[str, Set[str]]:
-        """
-        Determine which columns should not be in source tables
-        (were not in declared structure, and interfere with column production).
-
-        :param forbidden: optional incoming forbids.
-        :return: dictionary operator keys to forbidden sets.
-        """
-        if forbidden is None:
-            forbidden = set()
-        return {self.key: set(forbidden)}
 
     def replace_leaves(self, replacement_map: Dict[str, Any]):
         """
@@ -1635,21 +1597,6 @@ class ProjectNode(ViewRepresentation):
             # TODO: check op is in list of aggregators
             # Note: non-aggregators making through will be caught by table shape check
 
-    def forbidden_columns(
-        self, *, forbidden: Optional[Set[str]] = None
-    ) -> Dict[str, Set[str]]:
-        """
-        Determine which columns should not be in source tables
-        (were not in declared structure, and interfere with column production).
-
-        :param forbidden: optional incoming forbids.
-        :return: dictionary operator keys to forbidden sets.
-        """
-        if forbidden is None:
-            forbidden = set()
-        forbidden = set(forbidden).intersection(self.column_names)
-        return self.sources[0].forbidden_columns(forbidden=forbidden)
-
     def get_method_uses_(self, methods_seen: Set[MethodUse]) -> None:
         """
         Implementation of get methods_used(), internal method.
@@ -1907,21 +1854,6 @@ class SelectColumnsNode(ViewRepresentation):
             node_name="SelectColumnsNode",
         )
 
-    def forbidden_columns(
-        self, *, forbidden: Optional[Set[str]] = None
-    ) -> Dict[str, Set[str]]:
-        """
-        Determine which columns should not be in source tables
-        (were not in declared structure, and interfere with column production).
-
-        :param forbidden: optional incoming forbids.
-        :return: dictionary operator keys to forbidden sets.
-        """
-        if forbidden is None:
-            forbidden = set()
-        forbidden = set(forbidden).intersection(self.column_selection)
-        return self.sources[0].forbidden_columns(forbidden=forbidden)
-
     def replace_leaves(self, replacement_map: Dict[str, Any]):
         """
         Replace leaves of DAG
@@ -2019,21 +1951,6 @@ class DropColumnsNode(ViewRepresentation):
             sources=[source],
             node_name="DropColumnsNode",
         )
-
-    def forbidden_columns(
-        self, *, forbidden: Optional[Set[str]] = None
-    ) -> Dict[str, Set[str]]:
-        """
-        Determine which columns should not be in source tables
-        (were not in declared structure, and interfere with column production).
-
-        :param forbidden: optional incoming forbids.
-        :return: dictionary operator keys to forbidden sets.
-        """
-        if forbidden is None:
-            forbidden = set()
-        forbidden = set(forbidden) - set(self.column_deletions)
-        return self.sources[0].forbidden_columns(forbidden=forbidden)
 
     def replace_leaves(self, replacement_map: Dict[str, Any]):
         """
@@ -2266,23 +2183,6 @@ class MapColumnsNode(ViewRepresentation):
             node_name="MapColumnsNode",
         )
 
-    def forbidden_columns(
-        self, *, forbidden: Optional[Set[str]] = None
-    ) -> Dict[str, Set[str]]:
-        """
-        Determine which columns should not be in source tables
-        (were not in declared structure, and interfere with column production).
-
-        :param forbidden: optional incoming forbids.
-        :return: dictionary operator keys to forbidden sets.
-        """
-        # this is where forbidden columns are introduced
-        if forbidden is None:
-            forbidden = set()
-        new_forbidden = set(forbidden) - self.column_remapping.keys()
-        new_forbidden.update(self.new_columns)
-        return self.sources[0].forbidden_columns(forbidden=new_forbidden)
-
     def replace_leaves(self, replacement_map: Dict[str, Any]):
         """
         Replace leaves of DAG
@@ -2403,23 +2303,6 @@ class RenameColumnsNode(ViewRepresentation):
             sources=[source],
             node_name="RenameColumnsNode",
         )
-
-    def forbidden_columns(
-        self, *, forbidden: Optional[Set[str]] = None
-    ) -> Dict[str, Set[str]]:
-        """
-        Determine which columns should not be in source tables
-        (were not in declared structure, and interfere with column production).
-
-        :param forbidden: optional incoming forbids.
-        :return: dictionary operator keys to forbidden sets.
-        """
-        # this is where forbidden columns are introduced
-        if forbidden is None:
-            forbidden = set()
-        new_forbidden = set(forbidden) - self.reverse_mapping.keys()
-        new_forbidden.update(self.new_columns)
-        return self.sources[0].forbidden_columns(forbidden=new_forbidden)
 
     def replace_leaves(self, replacement_map: Dict[str, Any]):
         """
