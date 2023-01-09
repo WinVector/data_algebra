@@ -78,15 +78,22 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         data_model=None
     ):
         assert isinstance(self.ops, data_algebra.data_ops.ViewRepresentation)
-        return self.ops.transform(
-            X=X,
-            data_model=data_model
-        )
+        assert not isinstance(X, OpC)
+        if isinstance(X, data_algebra.data_ops_types.OperatorPlatform):
+            self.set(self.ops.transform(X=X, data_model=data_model))
+            return self
+        # assume a table
+        return self.ops.transform(X=X, data_model=data_model)
 
     # noinspection PyPep8Naming
     def act_on(self, X, *, data_model=None):
-        self.set(self.ops.act_on(X=X, data_model=data_model))
-        return self
+        assert not isinstance(X, OpC)
+        if isinstance(X, data_algebra.data_ops_types.OperatorPlatform):
+            self.set(self.ops.act_on(X=X, data_model=data_model))
+            return self
+        # assume a table
+        self.ops.act_on(X=X, data_model=data_model)
+        return 
 
     def replace_leaves(self, replacement_map: Dict[str, Any]):
         self.set(self.ops.replace_leaves(replacement_map))

@@ -259,7 +259,7 @@ def _populate_expr_impl_map(extend_context: bool) -> Dict[int, Dict[str, Callabl
         "base_Sunday": lambda x: x.base_Sunday(),
         "bfill": lambda x: x.fill_null(strategy='backward'),
         "ceil": lambda x: x.ceil(),
-        "coalesce0": lambda x: pl.when(x.is_null()).then(pl.col(_da_temp_zero_column_name)).otherwise(x),
+        "coalesce0": lambda x: pl.coalesce(x, _build_lit(0)),
         "cos": lambda x: x.cos(),
         "cosh": lambda x: x.cosh(),
         "count": lambda x: pl.when(x.is_null() | x.is_nan()).then(_build_lit(0)).otherwise(_build_lit(1)).sum(),  # not tested yet TODO
@@ -316,7 +316,6 @@ def _populate_expr_impl_map(extend_context: bool) -> Dict[int, Dict[str, Callabl
         "%": lambda a, b: a % b,
         "%/%": lambda a, b: a / b,
         "around": lambda a, b: a.round(b),
-        "coalesce": lambda a, b: pl.when(a.is_null()).then(b).otherwise(a),
         "date_diff": lambda a, b: a.date_diff(b),
         "is_in": lambda a, b: a.is_in(b),
         "mod": lambda a, b: a % b,
@@ -546,6 +545,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
             "&": _reduce_and,
             "or": _reduce_or,
             "|": _reduce_or,
+            "coalesce": lambda *args: pl.coalesce(args)
         }
         self.want_literals_unpacked = {
             "around",
