@@ -3409,7 +3409,7 @@
 </span><span id="L-2928"><a href="#L-2928"><span class="linenos">2928</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-2929"><a href="#L-2929"><span class="linenos">2929</span></a><span class="sd">    Evaluate operators with respect to Pandas data frames already stored in the operator chain.</span>
 </span><span id="L-2930"><a href="#L-2930"><span class="linenos">2930</span></a>
-</span><span id="L-2931"><a href="#L-2931"><span class="linenos">2931</span></a><span class="sd">    :param d: data algebra pipeline or OpC container to evaluate.</span>
+</span><span id="L-2931"><a href="#L-2931"><span class="linenos">2931</span></a><span class="sd">    :param d: data algebra pipeline/DAG to evaluate.</span>
 </span><span id="L-2932"><a href="#L-2932"><span class="linenos">2932</span></a><span class="sd">    :param data_model: adaptor to data dialect (Pandas for now)</span>
 </span><span id="L-2933"><a href="#L-2933"><span class="linenos">2933</span></a><span class="sd">    :param allow_limited_tables: logical, if True allow execution on non-complete tables</span>
 </span><span id="L-2934"><a href="#L-2934"><span class="linenos">2934</span></a><span class="sd">    :return: table result</span>
@@ -12424,7 +12424,7 @@ raise an exception if the values are not consistent.</p>
 </span><span id="ex-2929"><a href="#ex-2929"><span class="linenos">2929</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="ex-2930"><a href="#ex-2930"><span class="linenos">2930</span></a><span class="sd">    Evaluate operators with respect to Pandas data frames already stored in the operator chain.</span>
 </span><span id="ex-2931"><a href="#ex-2931"><span class="linenos">2931</span></a>
-</span><span id="ex-2932"><a href="#ex-2932"><span class="linenos">2932</span></a><span class="sd">    :param d: data algebra pipeline or OpC container to evaluate.</span>
+</span><span id="ex-2932"><a href="#ex-2932"><span class="linenos">2932</span></a><span class="sd">    :param d: data algebra pipeline/DAG to evaluate.</span>
 </span><span id="ex-2933"><a href="#ex-2933"><span class="linenos">2933</span></a><span class="sd">    :param data_model: adaptor to data dialect (Pandas for now)</span>
 </span><span id="ex-2934"><a href="#ex-2934"><span class="linenos">2934</span></a><span class="sd">    :param allow_limited_tables: logical, if True allow execution on non-complete tables</span>
 </span><span id="ex-2935"><a href="#ex-2935"><span class="linenos">2935</span></a><span class="sd">    :return: table result</span>
@@ -12440,7 +12440,7 @@ raise an exception if the values are not consistent.</p>
 <h6 id="parameters">Parameters</h6>
 
 <ul>
-<li><strong>d</strong>:  data algebra pipeline or OpC container to evaluate.</li>
+<li><strong>d</strong>:  data algebra pipeline/DAG to evaluate.</li>
 <li><strong>data_model</strong>:  adaptor to data dialect (Pandas for now)</li>
 <li><strong>allow_limited_tables</strong>:  logical, if True allow execution on non-complete tables</li>
 </ul>

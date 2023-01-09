@@ -2928,7 +2928,7 @@ def ex(d, *, data_model=None, allow_limited_tables: bool = False):
     """
     Evaluate operators with respect to Pandas data frames already stored in the operator chain.
 
-    :param d: data algebra pipeline or OpC container to evaluate.
+    :param d: data algebra pipeline/DAG to evaluate.
     :param data_model: adaptor to data dialect (Pandas for now)
     :param allow_limited_tables: logical, if True allow execution on non-complete tables
     :return: table result

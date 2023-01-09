@@ -499,37 +499,6 @@ class RecordMap:
     def __str__(self):
         return self.fmt_string
 
-    # more of the sklearn step API
-
-    # noinspection PyPep8Naming, PyUnusedLocal
-    def fit(self, X, y=None):
-        """No-op (sklearn pipeline interface)"""
-        pass
-
-    # noinspection PyPep8Naming, PyUnusedLocal
-    def fit_transform(self, X, y=None):
-        """transform() (sklearn pipeline interface)"""
-        return self.transform(X)
-
-    # noinspection PyUnusedLocal
-    def get_feature_names(self, input_features=None):
-        """Return columns produced (sklearn pipeline interface)"""
-        return list(self.columns_produced)
-
-    # noinspection PyUnusedLocal,PyMethodMayBeStatic
-    def get_params(self, deep=False):
-        """Return emtpy dictionary (sklearn pipeline interface)"""
-        return dict()
-
-    def set_params(self, **params):
-        """No-op (sklearn pipeline interface)"""
-        pass
-
-    # noinspection PyPep8Naming
-    def inverse_transform(self, X):
-        """Perform inverse transform (sklearn pipeline interface)"""
-        return self.inverse().transform(X)
-
 
 def pivot_blocks_to_rowrecs(
     *,

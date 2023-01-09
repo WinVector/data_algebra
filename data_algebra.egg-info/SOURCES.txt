@@ -26,7 +26,6 @@ data_algebra/expression_walker.py
 data_algebra/flow_text.py
 data_algebra/near_sql.py
 data_algebra/op_catalog.py
-data_algebra/op_container.py
 data_algebra/pandas_base.py
 data_algebra/pandas_model.py
 data_algebra/parse_by_lark.py

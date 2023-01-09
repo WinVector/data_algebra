@@ -81,24 +81,6 @@
                         <li>
                                 <a class="function" href="#RecordMap.fmt">fmt</a>
                         </li>
-                        <li>
-                                <a class="function" href="#RecordMap.fit">fit</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RecordMap.fit_transform">fit_transform</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RecordMap.get_feature_names">get_feature_names</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RecordMap.get_params">get_params</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RecordMap.set_params">set_params</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RecordMap.inverse_transform">inverse_transform</a>
-                        </li>
                 </ul>
 
             </li>
@@ -638,200 +620,169 @@
 </span><span id="L-499"><a href="#L-499"><span class="linenos">499</span></a>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-500"><a href="#L-500"><span class="linenos">500</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt_string</span>
 </span><span id="L-501"><a href="#L-501"><span class="linenos">501</span></a>
-</span><span id="L-502"><a href="#L-502"><span class="linenos">502</span></a>    <span class="c1"># more of the sklearn step API</span>
-</span><span id="L-503"><a href="#L-503"><span class="linenos">503</span></a>
-</span><span id="L-504"><a href="#L-504"><span class="linenos">504</span></a>    <span class="c1"># noinspection PyPep8Naming, PyUnusedLocal</span>
-</span><span id="L-505"><a href="#L-505"><span class="linenos">505</span></a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="L-506"><a href="#L-506"><span class="linenos">506</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;No-op (sklearn pipeline interface)&quot;&quot;&quot;</span>
-</span><span id="L-507"><a href="#L-507"><span class="linenos">507</span></a>        <span class="k">pass</span>
-</span><span id="L-508"><a href="#L-508"><span class="linenos">508</span></a>
-</span><span id="L-509"><a href="#L-509"><span class="linenos">509</span></a>    <span class="c1"># noinspection PyPep8Naming, PyUnusedLocal</span>
-</span><span id="L-510"><a href="#L-510"><span class="linenos">510</span></a>    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="L-511"><a href="#L-511"><span class="linenos">511</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;transform() (sklearn pipeline interface)&quot;&quot;&quot;</span>
-</span><span id="L-512"><a href="#L-512"><span class="linenos">512</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</span><span id="L-502"><a href="#L-502"><span class="linenos">502</span></a>
+</span><span id="L-503"><a href="#L-503"><span class="linenos">503</span></a><span class="k">def</span> <span class="nf">pivot_blocks_to_rowrecs</span><span class="p">(</span>
+</span><span id="L-504"><a href="#L-504"><span class="linenos">504</span></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="L-505"><a href="#L-505"><span class="linenos">505</span></a>    <span class="n">attribute_key_column</span><span class="p">,</span>
+</span><span id="L-506"><a href="#L-506"><span class="linenos">506</span></a>    <span class="n">attribute_value_column</span><span class="p">,</span>
+</span><span id="L-507"><a href="#L-507"><span class="linenos">507</span></a>    <span class="n">record_keys</span><span class="p">,</span>
+</span><span id="L-508"><a href="#L-508"><span class="linenos">508</span></a>    <span class="n">record_value_columns</span><span class="p">,</span>
+</span><span id="L-509"><a href="#L-509"><span class="linenos">509</span></a>    <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span>
+</span><span id="L-510"><a href="#L-510"><span class="linenos">510</span></a><span class="p">):</span>
+</span><span id="L-511"><a href="#L-511"><span class="linenos">511</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-512"><a href="#L-512"><span class="linenos">512</span></a><span class="sd">    Build a block records to row records map. This is very similar to a SQL pivot.</span>
 </span><span id="L-513"><a href="#L-513"><span class="linenos">513</span></a>
-</span><span id="L-514"><a href="#L-514"><span class="linenos">514</span></a>    <span class="c1"># noinspection PyUnusedLocal</span>
-</span><span id="L-515"><a href="#L-515"><span class="linenos">515</span></a>    <span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="L-516"><a href="#L-516"><span class="linenos">516</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return columns produced (sklearn pipeline interface)&quot;&quot;&quot;</span>
-</span><span id="L-517"><a href="#L-517"><span class="linenos">517</span></a>        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns_produced</span><span class="p">)</span>
-</span><span id="L-518"><a href="#L-518"><span class="linenos">518</span></a>
-</span><span id="L-519"><a href="#L-519"><span class="linenos">519</span></a>    <span class="c1"># noinspection PyUnusedLocal,PyMethodMayBeStatic</span>
-</span><span id="L-520"><a href="#L-520"><span class="linenos">520</span></a>    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-</span><span id="L-521"><a href="#L-521"><span class="linenos">521</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return emtpy dictionary (sklearn pipeline interface)&quot;&quot;&quot;</span>
-</span><span id="L-522"><a href="#L-522"><span class="linenos">522</span></a>        <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
-</span><span id="L-523"><a href="#L-523"><span class="linenos">523</span></a>
-</span><span id="L-524"><a href="#L-524"><span class="linenos">524</span></a>    <span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
-</span><span id="L-525"><a href="#L-525"><span class="linenos">525</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;No-op (sklearn pipeline interface)&quot;&quot;&quot;</span>
-</span><span id="L-526"><a href="#L-526"><span class="linenos">526</span></a>        <span class="k">pass</span>
-</span><span id="L-527"><a href="#L-527"><span class="linenos">527</span></a>
-</span><span id="L-528"><a href="#L-528"><span class="linenos">528</span></a>    <span class="c1"># noinspection PyPep8Naming</span>
-</span><span id="L-529"><a href="#L-529"><span class="linenos">529</span></a>    <span class="k">def</span> <span class="nf">inverse_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
-</span><span id="L-530"><a href="#L-530"><span class="linenos">530</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform inverse transform (sklearn pipeline interface)&quot;&quot;&quot;</span>
-</span><span id="L-531"><a href="#L-531"><span class="linenos">531</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">inverse</span><span class="p">()</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-</span><span id="L-532"><a href="#L-532"><span class="linenos">532</span></a>
-</span><span id="L-533"><a href="#L-533"><span class="linenos">533</span></a>
-</span><span id="L-534"><a href="#L-534"><span class="linenos">534</span></a><span class="k">def</span> <span class="nf">pivot_blocks_to_rowrecs</span><span class="p">(</span>
-</span><span id="L-535"><a href="#L-535"><span class="linenos">535</span></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="L-536"><a href="#L-536"><span class="linenos">536</span></a>    <span class="n">attribute_key_column</span><span class="p">,</span>
-</span><span id="L-537"><a href="#L-537"><span class="linenos">537</span></a>    <span class="n">attribute_value_column</span><span class="p">,</span>
-</span><span id="L-538"><a href="#L-538"><span class="linenos">538</span></a>    <span class="n">record_keys</span><span class="p">,</span>
-</span><span id="L-539"><a href="#L-539"><span class="linenos">539</span></a>    <span class="n">record_value_columns</span><span class="p">,</span>
-</span><span id="L-540"><a href="#L-540"><span class="linenos">540</span></a>    <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span>
-</span><span id="L-541"><a href="#L-541"><span class="linenos">541</span></a><span class="p">):</span>
-</span><span id="L-542"><a href="#L-542"><span class="linenos">542</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-543"><a href="#L-543"><span class="linenos">543</span></a><span class="sd">    Build a block records to row records map. This is very similar to a SQL pivot.</span>
-</span><span id="L-544"><a href="#L-544"><span class="linenos">544</span></a>
-</span><span id="L-545"><a href="#L-545"><span class="linenos">545</span></a><span class="sd">    :param attribute_key_column: column to identify record attribute keys</span>
-</span><span id="L-546"><a href="#L-546"><span class="linenos">546</span></a><span class="sd">    :param attribute_value_column: column for record attribute values</span>
-</span><span id="L-547"><a href="#L-547"><span class="linenos">547</span></a><span class="sd">    :param record_keys: names of key columns identifying row record blocks</span>
-</span><span id="L-548"><a href="#L-548"><span class="linenos">548</span></a><span class="sd">    :param record_value_columns: names of columns to take row record values from</span>
-</span><span id="L-549"><a href="#L-549"><span class="linenos">549</span></a><span class="sd">    :param local_data_model: data.frame data model</span>
-</span><span id="L-550"><a href="#L-550"><span class="linenos">550</span></a><span class="sd">    :return: RecordMap</span>
-</span><span id="L-551"><a href="#L-551"><span class="linenos">551</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-552"><a href="#L-552"><span class="linenos">552</span></a>
-</span><span id="L-553"><a href="#L-553"><span class="linenos">553</span></a>    <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-554"><a href="#L-554"><span class="linenos">554</span></a>        <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">default_data_model</span><span class="p">()</span>
-</span><span id="L-555"><a href="#L-555"><span class="linenos">555</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">local_data_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="p">)</span>
-</span><span id="L-556"><a href="#L-556"><span class="linenos">556</span></a>    <span class="n">control_table</span> <span class="o">=</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">data_frame</span><span class="p">(</span>
-</span><span id="L-557"><a href="#L-557"><span class="linenos">557</span></a>        <span class="p">{</span>
-</span><span id="L-558"><a href="#L-558"><span class="linenos">558</span></a>            <span class="n">attribute_key_column</span><span class="p">:</span> <span class="n">record_value_columns</span><span class="p">,</span>
-</span><span id="L-559"><a href="#L-559"><span class="linenos">559</span></a>            <span class="n">attribute_value_column</span><span class="p">:</span> <span class="n">record_value_columns</span><span class="p">,</span>
-</span><span id="L-560"><a href="#L-560"><span class="linenos">560</span></a>        <span class="p">}</span>
-</span><span id="L-561"><a href="#L-561"><span class="linenos">561</span></a>    <span class="p">)</span>
-</span><span id="L-562"><a href="#L-562"><span class="linenos">562</span></a>    <span class="n">ct</span> <span class="o">=</span> <span class="n">RecordSpecification</span><span class="p">(</span>
-</span><span id="L-563"><a href="#L-563"><span class="linenos">563</span></a>        <span class="n">control_table</span><span class="p">,</span>
-</span><span id="L-564"><a href="#L-564"><span class="linenos">564</span></a>        <span class="n">record_keys</span><span class="o">=</span><span class="n">record_keys</span><span class="p">,</span>
-</span><span id="L-565"><a href="#L-565"><span class="linenos">565</span></a>        <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">attribute_key_column</span><span class="p">],</span>
-</span><span id="L-566"><a href="#L-566"><span class="linenos">566</span></a>        <span class="n">local_data_model</span><span class="o">=</span><span class="n">local_data_model</span><span class="p">,</span>
+</span><span id="L-514"><a href="#L-514"><span class="linenos">514</span></a><span class="sd">    :param attribute_key_column: column to identify record attribute keys</span>
+</span><span id="L-515"><a href="#L-515"><span class="linenos">515</span></a><span class="sd">    :param attribute_value_column: column for record attribute values</span>
+</span><span id="L-516"><a href="#L-516"><span class="linenos">516</span></a><span class="sd">    :param record_keys: names of key columns identifying row record blocks</span>
+</span><span id="L-517"><a href="#L-517"><span class="linenos">517</span></a><span class="sd">    :param record_value_columns: names of columns to take row record values from</span>
+</span><span id="L-518"><a href="#L-518"><span class="linenos">518</span></a><span class="sd">    :param local_data_model: data.frame data model</span>
+</span><span id="L-519"><a href="#L-519"><span class="linenos">519</span></a><span class="sd">    :return: RecordMap</span>
+</span><span id="L-520"><a href="#L-520"><span class="linenos">520</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-521"><a href="#L-521"><span class="linenos">521</span></a>
+</span><span id="L-522"><a href="#L-522"><span class="linenos">522</span></a>    <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-523"><a href="#L-523"><span class="linenos">523</span></a>        <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">default_data_model</span><span class="p">()</span>
+</span><span id="L-524"><a href="#L-524"><span class="linenos">524</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">local_data_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="p">)</span>
+</span><span id="L-525"><a href="#L-525"><span class="linenos">525</span></a>    <span class="n">control_table</span> <span class="o">=</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">data_frame</span><span class="p">(</span>
+</span><span id="L-526"><a href="#L-526"><span class="linenos">526</span></a>        <span class="p">{</span>
+</span><span id="L-527"><a href="#L-527"><span class="linenos">527</span></a>            <span class="n">attribute_key_column</span><span class="p">:</span> <span class="n">record_value_columns</span><span class="p">,</span>
+</span><span id="L-528"><a href="#L-528"><span class="linenos">528</span></a>            <span class="n">attribute_value_column</span><span class="p">:</span> <span class="n">record_value_columns</span><span class="p">,</span>
+</span><span id="L-529"><a href="#L-529"><span class="linenos">529</span></a>        <span class="p">}</span>
+</span><span id="L-530"><a href="#L-530"><span class="linenos">530</span></a>    <span class="p">)</span>
+</span><span id="L-531"><a href="#L-531"><span class="linenos">531</span></a>    <span class="n">ct</span> <span class="o">=</span> <span class="n">RecordSpecification</span><span class="p">(</span>
+</span><span id="L-532"><a href="#L-532"><span class="linenos">532</span></a>        <span class="n">control_table</span><span class="p">,</span>
+</span><span id="L-533"><a href="#L-533"><span class="linenos">533</span></a>        <span class="n">record_keys</span><span class="o">=</span><span class="n">record_keys</span><span class="p">,</span>
+</span><span id="L-534"><a href="#L-534"><span class="linenos">534</span></a>        <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">attribute_key_column</span><span class="p">],</span>
+</span><span id="L-535"><a href="#L-535"><span class="linenos">535</span></a>        <span class="n">local_data_model</span><span class="o">=</span><span class="n">local_data_model</span><span class="p">,</span>
+</span><span id="L-536"><a href="#L-536"><span class="linenos">536</span></a>    <span class="p">)</span>
+</span><span id="L-537"><a href="#L-537"><span class="linenos">537</span></a>    <span class="k">return</span> <span class="n">ct</span><span class="o">.</span><span class="n">map_to_rows</span><span class="p">()</span>
+</span><span id="L-538"><a href="#L-538"><span class="linenos">538</span></a>
+</span><span id="L-539"><a href="#L-539"><span class="linenos">539</span></a>
+</span><span id="L-540"><a href="#L-540"><span class="linenos">540</span></a><span class="k">def</span> <span class="nf">pivot_rowrecs_to_blocks</span><span class="p">(</span>
+</span><span id="L-541"><a href="#L-541"><span class="linenos">541</span></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="L-542"><a href="#L-542"><span class="linenos">542</span></a>    <span class="n">attribute_key_column</span><span class="p">,</span>
+</span><span id="L-543"><a href="#L-543"><span class="linenos">543</span></a>    <span class="n">attribute_value_column</span><span class="p">,</span>
+</span><span id="L-544"><a href="#L-544"><span class="linenos">544</span></a>    <span class="n">record_keys</span><span class="p">,</span>
+</span><span id="L-545"><a href="#L-545"><span class="linenos">545</span></a>    <span class="n">record_value_columns</span><span class="p">,</span>
+</span><span id="L-546"><a href="#L-546"><span class="linenos">546</span></a>    <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="L-547"><a href="#L-547"><span class="linenos">547</span></a><span class="p">):</span>
+</span><span id="L-548"><a href="#L-548"><span class="linenos">548</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-549"><a href="#L-549"><span class="linenos">549</span></a><span class="sd">    Build a row records to block records map. This is very similar to a SQL unpivot.</span>
+</span><span id="L-550"><a href="#L-550"><span class="linenos">550</span></a>
+</span><span id="L-551"><a href="#L-551"><span class="linenos">551</span></a><span class="sd">    :param attribute_key_column: column to identify record attribute keys</span>
+</span><span id="L-552"><a href="#L-552"><span class="linenos">552</span></a><span class="sd">    :param attribute_value_column: column for record attribute values</span>
+</span><span id="L-553"><a href="#L-553"><span class="linenos">553</span></a><span class="sd">    :param record_keys: names of key columns identifying row record blocks</span>
+</span><span id="L-554"><a href="#L-554"><span class="linenos">554</span></a><span class="sd">    :param record_value_columns: names of columns to take row record values from</span>
+</span><span id="L-555"><a href="#L-555"><span class="linenos">555</span></a><span class="sd">    :param local_data_model: data.frame data model</span>
+</span><span id="L-556"><a href="#L-556"><span class="linenos">556</span></a><span class="sd">    :return: RecordMap</span>
+</span><span id="L-557"><a href="#L-557"><span class="linenos">557</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-558"><a href="#L-558"><span class="linenos">558</span></a>
+</span><span id="L-559"><a href="#L-559"><span class="linenos">559</span></a>    <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-560"><a href="#L-560"><span class="linenos">560</span></a>        <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">default_data_model</span><span class="p">()</span>
+</span><span id="L-561"><a href="#L-561"><span class="linenos">561</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">local_data_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="p">)</span>
+</span><span id="L-562"><a href="#L-562"><span class="linenos">562</span></a>    <span class="n">control_table</span> <span class="o">=</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">data_frame</span><span class="p">(</span>
+</span><span id="L-563"><a href="#L-563"><span class="linenos">563</span></a>        <span class="p">{</span>
+</span><span id="L-564"><a href="#L-564"><span class="linenos">564</span></a>            <span class="n">attribute_key_column</span><span class="p">:</span> <span class="n">record_value_columns</span><span class="p">,</span>
+</span><span id="L-565"><a href="#L-565"><span class="linenos">565</span></a>            <span class="n">attribute_value_column</span><span class="p">:</span> <span class="n">record_value_columns</span><span class="p">,</span>
+</span><span id="L-566"><a href="#L-566"><span class="linenos">566</span></a>        <span class="p">}</span>
 </span><span id="L-567"><a href="#L-567"><span class="linenos">567</span></a>    <span class="p">)</span>
-</span><span id="L-568"><a href="#L-568"><span class="linenos">568</span></a>    <span class="k">return</span> <span class="n">ct</span><span class="o">.</span><span class="n">map_to_rows</span><span class="p">()</span>
-</span><span id="L-569"><a href="#L-569"><span class="linenos">569</span></a>
-</span><span id="L-570"><a href="#L-570"><span class="linenos">570</span></a>
-</span><span id="L-571"><a href="#L-571"><span class="linenos">571</span></a><span class="k">def</span> <span class="nf">pivot_rowrecs_to_blocks</span><span class="p">(</span>
-</span><span id="L-572"><a href="#L-572"><span class="linenos">572</span></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="L-573"><a href="#L-573"><span class="linenos">573</span></a>    <span class="n">attribute_key_column</span><span class="p">,</span>
-</span><span id="L-574"><a href="#L-574"><span class="linenos">574</span></a>    <span class="n">attribute_value_column</span><span class="p">,</span>
-</span><span id="L-575"><a href="#L-575"><span class="linenos">575</span></a>    <span class="n">record_keys</span><span class="p">,</span>
-</span><span id="L-576"><a href="#L-576"><span class="linenos">576</span></a>    <span class="n">record_value_columns</span><span class="p">,</span>
-</span><span id="L-577"><a href="#L-577"><span class="linenos">577</span></a>    <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="L-578"><a href="#L-578"><span class="linenos">578</span></a><span class="p">):</span>
-</span><span id="L-579"><a href="#L-579"><span class="linenos">579</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-580"><a href="#L-580"><span class="linenos">580</span></a><span class="sd">    Build a row records to block records map. This is very similar to a SQL unpivot.</span>
-</span><span id="L-581"><a href="#L-581"><span class="linenos">581</span></a>
-</span><span id="L-582"><a href="#L-582"><span class="linenos">582</span></a><span class="sd">    :param attribute_key_column: column to identify record attribute keys</span>
-</span><span id="L-583"><a href="#L-583"><span class="linenos">583</span></a><span class="sd">    :param attribute_value_column: column for record attribute values</span>
-</span><span id="L-584"><a href="#L-584"><span class="linenos">584</span></a><span class="sd">    :param record_keys: names of key columns identifying row record blocks</span>
-</span><span id="L-585"><a href="#L-585"><span class="linenos">585</span></a><span class="sd">    :param record_value_columns: names of columns to take row record values from</span>
-</span><span id="L-586"><a href="#L-586"><span class="linenos">586</span></a><span class="sd">    :param local_data_model: data.frame data model</span>
-</span><span id="L-587"><a href="#L-587"><span class="linenos">587</span></a><span class="sd">    :return: RecordMap</span>
-</span><span id="L-588"><a href="#L-588"><span class="linenos">588</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-589"><a href="#L-589"><span class="linenos">589</span></a>
-</span><span id="L-590"><a href="#L-590"><span class="linenos">590</span></a>    <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-591"><a href="#L-591"><span class="linenos">591</span></a>        <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">default_data_model</span><span class="p">()</span>
-</span><span id="L-592"><a href="#L-592"><span class="linenos">592</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">local_data_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="p">)</span>
-</span><span id="L-593"><a href="#L-593"><span class="linenos">593</span></a>    <span class="n">control_table</span> <span class="o">=</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">data_frame</span><span class="p">(</span>
-</span><span id="L-594"><a href="#L-594"><span class="linenos">594</span></a>        <span class="p">{</span>
-</span><span id="L-595"><a href="#L-595"><span class="linenos">595</span></a>            <span class="n">attribute_key_column</span><span class="p">:</span> <span class="n">record_value_columns</span><span class="p">,</span>
-</span><span id="L-596"><a href="#L-596"><span class="linenos">596</span></a>            <span class="n">attribute_value_column</span><span class="p">:</span> <span class="n">record_value_columns</span><span class="p">,</span>
-</span><span id="L-597"><a href="#L-597"><span class="linenos">597</span></a>        <span class="p">}</span>
-</span><span id="L-598"><a href="#L-598"><span class="linenos">598</span></a>    <span class="p">)</span>
-</span><span id="L-599"><a href="#L-599"><span class="linenos">599</span></a>    <span class="n">ct</span> <span class="o">=</span> <span class="n">RecordSpecification</span><span class="p">(</span>
-</span><span id="L-600"><a href="#L-600"><span class="linenos">600</span></a>        <span class="n">control_table</span><span class="p">,</span>
-</span><span id="L-601"><a href="#L-601"><span class="linenos">601</span></a>        <span class="n">record_keys</span><span class="o">=</span><span class="n">record_keys</span><span class="p">,</span>
-</span><span id="L-602"><a href="#L-602"><span class="linenos">602</span></a>        <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">attribute_key_column</span><span class="p">],</span>
-</span><span id="L-603"><a href="#L-603"><span class="linenos">603</span></a>        <span class="n">local_data_model</span><span class="o">=</span><span class="n">local_data_model</span><span class="p">,</span>
-</span><span id="L-604"><a href="#L-604"><span class="linenos">604</span></a>    <span class="p">)</span>
-</span><span id="L-605"><a href="#L-605"><span class="linenos">605</span></a>    <span class="k">return</span> <span class="n">ct</span><span class="o">.</span><span class="n">map_from_rows</span><span class="p">()</span>
-</span><span id="L-606"><a href="#L-606"><span class="linenos">606</span></a>
-</span><span id="L-607"><a href="#L-607"><span class="linenos">607</span></a>
-</span><span id="L-608"><a href="#L-608"><span class="linenos">608</span></a><span class="k">def</span> <span class="nf">pivot_specification</span><span class="p">(</span>
-</span><span id="L-609"><a href="#L-609"><span class="linenos">609</span></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="L-610"><a href="#L-610"><span class="linenos">610</span></a>    <span class="n">row_keys</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-</span><span id="L-611"><a href="#L-611"><span class="linenos">611</span></a>    <span class="n">col_name_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;column_name&quot;</span><span class="p">,</span>
-</span><span id="L-612"><a href="#L-612"><span class="linenos">612</span></a>    <span class="n">col_value_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;column_value&quot;</span><span class="p">,</span>
-</span><span id="L-613"><a href="#L-613"><span class="linenos">613</span></a>    <span class="n">value_cols</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-</span><span id="L-614"><a href="#L-614"><span class="linenos">614</span></a>    <span class="n">local_data_model</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="L-615"><a href="#L-615"><span class="linenos">615</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecordMap</span><span class="p">:</span>
-</span><span id="L-616"><a href="#L-616"><span class="linenos">616</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-617"><a href="#L-617"><span class="linenos">617</span></a><span class="sd">    Specify the cdata transformation that pivots records from a single column of values into collected rows.</span>
-</span><span id="L-618"><a href="#L-618"><span class="linenos">618</span></a><span class="sd">    https://en.wikipedia.org/wiki/Pivot_table#History</span>
-</span><span id="L-619"><a href="#L-619"><span class="linenos">619</span></a>
-</span><span id="L-620"><a href="#L-620"><span class="linenos">620</span></a><span class="sd">    :param row_keys: columns that identify rows in the incoming data set</span>
-</span><span id="L-621"><a href="#L-621"><span class="linenos">621</span></a><span class="sd">    :param col_name_key: column name to take the names of columns as a column</span>
-</span><span id="L-622"><a href="#L-622"><span class="linenos">622</span></a><span class="sd">    :param col_value_key: column name to take the values in columns as a column</span>
-</span><span id="L-623"><a href="#L-623"><span class="linenos">623</span></a><span class="sd">    :param value_cols: columns to place values in</span>
-</span><span id="L-624"><a href="#L-624"><span class="linenos">624</span></a><span class="sd">    :param local_data_model: data.frame data model</span>
-</span><span id="L-625"><a href="#L-625"><span class="linenos">625</span></a><span class="sd">    :return: RecordSpecification</span>
-</span><span id="L-626"><a href="#L-626"><span class="linenos">626</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-627"><a href="#L-627"><span class="linenos">627</span></a>    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_cols</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-</span><span id="L-628"><a href="#L-628"><span class="linenos">628</span></a>    <span class="n">value_cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">value_cols</span><span class="p">)</span>
-</span><span id="L-629"><a href="#L-629"><span class="linenos">629</span></a>    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">row_keys</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-</span><span id="L-630"><a href="#L-630"><span class="linenos">630</span></a>    <span class="n">row_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">row_keys</span><span class="p">)</span>
-</span><span id="L-631"><a href="#L-631"><span class="linenos">631</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col_name_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-</span><span id="L-632"><a href="#L-632"><span class="linenos">632</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col_value_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-</span><span id="L-633"><a href="#L-633"><span class="linenos">633</span></a>    <span class="n">known_cols</span> <span class="o">=</span> <span class="n">row_keys</span> <span class="o">+</span> <span class="p">[</span><span class="n">col_name_key</span><span class="p">,</span> <span class="n">col_value_key</span><span class="p">]</span> <span class="o">+</span> <span class="n">value_cols</span>
-</span><span id="L-634"><a href="#L-634"><span class="linenos">634</span></a>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">known_cols</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">known_cols</span><span class="p">))</span>
-</span><span id="L-635"><a href="#L-635"><span class="linenos">635</span></a>    <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-636"><a href="#L-636"><span class="linenos">636</span></a>        <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">default_data_model</span><span class="p">()</span>
-</span><span id="L-637"><a href="#L-637"><span class="linenos">637</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">local_data_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="p">)</span>
-</span><span id="L-638"><a href="#L-638"><span class="linenos">638</span></a>    <span class="n">record_map</span> <span class="o">=</span> <span class="n">RecordMap</span><span class="p">(</span>
-</span><span id="L-639"><a href="#L-639"><span class="linenos">639</span></a>        <span class="n">blocks_in</span><span class="o">=</span><span class="n">RecordSpecification</span><span class="p">(</span>
-</span><span id="L-640"><a href="#L-640"><span class="linenos">640</span></a>            <span class="n">control_table</span><span class="o">=</span><span class="n">local_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-</span><span id="L-641"><a href="#L-641"><span class="linenos">641</span></a>                <span class="p">{</span>
-</span><span id="L-642"><a href="#L-642"><span class="linenos">642</span></a>                    <span class="n">col_name_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span>
-</span><span id="L-643"><a href="#L-643"><span class="linenos">643</span></a>                    <span class="n">col_value_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span>
-</span><span id="L-644"><a href="#L-644"><span class="linenos">644</span></a>                <span class="p">}</span>
-</span><span id="L-645"><a href="#L-645"><span class="linenos">645</span></a>            <span class="p">),</span>
-</span><span id="L-646"><a href="#L-646"><span class="linenos">646</span></a>            <span class="n">record_keys</span><span class="o">=</span><span class="n">row_keys</span><span class="p">,</span>
-</span><span id="L-647"><a href="#L-647"><span class="linenos">647</span></a>            <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">col_name_key</span><span class="p">],</span>
-</span><span id="L-648"><a href="#L-648"><span class="linenos">648</span></a>        <span class="p">)</span>
-</span><span id="L-649"><a href="#L-649"><span class="linenos">649</span></a>    <span class="p">)</span>
-</span><span id="L-650"><a href="#L-650"><span class="linenos">650</span></a>    <span class="k">return</span> <span class="n">record_map</span>
-</span><span id="L-651"><a href="#L-651"><span class="linenos">651</span></a>
-</span><span id="L-652"><a href="#L-652"><span class="linenos">652</span></a>
-</span><span id="L-653"><a href="#L-653"><span class="linenos">653</span></a><span class="k">def</span> <span class="nf">unpivot_specification</span><span class="p">(</span>
-</span><span id="L-654"><a href="#L-654"><span class="linenos">654</span></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="L-655"><a href="#L-655"><span class="linenos">655</span></a>    <span class="n">row_keys</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-</span><span id="L-656"><a href="#L-656"><span class="linenos">656</span></a>    <span class="n">col_name_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;column_name&quot;</span><span class="p">,</span>
-</span><span id="L-657"><a href="#L-657"><span class="linenos">657</span></a>    <span class="n">col_value_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;column_value&quot;</span><span class="p">,</span>
-</span><span id="L-658"><a href="#L-658"><span class="linenos">658</span></a>    <span class="n">value_cols</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-</span><span id="L-659"><a href="#L-659"><span class="linenos">659</span></a>    <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="L-660"><a href="#L-660"><span class="linenos">660</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecordMap</span><span class="p">:</span>
-</span><span id="L-661"><a href="#L-661"><span class="linenos">661</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-662"><a href="#L-662"><span class="linenos">662</span></a><span class="sd">    Specify the cdata transformation that un-pivots records into a single column of values plus keys.</span>
-</span><span id="L-663"><a href="#L-663"><span class="linenos">663</span></a><span class="sd">    https://en.wikipedia.org/wiki/Pivot_table#History</span>
-</span><span id="L-664"><a href="#L-664"><span class="linenos">664</span></a>
-</span><span id="L-665"><a href="#L-665"><span class="linenos">665</span></a><span class="sd">    :param row_keys: columns that identify rows in the incoming data set</span>
-</span><span id="L-666"><a href="#L-666"><span class="linenos">666</span></a><span class="sd">    :param col_name_key: column name to land the names of columns as a column</span>
-</span><span id="L-667"><a href="#L-667"><span class="linenos">667</span></a><span class="sd">    :param col_value_key: column name to land the values in columns as a column</span>
-</span><span id="L-668"><a href="#L-668"><span class="linenos">668</span></a><span class="sd">    :param value_cols: columns to take values from</span>
-</span><span id="L-669"><a href="#L-669"><span class="linenos">669</span></a><span class="sd">    :param local_data_model: data.frame data model</span>
-</span><span id="L-670"><a href="#L-670"><span class="linenos">670</span></a><span class="sd">    :return: RecordSpecification</span>
-</span><span id="L-671"><a href="#L-671"><span class="linenos">671</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-672"><a href="#L-672"><span class="linenos">672</span></a>    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_cols</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-</span><span id="L-673"><a href="#L-673"><span class="linenos">673</span></a>    <span class="n">value_cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">value_cols</span><span class="p">)</span>
-</span><span id="L-674"><a href="#L-674"><span class="linenos">674</span></a>    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">row_keys</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-</span><span id="L-675"><a href="#L-675"><span class="linenos">675</span></a>    <span class="n">row_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">row_keys</span><span class="p">)</span>
-</span><span id="L-676"><a href="#L-676"><span class="linenos">676</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col_name_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-</span><span id="L-677"><a href="#L-677"><span class="linenos">677</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col_value_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-</span><span id="L-678"><a href="#L-678"><span class="linenos">678</span></a>    <span class="n">known_cols</span> <span class="o">=</span> <span class="n">row_keys</span> <span class="o">+</span> <span class="p">[</span><span class="n">col_name_key</span><span class="p">,</span> <span class="n">col_value_key</span><span class="p">]</span> <span class="o">+</span> <span class="n">value_cols</span>
-</span><span id="L-679"><a href="#L-679"><span class="linenos">679</span></a>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">known_cols</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">known_cols</span><span class="p">))</span>
-</span><span id="L-680"><a href="#L-680"><span class="linenos">680</span></a>    <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-681"><a href="#L-681"><span class="linenos">681</span></a>        <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">default_data_model</span><span class="p">()</span>
-</span><span id="L-682"><a href="#L-682"><span class="linenos">682</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">local_data_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="p">)</span>
-</span><span id="L-683"><a href="#L-683"><span class="linenos">683</span></a>    <span class="n">record_map</span> <span class="o">=</span> <span class="n">RecordMap</span><span class="p">(</span>
-</span><span id="L-684"><a href="#L-684"><span class="linenos">684</span></a>        <span class="n">blocks_out</span><span class="o">=</span><span class="n">RecordSpecification</span><span class="p">(</span>
-</span><span id="L-685"><a href="#L-685"><span class="linenos">685</span></a>            <span class="n">control_table</span><span class="o">=</span><span class="n">local_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-</span><span id="L-686"><a href="#L-686"><span class="linenos">686</span></a>                <span class="p">{</span>
-</span><span id="L-687"><a href="#L-687"><span class="linenos">687</span></a>                    <span class="n">col_name_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span>
-</span><span id="L-688"><a href="#L-688"><span class="linenos">688</span></a>                    <span class="n">col_value_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span>
-</span><span id="L-689"><a href="#L-689"><span class="linenos">689</span></a>                <span class="p">}</span>
-</span><span id="L-690"><a href="#L-690"><span class="linenos">690</span></a>            <span class="p">),</span>
-</span><span id="L-691"><a href="#L-691"><span class="linenos">691</span></a>            <span class="n">record_keys</span><span class="o">=</span><span class="n">row_keys</span><span class="p">,</span>
-</span><span id="L-692"><a href="#L-692"><span class="linenos">692</span></a>            <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">col_name_key</span><span class="p">],</span>
-</span><span id="L-693"><a href="#L-693"><span class="linenos">693</span></a>        <span class="p">)</span>
-</span><span id="L-694"><a href="#L-694"><span class="linenos">694</span></a>    <span class="p">)</span>
-</span><span id="L-695"><a href="#L-695"><span class="linenos">695</span></a>    <span class="k">return</span> <span class="n">record_map</span>
+</span><span id="L-568"><a href="#L-568"><span class="linenos">568</span></a>    <span class="n">ct</span> <span class="o">=</span> <span class="n">RecordSpecification</span><span class="p">(</span>
+</span><span id="L-569"><a href="#L-569"><span class="linenos">569</span></a>        <span class="n">control_table</span><span class="p">,</span>
+</span><span id="L-570"><a href="#L-570"><span class="linenos">570</span></a>        <span class="n">record_keys</span><span class="o">=</span><span class="n">record_keys</span><span class="p">,</span>
+</span><span id="L-571"><a href="#L-571"><span class="linenos">571</span></a>        <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">attribute_key_column</span><span class="p">],</span>
+</span><span id="L-572"><a href="#L-572"><span class="linenos">572</span></a>        <span class="n">local_data_model</span><span class="o">=</span><span class="n">local_data_model</span><span class="p">,</span>
+</span><span id="L-573"><a href="#L-573"><span class="linenos">573</span></a>    <span class="p">)</span>
+</span><span id="L-574"><a href="#L-574"><span class="linenos">574</span></a>    <span class="k">return</span> <span class="n">ct</span><span class="o">.</span><span class="n">map_from_rows</span><span class="p">()</span>
+</span><span id="L-575"><a href="#L-575"><span class="linenos">575</span></a>
+</span><span id="L-576"><a href="#L-576"><span class="linenos">576</span></a>
+</span><span id="L-577"><a href="#L-577"><span class="linenos">577</span></a><span class="k">def</span> <span class="nf">pivot_specification</span><span class="p">(</span>
+</span><span id="L-578"><a href="#L-578"><span class="linenos">578</span></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="L-579"><a href="#L-579"><span class="linenos">579</span></a>    <span class="n">row_keys</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+</span><span id="L-580"><a href="#L-580"><span class="linenos">580</span></a>    <span class="n">col_name_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;column_name&quot;</span><span class="p">,</span>
+</span><span id="L-581"><a href="#L-581"><span class="linenos">581</span></a>    <span class="n">col_value_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;column_value&quot;</span><span class="p">,</span>
+</span><span id="L-582"><a href="#L-582"><span class="linenos">582</span></a>    <span class="n">value_cols</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+</span><span id="L-583"><a href="#L-583"><span class="linenos">583</span></a>    <span class="n">local_data_model</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="L-584"><a href="#L-584"><span class="linenos">584</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecordMap</span><span class="p">:</span>
+</span><span id="L-585"><a href="#L-585"><span class="linenos">585</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-586"><a href="#L-586"><span class="linenos">586</span></a><span class="sd">    Specify the cdata transformation that pivots records from a single column of values into collected rows.</span>
+</span><span id="L-587"><a href="#L-587"><span class="linenos">587</span></a><span class="sd">    https://en.wikipedia.org/wiki/Pivot_table#History</span>
+</span><span id="L-588"><a href="#L-588"><span class="linenos">588</span></a>
+</span><span id="L-589"><a href="#L-589"><span class="linenos">589</span></a><span class="sd">    :param row_keys: columns that identify rows in the incoming data set</span>
+</span><span id="L-590"><a href="#L-590"><span class="linenos">590</span></a><span class="sd">    :param col_name_key: column name to take the names of columns as a column</span>
+</span><span id="L-591"><a href="#L-591"><span class="linenos">591</span></a><span class="sd">    :param col_value_key: column name to take the values in columns as a column</span>
+</span><span id="L-592"><a href="#L-592"><span class="linenos">592</span></a><span class="sd">    :param value_cols: columns to place values in</span>
+</span><span id="L-593"><a href="#L-593"><span class="linenos">593</span></a><span class="sd">    :param local_data_model: data.frame data model</span>
+</span><span id="L-594"><a href="#L-594"><span class="linenos">594</span></a><span class="sd">    :return: RecordSpecification</span>
+</span><span id="L-595"><a href="#L-595"><span class="linenos">595</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-596"><a href="#L-596"><span class="linenos">596</span></a>    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_cols</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+</span><span id="L-597"><a href="#L-597"><span class="linenos">597</span></a>    <span class="n">value_cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">value_cols</span><span class="p">)</span>
+</span><span id="L-598"><a href="#L-598"><span class="linenos">598</span></a>    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">row_keys</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+</span><span id="L-599"><a href="#L-599"><span class="linenos">599</span></a>    <span class="n">row_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">row_keys</span><span class="p">)</span>
+</span><span id="L-600"><a href="#L-600"><span class="linenos">600</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col_name_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+</span><span id="L-601"><a href="#L-601"><span class="linenos">601</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col_value_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+</span><span id="L-602"><a href="#L-602"><span class="linenos">602</span></a>    <span class="n">known_cols</span> <span class="o">=</span> <span class="n">row_keys</span> <span class="o">+</span> <span class="p">[</span><span class="n">col_name_key</span><span class="p">,</span> <span class="n">col_value_key</span><span class="p">]</span> <span class="o">+</span> <span class="n">value_cols</span>
+</span><span id="L-603"><a href="#L-603"><span class="linenos">603</span></a>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">known_cols</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">known_cols</span><span class="p">))</span>
+</span><span id="L-604"><a href="#L-604"><span class="linenos">604</span></a>    <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-605"><a href="#L-605"><span class="linenos">605</span></a>        <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">default_data_model</span><span class="p">()</span>
+</span><span id="L-606"><a href="#L-606"><span class="linenos">606</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">local_data_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="p">)</span>
+</span><span id="L-607"><a href="#L-607"><span class="linenos">607</span></a>    <span class="n">record_map</span> <span class="o">=</span> <span class="n">RecordMap</span><span class="p">(</span>
+</span><span id="L-608"><a href="#L-608"><span class="linenos">608</span></a>        <span class="n">blocks_in</span><span class="o">=</span><span class="n">RecordSpecification</span><span class="p">(</span>
+</span><span id="L-609"><a href="#L-609"><span class="linenos">609</span></a>            <span class="n">control_table</span><span class="o">=</span><span class="n">local_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+</span><span id="L-610"><a href="#L-610"><span class="linenos">610</span></a>                <span class="p">{</span>
+</span><span id="L-611"><a href="#L-611"><span class="linenos">611</span></a>                    <span class="n">col_name_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span>
+</span><span id="L-612"><a href="#L-612"><span class="linenos">612</span></a>                    <span class="n">col_value_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span>
+</span><span id="L-613"><a href="#L-613"><span class="linenos">613</span></a>                <span class="p">}</span>
+</span><span id="L-614"><a href="#L-614"><span class="linenos">614</span></a>            <span class="p">),</span>
+</span><span id="L-615"><a href="#L-615"><span class="linenos">615</span></a>            <span class="n">record_keys</span><span class="o">=</span><span class="n">row_keys</span><span class="p">,</span>
+</span><span id="L-616"><a href="#L-616"><span class="linenos">616</span></a>            <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">col_name_key</span><span class="p">],</span>
+</span><span id="L-617"><a href="#L-617"><span class="linenos">617</span></a>        <span class="p">)</span>
+</span><span id="L-618"><a href="#L-618"><span class="linenos">618</span></a>    <span class="p">)</span>
+</span><span id="L-619"><a href="#L-619"><span class="linenos">619</span></a>    <span class="k">return</span> <span class="n">record_map</span>
+</span><span id="L-620"><a href="#L-620"><span class="linenos">620</span></a>
+</span><span id="L-621"><a href="#L-621"><span class="linenos">621</span></a>
+</span><span id="L-622"><a href="#L-622"><span class="linenos">622</span></a><span class="k">def</span> <span class="nf">unpivot_specification</span><span class="p">(</span>
+</span><span id="L-623"><a href="#L-623"><span class="linenos">623</span></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="L-624"><a href="#L-624"><span class="linenos">624</span></a>    <span class="n">row_keys</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+</span><span id="L-625"><a href="#L-625"><span class="linenos">625</span></a>    <span class="n">col_name_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;column_name&quot;</span><span class="p">,</span>
+</span><span id="L-626"><a href="#L-626"><span class="linenos">626</span></a>    <span class="n">col_value_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;column_value&quot;</span><span class="p">,</span>
+</span><span id="L-627"><a href="#L-627"><span class="linenos">627</span></a>    <span class="n">value_cols</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+</span><span id="L-628"><a href="#L-628"><span class="linenos">628</span></a>    <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="L-629"><a href="#L-629"><span class="linenos">629</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecordMap</span><span class="p">:</span>
+</span><span id="L-630"><a href="#L-630"><span class="linenos">630</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-631"><a href="#L-631"><span class="linenos">631</span></a><span class="sd">    Specify the cdata transformation that un-pivots records into a single column of values plus keys.</span>
+</span><span id="L-632"><a href="#L-632"><span class="linenos">632</span></a><span class="sd">    https://en.wikipedia.org/wiki/Pivot_table#History</span>
+</span><span id="L-633"><a href="#L-633"><span class="linenos">633</span></a>
+</span><span id="L-634"><a href="#L-634"><span class="linenos">634</span></a><span class="sd">    :param row_keys: columns that identify rows in the incoming data set</span>
+</span><span id="L-635"><a href="#L-635"><span class="linenos">635</span></a><span class="sd">    :param col_name_key: column name to land the names of columns as a column</span>
+</span><span id="L-636"><a href="#L-636"><span class="linenos">636</span></a><span class="sd">    :param col_value_key: column name to land the values in columns as a column</span>
+</span><span id="L-637"><a href="#L-637"><span class="linenos">637</span></a><span class="sd">    :param value_cols: columns to take values from</span>
+</span><span id="L-638"><a href="#L-638"><span class="linenos">638</span></a><span class="sd">    :param local_data_model: data.frame data model</span>
+</span><span id="L-639"><a href="#L-639"><span class="linenos">639</span></a><span class="sd">    :return: RecordSpecification</span>
+</span><span id="L-640"><a href="#L-640"><span class="linenos">640</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-641"><a href="#L-641"><span class="linenos">641</span></a>    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_cols</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+</span><span id="L-642"><a href="#L-642"><span class="linenos">642</span></a>    <span class="n">value_cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">value_cols</span><span class="p">)</span>
+</span><span id="L-643"><a href="#L-643"><span class="linenos">643</span></a>    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">row_keys</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+</span><span id="L-644"><a href="#L-644"><span class="linenos">644</span></a>    <span class="n">row_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">row_keys</span><span class="p">)</span>
+</span><span id="L-645"><a href="#L-645"><span class="linenos">645</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col_name_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+</span><span id="L-646"><a href="#L-646"><span class="linenos">646</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col_value_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+</span><span id="L-647"><a href="#L-647"><span class="linenos">647</span></a>    <span class="n">known_cols</span> <span class="o">=</span> <span class="n">row_keys</span> <span class="o">+</span> <span class="p">[</span><span class="n">col_name_key</span><span class="p">,</span> <span class="n">col_value_key</span><span class="p">]</span> <span class="o">+</span> <span class="n">value_cols</span>
+</span><span id="L-648"><a href="#L-648"><span class="linenos">648</span></a>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">known_cols</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">known_cols</span><span class="p">))</span>
+</span><span id="L-649"><a href="#L-649"><span class="linenos">649</span></a>    <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-650"><a href="#L-650"><span class="linenos">650</span></a>        <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">default_data_model</span><span class="p">()</span>
+</span><span id="L-651"><a href="#L-651"><span class="linenos">651</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">local_data_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="p">)</span>
+</span><span id="L-652"><a href="#L-652"><span class="linenos">652</span></a>    <span class="n">record_map</span> <span class="o">=</span> <span class="n">RecordMap</span><span class="p">(</span>
+</span><span id="L-653"><a href="#L-653"><span class="linenos">653</span></a>        <span class="n">blocks_out</span><span class="o">=</span><span class="n">RecordSpecification</span><span class="p">(</span>
+</span><span id="L-654"><a href="#L-654"><span class="linenos">654</span></a>            <span class="n">control_table</span><span class="o">=</span><span class="n">local_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+</span><span id="L-655"><a href="#L-655"><span class="linenos">655</span></a>                <span class="p">{</span>
+</span><span id="L-656"><a href="#L-656"><span class="linenos">656</span></a>                    <span class="n">col_name_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span>
+</span><span id="L-657"><a href="#L-657"><span class="linenos">657</span></a>                    <span class="n">col_value_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span>
+</span><span id="L-658"><a href="#L-658"><span class="linenos">658</span></a>                <span class="p">}</span>
+</span><span id="L-659"><a href="#L-659"><span class="linenos">659</span></a>            <span class="p">),</span>
+</span><span id="L-660"><a href="#L-660"><span class="linenos">660</span></a>            <span class="n">record_keys</span><span class="o">=</span><span class="n">row_keys</span><span class="p">,</span>
+</span><span id="L-661"><a href="#L-661"><span class="linenos">661</span></a>            <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">col_name_key</span><span class="p">],</span>
+</span><span id="L-662"><a href="#L-662"><span class="linenos">662</span></a>        <span class="p">)</span>
+</span><span id="L-663"><a href="#L-663"><span class="linenos">663</span></a>    <span class="p">)</span>
+</span><span id="L-664"><a href="#L-664"><span class="linenos">664</span></a>    <span class="k">return</span> <span class="n">record_map</span>
 </span></pre></div>
 
 
@@ -1640,37 +1591,6 @@ defaults to first column for non-trivial blocks and no columns for rows.</li>
 </span><span id="RecordMap-499"><a href="#RecordMap-499"><span class="linenos">499</span></a>
 </span><span id="RecordMap-500"><a href="#RecordMap-500"><span class="linenos">500</span></a>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="RecordMap-501"><a href="#RecordMap-501"><span class="linenos">501</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt_string</span>
-</span><span id="RecordMap-502"><a href="#RecordMap-502"><span class="linenos">502</span></a>
-</span><span id="RecordMap-503"><a href="#RecordMap-503"><span class="linenos">503</span></a>    <span class="c1"># more of the sklearn step API</span>
-</span><span id="RecordMap-504"><a href="#RecordMap-504"><span class="linenos">504</span></a>
-</span><span id="RecordMap-505"><a href="#RecordMap-505"><span class="linenos">505</span></a>    <span class="c1"># noinspection PyPep8Naming, PyUnusedLocal</span>
-</span><span id="RecordMap-506"><a href="#RecordMap-506"><span class="linenos">506</span></a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="RecordMap-507"><a href="#RecordMap-507"><span class="linenos">507</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;No-op (sklearn pipeline interface)&quot;&quot;&quot;</span>
-</span><span id="RecordMap-508"><a href="#RecordMap-508"><span class="linenos">508</span></a>        <span class="k">pass</span>
-</span><span id="RecordMap-509"><a href="#RecordMap-509"><span class="linenos">509</span></a>
-</span><span id="RecordMap-510"><a href="#RecordMap-510"><span class="linenos">510</span></a>    <span class="c1"># noinspection PyPep8Naming, PyUnusedLocal</span>
-</span><span id="RecordMap-511"><a href="#RecordMap-511"><span class="linenos">511</span></a>    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="RecordMap-512"><a href="#RecordMap-512"><span class="linenos">512</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;transform() (sklearn pipeline interface)&quot;&quot;&quot;</span>
-</span><span id="RecordMap-513"><a href="#RecordMap-513"><span class="linenos">513</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-</span><span id="RecordMap-514"><a href="#RecordMap-514"><span class="linenos">514</span></a>
-</span><span id="RecordMap-515"><a href="#RecordMap-515"><span class="linenos">515</span></a>    <span class="c1"># noinspection PyUnusedLocal</span>
-</span><span id="RecordMap-516"><a href="#RecordMap-516"><span class="linenos">516</span></a>    <span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="RecordMap-517"><a href="#RecordMap-517"><span class="linenos">517</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return columns produced (sklearn pipeline interface)&quot;&quot;&quot;</span>
-</span><span id="RecordMap-518"><a href="#RecordMap-518"><span class="linenos">518</span></a>        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns_produced</span><span class="p">)</span>
-</span><span id="RecordMap-519"><a href="#RecordMap-519"><span class="linenos">519</span></a>
-</span><span id="RecordMap-520"><a href="#RecordMap-520"><span class="linenos">520</span></a>    <span class="c1"># noinspection PyUnusedLocal,PyMethodMayBeStatic</span>
-</span><span id="RecordMap-521"><a href="#RecordMap-521"><span class="linenos">521</span></a>    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-</span><span id="RecordMap-522"><a href="#RecordMap-522"><span class="linenos">522</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return emtpy dictionary (sklearn pipeline interface)&quot;&quot;&quot;</span>
-</span><span id="RecordMap-523"><a href="#RecordMap-523"><span class="linenos">523</span></a>        <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
-</span><span id="RecordMap-524"><a href="#RecordMap-524"><span class="linenos">524</span></a>
-</span><span id="RecordMap-525"><a href="#RecordMap-525"><span class="linenos">525</span></a>    <span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
-</span><span id="RecordMap-526"><a href="#RecordMap-526"><span class="linenos">526</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;No-op (sklearn pipeline interface)&quot;&quot;&quot;</span>
-</span><span id="RecordMap-527"><a href="#RecordMap-527"><span class="linenos">527</span></a>        <span class="k">pass</span>
-</span><span id="RecordMap-528"><a href="#RecordMap-528"><span class="linenos">528</span></a>
-</span><span id="RecordMap-529"><a href="#RecordMap-529"><span class="linenos">529</span></a>    <span class="c1"># noinspection PyPep8Naming</span>
-</span><span id="RecordMap-530"><a href="#RecordMap-530"><span class="linenos">530</span></a>    <span class="k">def</span> <span class="nf">inverse_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
-</span><span id="RecordMap-531"><a href="#RecordMap-531"><span class="linenos">531</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform inverse transform (sklearn pipeline interface)&quot;&quot;&quot;</span>
-</span><span id="RecordMap-532"><a href="#RecordMap-532"><span class="linenos">532</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">inverse</span><span class="p">()</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -2136,138 +2056,6 @@ row representations can prevent this).</p>
 
 
                             </div>
-                            <div id="RecordMap.fit" class="classattr">
-                                        <input id="RecordMap.fit-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">fit</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">X</span>, </span><span class="param"><span class="n">y</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="RecordMap.fit-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#RecordMap.fit"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="RecordMap.fit-506"><a href="#RecordMap.fit-506"><span class="linenos">506</span></a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="RecordMap.fit-507"><a href="#RecordMap.fit-507"><span class="linenos">507</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;No-op (sklearn pipeline interface)&quot;&quot;&quot;</span>
-</span><span id="RecordMap.fit-508"><a href="#RecordMap.fit-508"><span class="linenos">508</span></a>        <span class="k">pass</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>No-op (sklearn pipeline interface)</p>
-</div>
-
-
-                            </div>
-                            <div id="RecordMap.fit_transform" class="classattr">
-                                        <input id="RecordMap.fit_transform-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">fit_transform</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">X</span>, </span><span class="param"><span class="n">y</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="RecordMap.fit_transform-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#RecordMap.fit_transform"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="RecordMap.fit_transform-511"><a href="#RecordMap.fit_transform-511"><span class="linenos">511</span></a>    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="RecordMap.fit_transform-512"><a href="#RecordMap.fit_transform-512"><span class="linenos">512</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;transform() (sklearn pipeline interface)&quot;&quot;&quot;</span>
-</span><span id="RecordMap.fit_transform-513"><a href="#RecordMap.fit_transform-513"><span class="linenos">513</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>transform() (sklearn pipeline interface)</p>
-</div>
-
-
-                            </div>
-                            <div id="RecordMap.get_feature_names" class="classattr">
-                                        <input id="RecordMap.get_feature_names-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">get_feature_names</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">input_features</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="RecordMap.get_feature_names-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#RecordMap.get_feature_names"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="RecordMap.get_feature_names-516"><a href="#RecordMap.get_feature_names-516"><span class="linenos">516</span></a>    <span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="RecordMap.get_feature_names-517"><a href="#RecordMap.get_feature_names-517"><span class="linenos">517</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return columns produced (sklearn pipeline interface)&quot;&quot;&quot;</span>
-</span><span id="RecordMap.get_feature_names-518"><a href="#RecordMap.get_feature_names-518"><span class="linenos">518</span></a>        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns_produced</span><span class="p">)</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Return columns produced (sklearn pipeline interface)</p>
-</div>
-
-
-                            </div>
-                            <div id="RecordMap.get_params" class="classattr">
-                                        <input id="RecordMap.get_params-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">get_params</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">deep</span><span class="o">=</span><span class="kc">False</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="RecordMap.get_params-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#RecordMap.get_params"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="RecordMap.get_params-521"><a href="#RecordMap.get_params-521"><span class="linenos">521</span></a>    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-</span><span id="RecordMap.get_params-522"><a href="#RecordMap.get_params-522"><span class="linenos">522</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return emtpy dictionary (sklearn pipeline interface)&quot;&quot;&quot;</span>
-</span><span id="RecordMap.get_params-523"><a href="#RecordMap.get_params-523"><span class="linenos">523</span></a>        <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Return emtpy dictionary (sklearn pipeline interface)</p>
-</div>
-
-
-                            </div>
-                            <div id="RecordMap.set_params" class="classattr">
-                                        <input id="RecordMap.set_params-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">set_params</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">**</span><span class="n">params</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="RecordMap.set_params-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#RecordMap.set_params"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="RecordMap.set_params-525"><a href="#RecordMap.set_params-525"><span class="linenos">525</span></a>    <span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
-</span><span id="RecordMap.set_params-526"><a href="#RecordMap.set_params-526"><span class="linenos">526</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;No-op (sklearn pipeline interface)&quot;&quot;&quot;</span>
-</span><span id="RecordMap.set_params-527"><a href="#RecordMap.set_params-527"><span class="linenos">527</span></a>        <span class="k">pass</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>No-op (sklearn pipeline interface)</p>
-</div>
-
-
-                            </div>
-                            <div id="RecordMap.inverse_transform" class="classattr">
-                                        <input id="RecordMap.inverse_transform-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">inverse_transform</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">X</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="RecordMap.inverse_transform-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#RecordMap.inverse_transform"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="RecordMap.inverse_transform-530"><a href="#RecordMap.inverse_transform-530"><span class="linenos">530</span></a>    <span class="k">def</span> <span class="nf">inverse_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
-</span><span id="RecordMap.inverse_transform-531"><a href="#RecordMap.inverse_transform-531"><span class="linenos">531</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform inverse transform (sklearn pipeline interface)&quot;&quot;&quot;</span>
-</span><span id="RecordMap.inverse_transform-532"><a href="#RecordMap.inverse_transform-532"><span class="linenos">532</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">inverse</span><span class="p">()</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Perform inverse transform (sklearn pipeline interface)</p>
-</div>
-
-
-                            </div>
                 </section>
                 <section id="pivot_blocks_to_rowrecs">
                             <input id="pivot_blocks_to_rowrecs-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
@@ -2280,41 +2068,41 @@ row representations can prevent this).</p>
 
     </div>
     <a class="headerlink" href="#pivot_blocks_to_rowrecs"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="pivot_blocks_to_rowrecs-535"><a href="#pivot_blocks_to_rowrecs-535"><span class="linenos">535</span></a><span class="k">def</span> <span class="nf">pivot_blocks_to_rowrecs</span><span class="p">(</span>
-</span><span id="pivot_blocks_to_rowrecs-536"><a href="#pivot_blocks_to_rowrecs-536"><span class="linenos">536</span></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="pivot_blocks_to_rowrecs-537"><a href="#pivot_blocks_to_rowrecs-537"><span class="linenos">537</span></a>    <span class="n">attribute_key_column</span><span class="p">,</span>
-</span><span id="pivot_blocks_to_rowrecs-538"><a href="#pivot_blocks_to_rowrecs-538"><span class="linenos">538</span></a>    <span class="n">attribute_value_column</span><span class="p">,</span>
-</span><span id="pivot_blocks_to_rowrecs-539"><a href="#pivot_blocks_to_rowrecs-539"><span class="linenos">539</span></a>    <span class="n">record_keys</span><span class="p">,</span>
-</span><span id="pivot_blocks_to_rowrecs-540"><a href="#pivot_blocks_to_rowrecs-540"><span class="linenos">540</span></a>    <span class="n">record_value_columns</span><span class="p">,</span>
-</span><span id="pivot_blocks_to_rowrecs-541"><a href="#pivot_blocks_to_rowrecs-541"><span class="linenos">541</span></a>    <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span>
-</span><span id="pivot_blocks_to_rowrecs-542"><a href="#pivot_blocks_to_rowrecs-542"><span class="linenos">542</span></a><span class="p">):</span>
-</span><span id="pivot_blocks_to_rowrecs-543"><a href="#pivot_blocks_to_rowrecs-543"><span class="linenos">543</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="pivot_blocks_to_rowrecs-544"><a href="#pivot_blocks_to_rowrecs-544"><span class="linenos">544</span></a><span class="sd">    Build a block records to row records map. This is very similar to a SQL pivot.</span>
-</span><span id="pivot_blocks_to_rowrecs-545"><a href="#pivot_blocks_to_rowrecs-545"><span class="linenos">545</span></a>
-</span><span id="pivot_blocks_to_rowrecs-546"><a href="#pivot_blocks_to_rowrecs-546"><span class="linenos">546</span></a><span class="sd">    :param attribute_key_column: column to identify record attribute keys</span>
-</span><span id="pivot_blocks_to_rowrecs-547"><a href="#pivot_blocks_to_rowrecs-547"><span class="linenos">547</span></a><span class="sd">    :param attribute_value_column: column for record attribute values</span>
-</span><span id="pivot_blocks_to_rowrecs-548"><a href="#pivot_blocks_to_rowrecs-548"><span class="linenos">548</span></a><span class="sd">    :param record_keys: names of key columns identifying row record blocks</span>
-</span><span id="pivot_blocks_to_rowrecs-549"><a href="#pivot_blocks_to_rowrecs-549"><span class="linenos">549</span></a><span class="sd">    :param record_value_columns: names of columns to take row record values from</span>
-</span><span id="pivot_blocks_to_rowrecs-550"><a href="#pivot_blocks_to_rowrecs-550"><span class="linenos">550</span></a><span class="sd">    :param local_data_model: data.frame data model</span>
-</span><span id="pivot_blocks_to_rowrecs-551"><a href="#pivot_blocks_to_rowrecs-551"><span class="linenos">551</span></a><span class="sd">    :return: RecordMap</span>
-</span><span id="pivot_blocks_to_rowrecs-552"><a href="#pivot_blocks_to_rowrecs-552"><span class="linenos">552</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="pivot_blocks_to_rowrecs-553"><a href="#pivot_blocks_to_rowrecs-553"><span class="linenos">553</span></a>
-</span><span id="pivot_blocks_to_rowrecs-554"><a href="#pivot_blocks_to_rowrecs-554"><span class="linenos">554</span></a>    <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="pivot_blocks_to_rowrecs-555"><a href="#pivot_blocks_to_rowrecs-555"><span class="linenos">555</span></a>        <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">default_data_model</span><span class="p">()</span>
-</span><span id="pivot_blocks_to_rowrecs-556"><a href="#pivot_blocks_to_rowrecs-556"><span class="linenos">556</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">local_data_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="p">)</span>
-</span><span id="pivot_blocks_to_rowrecs-557"><a href="#pivot_blocks_to_rowrecs-557"><span class="linenos">557</span></a>    <span class="n">control_table</span> <span class="o">=</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">data_frame</span><span class="p">(</span>
-</span><span id="pivot_blocks_to_rowrecs-558"><a href="#pivot_blocks_to_rowrecs-558"><span class="linenos">558</span></a>        <span class="p">{</span>
-</span><span id="pivot_blocks_to_rowrecs-559"><a href="#pivot_blocks_to_rowrecs-559"><span class="linenos">559</span></a>            <span class="n">attribute_key_column</span><span class="p">:</span> <span class="n">record_value_columns</span><span class="p">,</span>
-</span><span id="pivot_blocks_to_rowrecs-560"><a href="#pivot_blocks_to_rowrecs-560"><span class="linenos">560</span></a>            <span class="n">attribute_value_column</span><span class="p">:</span> <span class="n">record_value_columns</span><span class="p">,</span>
-</span><span id="pivot_blocks_to_rowrecs-561"><a href="#pivot_blocks_to_rowrecs-561"><span class="linenos">561</span></a>        <span class="p">}</span>
-</span><span id="pivot_blocks_to_rowrecs-562"><a href="#pivot_blocks_to_rowrecs-562"><span class="linenos">562</span></a>    <span class="p">)</span>
-</span><span id="pivot_blocks_to_rowrecs-563"><a href="#pivot_blocks_to_rowrecs-563"><span class="linenos">563</span></a>    <span class="n">ct</span> <span class="o">=</span> <span class="n">RecordSpecification</span><span class="p">(</span>
-</span><span id="pivot_blocks_to_rowrecs-564"><a href="#pivot_blocks_to_rowrecs-564"><span class="linenos">564</span></a>        <span class="n">control_table</span><span class="p">,</span>
-</span><span id="pivot_blocks_to_rowrecs-565"><a href="#pivot_blocks_to_rowrecs-565"><span class="linenos">565</span></a>        <span class="n">record_keys</span><span class="o">=</span><span class="n">record_keys</span><span class="p">,</span>
-</span><span id="pivot_blocks_to_rowrecs-566"><a href="#pivot_blocks_to_rowrecs-566"><span class="linenos">566</span></a>        <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">attribute_key_column</span><span class="p">],</span>
-</span><span id="pivot_blocks_to_rowrecs-567"><a href="#pivot_blocks_to_rowrecs-567"><span class="linenos">567</span></a>        <span class="n">local_data_model</span><span class="o">=</span><span class="n">local_data_model</span><span class="p">,</span>
-</span><span id="pivot_blocks_to_rowrecs-568"><a href="#pivot_blocks_to_rowrecs-568"><span class="linenos">568</span></a>    <span class="p">)</span>
-</span><span id="pivot_blocks_to_rowrecs-569"><a href="#pivot_blocks_to_rowrecs-569"><span class="linenos">569</span></a>    <span class="k">return</span> <span class="n">ct</span><span class="o">.</span><span class="n">map_to_rows</span><span class="p">()</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="pivot_blocks_to_rowrecs-504"><a href="#pivot_blocks_to_rowrecs-504"><span class="linenos">504</span></a><span class="k">def</span> <span class="nf">pivot_blocks_to_rowrecs</span><span class="p">(</span>
+</span><span id="pivot_blocks_to_rowrecs-505"><a href="#pivot_blocks_to_rowrecs-505"><span class="linenos">505</span></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="pivot_blocks_to_rowrecs-506"><a href="#pivot_blocks_to_rowrecs-506"><span class="linenos">506</span></a>    <span class="n">attribute_key_column</span><span class="p">,</span>
+</span><span id="pivot_blocks_to_rowrecs-507"><a href="#pivot_blocks_to_rowrecs-507"><span class="linenos">507</span></a>    <span class="n">attribute_value_column</span><span class="p">,</span>
+</span><span id="pivot_blocks_to_rowrecs-508"><a href="#pivot_blocks_to_rowrecs-508"><span class="linenos">508</span></a>    <span class="n">record_keys</span><span class="p">,</span>
+</span><span id="pivot_blocks_to_rowrecs-509"><a href="#pivot_blocks_to_rowrecs-509"><span class="linenos">509</span></a>    <span class="n">record_value_columns</span><span class="p">,</span>
+</span><span id="pivot_blocks_to_rowrecs-510"><a href="#pivot_blocks_to_rowrecs-510"><span class="linenos">510</span></a>    <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span>
+</span><span id="pivot_blocks_to_rowrecs-511"><a href="#pivot_blocks_to_rowrecs-511"><span class="linenos">511</span></a><span class="p">):</span>
+</span><span id="pivot_blocks_to_rowrecs-512"><a href="#pivot_blocks_to_rowrecs-512"><span class="linenos">512</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="pivot_blocks_to_rowrecs-513"><a href="#pivot_blocks_to_rowrecs-513"><span class="linenos">513</span></a><span class="sd">    Build a block records to row records map. This is very similar to a SQL pivot.</span>
+</span><span id="pivot_blocks_to_rowrecs-514"><a href="#pivot_blocks_to_rowrecs-514"><span class="linenos">514</span></a>
+</span><span id="pivot_blocks_to_rowrecs-515"><a href="#pivot_blocks_to_rowrecs-515"><span class="linenos">515</span></a><span class="sd">    :param attribute_key_column: column to identify record attribute keys</span>
+</span><span id="pivot_blocks_to_rowrecs-516"><a href="#pivot_blocks_to_rowrecs-516"><span class="linenos">516</span></a><span class="sd">    :param attribute_value_column: column for record attribute values</span>
+</span><span id="pivot_blocks_to_rowrecs-517"><a href="#pivot_blocks_to_rowrecs-517"><span class="linenos">517</span></a><span class="sd">    :param record_keys: names of key columns identifying row record blocks</span>
+</span><span id="pivot_blocks_to_rowrecs-518"><a href="#pivot_blocks_to_rowrecs-518"><span class="linenos">518</span></a><span class="sd">    :param record_value_columns: names of columns to take row record values from</span>
+</span><span id="pivot_blocks_to_rowrecs-519"><a href="#pivot_blocks_to_rowrecs-519"><span class="linenos">519</span></a><span class="sd">    :param local_data_model: data.frame data model</span>
+</span><span id="pivot_blocks_to_rowrecs-520"><a href="#pivot_blocks_to_rowrecs-520"><span class="linenos">520</span></a><span class="sd">    :return: RecordMap</span>
+</span><span id="pivot_blocks_to_rowrecs-521"><a href="#pivot_blocks_to_rowrecs-521"><span class="linenos">521</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="pivot_blocks_to_rowrecs-522"><a href="#pivot_blocks_to_rowrecs-522"><span class="linenos">522</span></a>
+</span><span id="pivot_blocks_to_rowrecs-523"><a href="#pivot_blocks_to_rowrecs-523"><span class="linenos">523</span></a>    <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="pivot_blocks_to_rowrecs-524"><a href="#pivot_blocks_to_rowrecs-524"><span class="linenos">524</span></a>        <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">default_data_model</span><span class="p">()</span>
+</span><span id="pivot_blocks_to_rowrecs-525"><a href="#pivot_blocks_to_rowrecs-525"><span class="linenos">525</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">local_data_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="p">)</span>
+</span><span id="pivot_blocks_to_rowrecs-526"><a href="#pivot_blocks_to_rowrecs-526"><span class="linenos">526</span></a>    <span class="n">control_table</span> <span class="o">=</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">data_frame</span><span class="p">(</span>
+</span><span id="pivot_blocks_to_rowrecs-527"><a href="#pivot_blocks_to_rowrecs-527"><span class="linenos">527</span></a>        <span class="p">{</span>
+</span><span id="pivot_blocks_to_rowrecs-528"><a href="#pivot_blocks_to_rowrecs-528"><span class="linenos">528</span></a>            <span class="n">attribute_key_column</span><span class="p">:</span> <span class="n">record_value_columns</span><span class="p">,</span>
+</span><span id="pivot_blocks_to_rowrecs-529"><a href="#pivot_blocks_to_rowrecs-529"><span class="linenos">529</span></a>            <span class="n">attribute_value_column</span><span class="p">:</span> <span class="n">record_value_columns</span><span class="p">,</span>
+</span><span id="pivot_blocks_to_rowrecs-530"><a href="#pivot_blocks_to_rowrecs-530"><span class="linenos">530</span></a>        <span class="p">}</span>
+</span><span id="pivot_blocks_to_rowrecs-531"><a href="#pivot_blocks_to_rowrecs-531"><span class="linenos">531</span></a>    <span class="p">)</span>
+</span><span id="pivot_blocks_to_rowrecs-532"><a href="#pivot_blocks_to_rowrecs-532"><span class="linenos">532</span></a>    <span class="n">ct</span> <span class="o">=</span> <span class="n">RecordSpecification</span><span class="p">(</span>
+</span><span id="pivot_blocks_to_rowrecs-533"><a href="#pivot_blocks_to_rowrecs-533"><span class="linenos">533</span></a>        <span class="n">control_table</span><span class="p">,</span>
+</span><span id="pivot_blocks_to_rowrecs-534"><a href="#pivot_blocks_to_rowrecs-534"><span class="linenos">534</span></a>        <span class="n">record_keys</span><span class="o">=</span><span class="n">record_keys</span><span class="p">,</span>
+</span><span id="pivot_blocks_to_rowrecs-535"><a href="#pivot_blocks_to_rowrecs-535"><span class="linenos">535</span></a>        <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">attribute_key_column</span><span class="p">],</span>
+</span><span id="pivot_blocks_to_rowrecs-536"><a href="#pivot_blocks_to_rowrecs-536"><span class="linenos">536</span></a>        <span class="n">local_data_model</span><span class="o">=</span><span class="n">local_data_model</span><span class="p">,</span>
+</span><span id="pivot_blocks_to_rowrecs-537"><a href="#pivot_blocks_to_rowrecs-537"><span class="linenos">537</span></a>    <span class="p">)</span>
+</span><span id="pivot_blocks_to_rowrecs-538"><a href="#pivot_blocks_to_rowrecs-538"><span class="linenos">538</span></a>    <span class="k">return</span> <span class="n">ct</span><span class="o">.</span><span class="n">map_to_rows</span><span class="p">()</span>
 </span></pre></div>
 
 
@@ -2350,41 +2138,41 @@ row representations can prevent this).</p>
 
     </div>
     <a class="headerlink" href="#pivot_rowrecs_to_blocks"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="pivot_rowrecs_to_blocks-572"><a href="#pivot_rowrecs_to_blocks-572"><span class="linenos">572</span></a><span class="k">def</span> <span class="nf">pivot_rowrecs_to_blocks</span><span class="p">(</span>
-</span><span id="pivot_rowrecs_to_blocks-573"><a href="#pivot_rowrecs_to_blocks-573"><span class="linenos">573</span></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="pivot_rowrecs_to_blocks-574"><a href="#pivot_rowrecs_to_blocks-574"><span class="linenos">574</span></a>    <span class="n">attribute_key_column</span><span class="p">,</span>
-</span><span id="pivot_rowrecs_to_blocks-575"><a href="#pivot_rowrecs_to_blocks-575"><span class="linenos">575</span></a>    <span class="n">attribute_value_column</span><span class="p">,</span>
-</span><span id="pivot_rowrecs_to_blocks-576"><a href="#pivot_rowrecs_to_blocks-576"><span class="linenos">576</span></a>    <span class="n">record_keys</span><span class="p">,</span>
-</span><span id="pivot_rowrecs_to_blocks-577"><a href="#pivot_rowrecs_to_blocks-577"><span class="linenos">577</span></a>    <span class="n">record_value_columns</span><span class="p">,</span>
-</span><span id="pivot_rowrecs_to_blocks-578"><a href="#pivot_rowrecs_to_blocks-578"><span class="linenos">578</span></a>    <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="pivot_rowrecs_to_blocks-579"><a href="#pivot_rowrecs_to_blocks-579"><span class="linenos">579</span></a><span class="p">):</span>
-</span><span id="pivot_rowrecs_to_blocks-580"><a href="#pivot_rowrecs_to_blocks-580"><span class="linenos">580</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="pivot_rowrecs_to_blocks-581"><a href="#pivot_rowrecs_to_blocks-581"><span class="linenos">581</span></a><span class="sd">    Build a row records to block records map. This is very similar to a SQL unpivot.</span>
-</span><span id="pivot_rowrecs_to_blocks-582"><a href="#pivot_rowrecs_to_blocks-582"><span class="linenos">582</span></a>
-</span><span id="pivot_rowrecs_to_blocks-583"><a href="#pivot_rowrecs_to_blocks-583"><span class="linenos">583</span></a><span class="sd">    :param attribute_key_column: column to identify record attribute keys</span>
-</span><span id="pivot_rowrecs_to_blocks-584"><a href="#pivot_rowrecs_to_blocks-584"><span class="linenos">584</span></a><span class="sd">    :param attribute_value_column: column for record attribute values</span>
-</span><span id="pivot_rowrecs_to_blocks-585"><a href="#pivot_rowrecs_to_blocks-585"><span class="linenos">585</span></a><span class="sd">    :param record_keys: names of key columns identifying row record blocks</span>
-</span><span id="pivot_rowrecs_to_blocks-586"><a href="#pivot_rowrecs_to_blocks-586"><span class="linenos">586</span></a><span class="sd">    :param record_value_columns: names of columns to take row record values from</span>
-</span><span id="pivot_rowrecs_to_blocks-587"><a href="#pivot_rowrecs_to_blocks-587"><span class="linenos">587</span></a><span class="sd">    :param local_data_model: data.frame data model</span>
-</span><span id="pivot_rowrecs_to_blocks-588"><a href="#pivot_rowrecs_to_blocks-588"><span class="linenos">588</span></a><span class="sd">    :return: RecordMap</span>
-</span><span id="pivot_rowrecs_to_blocks-589"><a href="#pivot_rowrecs_to_blocks-589"><span class="linenos">589</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="pivot_rowrecs_to_blocks-590"><a href="#pivot_rowrecs_to_blocks-590"><span class="linenos">590</span></a>
-</span><span id="pivot_rowrecs_to_blocks-591"><a href="#pivot_rowrecs_to_blocks-591"><span class="linenos">591</span></a>    <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="pivot_rowrecs_to_blocks-592"><a href="#pivot_rowrecs_to_blocks-592"><span class="linenos">592</span></a>        <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">default_data_model</span><span class="p">()</span>
-</span><span id="pivot_rowrecs_to_blocks-593"><a href="#pivot_rowrecs_to_blocks-593"><span class="linenos">593</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">local_data_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="p">)</span>
-</span><span id="pivot_rowrecs_to_blocks-594"><a href="#pivot_rowrecs_to_blocks-594"><span class="linenos">594</span></a>    <span class="n">control_table</span> <span class="o">=</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">data_frame</span><span class="p">(</span>
-</span><span id="pivot_rowrecs_to_blocks-595"><a href="#pivot_rowrecs_to_blocks-595"><span class="linenos">595</span></a>        <span class="p">{</span>
-</span><span id="pivot_rowrecs_to_blocks-596"><a href="#pivot_rowrecs_to_blocks-596"><span class="linenos">596</span></a>            <span class="n">attribute_key_column</span><span class="p">:</span> <span class="n">record_value_columns</span><span class="p">,</span>
-</span><span id="pivot_rowrecs_to_blocks-597"><a href="#pivot_rowrecs_to_blocks-597"><span class="linenos">597</span></a>            <span class="n">attribute_value_column</span><span class="p">:</span> <span class="n">record_value_columns</span><span class="p">,</span>
-</span><span id="pivot_rowrecs_to_blocks-598"><a href="#pivot_rowrecs_to_blocks-598"><span class="linenos">598</span></a>        <span class="p">}</span>
-</span><span id="pivot_rowrecs_to_blocks-599"><a href="#pivot_rowrecs_to_blocks-599"><span class="linenos">599</span></a>    <span class="p">)</span>
-</span><span id="pivot_rowrecs_to_blocks-600"><a href="#pivot_rowrecs_to_blocks-600"><span class="linenos">600</span></a>    <span class="n">ct</span> <span class="o">=</span> <span class="n">RecordSpecification</span><span class="p">(</span>
-</span><span id="pivot_rowrecs_to_blocks-601"><a href="#pivot_rowrecs_to_blocks-601"><span class="linenos">601</span></a>        <span class="n">control_table</span><span class="p">,</span>
-</span><span id="pivot_rowrecs_to_blocks-602"><a href="#pivot_rowrecs_to_blocks-602"><span class="linenos">602</span></a>        <span class="n">record_keys</span><span class="o">=</span><span class="n">record_keys</span><span class="p">,</span>
-</span><span id="pivot_rowrecs_to_blocks-603"><a href="#pivot_rowrecs_to_blocks-603"><span class="linenos">603</span></a>        <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">attribute_key_column</span><span class="p">],</span>
-</span><span id="pivot_rowrecs_to_blocks-604"><a href="#pivot_rowrecs_to_blocks-604"><span class="linenos">604</span></a>        <span class="n">local_data_model</span><span class="o">=</span><span class="n">local_data_model</span><span class="p">,</span>
-</span><span id="pivot_rowrecs_to_blocks-605"><a href="#pivot_rowrecs_to_blocks-605"><span class="linenos">605</span></a>    <span class="p">)</span>
-</span><span id="pivot_rowrecs_to_blocks-606"><a href="#pivot_rowrecs_to_blocks-606"><span class="linenos">606</span></a>    <span class="k">return</span> <span class="n">ct</span><span class="o">.</span><span class="n">map_from_rows</span><span class="p">()</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="pivot_rowrecs_to_blocks-541"><a href="#pivot_rowrecs_to_blocks-541"><span class="linenos">541</span></a><span class="k">def</span> <span class="nf">pivot_rowrecs_to_blocks</span><span class="p">(</span>
+</span><span id="pivot_rowrecs_to_blocks-542"><a href="#pivot_rowrecs_to_blocks-542"><span class="linenos">542</span></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="pivot_rowrecs_to_blocks-543"><a href="#pivot_rowrecs_to_blocks-543"><span class="linenos">543</span></a>    <span class="n">attribute_key_column</span><span class="p">,</span>
+</span><span id="pivot_rowrecs_to_blocks-544"><a href="#pivot_rowrecs_to_blocks-544"><span class="linenos">544</span></a>    <span class="n">attribute_value_column</span><span class="p">,</span>
+</span><span id="pivot_rowrecs_to_blocks-545"><a href="#pivot_rowrecs_to_blocks-545"><span class="linenos">545</span></a>    <span class="n">record_keys</span><span class="p">,</span>
+</span><span id="pivot_rowrecs_to_blocks-546"><a href="#pivot_rowrecs_to_blocks-546"><span class="linenos">546</span></a>    <span class="n">record_value_columns</span><span class="p">,</span>
+</span><span id="pivot_rowrecs_to_blocks-547"><a href="#pivot_rowrecs_to_blocks-547"><span class="linenos">547</span></a>    <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="pivot_rowrecs_to_blocks-548"><a href="#pivot_rowrecs_to_blocks-548"><span class="linenos">548</span></a><span class="p">):</span>
+</span><span id="pivot_rowrecs_to_blocks-549"><a href="#pivot_rowrecs_to_blocks-549"><span class="linenos">549</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="pivot_rowrecs_to_blocks-550"><a href="#pivot_rowrecs_to_blocks-550"><span class="linenos">550</span></a><span class="sd">    Build a row records to block records map. This is very similar to a SQL unpivot.</span>
+</span><span id="pivot_rowrecs_to_blocks-551"><a href="#pivot_rowrecs_to_blocks-551"><span class="linenos">551</span></a>
+</span><span id="pivot_rowrecs_to_blocks-552"><a href="#pivot_rowrecs_to_blocks-552"><span class="linenos">552</span></a><span class="sd">    :param attribute_key_column: column to identify record attribute keys</span>
+</span><span id="pivot_rowrecs_to_blocks-553"><a href="#pivot_rowrecs_to_blocks-553"><span class="linenos">553</span></a><span class="sd">    :param attribute_value_column: column for record attribute values</span>
+</span><span id="pivot_rowrecs_to_blocks-554"><a href="#pivot_rowrecs_to_blocks-554"><span class="linenos">554</span></a><span class="sd">    :param record_keys: names of key columns identifying row record blocks</span>
+</span><span id="pivot_rowrecs_to_blocks-555"><a href="#pivot_rowrecs_to_blocks-555"><span class="linenos">555</span></a><span class="sd">    :param record_value_columns: names of columns to take row record values from</span>
+</span><span id="pivot_rowrecs_to_blocks-556"><a href="#pivot_rowrecs_to_blocks-556"><span class="linenos">556</span></a><span class="sd">    :param local_data_model: data.frame data model</span>
+</span><span id="pivot_rowrecs_to_blocks-557"><a href="#pivot_rowrecs_to_blocks-557"><span class="linenos">557</span></a><span class="sd">    :return: RecordMap</span>
+</span><span id="pivot_rowrecs_to_blocks-558"><a href="#pivot_rowrecs_to_blocks-558"><span class="linenos">558</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="pivot_rowrecs_to_blocks-559"><a href="#pivot_rowrecs_to_blocks-559"><span class="linenos">559</span></a>
+</span><span id="pivot_rowrecs_to_blocks-560"><a href="#pivot_rowrecs_to_blocks-560"><span class="linenos">560</span></a>    <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="pivot_rowrecs_to_blocks-561"><a href="#pivot_rowrecs_to_blocks-561"><span class="linenos">561</span></a>        <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">default_data_model</span><span class="p">()</span>
+</span><span id="pivot_rowrecs_to_blocks-562"><a href="#pivot_rowrecs_to_blocks-562"><span class="linenos">562</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">local_data_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="p">)</span>
+</span><span id="pivot_rowrecs_to_blocks-563"><a href="#pivot_rowrecs_to_blocks-563"><span class="linenos">563</span></a>    <span class="n">control_table</span> <span class="o">=</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">data_frame</span><span class="p">(</span>
+</span><span id="pivot_rowrecs_to_blocks-564"><a href="#pivot_rowrecs_to_blocks-564"><span class="linenos">564</span></a>        <span class="p">{</span>
+</span><span id="pivot_rowrecs_to_blocks-565"><a href="#pivot_rowrecs_to_blocks-565"><span class="linenos">565</span></a>            <span class="n">attribute_key_column</span><span class="p">:</span> <span class="n">record_value_columns</span><span class="p">,</span>
+</span><span id="pivot_rowrecs_to_blocks-566"><a href="#pivot_rowrecs_to_blocks-566"><span class="linenos">566</span></a>            <span class="n">attribute_value_column</span><span class="p">:</span> <span class="n">record_value_columns</span><span class="p">,</span>
+</span><span id="pivot_rowrecs_to_blocks-567"><a href="#pivot_rowrecs_to_blocks-567"><span class="linenos">567</span></a>        <span class="p">}</span>
+</span><span id="pivot_rowrecs_to_blocks-568"><a href="#pivot_rowrecs_to_blocks-568"><span class="linenos">568</span></a>    <span class="p">)</span>
+</span><span id="pivot_rowrecs_to_blocks-569"><a href="#pivot_rowrecs_to_blocks-569"><span class="linenos">569</span></a>    <span class="n">ct</span> <span class="o">=</span> <span class="n">RecordSpecification</span><span class="p">(</span>
+</span><span id="pivot_rowrecs_to_blocks-570"><a href="#pivot_rowrecs_to_blocks-570"><span class="linenos">570</span></a>        <span class="n">control_table</span><span class="p">,</span>
+</span><span id="pivot_rowrecs_to_blocks-571"><a href="#pivot_rowrecs_to_blocks-571"><span class="linenos">571</span></a>        <span class="n">record_keys</span><span class="o">=</span><span class="n">record_keys</span><span class="p">,</span>
+</span><span id="pivot_rowrecs_to_blocks-572"><a href="#pivot_rowrecs_to_blocks-572"><span class="linenos">572</span></a>        <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">attribute_key_column</span><span class="p">],</span>
+</span><span id="pivot_rowrecs_to_blocks-573"><a href="#pivot_rowrecs_to_blocks-573"><span class="linenos">573</span></a>        <span class="n">local_data_model</span><span class="o">=</span><span class="n">local_data_model</span><span class="p">,</span>
+</span><span id="pivot_rowrecs_to_blocks-574"><a href="#pivot_rowrecs_to_blocks-574"><span class="linenos">574</span></a>    <span class="p">)</span>
+</span><span id="pivot_rowrecs_to_blocks-575"><a href="#pivot_rowrecs_to_blocks-575"><span class="linenos">575</span></a>    <span class="k">return</span> <span class="n">ct</span><span class="o">.</span><span class="n">map_from_rows</span><span class="p">()</span>
 </span></pre></div>
 
 
@@ -2420,49 +2208,49 @@ row representations can prevent this).</p>
 
     </div>
     <a class="headerlink" href="#pivot_specification"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="pivot_specification-609"><a href="#pivot_specification-609"><span class="linenos">609</span></a><span class="k">def</span> <span class="nf">pivot_specification</span><span class="p">(</span>
-</span><span id="pivot_specification-610"><a href="#pivot_specification-610"><span class="linenos">610</span></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="pivot_specification-611"><a href="#pivot_specification-611"><span class="linenos">611</span></a>    <span class="n">row_keys</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-</span><span id="pivot_specification-612"><a href="#pivot_specification-612"><span class="linenos">612</span></a>    <span class="n">col_name_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;column_name&quot;</span><span class="p">,</span>
-</span><span id="pivot_specification-613"><a href="#pivot_specification-613"><span class="linenos">613</span></a>    <span class="n">col_value_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;column_value&quot;</span><span class="p">,</span>
-</span><span id="pivot_specification-614"><a href="#pivot_specification-614"><span class="linenos">614</span></a>    <span class="n">value_cols</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-</span><span id="pivot_specification-615"><a href="#pivot_specification-615"><span class="linenos">615</span></a>    <span class="n">local_data_model</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="pivot_specification-616"><a href="#pivot_specification-616"><span class="linenos">616</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecordMap</span><span class="p">:</span>
-</span><span id="pivot_specification-617"><a href="#pivot_specification-617"><span class="linenos">617</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="pivot_specification-618"><a href="#pivot_specification-618"><span class="linenos">618</span></a><span class="sd">    Specify the cdata transformation that pivots records from a single column of values into collected rows.</span>
-</span><span id="pivot_specification-619"><a href="#pivot_specification-619"><span class="linenos">619</span></a><span class="sd">    https://en.wikipedia.org/wiki/Pivot_table#History</span>
-</span><span id="pivot_specification-620"><a href="#pivot_specification-620"><span class="linenos">620</span></a>
-</span><span id="pivot_specification-621"><a href="#pivot_specification-621"><span class="linenos">621</span></a><span class="sd">    :param row_keys: columns that identify rows in the incoming data set</span>
-</span><span id="pivot_specification-622"><a href="#pivot_specification-622"><span class="linenos">622</span></a><span class="sd">    :param col_name_key: column name to take the names of columns as a column</span>
-</span><span id="pivot_specification-623"><a href="#pivot_specification-623"><span class="linenos">623</span></a><span class="sd">    :param col_value_key: column name to take the values in columns as a column</span>
-</span><span id="pivot_specification-624"><a href="#pivot_specification-624"><span class="linenos">624</span></a><span class="sd">    :param value_cols: columns to place values in</span>
-</span><span id="pivot_specification-625"><a href="#pivot_specification-625"><span class="linenos">625</span></a><span class="sd">    :param local_data_model: data.frame data model</span>
-</span><span id="pivot_specification-626"><a href="#pivot_specification-626"><span class="linenos">626</span></a><span class="sd">    :return: RecordSpecification</span>
-</span><span id="pivot_specification-627"><a href="#pivot_specification-627"><span class="linenos">627</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="pivot_specification-628"><a href="#pivot_specification-628"><span class="linenos">628</span></a>    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_cols</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-</span><span id="pivot_specification-629"><a href="#pivot_specification-629"><span class="linenos">629</span></a>    <span class="n">value_cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">value_cols</span><span class="p">)</span>
-</span><span id="pivot_specification-630"><a href="#pivot_specification-630"><span class="linenos">630</span></a>    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">row_keys</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-</span><span id="pivot_specification-631"><a href="#pivot_specification-631"><span class="linenos">631</span></a>    <span class="n">row_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">row_keys</span><span class="p">)</span>
-</span><span id="pivot_specification-632"><a href="#pivot_specification-632"><span class="linenos">632</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col_name_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-</span><span id="pivot_specification-633"><a href="#pivot_specification-633"><span class="linenos">633</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col_value_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-</span><span id="pivot_specification-634"><a href="#pivot_specification-634"><span class="linenos">634</span></a>    <span class="n">known_cols</span> <span class="o">=</span> <span class="n">row_keys</span> <span class="o">+</span> <span class="p">[</span><span class="n">col_name_key</span><span class="p">,</span> <span class="n">col_value_key</span><span class="p">]</span> <span class="o">+</span> <span class="n">value_cols</span>
-</span><span id="pivot_specification-635"><a href="#pivot_specification-635"><span class="linenos">635</span></a>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">known_cols</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">known_cols</span><span class="p">))</span>
-</span><span id="pivot_specification-636"><a href="#pivot_specification-636"><span class="linenos">636</span></a>    <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="pivot_specification-637"><a href="#pivot_specification-637"><span class="linenos">637</span></a>        <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">default_data_model</span><span class="p">()</span>
-</span><span id="pivot_specification-638"><a href="#pivot_specification-638"><span class="linenos">638</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">local_data_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="p">)</span>
-</span><span id="pivot_specification-639"><a href="#pivot_specification-639"><span class="linenos">639</span></a>    <span class="n">record_map</span> <span class="o">=</span> <span class="n">RecordMap</span><span class="p">(</span>
-</span><span id="pivot_specification-640"><a href="#pivot_specification-640"><span class="linenos">640</span></a>        <span class="n">blocks_in</span><span class="o">=</span><span class="n">RecordSpecification</span><span class="p">(</span>
-</span><span id="pivot_specification-641"><a href="#pivot_specification-641"><span class="linenos">641</span></a>            <span class="n">control_table</span><span class="o">=</span><span class="n">local_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-</span><span id="pivot_specification-642"><a href="#pivot_specification-642"><span class="linenos">642</span></a>                <span class="p">{</span>
-</span><span id="pivot_specification-643"><a href="#pivot_specification-643"><span class="linenos">643</span></a>                    <span class="n">col_name_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span>
-</span><span id="pivot_specification-644"><a href="#pivot_specification-644"><span class="linenos">644</span></a>                    <span class="n">col_value_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span>
-</span><span id="pivot_specification-645"><a href="#pivot_specification-645"><span class="linenos">645</span></a>                <span class="p">}</span>
-</span><span id="pivot_specification-646"><a href="#pivot_specification-646"><span class="linenos">646</span></a>            <span class="p">),</span>
-</span><span id="pivot_specification-647"><a href="#pivot_specification-647"><span class="linenos">647</span></a>            <span class="n">record_keys</span><span class="o">=</span><span class="n">row_keys</span><span class="p">,</span>
-</span><span id="pivot_specification-648"><a href="#pivot_specification-648"><span class="linenos">648</span></a>            <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">col_name_key</span><span class="p">],</span>
-</span><span id="pivot_specification-649"><a href="#pivot_specification-649"><span class="linenos">649</span></a>        <span class="p">)</span>
-</span><span id="pivot_specification-650"><a href="#pivot_specification-650"><span class="linenos">650</span></a>    <span class="p">)</span>
-</span><span id="pivot_specification-651"><a href="#pivot_specification-651"><span class="linenos">651</span></a>    <span class="k">return</span> <span class="n">record_map</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="pivot_specification-578"><a href="#pivot_specification-578"><span class="linenos">578</span></a><span class="k">def</span> <span class="nf">pivot_specification</span><span class="p">(</span>
+</span><span id="pivot_specification-579"><a href="#pivot_specification-579"><span class="linenos">579</span></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="pivot_specification-580"><a href="#pivot_specification-580"><span class="linenos">580</span></a>    <span class="n">row_keys</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+</span><span id="pivot_specification-581"><a href="#pivot_specification-581"><span class="linenos">581</span></a>    <span class="n">col_name_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;column_name&quot;</span><span class="p">,</span>
+</span><span id="pivot_specification-582"><a href="#pivot_specification-582"><span class="linenos">582</span></a>    <span class="n">col_value_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;column_value&quot;</span><span class="p">,</span>
+</span><span id="pivot_specification-583"><a href="#pivot_specification-583"><span class="linenos">583</span></a>    <span class="n">value_cols</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+</span><span id="pivot_specification-584"><a href="#pivot_specification-584"><span class="linenos">584</span></a>    <span class="n">local_data_model</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="pivot_specification-585"><a href="#pivot_specification-585"><span class="linenos">585</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecordMap</span><span class="p">:</span>
+</span><span id="pivot_specification-586"><a href="#pivot_specification-586"><span class="linenos">586</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="pivot_specification-587"><a href="#pivot_specification-587"><span class="linenos">587</span></a><span class="sd">    Specify the cdata transformation that pivots records from a single column of values into collected rows.</span>
+</span><span id="pivot_specification-588"><a href="#pivot_specification-588"><span class="linenos">588</span></a><span class="sd">    https://en.wikipedia.org/wiki/Pivot_table#History</span>
+</span><span id="pivot_specification-589"><a href="#pivot_specification-589"><span class="linenos">589</span></a>
+</span><span id="pivot_specification-590"><a href="#pivot_specification-590"><span class="linenos">590</span></a><span class="sd">    :param row_keys: columns that identify rows in the incoming data set</span>
+</span><span id="pivot_specification-591"><a href="#pivot_specification-591"><span class="linenos">591</span></a><span class="sd">    :param col_name_key: column name to take the names of columns as a column</span>
+</span><span id="pivot_specification-592"><a href="#pivot_specification-592"><span class="linenos">592</span></a><span class="sd">    :param col_value_key: column name to take the values in columns as a column</span>
+</span><span id="pivot_specification-593"><a href="#pivot_specification-593"><span class="linenos">593</span></a><span class="sd">    :param value_cols: columns to place values in</span>
+</span><span id="pivot_specification-594"><a href="#pivot_specification-594"><span class="linenos">594</span></a><span class="sd">    :param local_data_model: data.frame data model</span>
+</span><span id="pivot_specification-595"><a href="#pivot_specification-595"><span class="linenos">595</span></a><span class="sd">    :return: RecordSpecification</span>
+</span><span id="pivot_specification-596"><a href="#pivot_specification-596"><span class="linenos">596</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="pivot_specification-597"><a href="#pivot_specification-597"><span class="linenos">597</span></a>    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_cols</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+</span><span id="pivot_specification-598"><a href="#pivot_specification-598"><span class="linenos">598</span></a>    <span class="n">value_cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">value_cols</span><span class="p">)</span>
+</span><span id="pivot_specification-599"><a href="#pivot_specification-599"><span class="linenos">599</span></a>    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">row_keys</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+</span><span id="pivot_specification-600"><a href="#pivot_specification-600"><span class="linenos">600</span></a>    <span class="n">row_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">row_keys</span><span class="p">)</span>
+</span><span id="pivot_specification-601"><a href="#pivot_specification-601"><span class="linenos">601</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col_name_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+</span><span id="pivot_specification-602"><a href="#pivot_specification-602"><span class="linenos">602</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col_value_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+</span><span id="pivot_specification-603"><a href="#pivot_specification-603"><span class="linenos">603</span></a>    <span class="n">known_cols</span> <span class="o">=</span> <span class="n">row_keys</span> <span class="o">+</span> <span class="p">[</span><span class="n">col_name_key</span><span class="p">,</span> <span class="n">col_value_key</span><span class="p">]</span> <span class="o">+</span> <span class="n">value_cols</span>
+</span><span id="pivot_specification-604"><a href="#pivot_specification-604"><span class="linenos">604</span></a>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">known_cols</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">known_cols</span><span class="p">))</span>
+</span><span id="pivot_specification-605"><a href="#pivot_specification-605"><span class="linenos">605</span></a>    <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="pivot_specification-606"><a href="#pivot_specification-606"><span class="linenos">606</span></a>        <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">default_data_model</span><span class="p">()</span>
+</span><span id="pivot_specification-607"><a href="#pivot_specification-607"><span class="linenos">607</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">local_data_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="p">)</span>
+</span><span id="pivot_specification-608"><a href="#pivot_specification-608"><span class="linenos">608</span></a>    <span class="n">record_map</span> <span class="o">=</span> <span class="n">RecordMap</span><span class="p">(</span>
+</span><span id="pivot_specification-609"><a href="#pivot_specification-609"><span class="linenos">609</span></a>        <span class="n">blocks_in</span><span class="o">=</span><span class="n">RecordSpecification</span><span class="p">(</span>
+</span><span id="pivot_specification-610"><a href="#pivot_specification-610"><span class="linenos">610</span></a>            <span class="n">control_table</span><span class="o">=</span><span class="n">local_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+</span><span id="pivot_specification-611"><a href="#pivot_specification-611"><span class="linenos">611</span></a>                <span class="p">{</span>
+</span><span id="pivot_specification-612"><a href="#pivot_specification-612"><span class="linenos">612</span></a>                    <span class="n">col_name_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span>
+</span><span id="pivot_specification-613"><a href="#pivot_specification-613"><span class="linenos">613</span></a>                    <span class="n">col_value_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span>
+</span><span id="pivot_specification-614"><a href="#pivot_specification-614"><span class="linenos">614</span></a>                <span class="p">}</span>
+</span><span id="pivot_specification-615"><a href="#pivot_specification-615"><span class="linenos">615</span></a>            <span class="p">),</span>
+</span><span id="pivot_specification-616"><a href="#pivot_specification-616"><span class="linenos">616</span></a>            <span class="n">record_keys</span><span class="o">=</span><span class="n">row_keys</span><span class="p">,</span>
+</span><span id="pivot_specification-617"><a href="#pivot_specification-617"><span class="linenos">617</span></a>            <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">col_name_key</span><span class="p">],</span>
+</span><span id="pivot_specification-618"><a href="#pivot_specification-618"><span class="linenos">618</span></a>        <span class="p">)</span>
+</span><span id="pivot_specification-619"><a href="#pivot_specification-619"><span class="linenos">619</span></a>    <span class="p">)</span>
+</span><span id="pivot_specification-620"><a href="#pivot_specification-620"><span class="linenos">620</span></a>    <span class="k">return</span> <span class="n">record_map</span>
 </span></pre></div>
 
 
@@ -2499,49 +2287,49 @@ row representations can prevent this).</p>
 
     </div>
     <a class="headerlink" href="#unpivot_specification"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="unpivot_specification-654"><a href="#unpivot_specification-654"><span class="linenos">654</span></a><span class="k">def</span> <span class="nf">unpivot_specification</span><span class="p">(</span>
-</span><span id="unpivot_specification-655"><a href="#unpivot_specification-655"><span class="linenos">655</span></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="unpivot_specification-656"><a href="#unpivot_specification-656"><span class="linenos">656</span></a>    <span class="n">row_keys</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-</span><span id="unpivot_specification-657"><a href="#unpivot_specification-657"><span class="linenos">657</span></a>    <span class="n">col_name_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;column_name&quot;</span><span class="p">,</span>
-</span><span id="unpivot_specification-658"><a href="#unpivot_specification-658"><span class="linenos">658</span></a>    <span class="n">col_value_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;column_value&quot;</span><span class="p">,</span>
-</span><span id="unpivot_specification-659"><a href="#unpivot_specification-659"><span class="linenos">659</span></a>    <span class="n">value_cols</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-</span><span id="unpivot_specification-660"><a href="#unpivot_specification-660"><span class="linenos">660</span></a>    <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="unpivot_specification-661"><a href="#unpivot_specification-661"><span class="linenos">661</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecordMap</span><span class="p">:</span>
-</span><span id="unpivot_specification-662"><a href="#unpivot_specification-662"><span class="linenos">662</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="unpivot_specification-663"><a href="#unpivot_specification-663"><span class="linenos">663</span></a><span class="sd">    Specify the cdata transformation that un-pivots records into a single column of values plus keys.</span>
-</span><span id="unpivot_specification-664"><a href="#unpivot_specification-664"><span class="linenos">664</span></a><span class="sd">    https://en.wikipedia.org/wiki/Pivot_table#History</span>
-</span><span id="unpivot_specification-665"><a href="#unpivot_specification-665"><span class="linenos">665</span></a>
-</span><span id="unpivot_specification-666"><a href="#unpivot_specification-666"><span class="linenos">666</span></a><span class="sd">    :param row_keys: columns that identify rows in the incoming data set</span>
-</span><span id="unpivot_specification-667"><a href="#unpivot_specification-667"><span class="linenos">667</span></a><span class="sd">    :param col_name_key: column name to land the names of columns as a column</span>
-</span><span id="unpivot_specification-668"><a href="#unpivot_specification-668"><span class="linenos">668</span></a><span class="sd">    :param col_value_key: column name to land the values in columns as a column</span>
-</span><span id="unpivot_specification-669"><a href="#unpivot_specification-669"><span class="linenos">669</span></a><span class="sd">    :param value_cols: columns to take values from</span>
-</span><span id="unpivot_specification-670"><a href="#unpivot_specification-670"><span class="linenos">670</span></a><span class="sd">    :param local_data_model: data.frame data model</span>
-</span><span id="unpivot_specification-671"><a href="#unpivot_specification-671"><span class="linenos">671</span></a><span class="sd">    :return: RecordSpecification</span>
-</span><span id="unpivot_specification-672"><a href="#unpivot_specification-672"><span class="linenos">672</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="unpivot_specification-673"><a href="#unpivot_specification-673"><span class="linenos">673</span></a>    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_cols</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-</span><span id="unpivot_specification-674"><a href="#unpivot_specification-674"><span class="linenos">674</span></a>    <span class="n">value_cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">value_cols</span><span class="p">)</span>
-</span><span id="unpivot_specification-675"><a href="#unpivot_specification-675"><span class="linenos">675</span></a>    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">row_keys</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-</span><span id="unpivot_specification-676"><a href="#unpivot_specification-676"><span class="linenos">676</span></a>    <span class="n">row_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">row_keys</span><span class="p">)</span>
-</span><span id="unpivot_specification-677"><a href="#unpivot_specification-677"><span class="linenos">677</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col_name_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-</span><span id="unpivot_specification-678"><a href="#unpivot_specification-678"><span class="linenos">678</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col_value_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-</span><span id="unpivot_specification-679"><a href="#unpivot_specification-679"><span class="linenos">679</span></a>    <span class="n">known_cols</span> <span class="o">=</span> <span class="n">row_keys</span> <span class="o">+</span> <span class="p">[</span><span class="n">col_name_key</span><span class="p">,</span> <span class="n">col_value_key</span><span class="p">]</span> <span class="o">+</span> <span class="n">value_cols</span>
-</span><span id="unpivot_specification-680"><a href="#unpivot_specification-680"><span class="linenos">680</span></a>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">known_cols</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">known_cols</span><span class="p">))</span>
-</span><span id="unpivot_specification-681"><a href="#unpivot_specification-681"><span class="linenos">681</span></a>    <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="unpivot_specification-682"><a href="#unpivot_specification-682"><span class="linenos">682</span></a>        <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">default_data_model</span><span class="p">()</span>
-</span><span id="unpivot_specification-683"><a href="#unpivot_specification-683"><span class="linenos">683</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">local_data_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="p">)</span>
-</span><span id="unpivot_specification-684"><a href="#unpivot_specification-684"><span class="linenos">684</span></a>    <span class="n">record_map</span> <span class="o">=</span> <span class="n">RecordMap</span><span class="p">(</span>
-</span><span id="unpivot_specification-685"><a href="#unpivot_specification-685"><span class="linenos">685</span></a>        <span class="n">blocks_out</span><span class="o">=</span><span class="n">RecordSpecification</span><span class="p">(</span>
-</span><span id="unpivot_specification-686"><a href="#unpivot_specification-686"><span class="linenos">686</span></a>            <span class="n">control_table</span><span class="o">=</span><span class="n">local_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-</span><span id="unpivot_specification-687"><a href="#unpivot_specification-687"><span class="linenos">687</span></a>                <span class="p">{</span>
-</span><span id="unpivot_specification-688"><a href="#unpivot_specification-688"><span class="linenos">688</span></a>                    <span class="n">col_name_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span>
-</span><span id="unpivot_specification-689"><a href="#unpivot_specification-689"><span class="linenos">689</span></a>                    <span class="n">col_value_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span>
-</span><span id="unpivot_specification-690"><a href="#unpivot_specification-690"><span class="linenos">690</span></a>                <span class="p">}</span>
-</span><span id="unpivot_specification-691"><a href="#unpivot_specification-691"><span class="linenos">691</span></a>            <span class="p">),</span>
-</span><span id="unpivot_specification-692"><a href="#unpivot_specification-692"><span class="linenos">692</span></a>            <span class="n">record_keys</span><span class="o">=</span><span class="n">row_keys</span><span class="p">,</span>
-</span><span id="unpivot_specification-693"><a href="#unpivot_specification-693"><span class="linenos">693</span></a>            <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">col_name_key</span><span class="p">],</span>
-</span><span id="unpivot_specification-694"><a href="#unpivot_specification-694"><span class="linenos">694</span></a>        <span class="p">)</span>
-</span><span id="unpivot_specification-695"><a href="#unpivot_specification-695"><span class="linenos">695</span></a>    <span class="p">)</span>
-</span><span id="unpivot_specification-696"><a href="#unpivot_specification-696"><span class="linenos">696</span></a>    <span class="k">return</span> <span class="n">record_map</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="unpivot_specification-623"><a href="#unpivot_specification-623"><span class="linenos">623</span></a><span class="k">def</span> <span class="nf">unpivot_specification</span><span class="p">(</span>
+</span><span id="unpivot_specification-624"><a href="#unpivot_specification-624"><span class="linenos">624</span></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="unpivot_specification-625"><a href="#unpivot_specification-625"><span class="linenos">625</span></a>    <span class="n">row_keys</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+</span><span id="unpivot_specification-626"><a href="#unpivot_specification-626"><span class="linenos">626</span></a>    <span class="n">col_name_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;column_name&quot;</span><span class="p">,</span>
+</span><span id="unpivot_specification-627"><a href="#unpivot_specification-627"><span class="linenos">627</span></a>    <span class="n">col_value_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;column_value&quot;</span><span class="p">,</span>
+</span><span id="unpivot_specification-628"><a href="#unpivot_specification-628"><span class="linenos">628</span></a>    <span class="n">value_cols</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+</span><span id="unpivot_specification-629"><a href="#unpivot_specification-629"><span class="linenos">629</span></a>    <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="unpivot_specification-630"><a href="#unpivot_specification-630"><span class="linenos">630</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecordMap</span><span class="p">:</span>
+</span><span id="unpivot_specification-631"><a href="#unpivot_specification-631"><span class="linenos">631</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="unpivot_specification-632"><a href="#unpivot_specification-632"><span class="linenos">632</span></a><span class="sd">    Specify the cdata transformation that un-pivots records into a single column of values plus keys.</span>
+</span><span id="unpivot_specification-633"><a href="#unpivot_specification-633"><span class="linenos">633</span></a><span class="sd">    https://en.wikipedia.org/wiki/Pivot_table#History</span>
+</span><span id="unpivot_specification-634"><a href="#unpivot_specification-634"><span class="linenos">634</span></a>
+</span><span id="unpivot_specification-635"><a href="#unpivot_specification-635"><span class="linenos">635</span></a><span class="sd">    :param row_keys: columns that identify rows in the incoming data set</span>
+</span><span id="unpivot_specification-636"><a href="#unpivot_specification-636"><span class="linenos">636</span></a><span class="sd">    :param col_name_key: column name to land the names of columns as a column</span>
+</span><span id="unpivot_specification-637"><a href="#unpivot_specification-637"><span class="linenos">637</span></a><span class="sd">    :param col_value_key: column name to land the values in columns as a column</span>
+</span><span id="unpivot_specification-638"><a href="#unpivot_specification-638"><span class="linenos">638</span></a><span class="sd">    :param value_cols: columns to take values from</span>
+</span><span id="unpivot_specification-639"><a href="#unpivot_specification-639"><span class="linenos">639</span></a><span class="sd">    :param local_data_model: data.frame data model</span>
+</span><span id="unpivot_specification-640"><a href="#unpivot_specification-640"><span class="linenos">640</span></a><span class="sd">    :return: RecordSpecification</span>
+</span><span id="unpivot_specification-641"><a href="#unpivot_specification-641"><span class="linenos">641</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="unpivot_specification-642"><a href="#unpivot_specification-642"><span class="linenos">642</span></a>    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_cols</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+</span><span id="unpivot_specification-643"><a href="#unpivot_specification-643"><span class="linenos">643</span></a>    <span class="n">value_cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">value_cols</span><span class="p">)</span>
+</span><span id="unpivot_specification-644"><a href="#unpivot_specification-644"><span class="linenos">644</span></a>    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">row_keys</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+</span><span id="unpivot_specification-645"><a href="#unpivot_specification-645"><span class="linenos">645</span></a>    <span class="n">row_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">row_keys</span><span class="p">)</span>
+</span><span id="unpivot_specification-646"><a href="#unpivot_specification-646"><span class="linenos">646</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col_name_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+</span><span id="unpivot_specification-647"><a href="#unpivot_specification-647"><span class="linenos">647</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col_value_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+</span><span id="unpivot_specification-648"><a href="#unpivot_specification-648"><span class="linenos">648</span></a>    <span class="n">known_cols</span> <span class="o">=</span> <span class="n">row_keys</span> <span class="o">+</span> <span class="p">[</span><span class="n">col_name_key</span><span class="p">,</span> <span class="n">col_value_key</span><span class="p">]</span> <span class="o">+</span> <span class="n">value_cols</span>
+</span><span id="unpivot_specification-649"><a href="#unpivot_specification-649"><span class="linenos">649</span></a>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">known_cols</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">known_cols</span><span class="p">))</span>
+</span><span id="unpivot_specification-650"><a href="#unpivot_specification-650"><span class="linenos">650</span></a>    <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="unpivot_specification-651"><a href="#unpivot_specification-651"><span class="linenos">651</span></a>        <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">default_data_model</span><span class="p">()</span>
+</span><span id="unpivot_specification-652"><a href="#unpivot_specification-652"><span class="linenos">652</span></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">local_data_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="p">)</span>
+</span><span id="unpivot_specification-653"><a href="#unpivot_specification-653"><span class="linenos">653</span></a>    <span class="n">record_map</span> <span class="o">=</span> <span class="n">RecordMap</span><span class="p">(</span>
+</span><span id="unpivot_specification-654"><a href="#unpivot_specification-654"><span class="linenos">654</span></a>        <span class="n">blocks_out</span><span class="o">=</span><span class="n">RecordSpecification</span><span class="p">(</span>
+</span><span id="unpivot_specification-655"><a href="#unpivot_specification-655"><span class="linenos">655</span></a>            <span class="n">control_table</span><span class="o">=</span><span class="n">local_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+</span><span id="unpivot_specification-656"><a href="#unpivot_specification-656"><span class="linenos">656</span></a>                <span class="p">{</span>
+</span><span id="unpivot_specification-657"><a href="#unpivot_specification-657"><span class="linenos">657</span></a>                    <span class="n">col_name_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span>
+</span><span id="unpivot_specification-658"><a href="#unpivot_specification-658"><span class="linenos">658</span></a>                    <span class="n">col_value_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span>
+</span><span id="unpivot_specification-659"><a href="#unpivot_specification-659"><span class="linenos">659</span></a>                <span class="p">}</span>
+</span><span id="unpivot_specification-660"><a href="#unpivot_specification-660"><span class="linenos">660</span></a>            <span class="p">),</span>
+</span><span id="unpivot_specification-661"><a href="#unpivot_specification-661"><span class="linenos">661</span></a>            <span class="n">record_keys</span><span class="o">=</span><span class="n">row_keys</span><span class="p">,</span>
+</span><span id="unpivot_specification-662"><a href="#unpivot_specification-662"><span class="linenos">662</span></a>            <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">col_name_key</span><span class="p">],</span>
+</span><span id="unpivot_specification-663"><a href="#unpivot_specification-663"><span class="linenos">663</span></a>        <span class="p">)</span>
+</span><span id="unpivot_specification-664"><a href="#unpivot_specification-664"><span class="linenos">664</span></a>    <span class="p">)</span>
+</span><span id="unpivot_specification-665"><a href="#unpivot_specification-665"><span class="linenos">665</span></a>    <span class="k">return</span> <span class="n">record_map</span>
 </span></pre></div>
 
 
