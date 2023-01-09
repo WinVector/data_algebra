@@ -129,24 +129,6 @@
                         <li>
                                 <a class="function" href="#OperatorPlatform.map_records">map_records</a>
                         </li>
-                        <li>
-                                <a class="function" href="#OperatorPlatform.fit">fit</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#OperatorPlatform.fit_transform">fit_transform</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#OperatorPlatform.get_feature_names">get_feature_names</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#OperatorPlatform.get_params">get_params</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#OperatorPlatform.set_params">set_params</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#OperatorPlatform.inverse_transform">inverse_transform</a>
-                        </li>
                 </ul>
 
             </li>
@@ -504,39 +486,6 @@
 </span><span id="L-329"><a href="#L-329"><span class="linenos">329</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span>
 </span><span id="L-330"><a href="#L-330"><span class="linenos">330</span></a>            <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordMap</span><span class="p">(</span><span class="n">blocks_in</span><span class="o">=</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span><span class="p">),</span>
 </span><span id="L-331"><a href="#L-331"><span class="linenos">331</span></a>        <span class="p">)</span>
-</span><span id="L-332"><a href="#L-332"><span class="linenos">332</span></a>
-</span><span id="L-333"><a href="#L-333"><span class="linenos">333</span></a>    <span class="c1"># sklearn step style interface</span>
-</span><span id="L-334"><a href="#L-334"><span class="linenos">334</span></a>
-</span><span id="L-335"><a href="#L-335"><span class="linenos">335</span></a>    <span class="c1"># noinspection PyPep8Naming, PyUnusedLocal</span>
-</span><span id="L-336"><a href="#L-336"><span class="linenos">336</span></a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="L-337"><a href="#L-337"><span class="linenos">337</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;sklearn interface, fit() is a noop&quot;&quot;&quot;</span>
-</span><span id="L-338"><a href="#L-338"><span class="linenos">338</span></a>
-</span><span id="L-339"><a href="#L-339"><span class="linenos">339</span></a>    <span class="c1"># noinspection PyPep8Naming, PyUnusedLocal</span>
-</span><span id="L-340"><a href="#L-340"><span class="linenos">340</span></a>    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="L-341"><a href="#L-341"><span class="linenos">341</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;sklearn interface, fit() is a noop&quot;&quot;&quot;</span>
-</span><span id="L-342"><a href="#L-342"><span class="linenos">342</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
-</span><span id="L-343"><a href="#L-343"><span class="linenos">343</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-</span><span id="L-344"><a href="#L-344"><span class="linenos">344</span></a>
-</span><span id="L-345"><a href="#L-345"><span class="linenos">345</span></a>    <span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="L-346"><a href="#L-346"><span class="linenos">346</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;sklearn interface, return columns&quot;&quot;&quot;</span>
-</span><span id="L-347"><a href="#L-347"><span class="linenos">347</span></a>        <span class="n">cp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_produced</span><span class="p">()</span>
-</span><span id="L-348"><a href="#L-348"><span class="linenos">348</span></a>        <span class="k">if</span> <span class="n">input_features</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-349"><a href="#L-349"><span class="linenos">349</span></a>            <span class="n">cp_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
-</span><span id="L-350"><a href="#L-350"><span class="linenos">350</span></a>            <span class="n">cp</span> <span class="o">=</span> <span class="n">cp</span> <span class="o">+</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">input_features</span> <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cp_set</span><span class="p">]</span>
-</span><span id="L-351"><a href="#L-351"><span class="linenos">351</span></a>        <span class="k">return</span> <span class="n">cp</span>
-</span><span id="L-352"><a href="#L-352"><span class="linenos">352</span></a>
-</span><span id="L-353"><a href="#L-353"><span class="linenos">353</span></a>    <span class="c1"># noinspection PyMethodMayBeStatic</span>
-</span><span id="L-354"><a href="#L-354"><span class="linenos">354</span></a>    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-</span><span id="L-355"><a href="#L-355"><span class="linenos">355</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;sklearn interface, noop&quot;&quot;&quot;</span>
-</span><span id="L-356"><a href="#L-356"><span class="linenos">356</span></a>        <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
-</span><span id="L-357"><a href="#L-357"><span class="linenos">357</span></a>
-</span><span id="L-358"><a href="#L-358"><span class="linenos">358</span></a>    <span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
-</span><span id="L-359"><a href="#L-359"><span class="linenos">359</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;sklearn interface, noop&quot;&quot;&quot;</span>
-</span><span id="L-360"><a href="#L-360"><span class="linenos">360</span></a>
-</span><span id="L-361"><a href="#L-361"><span class="linenos">361</span></a>    <span class="c1"># noinspection PyPep8Naming</span>
-</span><span id="L-362"><a href="#L-362"><span class="linenos">362</span></a>    <span class="k">def</span> <span class="nf">inverse_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
-</span><span id="L-363"><a href="#L-363"><span class="linenos">363</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;sklearn interface, raise&quot;&quot;&quot;</span>
-</span><span id="L-364"><a href="#L-364"><span class="linenos">364</span></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;data_algebra does not support inverse_transform&quot;</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -964,39 +913,6 @@
 </span><span id="OperatorPlatform-330"><a href="#OperatorPlatform-330"><span class="linenos">330</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span>
 </span><span id="OperatorPlatform-331"><a href="#OperatorPlatform-331"><span class="linenos">331</span></a>            <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordMap</span><span class="p">(</span><span class="n">blocks_in</span><span class="o">=</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span><span class="p">),</span>
 </span><span id="OperatorPlatform-332"><a href="#OperatorPlatform-332"><span class="linenos">332</span></a>        <span class="p">)</span>
-</span><span id="OperatorPlatform-333"><a href="#OperatorPlatform-333"><span class="linenos">333</span></a>
-</span><span id="OperatorPlatform-334"><a href="#OperatorPlatform-334"><span class="linenos">334</span></a>    <span class="c1"># sklearn step style interface</span>
-</span><span id="OperatorPlatform-335"><a href="#OperatorPlatform-335"><span class="linenos">335</span></a>
-</span><span id="OperatorPlatform-336"><a href="#OperatorPlatform-336"><span class="linenos">336</span></a>    <span class="c1"># noinspection PyPep8Naming, PyUnusedLocal</span>
-</span><span id="OperatorPlatform-337"><a href="#OperatorPlatform-337"><span class="linenos">337</span></a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="OperatorPlatform-338"><a href="#OperatorPlatform-338"><span class="linenos">338</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;sklearn interface, fit() is a noop&quot;&quot;&quot;</span>
-</span><span id="OperatorPlatform-339"><a href="#OperatorPlatform-339"><span class="linenos">339</span></a>
-</span><span id="OperatorPlatform-340"><a href="#OperatorPlatform-340"><span class="linenos">340</span></a>    <span class="c1"># noinspection PyPep8Naming, PyUnusedLocal</span>
-</span><span id="OperatorPlatform-341"><a href="#OperatorPlatform-341"><span class="linenos">341</span></a>    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="OperatorPlatform-342"><a href="#OperatorPlatform-342"><span class="linenos">342</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;sklearn interface, fit() is a noop&quot;&quot;&quot;</span>
-</span><span id="OperatorPlatform-343"><a href="#OperatorPlatform-343"><span class="linenos">343</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
-</span><span id="OperatorPlatform-344"><a href="#OperatorPlatform-344"><span class="linenos">344</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-</span><span id="OperatorPlatform-345"><a href="#OperatorPlatform-345"><span class="linenos">345</span></a>
-</span><span id="OperatorPlatform-346"><a href="#OperatorPlatform-346"><span class="linenos">346</span></a>    <span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="OperatorPlatform-347"><a href="#OperatorPlatform-347"><span class="linenos">347</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;sklearn interface, return columns&quot;&quot;&quot;</span>
-</span><span id="OperatorPlatform-348"><a href="#OperatorPlatform-348"><span class="linenos">348</span></a>        <span class="n">cp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_produced</span><span class="p">()</span>
-</span><span id="OperatorPlatform-349"><a href="#OperatorPlatform-349"><span class="linenos">349</span></a>        <span class="k">if</span> <span class="n">input_features</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="OperatorPlatform-350"><a href="#OperatorPlatform-350"><span class="linenos">350</span></a>            <span class="n">cp_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
-</span><span id="OperatorPlatform-351"><a href="#OperatorPlatform-351"><span class="linenos">351</span></a>            <span class="n">cp</span> <span class="o">=</span> <span class="n">cp</span> <span class="o">+</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">input_features</span> <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cp_set</span><span class="p">]</span>
-</span><span id="OperatorPlatform-352"><a href="#OperatorPlatform-352"><span class="linenos">352</span></a>        <span class="k">return</span> <span class="n">cp</span>
-</span><span id="OperatorPlatform-353"><a href="#OperatorPlatform-353"><span class="linenos">353</span></a>
-</span><span id="OperatorPlatform-354"><a href="#OperatorPlatform-354"><span class="linenos">354</span></a>    <span class="c1"># noinspection PyMethodMayBeStatic</span>
-</span><span id="OperatorPlatform-355"><a href="#OperatorPlatform-355"><span class="linenos">355</span></a>    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-</span><span id="OperatorPlatform-356"><a href="#OperatorPlatform-356"><span class="linenos">356</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;sklearn interface, noop&quot;&quot;&quot;</span>
-</span><span id="OperatorPlatform-357"><a href="#OperatorPlatform-357"><span class="linenos">357</span></a>        <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
-</span><span id="OperatorPlatform-358"><a href="#OperatorPlatform-358"><span class="linenos">358</span></a>
-</span><span id="OperatorPlatform-359"><a href="#OperatorPlatform-359"><span class="linenos">359</span></a>    <span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
-</span><span id="OperatorPlatform-360"><a href="#OperatorPlatform-360"><span class="linenos">360</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;sklearn interface, noop&quot;&quot;&quot;</span>
-</span><span id="OperatorPlatform-361"><a href="#OperatorPlatform-361"><span class="linenos">361</span></a>
-</span><span id="OperatorPlatform-362"><a href="#OperatorPlatform-362"><span class="linenos">362</span></a>    <span class="c1"># noinspection PyPep8Naming</span>
-</span><span id="OperatorPlatform-363"><a href="#OperatorPlatform-363"><span class="linenos">363</span></a>    <span class="k">def</span> <span class="nf">inverse_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
-</span><span id="OperatorPlatform-364"><a href="#OperatorPlatform-364"><span class="linenos">364</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;sklearn interface, raise&quot;&quot;&quot;</span>
-</span><span id="OperatorPlatform-365"><a href="#OperatorPlatform-365"><span class="linenos">365</span></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;data_algebra does not support inverse_transform&quot;</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -2049,141 +1965,6 @@ direction as extend).</li>
 <blockquote>
   <p>compose operator directed acyclic graph</p>
 </blockquote>
-</div>
-
-
-                            </div>
-                            <div id="OperatorPlatform.fit" class="classattr">
-                                        <input id="OperatorPlatform.fit-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">fit</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">X</span>, </span><span class="param"><span class="n">y</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="OperatorPlatform.fit-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#OperatorPlatform.fit"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="OperatorPlatform.fit-337"><a href="#OperatorPlatform.fit-337"><span class="linenos">337</span></a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="OperatorPlatform.fit-338"><a href="#OperatorPlatform.fit-338"><span class="linenos">338</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;sklearn interface, fit() is a noop&quot;&quot;&quot;</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>sklearn interface, fit() is a noop</p>
-</div>
-
-
-                            </div>
-                            <div id="OperatorPlatform.fit_transform" class="classattr">
-                                        <input id="OperatorPlatform.fit_transform-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">fit_transform</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">X</span>, </span><span class="param"><span class="n">y</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="OperatorPlatform.fit_transform-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#OperatorPlatform.fit_transform"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="OperatorPlatform.fit_transform-341"><a href="#OperatorPlatform.fit_transform-341"><span class="linenos">341</span></a>    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="OperatorPlatform.fit_transform-342"><a href="#OperatorPlatform.fit_transform-342"><span class="linenos">342</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;sklearn interface, fit() is a noop&quot;&quot;&quot;</span>
-</span><span id="OperatorPlatform.fit_transform-343"><a href="#OperatorPlatform.fit_transform-343"><span class="linenos">343</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
-</span><span id="OperatorPlatform.fit_transform-344"><a href="#OperatorPlatform.fit_transform-344"><span class="linenos">344</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>sklearn interface, fit() is a noop</p>
-</div>
-
-
-                            </div>
-                            <div id="OperatorPlatform.get_feature_names" class="classattr">
-                                        <input id="OperatorPlatform.get_feature_names-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">get_feature_names</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">input_features</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="OperatorPlatform.get_feature_names-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#OperatorPlatform.get_feature_names"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="OperatorPlatform.get_feature_names-346"><a href="#OperatorPlatform.get_feature_names-346"><span class="linenos">346</span></a>    <span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="OperatorPlatform.get_feature_names-347"><a href="#OperatorPlatform.get_feature_names-347"><span class="linenos">347</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;sklearn interface, return columns&quot;&quot;&quot;</span>
-</span><span id="OperatorPlatform.get_feature_names-348"><a href="#OperatorPlatform.get_feature_names-348"><span class="linenos">348</span></a>        <span class="n">cp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_produced</span><span class="p">()</span>
-</span><span id="OperatorPlatform.get_feature_names-349"><a href="#OperatorPlatform.get_feature_names-349"><span class="linenos">349</span></a>        <span class="k">if</span> <span class="n">input_features</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="OperatorPlatform.get_feature_names-350"><a href="#OperatorPlatform.get_feature_names-350"><span class="linenos">350</span></a>            <span class="n">cp_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
-</span><span id="OperatorPlatform.get_feature_names-351"><a href="#OperatorPlatform.get_feature_names-351"><span class="linenos">351</span></a>            <span class="n">cp</span> <span class="o">=</span> <span class="n">cp</span> <span class="o">+</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">input_features</span> <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cp_set</span><span class="p">]</span>
-</span><span id="OperatorPlatform.get_feature_names-352"><a href="#OperatorPlatform.get_feature_names-352"><span class="linenos">352</span></a>        <span class="k">return</span> <span class="n">cp</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>sklearn interface, return columns</p>
-</div>
-
-
-                            </div>
-                            <div id="OperatorPlatform.get_params" class="classattr">
-                                        <input id="OperatorPlatform.get_params-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">get_params</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">deep</span><span class="o">=</span><span class="kc">False</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="OperatorPlatform.get_params-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#OperatorPlatform.get_params"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="OperatorPlatform.get_params-355"><a href="#OperatorPlatform.get_params-355"><span class="linenos">355</span></a>    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-</span><span id="OperatorPlatform.get_params-356"><a href="#OperatorPlatform.get_params-356"><span class="linenos">356</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;sklearn interface, noop&quot;&quot;&quot;</span>
-</span><span id="OperatorPlatform.get_params-357"><a href="#OperatorPlatform.get_params-357"><span class="linenos">357</span></a>        <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>sklearn interface, noop</p>
-</div>
-
-
-                            </div>
-                            <div id="OperatorPlatform.set_params" class="classattr">
-                                        <input id="OperatorPlatform.set_params-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">set_params</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">**</span><span class="n">params</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="OperatorPlatform.set_params-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#OperatorPlatform.set_params"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="OperatorPlatform.set_params-359"><a href="#OperatorPlatform.set_params-359"><span class="linenos">359</span></a>    <span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
-</span><span id="OperatorPlatform.set_params-360"><a href="#OperatorPlatform.set_params-360"><span class="linenos">360</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;sklearn interface, noop&quot;&quot;&quot;</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>sklearn interface, noop</p>
-</div>
-
-
-                            </div>
-                            <div id="OperatorPlatform.inverse_transform" class="classattr">
-                                        <input id="OperatorPlatform.inverse_transform-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">inverse_transform</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">X</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="OperatorPlatform.inverse_transform-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#OperatorPlatform.inverse_transform"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="OperatorPlatform.inverse_transform-363"><a href="#OperatorPlatform.inverse_transform-363"><span class="linenos">363</span></a>    <span class="k">def</span> <span class="nf">inverse_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
-</span><span id="OperatorPlatform.inverse_transform-364"><a href="#OperatorPlatform.inverse_transform-364"><span class="linenos">364</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;sklearn interface, raise&quot;&quot;&quot;</span>
-</span><span id="OperatorPlatform.inverse_transform-365"><a href="#OperatorPlatform.inverse_transform-365"><span class="linenos">365</span></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;data_algebra does not support inverse_transform&quot;</span><span class="p">)</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>sklearn interface, raise</p>
 </div>
 
 
