@@ -1,5 +1,4 @@
 from data_algebra.data_ops import TableDescription, SQLNode
-from data_algebra.op_container import OpC
 import data_algebra.SQLite
 import data_algebra.test_util
 
@@ -47,7 +46,3 @@ def test_user_sql():
     ops_sql = ops_table.replace_leaves({"derived_results": sql_node})
     assert ops_sql.sources[0].node_name == 'SQLNode'
     assert ops == ops_sql
-
-    # capture ops
-    ops_captured = ops.replace_leaves({"derived_results": OpC(TableDescription(table_name="derived_results", column_names=["g", "v1", "v2", "v3"]))})
-    assert isinstance(ops_captured, OpC)

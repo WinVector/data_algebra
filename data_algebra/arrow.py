@@ -113,19 +113,6 @@ class DataOpArrow(Arrow):
             X = X[self.incoming_columns]
         return self.pipeline.act_on(X)
 
-    # noinspection PyPep8Naming
-    def fit(self, X, y=None):
-        """Learn input and output types from example, and return self"""
-        # assume a pandas.DataFrame compatible object
-        self.act_on(X)
-        return self
-
-    # noinspection PyPep8Naming
-    def fit_transform(self, X, y=None):
-        """Learn input and output types from example, and return transform."""
-        out = self.transform(X)
-        return out
-
     def dom(self):
         return DataOpArrow(
             data_algebra.data_ops.TableDescription(
