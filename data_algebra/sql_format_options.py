@@ -60,10 +60,12 @@ class SQLFormatOptions(SimpleNamespace):
     def __str__(self):
         return self.__repr__()
 
-    # noinspection PyUnusedLocal
     def _repr_pretty_(self, p, cycle):
         """
-        IPython pretty print, used at implicit print time
+        IPython pretty print, used at implicit display()
         https://ipython.readthedocs.io/en/stable/config/integrating.html
         """
-        p.text(str(self))
+        if cycle:
+            p.text("SQLFormatOptions()")
+        else:
+            p.text(str(self))

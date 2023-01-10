@@ -340,6 +340,17 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
 
     def __str__(self):
         return self.to_python(strict=True, pretty=True)
+    
+    def _repr_pretty_(self, p, cycle):
+        """
+        IPython pretty print, used at implicit display()
+        https://ipython.readthedocs.io/en/stable/config/integrating.html
+        """
+        if cycle:
+            p.text("ViewRepresentation()")
+        else:
+            p.text(self.to_python(strict=True, pretty=True))
+
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
     @abc.abstractmethod

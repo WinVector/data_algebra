@@ -154,11 +154,6 @@ class RecordSpecification:
         )
         return s
 
-    def __eq__(self, other):
-        if not isinstance(other, RecordSpecification):
-            return False
-        return self.__repr__() == other.__repr__()
-
     def fmt(self):
         """
         Prepare for printing
@@ -182,6 +177,21 @@ class RecordSpecification:
 
     def __str__(self):
         return self.fmt()
+    
+    def _repr_pretty_(self, p, cycle):
+        """
+        IPython pretty print, used at implicit display()
+        https://ipython.readthedocs.io/en/stable/config/integrating.html
+        """
+        if cycle:
+            p.text("RecordSpecification()")
+        else:
+            p.text(self.fmt())
+
+    def __eq__(self, other):
+        if not isinstance(other, RecordSpecification):
+            return False
+        return self.__repr__() == other.__repr__()
 
     def map_to_rows(self):
         """
@@ -263,7 +273,6 @@ class RecordMap:
         else:
             assert self.blocks_in is not None  # type hint
             self.columns_produced = self.blocks_in.row_columns
-        self.fmt_string = self.fmt()
 
     def __eq__(self, other):
         if not isinstance(other, RecordMap):
@@ -449,7 +458,7 @@ class RecordMap:
             return "RecordMap(no-op)"
         if (self.blocks_in is not None) and (self.blocks_out is not None):
             s = (
-                "Transform block records of structure:\n"
+                "RecordMap: transforming block records of structure:\n"
                 + str(self.blocks_in)
                 + "to block records of structure:\n"
                 + str(self.blocks_out)
@@ -457,7 +466,7 @@ class RecordMap:
             return s
         if self.blocks_in is not None:
             s = (
-                "Transform block records of structure:\n"
+                "RecordMap: transforming block records of structure:\n"
                 + str(self.blocks_in)
                 + "to row records of the form:\n"
                 + "  record_keys: "
@@ -470,7 +479,7 @@ class RecordMap:
             return s
         if self.blocks_out is not None:
             s = (
-                "Transform row records of the form:\n"
+                "RecordMap: transforming row records of the form:\n"
                 + "  record_keys: "
                 + str(self.blocks_out.record_keys)
                 + "\n"
@@ -497,7 +506,17 @@ class RecordMap:
         return s
 
     def __str__(self):
-        return self.fmt_string
+        return self.fmt()
+    
+    def _repr_pretty_(self, p, cycle):
+        """
+        IPython pretty print, used at implicit display()
+        https://ipython.readthedocs.io/en/stable/config/integrating.html
+        """
+        if cycle:
+            p.text("RecordMap()")
+        else:
+            p.text(self.fmt())
 
 
 def pivot_blocks_to_rowrecs(

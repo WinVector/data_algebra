@@ -64,28 +64,23 @@ def test_small_cdata_example_debug():
         record_keys=["id", "Species"],
     )
 
-    
-
     mp_to_blocks = RecordMap(blocks_out=record_spec)
     waste_str = str(mp_to_blocks)
+    assert isinstance(waste_str, str)
     arranged_blocks = mp_to_blocks.transform(iris)
     assert data_algebra.test_util.equivalent_frames(arranged_blocks, iris_blocks_orig)
     # arranged_blocks
 
-    
-
     mp_to_rows = RecordMap(blocks_in=record_spec)
     waste_str = str(mp_to_rows)
+    assert isinstance(waste_str, str)
     arranged_rows = mp_to_rows.transform(arranged_blocks)
     assert data_algebra.test_util.equivalent_frames(arranged_rows, iris_orig)
     # arranged_rows
 
 
 def test_cdata1():
-
     # From: https://github.com/WinVector/data_algebra/blob/master/Examples/cdata/cdata.ipynb
-
-    
 
     buf = io.StringIO(
         re.sub(
@@ -147,9 +142,8 @@ def test_cdata1():
         record_keys=["id", "Species"],
     )
     waste_str = str(record_spec)
-
+    assert isinstance(waste_str, str)
     
-
     db_model = data_algebra.SQLite.SQLiteModel()
 
     source_table = data_algebra.data_ops.TableDescription(
