@@ -117,14 +117,16 @@ def test_ex_examples_join_catch_unnamed_2():
     d1 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [1, 2, 2], "y": [3, 3, 4], "z": [6, 7, 8],}
     )
+    descr1 = describe_table(d1, table_name="d1", keep_all=True)
+    assert descr1.table_name_was_set_by_user
     d2 = data_algebra.data_model.default_data_model().pd.DataFrame(
         {"x": [1, 2, 2], "y": [3, 3, 4], "q": ["a", "b", "c"],}
     )
-
-    ops = describe_table(d1, table_name="d1", keep_all=True).natural_join(
-        b=describe_table(d2, keep_all=True), by=["x", "y"], jointype="inner"
+    descr2 = describe_table(d2, keep_all=True)
+    assert not descr2.table_name_was_set_by_user
+    ops = descr1.natural_join(
+        b=descr2, by=["x", "y"], jointype="inner"
     )
-
     with pytest.raises(AssertionError):
         ops.ex()
 
