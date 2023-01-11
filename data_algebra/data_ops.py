@@ -260,6 +260,19 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
     def columns_produced(self) -> List[str]:
         """Return list of columns produced by operator dag."""
         return list(self.column_names)
+    
+    def cod(self, *, table_name: Optional[str] = None):
+        """
+        Description of operator co-domain, a table description.
+
+        :param table_name: optional name for table
+        :return: TableDescription representing produced columns.
+        """
+        assert isinstance(table_name, (str, type(None)))
+        return TableDescription(
+                table_name=table_name,
+                column_names=self.columns_produced(),
+        )
 
     def columns_used_implementation_(
         self, *, using, columns_currently_using_records
@@ -269,7 +282,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         try:
             crec = columns_currently_using_records[self_merged_rep_id]
         except KeyError:
-            crec = set()
+            crec = OrderedSet()
             columns_currently_using_records[self_merged_rep_id] = crec
         if using is None:
             crec.update(self.column_names)
@@ -300,6 +313,16 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             vi = columns_currently_using_records[ti.merged_rep_id()]
             columns_used[k] = vi.copy()
         return columns_used
+    
+    def dom(self):
+        """
+        Description of domain.
+        
+        :return: map of tables names to table descriptions
+        """
+        cu_map = self.columns_used()
+        res = {k: TableDescription(table_name=k, column_names=v) for k, v in cu_map.items()}
+        return res
 
     # printing
 

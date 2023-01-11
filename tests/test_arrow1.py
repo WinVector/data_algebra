@@ -158,6 +158,23 @@ def test_arrow_cod_dom():
     assert a1.cod() == a2.dom()
 
 
+def test_arrow_cod_dom_table():
+    d = data_algebra.data_model.default_data_model().pd.DataFrame({"x": [1, 2, 3], "y": [3, 4, 4],})
+    td = describe_table(d)
+    a = td.extend({"z": "x.mean()"}, partition_by=["y"])
+    cod = a.cod()
+    assert isinstance(cod, TableDescription)
+    a_r = a >> cod
+    assert a_r == a
+    dom = a.dom()
+    assert isinstance(dom, dict)
+    assert len(dom) == 1
+    dom_table = list(dom.values())[0]
+    assert isinstance(dom_table, TableDescription)
+    a_l = dom_table >> a
+    assert a_l == a
+
+
 def test_arrow_compose_2():
     b1 = DataOpArrow(
         TableDescription(column_names=["x", "y"], table_name=None).extend({"y": "x+1"})
