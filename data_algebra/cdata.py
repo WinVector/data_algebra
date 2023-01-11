@@ -15,7 +15,7 @@ def _str_list_to_html(lst: Iterable[str]) -> str:
     return "[" + ", ".join([html.escape(k.__repr__()) for k in lst]) + "]"
 
 
-def _format_table(d, *, record_id_cols: Iterable[str], control_id_cols: Iterable[str]):
+def _format_table(d, *, record_id_cols: Iterable[str], control_id_cols: Iterable[str], add_style: bool = True):
     local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(d)
     d = local_data_model.to_pandas(d)
     pd = data_algebra.data_model.lookup_data_model_for_dataframe(d).pd
@@ -27,11 +27,12 @@ def _format_table(d, *, record_id_cols: Iterable[str], control_id_cols: Iterable
     d = pd.DataFrame({
         (cc, cn): d[cn] for (cc, cn) in record_id_col_pairs + control_id_col_pairs + value_id_col_pairs
     })
-    d =  (
-        d.style
-            .set_properties(**{'background-color': '#FFE4C4'}, subset=record_id_col_pairs)
-            .set_properties(**{'background-color': '#7FFFD4'}, subset=control_id_col_pairs)
-    )
+    if add_style:
+        d =  (
+            d.style
+                .set_properties(**{'background-color': '#FFE4C4'}, subset=record_id_col_pairs)
+                .set_properties(**{'background-color': '#7FFFD4'}, subset=control_id_col_pairs)
+        )
     return d
 
 
@@ -499,41 +500,25 @@ class RecordMap:
         """Format for informal presentation."""
         if (self.blocks_in is None) and (self.blocks_out is None):
             return "RecordMap(no-op)"
-        if (self.blocks_in is not None) and (self.blocks_out is not None):
-            s = (
-                "RecordMap: transforming block records of structure:\n"
-                + str(self.blocks_in)
-                + "to block records of structure:\n"
-                + str(self.blocks_out)
-            )
-            return s
-        if self.blocks_in is not None:
-            s = (
-                "RecordMap: transforming block records of structure:\n"
-                + str(self.blocks_in)
-                + "to row records of the form:\n"
-                + "  record_keys: "
-                + str(self.blocks_in.record_keys)
-                + "\n"
-                + " "
-                + str(self.blocks_in.row_version(include_record_keys=False))
-                + "\n"
-            )
-            return s
-        if self.blocks_out is not None:
-            s = (
-                "RecordMap: transforming row records of the form:\n"
-                + "  record_keys: "
-                + str(self.blocks_out.record_keys)
-                + "\n"
-                + " "
-                + str(self.blocks_out.row_version(include_record_keys=False))
-                + "\n"
-                + "to block records of structure:\n"
-                + str(self.blocks_out)
-            )
-            return s
-        raise ValueError("should not be reached")
+        example_input = self.example_input()
+        example_input_formatted = _format_table(
+            example_input,
+            record_id_cols=set(self.record_keys()), 
+            control_id_cols=self.input_control_table_key_columns(),
+            add_style=False)
+        example_output = self.transform(example_input)
+        example_output_formatted = _format_table(
+            example_output,
+            record_id_cols=set(self.record_keys()), 
+            control_id_cols=self.output_control_table_key_columns(),
+            add_style=False)
+        s = (
+            "RecordMap: transforming records of the form:\n"
+            + str(example_input_formatted)
+            + "\nto records of the form:\n"
+            + str(example_output_formatted)
+        )
+        return s
 
     def __repr__(self):
         s = (
