@@ -326,8 +326,8 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         
         :return: map of tables names to table descriptions
         """
-        cu_map = self.columns_used()
-        res = {k: TableDescription(table_name=k, column_names=v) for k, v in cu_map.items()}
+        tb_map = self.get_tables()
+        res = {k: TableDescription(table_name=k if t.table_name_was_set_by_user else None, column_names=t.column_names) for k, t in tb_map.items()}
         return res
 
     # printing
