@@ -343,7 +343,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
     
     def _repr_pretty_(self, p, cycle):
         """
-        IPython pretty print, used at implicit display()
+        IPython pretty print
         https://ipython.readthedocs.io/en/stable/config/integrating.html
         """
         if cycle:
