@@ -4,10 +4,35 @@ Class for representing record structure transformations.
 
 
 import re
+import html
 from typing import Iterable, List, Optional
 
 import data_algebra.data_model
 import data_algebra.util
+
+
+def _str_list_to_html(lst: Iterable[str]) -> str:
+    return "[" + ", ".join([html.escape(k.__repr__()) for k in lst]) + "]"
+
+
+def _format_table(d, *, record_id_cols: Iterable[str], control_id_cols: Iterable[str]):
+    local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(d)
+    d = local_data_model.to_pandas(d)
+    pd = data_algebra.data_model.lookup_data_model_for_dataframe(d).pd
+    record_id_cols = list(record_id_cols)
+    control_id_cols = list(control_id_cols)
+    record_id_col_pairs = [("record id", c) for c in d.columns if c in set(record_id_cols)]
+    control_id_col_pairs = [("record structure", c) for c in d.columns if c in set(control_id_cols)]
+    value_id_col_pairs = [("value", c) for c in d.columns if (c not in set(record_id_cols)) and (c not in set(control_id_cols))]
+    d = pd.DataFrame({
+        (cc, cn): d[cn] for (cc, cn) in record_id_col_pairs + control_id_col_pairs + value_id_col_pairs
+    })
+    d =  (
+        d.style
+            .set_properties(**{'background-color': '#FFE4C4'}, subset=record_id_col_pairs)
+            .set_properties(**{'background-color': '#7FFFD4'}, subset=control_id_col_pairs)
+    )
+    return d
 
 
 class RecordSpecification:
@@ -154,11 +179,6 @@ class RecordSpecification:
         )
         return s
 
-    def __eq__(self, other):
-        if not isinstance(other, RecordSpecification):
-            return False
-        return self.__repr__() == other.__repr__()
-
     def fmt(self):
         """
         Prepare for printing
@@ -182,6 +202,39 @@ class RecordSpecification:
 
     def __str__(self):
         return self.fmt()
+    
+    def _repr_pretty_(self, p, cycle):
+        """
+        IPython pretty print
+        https://ipython.readthedocs.io/en/stable/config/integrating.html
+        """
+        if cycle:
+            p.text("RecordSpecification()")
+        else:
+            p.text(self.fmt())
+    
+    def _repr_html_(self):
+        s = (
+            "<p>RecordSpecification<br>\n"
+            + "<ul>"
+            + "<li>record_keys: "
+            + _str_list_to_html(self.record_keys)
+            + "</li>\n"
+            + "<li>control_table_keys: "
+            + _str_list_to_html(self.control_table_keys)
+            + "</li>\n"
+            + "<li>control_table:<br>\n"
+            + self.control_table._repr_html_()
+            + "</li>\n"
+            + "</ul>"
+            + "</p>\n"
+        )
+        return s    
+
+    def __eq__(self, other):
+        if not isinstance(other, RecordSpecification):
+            return False
+        return self.__repr__() == other.__repr__()
 
     def map_to_rows(self):
         """
@@ -263,7 +316,6 @@ class RecordMap:
         else:
             assert self.blocks_in is not None  # type hint
             self.columns_produced = self.blocks_in.row_columns
-        self.fmt_string = self.fmt()
 
     def __eq__(self, other):
         if not isinstance(other, RecordMap):
@@ -449,7 +501,7 @@ class RecordMap:
             return "RecordMap(no-op)"
         if (self.blocks_in is not None) and (self.blocks_out is not None):
             s = (
-                "Transform block records of structure:\n"
+                "RecordMap: transforming block records of structure:\n"
                 + str(self.blocks_in)
                 + "to block records of structure:\n"
                 + str(self.blocks_out)
@@ -457,7 +509,7 @@ class RecordMap:
             return s
         if self.blocks_in is not None:
             s = (
-                "Transform block records of structure:\n"
+                "RecordMap: transforming block records of structure:\n"
                 + str(self.blocks_in)
                 + "to row records of the form:\n"
                 + "  record_keys: "
@@ -470,7 +522,7 @@ class RecordMap:
             return s
         if self.blocks_out is not None:
             s = (
-                "Transform row records of the form:\n"
+                "RecordMap: transforming row records of the form:\n"
                 + "  record_keys: "
                 + str(self.blocks_out.record_keys)
                 + "\n"
@@ -497,7 +549,38 @@ class RecordMap:
         return s
 
     def __str__(self):
-        return self.fmt_string
+        return self.fmt()
+    
+    def _repr_pretty_(self, p, cycle):
+        """
+        IPython pretty print
+        https://ipython.readthedocs.io/en/stable/config/integrating.html
+        """
+        if cycle:
+            p.text("RecordMap()")
+        else:
+            p.text(self.fmt())
+    
+    def _repr_html_(self):
+        if (self.blocks_in is None) and (self.blocks_out is None):
+            return "RecordMap(no-op)"
+        example_input = self.example_input()
+        example_input_formatted = _format_table(
+            example_input,
+            record_id_cols=set(self.record_keys()), 
+            control_id_cols=self.input_control_table_key_columns())
+        example_output = self.transform(example_input)
+        example_output_formatted = _format_table(
+            example_output,
+            record_id_cols=set(self.record_keys()), 
+            control_id_cols=self.output_control_table_key_columns())
+        s = (
+            "RecordMap: transforming records of the form:<br>\n"
+            + example_input_formatted._repr_html_()
+            + "<br>\nto records of the form:<br>\n"
+            + example_output_formatted._repr_html_()
+        )
+        return s
 
 
 def pivot_blocks_to_rowrecs(

@@ -124,13 +124,15 @@
 </span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
 </span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a>
-</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a>    <span class="c1"># noinspection PyUnusedLocal</span>
-</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a>    <span class="k">def</span> <span class="nf">_repr_pretty_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">cycle</span><span class="p">):</span>
-</span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos">66</span></a><span class="sd">        IPython pretty print, used at implicit print time</span>
-</span><span id="L-67"><a href="#L-67"><span class="linenos">67</span></a><span class="sd">        https://ipython.readthedocs.io/en/stable/config/integrating.html</span>
-</span><span id="L-68"><a href="#L-68"><span class="linenos">68</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-69"><a href="#L-69"><span class="linenos">69</span></a>        <span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a>    <span class="k">def</span> <span class="nf">_repr_pretty_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">cycle</span><span class="p">):</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a><span class="sd">        IPython pretty print</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos">66</span></a><span class="sd">        https://ipython.readthedocs.io/en/stable/config/integrating.html</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos">67</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos">68</span></a>        <span class="k">if</span> <span class="n">cycle</span><span class="p">:</span>
+</span><span id="L-69"><a href="#L-69"><span class="linenos">69</span></a>            <span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;SQLFormatOptions()&quot;</span><span class="p">)</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos">70</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos">71</span></a>            <span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
 </span></pre></div>
 
 
@@ -201,13 +203,15 @@
 </span><span id="SQLFormatOptions-61"><a href="#SQLFormatOptions-61"><span class="linenos">61</span></a>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="SQLFormatOptions-62"><a href="#SQLFormatOptions-62"><span class="linenos">62</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
 </span><span id="SQLFormatOptions-63"><a href="#SQLFormatOptions-63"><span class="linenos">63</span></a>
-</span><span id="SQLFormatOptions-64"><a href="#SQLFormatOptions-64"><span class="linenos">64</span></a>    <span class="c1"># noinspection PyUnusedLocal</span>
-</span><span id="SQLFormatOptions-65"><a href="#SQLFormatOptions-65"><span class="linenos">65</span></a>    <span class="k">def</span> <span class="nf">_repr_pretty_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">cycle</span><span class="p">):</span>
-</span><span id="SQLFormatOptions-66"><a href="#SQLFormatOptions-66"><span class="linenos">66</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="SQLFormatOptions-67"><a href="#SQLFormatOptions-67"><span class="linenos">67</span></a><span class="sd">        IPython pretty print, used at implicit print time</span>
-</span><span id="SQLFormatOptions-68"><a href="#SQLFormatOptions-68"><span class="linenos">68</span></a><span class="sd">        https://ipython.readthedocs.io/en/stable/config/integrating.html</span>
-</span><span id="SQLFormatOptions-69"><a href="#SQLFormatOptions-69"><span class="linenos">69</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="SQLFormatOptions-70"><a href="#SQLFormatOptions-70"><span class="linenos">70</span></a>        <span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+</span><span id="SQLFormatOptions-64"><a href="#SQLFormatOptions-64"><span class="linenos">64</span></a>    <span class="k">def</span> <span class="nf">_repr_pretty_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">cycle</span><span class="p">):</span>
+</span><span id="SQLFormatOptions-65"><a href="#SQLFormatOptions-65"><span class="linenos">65</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="SQLFormatOptions-66"><a href="#SQLFormatOptions-66"><span class="linenos">66</span></a><span class="sd">        IPython pretty print</span>
+</span><span id="SQLFormatOptions-67"><a href="#SQLFormatOptions-67"><span class="linenos">67</span></a><span class="sd">        https://ipython.readthedocs.io/en/stable/config/integrating.html</span>
+</span><span id="SQLFormatOptions-68"><a href="#SQLFormatOptions-68"><span class="linenos">68</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="SQLFormatOptions-69"><a href="#SQLFormatOptions-69"><span class="linenos">69</span></a>        <span class="k">if</span> <span class="n">cycle</span><span class="p">:</span>
+</span><span id="SQLFormatOptions-70"><a href="#SQLFormatOptions-70"><span class="linenos">70</span></a>            <span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;SQLFormatOptions()&quot;</span><span class="p">)</span>
+</span><span id="SQLFormatOptions-71"><a href="#SQLFormatOptions-71"><span class="linenos">71</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="SQLFormatOptions-72"><a href="#SQLFormatOptions-72"><span class="linenos">72</span></a>            <span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
 </span></pre></div>
 
 
