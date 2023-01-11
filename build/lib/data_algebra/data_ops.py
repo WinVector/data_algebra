@@ -133,10 +133,12 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
     """Structure to represent the columns of a query or a table.
     Abstract base class."""
 
+
     column_names: Tuple[str, ...]
     sources: Tuple[
         "ViewRepresentation", ...
     ]  # https://www.python.org/dev/peps/pep-0484/#forward-references
+    key: Optional[str]
 
     def __init__(
         self,
@@ -144,10 +146,13 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         *,
         sources: Optional[Iterable["ViewRepresentation"]] = None,
         node_name: str,
+        key: Optional[str] = None,
     ):
         # don't let instances masquerade as iterables
         assert not isinstance(column_names, str)
+        assert isinstance(node_name, str)
         assert not isinstance(sources, OperatorPlatform)
+        assert isinstance(key, (str, type(None)))
         if not isinstance(column_names, tuple):
             column_names = tuple(column_names)
         assert len(column_names) > 0
@@ -163,6 +168,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         for si in sources:
             assert isinstance(si, ViewRepresentation)
         self.sources = sources
+        self.key = key
         OperatorPlatform.__init__(self, node_name=node_name)
 
     def column_map(self) -> collections.OrderedDict:
@@ -260,6 +266,19 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
     def columns_produced(self) -> List[str]:
         """Return list of columns produced by operator dag."""
         return list(self.column_names)
+    
+    def cod(self, *, table_name: Optional[str] = None):
+        """
+        Description of operator co-domain, a table description.
+
+        :param table_name: optional name for table
+        :return: TableDescription representing produced columns.
+        """
+        assert isinstance(table_name, (str, type(None)))
+        return TableDescription(
+                table_name=table_name,
+                column_names=self.columns_produced(),
+        )
 
     def columns_used_implementation_(
         self, *, using, columns_currently_using_records
@@ -269,7 +288,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         try:
             crec = columns_currently_using_records[self_merged_rep_id]
         except KeyError:
-            crec = set()
+            crec = OrderedSet()
             columns_currently_using_records[self_merged_rep_id] = crec
         if using is None:
             crec.update(self.column_names)
@@ -300,6 +319,16 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             vi = columns_currently_using_records[ti.merged_rep_id()]
             columns_used[k] = vi.copy()
         return columns_used
+    
+    def dom(self):
+        """
+        Description of domain.
+        
+        :return: map of tables names to table descriptions
+        """
+        tb_map = self.get_tables()
+        res = {k: TableDescription(table_name=k if t.table_name_was_set_by_user else None, column_names=t.column_names) for k, t in tb_map.items()}
+        return res
 
     # printing
 
@@ -393,13 +422,21 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         :return: transformed result
         """
         tables = self.get_tables()
-        assert len(tables) == 1
-        key = list(tables.keys())[0]
-        old = tables[key]
         if isinstance(X, ViewRepresentation):
-            assert set(X.column_names) == set(old.column_names)  # this is defending associativity
+            # insert to only table or if more than one, table with matching key
+            if len(tables) == 1:
+                key = list(tables.keys())[0]
+            else:
+                key = X.key
+            assert isinstance(key, str)
+            old = tables[key]
+            assert set(X.column_names) == set(old.column_names)  # this is defending associativity of composition against table narrowing
             return self.replace_leaves({key: X})
         # assume a table
+        assert len(tables) == 1
+        key = list(tables.keys())[0]
+        assert isinstance(key, str)
+        old = tables[key]
         assert set(X.columns) == set(old.column_names)
         return self.transform(
             X=X,
@@ -940,10 +977,8 @@ class TableDescription(ViewRepresentation):
     """
 
     table_name: str
-    column_names: Tuple[str, ...]
-    qualifiers: Dict[str, str]
-    key: str
     table_name_was_set_by_user: bool
+    qualifiers: Dict[str, str]
 
     def __init__(
         self,
@@ -962,14 +997,16 @@ class TableDescription(ViewRepresentation):
             column_names = tuple(
                 column_names
             )  # convert to tuple from other types such as series
-        ViewRepresentation.__init__(
-            self, column_names=column_names, node_name="TableDescription"
-        )
+        table_name_was_set_by_user = True
         if table_name is None:
-            self.table_name_was_set_by_user = False
+            table_name_was_set_by_user = False
             table_name = "data_frame"
-        else:
-            self.table_name_was_set_by_user = True
+        assert isinstance(table_name, str)
+        ViewRepresentation.__init__(
+            self, column_names=column_names, node_name="TableDescription", key=table_name,
+        )
+        self.table_name_was_set_by_user = table_name_was_set_by_user
+        self.table_name = table_name
         assert isinstance(table_name, str)
         if head is not None:
             if set([c for c in head.columns]) != set(column_names):
@@ -977,16 +1014,12 @@ class TableDescription(ViewRepresentation):
         self.head = head
         self.limit_was = limit_was
         self.sql_meta = sql_meta
-        self.table_name = table_name
         self.nrows = nrows
         self.column_names = column_names
         if qualifiers is None:
             qualifiers = {}
         assert isinstance(qualifiers, dict)
         self.qualifiers = qualifiers.copy()
-        self.key = ""
-        if self.table_name is not None:
-            self.key = self.table_name
 
     def same_table_description_(self, other):
         """
