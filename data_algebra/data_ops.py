@@ -962,10 +962,6 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         return ConvertRecordsNode(source=self, record_map=record_map)
 
 
-# Could also have general query as starting ops, but don't see a lot of point to
-# it until somebody needs it.
-
-
 class TableDescription(ViewRepresentation):
     """
      Describe columns, and qualifiers, of a table.
@@ -2734,7 +2730,6 @@ class ConvertRecordsNode(ViewRepresentation):
     """
 
     def __init__(self, *, source, record_map):
-        sources = [source]
         self.record_map = record_map
         unknown = set(self.record_map.columns_needed) - set(source.column_names)
         if len(unknown) > 0:
@@ -2742,7 +2737,7 @@ class ConvertRecordsNode(ViewRepresentation):
         ViewRepresentation.__init__(
             self,
             column_names=record_map.columns_produced,
-            sources=sources,
+            sources=[source],
             node_name="ConvertRecordsNode",
         )
 
@@ -2973,7 +2968,7 @@ def ex(d, *, data_model=None, allow_limited_tables: bool = False):
     Evaluate operators with respect to Pandas data frames already stored in the operator chain.
 
     :param d: data algebra pipeline/DAG to evaluate.
-    :param data_model: adaptor to data dialect (Pandas for now)
+    :param data_model: adaptor to data dialect
     :param allow_limited_tables: logical, if True allow execution on non-complete tables
     :return: table result
     """

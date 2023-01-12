@@ -9,6 +9,7 @@ from typing import Iterable, List, Optional
 
 import data_algebra.data_model
 import data_algebra.util
+import data_algebra.data_ops
 
 
 def _str_list_to_html(lst: Iterable[str]) -> str:
@@ -425,6 +426,10 @@ class RecordMap:
                 blocks_out=self.blocks_out,
             )
         return X
+    
+    def act_on(self, X):
+        assert isinstance(X, data_algebra.data_ops.ViewRepresentation)
+        return X.convert_records(self)
 
     def compose(self, other):
         """
@@ -487,6 +492,40 @@ class RecordMap:
                     ),
                     strict=strict,
                 )
+    
+    def as_pipeline(self, 
+        *, 
+        table_name: Optional[str] = None,
+        local_data_model=None,
+        value_suffix: str = " value",
+        record_key_suffix: str = " record key",
+        ):
+        """
+        Build into processing pipeline.
+
+        :param table_name: name for input table.
+        :param local_data_model: optional Pandas data model.
+        :param value_suffix: suffix to identify values
+        :param record_key_suffix: suffix to identify record keys
+        :return: cdata operator as a pipeline
+        """
+        assert isinstance(value_suffix, str)
+        assert isinstance(record_key_suffix, str)
+        exp_inp = self.example_input(
+            local_data_model=local_data_model, 
+            value_suffix=value_suffix, 
+            record_key_suffix=record_key_suffix)
+        ops = (
+            data_algebra.data_ops.describe_table(
+                exp_inp,
+                table_name=table_name,
+                row_limit=None,
+                keep_sample=True,
+                keep_all=True,
+                )
+                .convert_records(self)
+        )
+        return ops
 
     def inverse(self):
         """
@@ -495,6 +534,12 @@ class RecordMap:
         """
         assert self.strict
         return RecordMap(blocks_in=self.blocks_out, blocks_out=self.blocks_in, strict=True)
+
+    def __rshift__(self, other):  # override self >> other
+        return self.act_on(other)
+
+    def __rrshift__(self, other):  # override other >> self
+        return self.transform(other)
 
     def fmt(self) -> str:
         """Format for informal presentation."""

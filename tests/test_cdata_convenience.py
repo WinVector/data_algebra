@@ -72,3 +72,31 @@ def test_cdata_convenience_1():
     data_algebra.test_util.check_transform(
         ops=ops1, data={"d": d, "d2": d2}, expect=expect_2
     )
+
+
+def test_cdata_convenience_2():
+    mp = pivot_rowrecs_to_blocks(
+        attribute_key_column="curve",
+        attribute_value_column="effect_size",
+        record_keys=["n"],
+        record_value_columns=["T", "T_E"],
+    )
+    ops = mp.as_pipeline()
+    assert isinstance(ops, ViewRepresentation)
+    ex_inp = mp.example_input()
+    res = ex_inp >> ops
+    pd = data_algebra.data_model.default_data_model().pd
+    expect = pd.DataFrame({
+        "n": ["n record key", "n record key"],
+        "curve": ["T", "T_E"],
+        "effect_size": ["T value", "T_E value"],
+    })
+    assert data_algebra.test_util.equivalent_frames(res, expect)
+    res_2 = ops.ex()
+    assert data_algebra.test_util.equivalent_frames(res_2, expect)
+    res_3 = ex_inp >> mp
+    assert data_algebra.test_util.equivalent_frames(res_3, expect)
+    res_ops = data_algebra.data_ops.descr(ex_inp=ex_inp) >> mp
+    assert isinstance(res_ops, ViewRepresentation)
+    res_5 = res_ops.transform(ex_inp)
+    assert data_algebra.test_util.equivalent_frames(res_5, expect)
