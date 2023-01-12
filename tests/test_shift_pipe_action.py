@@ -4,7 +4,6 @@ import data_algebra.test_util
 from data_algebra.shift_pipe_action import ShiftPipeAction
 from data_algebra.cdata import pivot_rowrecs_to_blocks
 from data_algebra.data_ops import descr, ConvertRecordsNode, ViewRepresentation
-import pytest
 
 
 def test_shift_pipe_action_1():
@@ -16,21 +15,21 @@ def test_shift_pipe_action_1():
             ShiftPipeAction.__init__(self)
             self.nm = nm
         
-        def act_on(self, b):
-            return f"{self}.act_on({b})"
+        def act_on(self, b, *, correct_ordered_first_call: bool = False):
+            return f"{self}.act_on({b}, correct_ordered_first_call={correct_ordered_first_call})"
         
         def __str__(self) -> str:
             return self.nm
 
     a = T1("a")
     b = T1("b")
-    assert (a >> b) == "b.act_on(a)"
-    assert (b >> a) == "a.act_on(b)"
-    assert (7 >> a) == "a.act_on(7)"
-    assert (a >> 7) == "a.act_on(7)"
+    assert (a >> b) == "b.act_on(a, correct_ordered_first_call=True)"
+    assert (b >> a) == "a.act_on(b, correct_ordered_first_call=True)"
+    assert (7 >> a) == "a.act_on(7, correct_ordered_first_call=True)"
+    assert (a >> 7) == "a.act_on(7, correct_ordered_first_call=False)"
 
 
-def test_shift_pipe_action_rm_data():
+def test_shift_pipe_action_mp_ops_data():
     mp = pivot_rowrecs_to_blocks(
         attribute_key_column="curve",
         attribute_value_column="effect_size",

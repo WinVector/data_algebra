@@ -68,8 +68,14 @@ class DataOpArrow(Arrow):
         cp = self.outgoing_columns.copy()
         return cp
 
-    def act_on(self, b):
-        """replace self input table with b"""
+    def act_on(self, b, *, correct_ordered_first_call: bool = False):
+        """
+        Apply self onto b.
+        
+        :param b: item to act on, or item that has been sent to self.
+        :param correct_ordered_first_call: if True indicates this call is from __rshift__ or __rrshift__ and not the fallback paths.
+        """
+        assert isinstance(correct_ordered_first_call, bool)
         if isinstance(b, data_algebra.data_ops.ViewRepresentation):
             b = DataOpArrow(b)
         if isinstance(b, DataOpArrow):
@@ -87,8 +93,8 @@ class DataOpArrow(Arrow):
                 free_table_key=b.free_table_key,
             )
             return res
-        if isinstance(b, ShiftPipeAction):
-            return b.act_on(self)  # fall back
+        if correct_ordered_first_call and isinstance(b, ShiftPipeAction):
+            return b.act_on(self, correct_ordered_first_call=False)  # fall back
         # assume a pandas.DataFrame compatible object
         # noinspection PyUnresolvedReferences
         cols = set(b.columns)

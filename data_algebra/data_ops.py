@@ -412,14 +412,16 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
     
     # composition
 
-    def act_on(self, b):
+    def act_on(self, b, *, correct_ordered_first_call: bool = False):
         """
         apply self to b, must associate with composition
         Operator is strict about column names.
 
         :param b: input data frame
+        :param correct_ordered_first_call: indicate not on fallback path
         :return: transformed or composed result
         """
+        assert isinstance(correct_ordered_first_call, bool)
         tables = self.get_tables()
         if isinstance(b, ViewRepresentation):
             # insert to only table or if more than one, table with matching key
@@ -432,8 +434,8 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             assert set(b.column_names) == set(old.column_names)  # this is defending associativity of composition against table narrowing
             return self.replace_leaves({key: b})
         # see if b is ShiftPipeAction, so it can handle the mapping (using fact data is not a ShiftPipeAction instance)
-        if isinstance(b, ShiftPipeAction):
-            return b.act_on(self)
+        if correct_ordered_first_call and isinstance(b, ShiftPipeAction):
+            return b.act_on(self, correct_ordered_first_call=False)
         # assume a table
         assert len(tables) == 1
         key = list(tables.keys())[0]

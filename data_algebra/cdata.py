@@ -533,13 +533,14 @@ class RecordMap(ShiftPipeAction):
         assert self.strict
         return RecordMap(blocks_in=self.blocks_out, blocks_out=self.blocks_in, strict=True)
     
-    def act_on(self, b):
+    def act_on(self, b, *, correct_ordered_first_call: bool = False):
+        assert isinstance(correct_ordered_first_call, bool)
         if isinstance(b, RecordMap):
             self.compose(b)
         if isinstance(b, data_algebra.data_ops.ViewRepresentation):
             return b.convert_records(self)
-        if isinstance(b, ShiftPipeAction):
-            return b.act_on(self)  # fall back to peer's action
+        if correct_ordered_first_call and isinstance(b, ShiftPipeAction):
+            return b.act_on(self, correct_ordered_first_call=False)  # fall back to peer's action
         # assume table like
         return self.transform(b)
 
