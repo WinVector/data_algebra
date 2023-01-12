@@ -24,6 +24,7 @@ from data_algebra.OrderedSet import (
     ordered_union,
 )
 import data_algebra.util
+from data_algebra.shift_pipe_action import ShiftPipeAction
 
 
 _have_black = False
@@ -411,36 +412,36 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
     
     # composition
 
-    # noinspection PyPep8Naming
-    def act_on(self, X, *, data_model=None):
+    def act_on(self, b):
         """
-        apply self to X, must associate with composition
+        apply self to b, must associate with composition
         Operator is strict about column names.
 
-        :param X: input data frame
-        :param data_model implementation to use
-        :return: transformed result
+        :param b: input data frame
+        :return: transformed or composed result
         """
         tables = self.get_tables()
-        if isinstance(X, ViewRepresentation):
+        if isinstance(b, ViewRepresentation):
             # insert to only table or if more than one, table with matching key
             if len(tables) == 1:
                 key = list(tables.keys())[0]
             else:
-                key = X.key
+                key = b.key
             assert isinstance(key, str)
             old = tables[key]
-            assert set(X.column_names) == set(old.column_names)  # this is defending associativity of composition against table narrowing
-            return self.replace_leaves({key: X})
+            assert set(b.column_names) == set(old.column_names)  # this is defending associativity of composition against table narrowing
+            return self.replace_leaves({key: b})
+        # see if b is ShiftPipeAction, so it can handle the mapping (using fact data is not a ShiftPipeAction instance)
+        if isinstance(b, ShiftPipeAction):
+            return b.act_on(self)
         # assume a table
         assert len(tables) == 1
         key = list(tables.keys())[0]
         assert isinstance(key, str)
         old = tables[key]
-        assert set(X.columns) == set(old.column_names)
+        assert set(b.columns) == set(old.column_names)
         return self.transform(
-            X=X,
-            data_model=data_model,
+            b,
             strict=True,
         )
 

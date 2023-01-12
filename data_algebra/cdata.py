@@ -10,6 +10,7 @@ from typing import Iterable, List, Optional
 import data_algebra.data_model
 import data_algebra.util
 import data_algebra.data_ops
+from data_algebra.shift_pipe_action import ShiftPipeAction
 
 
 def _str_list_to_html(lst: Iterable[str]) -> str:
@@ -257,7 +258,7 @@ class RecordSpecification:
         return RecordMap(blocks_out=self, strict=self.strict)
 
 
-class RecordMap:
+class RecordMap(ShiftPipeAction):
     """
     Class for specifying general record to record transforms.
     """
@@ -280,6 +281,7 @@ class RecordMap:
         :param blocks_out: outgoing record specification, None for row-records.
         :param strict: if True insist block be strict, and in and out blocks agree on row-form columns.∂
         """
+        ShiftPipeAction.__init__(self)
         assert isinstance(strict, bool)
         self.strict = strict
         if blocks_in is not None:
@@ -426,10 +428,6 @@ class RecordMap:
                 blocks_out=self.blocks_out,
             )
         return X
-    
-    def act_on(self, X):
-        assert isinstance(X, data_algebra.data_ops.ViewRepresentation)
-        return X.convert_records(self)
 
     def compose(self, other):
         """
@@ -534,12 +532,16 @@ class RecordMap:
         """
         assert self.strict
         return RecordMap(blocks_in=self.blocks_out, blocks_out=self.blocks_in, strict=True)
-
-    def __rshift__(self, other):  # override self >> other
-        return self.act_on(other)
-
-    def __rrshift__(self, other):  # override other >> self
-        return self.transform(other)
+    
+    def act_on(self, b):
+        if isinstance(b, RecordMap):
+            self.compose(b)
+        if isinstance(b, data_algebra.data_ops.ViewRepresentation):
+            return b.convert_records(self)
+        if isinstance(b, ShiftPipeAction):
+            return b.act_on(self)  # fall back to peer's action
+        # assume table like
+        return self.transform(b)
 
     def fmt(self) -> str:
         """Format for informal presentation."""

@@ -8,6 +8,7 @@ from typing import Any, Dict, Iterable, List, Optional, Set, NamedTuple
 import data_algebra.expr_rep
 import data_algebra.cdata
 import data_algebra.OrderedSet
+from data_algebra.shift_pipe_action import ShiftPipeAction
 
 
 class MethodUse(NamedTuple):
@@ -19,12 +20,13 @@ class MethodUse(NamedTuple):
     is_ordered: bool = False
 
 
-class OperatorPlatform(abc.ABC):
+class OperatorPlatform(ShiftPipeAction):
     """Abstract class representing ability to apply data_algebra operations."""
 
     node_name: str
 
     def __init__(self, *, node_name: str):
+        ShiftPipeAction.__init__(self)
         assert isinstance(node_name, str)
         self.node_name = node_name
 
@@ -72,24 +74,6 @@ class OperatorPlatform(abc.ABC):
         :param replacement_map, table/sqlkeys mapped to replacement Operator platforms
         :return: new operator DAG
         """
-
-    # noinspection PyPep8Naming
-    @abc.abstractmethod
-    def act_on(self, X, *, data_model=None):
-        """
-        apply self to X, must associate with composition
-        Operator is strict about column names.
-
-        :param X: input data frame
-        :param data_model implementation to use
-        :return: transformed result
-        """
-
-    def __rshift__(self, other):  # override self >> other
-        return other.act_on(self)
-
-    def __rrshift__(self, other):  # override other >> self
-        return self.act_on(other)
 
     # imitate a method
     def use(self, user_function, *args, **kwargs):

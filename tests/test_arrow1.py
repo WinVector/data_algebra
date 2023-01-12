@@ -48,7 +48,7 @@ def test_arrow1():
     assert data_algebra.test_util.equivalent_frames(d >> a1, d >> li >> a1)
     assert data_algebra.test_util.equivalent_frames(d >> a1, d >> a1 >> ri)
     a1.dom() >> a1
-    a1.apply_to(a1.dom())
+    a1.act_on(a1.dom())
 
     cols2_too_small = [c for c in (set(id_ops_b.column_names) - set(["i"]))]
     ordered_ops = TableDescription(
@@ -104,7 +104,7 @@ def test_arrow1():
     a3 = data_algebra.arrow.DataOpArrow(unordered_ops)
     # print(a3)
 
-    f0 = (a3.apply_to(a2.apply_to(a1))).pipeline.__repr__()
+    f0 = (a3.act_on(a2.act_on(a1))).pipeline.__repr__()
     f1 = (a1 >> a2 >> a3).pipeline.__repr__()
 
     assert f1 == f0
@@ -140,7 +140,7 @@ def test_arrow1():
     assert data_algebra.test_util.equivalent_frames(d >> a1, d >> li >> a1)
     assert data_algebra.test_util.equivalent_frames(d >> a1, d >> a1 >> ri)
     a1.dom() >> a1
-    a1.apply_to(a1.dom())
+    a1.act_on(a1.dom())
 
 
 def test_arrow_cod_dom():
