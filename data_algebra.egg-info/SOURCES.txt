@@ -31,6 +31,7 @@ data_algebra/pandas_model.py
 data_algebra/parse_by_lark.py
 data_algebra/polars_model.py
 data_algebra/python3_lark.py
+data_algebra/shift_pipe_action.py
 data_algebra/solutions.py
 data_algebra/sql_format_options.py
 data_algebra/test_util.py

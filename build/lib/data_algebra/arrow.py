@@ -2,9 +2,10 @@ import abc
 
 import data_algebra.data_ops
 import data_algebra.flow_text
+from data_algebra.shift_pipe_action import ShiftPipeAction
 
 
-class Arrow(abc.ABC):
+class Arrow(ShiftPipeAction):
     """
     Arrow from category theory: see Steve Awody,
     "Category Theory, 2nd Edition", Oxford Univ. Press, 2010 pg. 4.
@@ -13,7 +14,7 @@ class Arrow(abc.ABC):
     """
 
     def __init__(self):
-        pass
+        ShiftPipeAction.__init__(self)
 
     @abc.abstractmethod
     def dom(self):
@@ -23,27 +24,15 @@ class Arrow(abc.ABC):
     def cod(self):
         """return co-domain, object at head of arrow"""
 
-    @abc.abstractmethod
-    def apply_to(self, b):
-        """apply_to b, compose arrows (right to left)"""
-
     # noinspection PyPep8Naming
     @abc.abstractmethod
-    def act_on(self, X):
-        """act on X, must associate with composition"""
+    def act_on(self, b):
+        """act on b, must associate with composition"""
 
     # noinspection PyPep8Naming
     def transform(self, X):
         """transform X, may or may not associate with composition"""
         return self.act_on(X)
-
-    def __rshift__(self, other):  # override self >> other
-        return other.apply_to(self)
-
-    def __rrshift__(self, other):  # override other >> self
-        if isinstance(other, Arrow):
-            return self.apply_to(other)
-        return self.act_on(other)
 
 
 class DataOpArrow(Arrow):
@@ -79,39 +68,44 @@ class DataOpArrow(Arrow):
         cp = self.outgoing_columns.copy()
         return cp
 
-    def apply_to(self, b):
-        """replace self input table with b"""
+    def act_on(self, b, *, correct_ordered_first_call: bool = False):
+        """
+        Apply self onto b.
+        
+        :param b: item to act on, or item that has been sent to self.
+        :param correct_ordered_first_call: if True indicates this call is from __rshift__ or __rrshift__ and not the fallback paths.
+        """
+        assert isinstance(correct_ordered_first_call, bool)
         if isinstance(b, data_algebra.data_ops.ViewRepresentation):
             b = DataOpArrow(b)
-        assert isinstance(b, DataOpArrow)
-        # check categorical arrow composition conditions
-        missing = set(self.incoming_columns) - set(b.outgoing_columns)
-        if len(missing) > 0:
-            raise ValueError("missing required columns: " + str(missing))
-        excess = set(b.outgoing_columns) - set(self.incoming_columns)
-        if len(excess) > 0:
-            raise ValueError("extra incoming columns: " + str(excess))
-        new_pipeline = self.pipeline.replace_leaves({self.free_table_key: b.pipeline})
-        new_pipeline.get_tables()  # check tables are compatible
-        res = DataOpArrow(
-            pipeline=new_pipeline,
-            free_table_key=b.free_table_key,
-        )
-        return res
-
-    # noinspection PyPep8Naming
-    def act_on(self, X):
+        if isinstance(b, DataOpArrow):
+            # check categorical arrow composition conditions
+            missing = set(self.incoming_columns) - set(b.outgoing_columns)
+            if len(missing) > 0:
+                raise ValueError("missing required columns: " + str(missing))
+            excess = set(b.outgoing_columns) - set(self.incoming_columns)
+            if len(excess) > 0:
+                raise ValueError("extra incoming columns: " + str(excess))
+            new_pipeline = self.pipeline.replace_leaves({self.free_table_key: b.pipeline})
+            new_pipeline.get_tables()  # check tables are compatible
+            res = DataOpArrow(
+                pipeline=new_pipeline,
+                free_table_key=b.free_table_key,
+            )
+            return res
+        if correct_ordered_first_call and isinstance(b, ShiftPipeAction):
+            return b.act_on(self, correct_ordered_first_call=False)  # fall back
         # assume a pandas.DataFrame compatible object
         # noinspection PyUnresolvedReferences
-        cols = set(X.columns)
+        cols = set(b.columns)
         missing = set(self.incoming_columns) - cols
         if len(missing) > 0:
             raise ValueError("missing required columns: " + str(missing))
         excess = cols - set(self.incoming_columns)
         assert len(excess) == 0
         if len(excess) > 0:
-            X = X[self.incoming_columns]
-        return self.pipeline.act_on(X)
+            b = b[self.incoming_columns]
+        return self.pipeline.act_on(b)
 
     def dom(self):
         return DataOpArrow(
