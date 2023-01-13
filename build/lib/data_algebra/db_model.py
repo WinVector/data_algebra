@@ -1931,9 +1931,12 @@ class DBModel:
         """
         Convert row recs to blocks transformation into structures to help with SQL conversion.
         """
+        ct = record_spec.control_table
+        dm = data_algebra.data_model.lookup_data_model_for_dataframe(ct)
+        ct = dm.to_pandas(ct)
         control_value_cols = [
             c
-            for c in record_spec.control_table.columns
+            for c in ct.columns
             if c not in record_spec.control_table_keys
         ]
         control_cols = [
@@ -1960,7 +1963,7 @@ class DBModel:
                 continue
             seen.add(result_col)
             cstmt = " CASE "
-            col = record_spec.control_table[result_col]
+            col = ct[result_col]
             isnull = col.isnull()
             for i in range(len(col)):
                 if not (isnull[i]):
@@ -1979,7 +1982,7 @@ class DBModel:
                     cstmt = cstmt + col_sql
             cstmt = cstmt + " ELSE NULL END AS " + self.quote_identifier(result_col)
             col_stmts.append(cstmt)
-        ctab_sql = self.table_values_to_sql_str_list(record_spec.control_table)
+        ctab_sql = self.table_values_to_sql_str_list(ct)
         sql_prefix = _list_join_expecting_list(",", col_stmts) + [
             "FROM ( SELECT * FROM "
         ]
@@ -2000,17 +2003,20 @@ class DBModel:
         """
         Convert blocks to row recs transform into structures to help with SQL translation.
         """
-        assert record_spec.control_table.shape[0] >= 1
+        ct = record_spec.control_table
+        dm = data_algebra.data_model.lookup_data_model_for_dataframe(ct)
+        ct = dm.to_pandas(ct)
+        assert ct.shape[0] >= 1
         col_stmts = []
         for c in record_spec.record_keys:
             col_stmts.append(
                 " " + self.quote_identifier(c) + " AS " + self.quote_identifier(c)
             )
-        if record_spec.control_table.shape[0] == 1:
+        if ct.shape[0] == 1:
             # special case with one row control table (rowrec)
-            for cc in record_spec.control_table.columns:
+            for cc in ct.columns:
                 if cc not in record_spec.control_table_keys:
-                    cc0 = record_spec.control_table[cc][0]
+                    cc0 = ct[cc][0]
                     col_stmts.append(
                         " "
                         + self.quote_identifier(cc)
@@ -2024,14 +2030,14 @@ class DBModel:
             return sql_prefix, sql_suffix
         control_value_cols = [
             c
-            for c in record_spec.control_table.columns
+            for c in ct.columns
             if c not in record_spec.control_table_keys
         ]
         control_cols = [self.quote_identifier(c) for c in record_spec.record_keys]
         seen = set()
-        for i in range(record_spec.control_table.shape[0]):
+        for i in range(ct.shape[0]):
             for vc in control_value_cols:
-                col = record_spec.control_table[vc]
+                col = ct[vc]
                 isnull = col.isnull()
                 if col[i] not in seen and not isnull[i]:
                     seen.add(col[i])
@@ -2043,7 +2049,7 @@ class DBModel:
                             + " AS "
                             + self.string_type
                             + ") = "
-                            + self.quote_string(str(record_spec.control_table[cc][i]))
+                            + self.quote_string(str(ct[cc][i]))
                             + " ) "
                         )
                     cstmt = (

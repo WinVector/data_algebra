@@ -27,6 +27,8 @@ def test_shift_pipe_action_1():
     assert (b >> a) == "a.act_on(b, correct_ordered_first_call=True)"
     assert (7 >> a) == "a.act_on(7, correct_ordered_first_call=True)"
     assert (a >> 7) == "a.act_on(7, correct_ordered_first_call=False)"
+    assert a(7) == "a.act_on(7, correct_ordered_first_call=True)"
+    assert a(b) == "a.act_on(b, correct_ordered_first_call=True)"
 
 
 def test_shift_pipe_action_mp_ops_data():

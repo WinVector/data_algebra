@@ -2837,7 +2837,7 @@ class ConvertRecordsNode(ViewRepresentation):
             view_name = "convert_records_blocks_out_" + str(temp_id_source[0])
             temp_id_source[0] = temp_id_source[0] + 1
             pi, si = db_model.row_recs_to_blocks_query_str_list_pair(
-                record_spec=self.record_map.blocks_out,
+                record_spec=self.record_map.blocks_out
             )
             near_sql = data_algebra.near_sql.NearSQLRawQStep(
                 prefix=pi,

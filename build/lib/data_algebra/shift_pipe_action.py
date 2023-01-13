@@ -36,3 +36,6 @@ class ShiftPipeAction(abc.ABC):
         This is read as sending b to self.
         """
         return self.act_on(b, correct_ordered_first_call=True)
+
+    def __call__(self, b):
+        return self.act_on(b, correct_ordered_first_call=True)
