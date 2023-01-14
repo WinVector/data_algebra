@@ -1240,7 +1240,7 @@ class ColumnReference(Term):
 
 
 def col(nm: str):
-    """represent a column or value"""
+    """represent a column reference"""
     assert isinstance(nm, str)
     return ColumnReference(column_name=nm)
 
@@ -1461,3 +1461,19 @@ def implies_windowed(parsed_exprs: dict) -> bool:
             if opk.op in data_algebra.expr_rep.fn_names_that_imply_windowed_situation:
                 return True
     return False
+
+
+# predefine one as constant
+one = lit(1)
+
+
+class ColumnNamer:
+    """class to generate column names using dot/attribute notation"""
+    def __init__(self) -> None:
+        pass
+
+    def __getattr__(self, key):
+        assert isinstance(key, str)
+        return col(key)
+
+d_ = ColumnNamer()
