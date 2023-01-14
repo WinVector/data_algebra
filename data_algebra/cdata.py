@@ -536,7 +536,7 @@ class RecordMap(ShiftPipeAction):
     def act_on(self, b, *, correct_ordered_first_call: bool = False):
         assert isinstance(correct_ordered_first_call, bool)
         if isinstance(b, RecordMap):
-            self.compose(b)
+            return self.compose(b)
         if isinstance(b, data_algebra.data_ops.ViewRepresentation):
             return b.convert_records(self)
         if correct_ordered_first_call and isinstance(b, ShiftPipeAction):
