@@ -19,6 +19,7 @@ import data_algebra.data_ops
 from data_algebra.OrderedSet import OrderedSet
 import data_algebra.op_catalog
 from data_algebra.sql_format_options import SQLFormatOptions
+from data_algebra.shift_pipe_action import ShiftPipeAction
 
 # The db_model can be a bit tricky as SQL is represented a few ways depending
 # on how close to a final result we are.
@@ -753,7 +754,7 @@ def _annotated_method_catalogue(
     return known_method_uses, recommended_method_uses
 
 
-class DBModel:
+class DBModel(ShiftPipeAction):
     """A model of how SQL should be generated for a given database."""
 
     identifier_quote: str
@@ -792,6 +793,7 @@ class DBModel:
         union_all_term_start: str = "(",
         union_all_term_end: str = ")",
     ):
+        ShiftPipeAction.__init__(self)
         self.local_data_model = data_algebra.data_model.default_data_model()
         if sql_formatters is None:
             sql_formatters = {}
@@ -1841,7 +1843,6 @@ class DBModel:
         :param sql_format_options: sql formatting options
         :return: sql string
         """
-        assert isinstance(self, DBModel)
         assert isinstance(ops, data_algebra.data_ops.ViewRepresentation)
         if sql_format_options is None:
             sql_format_options = self.default_SQL_format_options
@@ -1924,6 +1925,13 @@ class DBModel:
         sql_str_list = [v.rstrip() for v in sql_str_list]
         sql_str_list = [v for v in sql_str_list if len(v) > 0]
         return "\n".join(sql_str_list) + "\n"
+    
+    def act_on(self, b, *, correct_ordered_first_call: bool = False):
+        if isinstance(b, data_algebra.data_ops.ViewRepresentation):
+            return self.to_sql(b)
+        if correct_ordered_first_call and isinstance(b, ShiftPipeAction):
+            return b.act_on(self, correct_ordered_first_call=False)  # fall back
+        raise TypeError(f"inappropriate type to DBModel.act_on(): {type(b)}")
 
     def row_recs_to_blocks_query_str_list_pair(
         self, record_spec
@@ -2315,18 +2323,21 @@ class DBModel:
         return self.__str__()
 
 
-class DBHandle:
+class DBHandle(ShiftPipeAction):
     """
     Container for database connection handles.
     """
 
     def __init__(self, *, db_model: DBModel, conn, db_engine=None):
         """
+        Represent a db connection.
 
         :param db_model: associated database model
         :param conn: database connection
         :param db_engine: optional sqlalchemy style engine (for closing)
         """
+        # TODO: user controllable data model?
+        ShiftPipeAction.__init__(self)
         assert isinstance(db_model, DBModel)
         self.db_model = db_model
         self.db_engine = db_engine
@@ -2343,6 +2354,15 @@ class DBHandle:
         Return results of query as a Pandas data frame.
         """
         return self.db_model.read_query(conn=self.conn, q=q)
+
+    def act_on(self, b, *, correct_ordered_first_call: bool = False):
+        if isinstance(b, data_algebra.data_ops.ViewRepresentation):
+            return self.read_query(b)
+        if isinstance(b, str):
+            return self.read_query(b)
+        if correct_ordered_first_call and isinstance(b, ShiftPipeAction):
+            return b.act_on(self, correct_ordered_first_call=False)  # fall back
+        raise TypeError(f"inappropriate type to DBHandle.act_on(): {type(b)}")
     
     def read_table(self, table_name:str):
         """

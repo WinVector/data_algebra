@@ -14,15 +14,16 @@ class ShiftPipeAction(abc.ABC):
     def act_on(self, b, *, correct_ordered_first_call: bool = False):
         """
         Apply self onto b.
+        This is read as "self acting on b."
         
         :param b: item to act on, or item that has been sent to self.
-        :param correct_ordered_first_call: if True indicates this call is from __rshift__ or __rrshift__ and not the fallback paths.
+        :param correct_ordered_first_call: if True indicates this is from not the fallback paths.
         """
 
     def __rshift__(self, b):  # override self >> b
         """
-        Delegate self >> b to b.act_on(self) b is a ShiftPipeAction instance, else call self.act_on(b)
-        This is read as "sending self to b".
+        Implement self >> b to b.act_on(self) if b is a ShiftPipeAction instance, else call self.act_on(b) as a fall-back.
+        This is read as "b acting on self."
         """
         if isinstance(b, ShiftPipeAction):
             # this is the expected path
@@ -32,13 +33,14 @@ class ShiftPipeAction(abc.ABC):
 
     def __rrshift__(self, b):  # override b >> self
         """
-        Delegate b >> self to self.act_on(b).
-        This is read as sending b to self.
+        Implement b >> self to self.act_on(b).
+        This is read as "self acting on b."
         """
         return self.act_on(b, correct_ordered_first_call=True)
 
     def __call__(self, b):
         """
-        Treat as b >> self, or self.act_on(b).
+        Implement self(b) as self.act_on(b).
+        This is read as "self acting on b."
         """
         return self.act_on(b, correct_ordered_first_call=True)
