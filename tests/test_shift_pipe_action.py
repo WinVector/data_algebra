@@ -3,7 +3,9 @@ import data_algebra.data_model
 import data_algebra.test_util
 from data_algebra.shift_pipe_action import ShiftPipeAction
 from data_algebra.cdata import pivot_rowrecs_to_blocks
-from data_algebra.data_ops import descr, ConvertRecordsNode, ViewRepresentation
+from data_algebra import descr, d_, lit
+from data_algebra.data_ops import ConvertRecordsNode, ViewRepresentation
+import data_algebra.SQLite
 
 
 def test_shift_pipe_action_1():
@@ -81,4 +83,29 @@ def test_shift_pipe_action_mp_ops_data():
     assert isinstance(res_c1, ViewRepresentation)
     pref = descr(ex_inp=ex_inp).convert_records(mp).extend({"z": 1})
     assert pref == res_c1
-    
+
+
+def test_shift_pipe_action_db_etc():
+    pd = data_algebra.data_model.default_data_model().pd
+    mp = pivot_rowrecs_to_blocks(
+        attribute_key_column="curve",
+        attribute_value_column="effect_size",
+        record_keys=["n"],
+        record_value_columns=["T", "T_E"],
+    )
+    ex_inp = mp.example_input()
+    ops = mp.as_pipeline(table_name="ex_inp")
+    assert isinstance(ops, ViewRepresentation)
+    with data_algebra.SQLite.example_handle() as db_handle:
+        db_handle.insert_table(ex_inp, table_name="ex_inp")
+        res_db = ops >> db_handle
+        sql = ops >> db_handle.db_model
+        res_db_s = sql >> db_handle
+    expect = pd.DataFrame({
+        "n": ["n record key", "n record key"],
+        "curve": ["T", "T_E"],
+        "effect_size": ["T value", "T_E value"],
+    })
+    assert data_algebra.test_util.equivalent_frames(res_db, expect)
+    assert isinstance(sql, str)
+    assert data_algebra.test_util.equivalent_frames(res_db_s, expect)
