@@ -3,15 +3,14 @@ import abc
 from typing import Optional, Set
 import data_algebra.data_model
 import data_algebra.data_ops
-from data_algebra.shift_pipe_action import ShiftPipeAction
 
 
-class DataSpace(ShiftPipeAction):
+class DataSpace(abc.ABC):
     """
     Class modeling a space of data keyed by strings, with specified semantics.
     """
     def __init__(self) -> None:
-        ShiftPipeAction.__init__(self)
+        pass
 
     @abc.abstractmethod
     def insert(self, *, key: Optional[str] = None, value, allow_overwrite: bool = True) -> data_algebra.data_ops.TableDescription:
@@ -63,13 +62,6 @@ class DataSpace(ShiftPipeAction):
         :param allow_overwrite: if True allow table replacement
         :return: data key
         """
-    
-    def act_on(self, b, *, correct_ordered_first_call: bool = False):
-        if isinstance(b, data_algebra.data_ops.ViewRepresentation):
-            return self.execute(b)
-        if correct_ordered_first_call and isinstance(b, ShiftPipeAction):
-            return b.act_on(self, correct_ordered_first_call=False)  # fall back
-        raise TypeError(f"inappropriate type to DataSpace.act_on(): {type(b)}")
 
     @abc.abstractmethod
     def describe(self, key: str) -> data_algebra.data_ops.TableDescription:
