@@ -38,4 +38,7 @@ class ShiftPipeAction(abc.ABC):
         return self.act_on(b, correct_ordered_first_call=True)
 
     def __call__(self, b):
+        """
+        Treat as b >> self, or self.act_on(b).
+        """
         return self.act_on(b, correct_ordered_first_call=True)
