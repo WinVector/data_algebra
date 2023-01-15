@@ -30,10 +30,10 @@ except ModuleNotFoundError:
 
 
 # controls
-test_PostgreSQL = False  # causes an external dependency
-test_BigQuery = False  # causes an external dependency
-test_MySQL = False  # causes an external dependency
-test_Spark = False  # causes an external dependency
+test_PostgreSQL = True  # causes an external dependency
+test_BigQuery = True  # causes an external dependency
+test_MySQL = True  # causes an external dependency
+test_Spark = True  # causes an external dependency
 
 run_direct_ops_path_tests = False
 

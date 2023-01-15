@@ -131,15 +131,206 @@ tests/test_window_fns.py .....                                           [ 98%]
 tests/test_with.py ..                                                    [ 99%]
 tests/test_xicor.py ..                                                   [100%]
 
+=============================== warnings summary ===============================
+tests/test_agg.py: 18 warnings
+tests/test_any_project.py: 48 warnings
+tests/test_arith.py: 18 warnings
+tests/test_bitemporal_obs_agg_join.py: 38 warnings
+tests/test_cdata1.py: 16 warnings
+tests/test_cdata_convenience.py: 34 warnings
+tests/test_cdata_example.py: 22 warnings
+tests/test_cdata_tr6_example.py: 86 warnings
+tests/test_cdata_wvpy_case.py: 72 warnings
+tests/test_coalesce.py: 22 warnings
+tests/test_compare_data_frames.py: 32 warnings
+tests/test_complex_expr.py: 108 warnings
+tests/test_compound_where.py: 22 warnings
+tests/test_concat_rows.py: 82 warnings
+tests/test_cross_product_join.py: 24 warnings
+tests/test_dag_elim.py: 288 warnings
+tests/test_db_handle.py: 24 warnings
+tests/test_drop_columns.py: 18 warnings
+tests/test_exp.py: 20 warnings
+tests/test_expand_rows.py: 36 warnings
+tests/test_expression_expectations.py: 188 warnings
+tests/test_extend.py: 16 warnings
+tests/test_forbidden_calculation.py: 52 warnings
+tests/test_ghost_col_issue.py: 26 warnings
+tests/test_idioms.py: 294 warnings
+tests/test_if_else.py: 104 warnings
+tests/test_incomplete_agg.py: 22 warnings
+tests/test_join_check.py: 28 warnings
+tests/test_join_conditions.py: 28 warnings
+tests/test_join_effects.py: 30 warnings
+tests/test_join_multi_key.py: 32 warnings
+tests/test_join_opt.py: 80 warnings
+tests/test_join_variations.py: 64 warnings
+tests/test_logistic_example.py: 32 warnings
+tests/test_mapv.py: 16 warnings
+tests/test_math.py: 20 warnings
+tests/test_minimum.py: 26 warnings
+tests/test_mod_fns.py: 22 warnings
+tests/test_multi_map.py: 40 warnings
+tests/test_natural_join.py: 30 warnings
+tests/test_neg.py: 20 warnings
+tests/test_null_bad.py: 16 warnings
+tests/test_one_row_cdata_convert.py: 38 warnings
+tests/test_or.py: 80 warnings
+tests/test_order_limit.py: 18 warnings
+tests/test_parens.py: 32 warnings
+tests/test_project.py: 76 warnings
+tests/test_rank_to_average.py: 26 warnings
+tests/test_readme_example.py: 32 warnings
+tests/test_rename.py: 112 warnings
+tests/test_round.py: 48 warnings
+tests/test_scoring_example.py: 32 warnings
+tests/test_select.py: 18 warnings
+tests/test_select_values.py: 2 warnings
+tests/test_shift.py: 18 warnings
+tests/test_sign_parse.py: 36 warnings
+tests/test_simple.py: 18 warnings
+tests/test_simple_expr.py: 16 warnings
+tests/test_spark_sql.py: 10 warnings
+tests/test_sql_extend_shortening.py: 42 warnings
+tests/test_sqlite_joins.py: 176 warnings
+tests/test_std_var.py: 18 warnings
+tests/test_str_extend_str_const.py: 64 warnings
+tests/test_strat_example.py: 56 warnings
+tests/test_sum_cumsum.py: 18 warnings
+tests/test_sum_one.py: 18 warnings
+tests/test_t_test_example.py: 56 warnings
+tests/test_transform_examples.py: 208 warnings
+tests/test_types.py: 26 warnings
+tests/test_uniform.py: 34 warnings
+tests/test_use.py: 36 warnings
+tests/test_value_behaves_like_column.py: 56 warnings
+tests/test_var.py: 18 warnings
+tests/test_window2.py: 38 warnings
+tests/test_window_fns.py: 40 warnings
+tests/test_with.py: 60 warnings
+tests/test_xicor.py: 36 warnings
+  /Users/johnmount/opt/anaconda3/envs/data_algebra_dev_env/lib/python3.10/site-packages/pyspark/sql/pandas/utils.py:35: DeprecationWarning: distutils Version classes are deprecated. Use packaging.version instead.
+    if LooseVersion(pandas.__version__) < LooseVersion(minimum_pandas_version):
+
+tests/test_agg.py: 1 warning
+tests/test_any_project.py: 2 warnings
+tests/test_arith.py: 1 warning
+tests/test_bitemporal_obs_agg_join.py: 2 warnings
+tests/test_cdata1.py: 1 warning
+tests/test_cdata_convenience.py: 2 warnings
+tests/test_cdata_example.py: 1 warning
+tests/test_cdata_tr6_example.py: 4 warnings
+tests/test_cdata_wvpy_case.py: 2 warnings
+tests/test_coalesce.py: 1 warning
+tests/test_compare_data_frames.py: 2 warnings
+tests/test_complex_expr.py: 4 warnings
+tests/test_compound_where.py: 1 warning
+tests/test_concat_rows.py: 5 warnings
+tests/test_cross_product_join.py: 2 warnings
+tests/test_dag_elim.py: 12 warnings
+tests/test_db_handle.py: 2 warnings
+tests/test_drop_columns.py: 1 warning
+tests/test_exp.py: 1 warning
+tests/test_expand_rows.py: 2 warnings
+tests/test_expression_expectations.py: 1 warning
+tests/test_extend.py: 1 warning
+tests/test_forbidden_calculation.py: 3 warnings
+tests/test_ghost_col_issue.py: 1 warning
+tests/test_idioms.py: 14 warnings
+tests/test_if_else.py: 5 warnings
+tests/test_incomplete_agg.py: 1 warning
+tests/test_join_check.py: 2 warnings
+tests/test_join_conditions.py: 2 warnings
+tests/test_join_effects.py: 2 warnings
+tests/test_join_multi_key.py: 2 warnings
+tests/test_join_opt.py: 4 warnings
+tests/test_join_variations.py: 4 warnings
+tests/test_logistic_example.py: 1 warning
+tests/test_mapv.py: 1 warning
+tests/test_math.py: 1 warning
+tests/test_minimum.py: 1 warning
+tests/test_mod_fns.py: 1 warning
+tests/test_multi_map.py: 2 warnings
+tests/test_natural_join.py: 2 warnings
+tests/test_neg.py: 1 warning
+tests/test_null_bad.py: 1 warning
+tests/test_one_row_cdata_convert.py: 2 warnings
+tests/test_or.py: 4 warnings
+tests/test_order_limit.py: 1 warning
+tests/test_parens.py: 2 warnings
+tests/test_project.py: 3 warnings
+tests/test_rank_to_average.py: 1 warning
+tests/test_readme_example.py: 1 warning
+tests/test_rename.py: 6 warnings
+tests/test_round.py: 3 warnings
+tests/test_scoring_example.py: 1 warning
+tests/test_select.py: 1 warning
+tests/test_shift.py: 1 warning
+tests/test_sign_parse.py: 2 warnings
+tests/test_simple.py: 1 warning
+tests/test_simple_expr.py: 1 warning
+tests/test_spark_sql.py: 1 warning
+tests/test_sql_extend_shortening.py: 2 warnings
+tests/test_sqlite_joins.py: 10 warnings
+tests/test_std_var.py: 1 warning
+tests/test_str_extend_str_const.py: 4 warnings
+tests/test_strat_example.py: 2 warnings
+tests/test_sum_cumsum.py: 1 warning
+tests/test_sum_one.py: 1 warning
+tests/test_t_test_example.py: 2 warnings
+tests/test_transform_examples.py: 12 warnings
+tests/test_types.py: 1 warning
+tests/test_uniform.py: 2 warnings
+tests/test_use.py: 2 warnings
+tests/test_value_behaves_like_column.py: 3 warnings
+tests/test_var.py: 1 warning
+tests/test_window2.py: 2 warnings
+tests/test_window_fns.py: 2 warnings
+tests/test_with.py: 3 warnings
+tests/test_xicor.py: 2 warnings
+  /Users/johnmount/opt/anaconda3/envs/data_algebra_dev_env/lib/python3.10/site-packages/pyspark/sql/pandas/conversion.py:371: FutureWarning: iteritems is deprecated and will be removed in a future version. Use .items instead.
+    for column, series in pdf.iteritems():
+
+tests/test_any_project.py: 40 warnings
+tests/test_arith.py: 4 warnings
+tests/test_complex_expr.py: 58 warnings
+tests/test_expression_expectations.py: 19 warnings
+tests/test_if_else.py: 28 warnings
+tests/test_mod_fns.py: 12 warnings
+tests/test_or.py: 12 warnings
+tests/test_parens.py: 4 warnings
+tests/test_sign_parse.py: 6 warnings
+  /Users/johnmount/opt/anaconda3/envs/data_algebra_dev_env/lib/python3.10/site-packages/pyspark/sql/pandas/conversion.py:238: DeprecationWarning: `np.bool` is a deprecated alias for the builtin `bool`. To silence this warning, use `bool` by itself. Doing this will not modify any behavior and is safe. If you specifically wanted the numpy scalar type, use `np.bool_` here.
+  Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations
+    return np.bool
+
+tests/test_expression_expectations.py::test_expression_expectations_direct
+tests/test_expression_expectations.py::test_expression_expectations_direct
+tests/test_expression_expectations.py::test_expression_expectations_direct
+tests/test_expression_expectations.py::test_expression_expectations_direct
+  /Users/johnmount/opt/anaconda3/envs/data_algebra_dev_env/lib/python3.10/site-packages/pyspark/sql/pandas/conversion.py:194: FutureWarning: Passing unit-less datetime64 dtype to .astype is deprecated and will raise in a future version. Pass 'datetime64[ns]' instead
+    series = series.astype(t, copy=False)
+
+tests/test_if_else.py::test_if_else_where
+tests/test_if_else.py::test_if_else_where
+tests/test_if_else.py::test_if_else_where
+tests/test_if_else.py::test_if_else_where
+tests/test_if_else.py::test_if_else_where
+  /Users/johnmount/opt/anaconda3/envs/data_algebra_dev_env/lib/python3.10/site-packages/pyspark/sql/pandas/conversion.py:181: DeprecationWarning: `np.object` is a deprecated alias for the builtin `object`. To silence this warning, use `object` by itself. Doing this will not modify any behavior and is safe. 
+  Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations
+    dtype[fieldIdx] = np.object
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+
 ---------- coverage: platform darwin, python 3.10.8-final-0 ----------
 Name                                   Stmts   Miss  Cover   Missing
 --------------------------------------------------------------------
-data_algebra/BigQuery.py                 126     67    47%   22-23, 27, 131-135, 139, 153-160, 169-178, 183-201, 215-244, 248-261, 272-287
-data_algebra/MySQL.py                     31      8    74%   16-17, 79, 91-97
+data_algebra/BigQuery.py                 126     11    91%   22-23, 27, 131-135, 156, 251, 253, 286-287
+data_algebra/MySQL.py                     31      3    90%   16-17, 79
 data_algebra/OrderedSet.py                82      7    91%   33, 46, 49, 55, 58, 61, 64
-data_algebra/PostgreSQL.py                30      7    77%   15-16, 69-75
+data_algebra/PostgreSQL.py                30      2    93%   15-16
 data_algebra/SQLite.py                   193     19    90%   91, 101, 127, 141, 143, 155, 171-172, 193, 201, 233, 312-316, 448, 489, 494
-data_algebra/SparkSQL.py                  89     46    48%   16-17, 21-22, 26-28, 89, 94, 140-144, 150-154, 178-180, 186-193, 200-215, 226-231
+data_algebra/SparkSQL.py                  89      7    92%   16-17, 89, 203, 214-215, 227
 data_algebra/__init__.py                   9      0   100%
 data_algebra/arrow.py                     95     23    76%   52, 58, 68-69, 80, 97, 103, 107, 139, 148, 154-160, 163-169, 182, 184, 186, 190, 194
 data_algebra/cdata.py                    348     63    82%   17, 33, 76, 78, 87, 89, 92-95, 97, 100, 106, 110, 113, 118, 122, 130, 138, 143, 164-168, 214-217, 220-235, 239, 293, 299, 305, 308, 326, 328, 330, 333, 336, 343, 347, 349, 395, 415, 447, 454-457, 468, 539, 543, 550, 592-595, 598-616
@@ -150,7 +341,7 @@ data_algebra/data_ops.py                1322    205    84%   36-37, 56-57, 94, 1
 data_algebra/data_ops_types.py            67      1    99%   312
 data_algebra/data_ops_utils.py            33      3    91%   29, 33, 43
 data_algebra/data_space.py                25      1    96%   76
-data_algebra/db_model.py                1021    103    90%   44, 59, 67-69, 205, 340-341, 421, 846, 858, 916, 923, 931-932, 951-955, 965, 979-983, 1007, 1019, 1078, 1080, 1086, 1097, 1109, 1141, 1145, 1150, 1183, 1187, 1203, 1206, 1286, 1297, 1302, 1325, 1329, 1370, 1377, 1415, 1419, 1437, 1452, 1456, 1478, 1482, 1496, 1536, 1540, 1576, 1580, 1641, 1645, 1647, 1650, 1675, 1754, 1758, 1762, 1765, 1770, 1813, 1824, 1932-1934, 1971, 2025-2038, 2092-2093, 2111, 2120, 2135, 2141, 2143, 2147, 2156, 2171, 2180, 2221, 2258, 2261, 2268, 2363-2365, 2388, 2481-2484, 2489-2490, 2494
+data_algebra/db_model.py                1021    100    90%   44, 59, 67-69, 205, 340-341, 421, 858, 916, 923, 931-932, 951-955, 965, 979-983, 1007, 1019, 1078, 1080, 1086, 1097, 1109, 1141, 1145, 1150, 1183, 1187, 1203, 1206, 1286, 1297, 1302, 1325, 1329, 1370, 1377, 1415, 1419, 1437, 1452, 1456, 1478, 1482, 1496, 1536, 1540, 1576, 1580, 1641, 1645, 1647, 1650, 1675, 1754, 1758, 1762, 1765, 1770, 1813, 1824, 1932-1934, 1971, 2025-2038, 2092-2093, 2111, 2120, 2135, 2141, 2143, 2147, 2156, 2171, 2180, 2221, 2258, 2261, 2268, 2363-2365, 2388, 2483-2484, 2489-2490, 2494
 data_algebra/db_space.py                  76     16    79%   58-59, 63, 73-77, 83, 118-119, 132-133, 137-139
 data_algebra/eval_cache.py                51      0   100%
 data_algebra/expr_parse.py                34      0   100%
@@ -167,10 +358,9 @@ data_algebra/python3_lark.py               1      0   100%
 data_algebra/shift_pipe_action.py         14      0   100%
 data_algebra/solutions.py                135      4    97%   63, 308, 389, 472
 data_algebra/sql_format_options.py        17      4    76%   61, 68-71
-data_algebra/test_util.py                334     59    82%   28-29, 104, 126, 136, 139, 143, 166, 169, 173, 175-178, 189, 264-269, 273, 285, 295, 332, 334, 345, 353, 364, 371, 377, 389, 400, 414, 469, 473, 524-527, 529-532, 534-537, 539-542, 653-658, 663-664, 666
+data_algebra/test_util.py                334     43    87%   28-29, 104, 126, 136, 139, 143, 166, 169, 173, 175-178, 189, 264-269, 273, 285, 295, 332, 334, 345, 353, 364, 371, 377, 389, 400, 414, 469, 473, 653-658, 663-664, 666
 data_algebra/util.py                     127     28    78%   26, 59-60, 63-64, 67-68, 71-72, 75-76, 79-80, 83-84, 87-88, 91-92, 95-96, 143, 165, 167, 182, 223, 227, 229
 --------------------------------------------------------------------
-TOTAL                                   6729    911    86%
+TOTAL                                   6729    787    88%
 
-
-======================= 375 passed in 851.63s (0:14:11) ========================
+=============== 375 passed, 4204 warnings in 4390.12s (1:13:10) ================
