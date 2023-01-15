@@ -433,6 +433,9 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             old = tables[key]
             assert set(b.column_names) == set(old.column_names)  # this is defending associativity of composition against table narrowing
             return self.replace_leaves({key: b})
+        if isinstance(b, dict):
+            # assume dictionary of tables
+            return self.eval(b)
         # see if b is ShiftPipeAction, so it can handle the mapping (using fact data is not a ShiftPipeAction instance)
         if correct_ordered_first_call and isinstance(b, ShiftPipeAction):
             return b.act_on(self, correct_ordered_first_call=False)
