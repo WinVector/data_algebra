@@ -4,7 +4,7 @@ import data_algebra.test_util
 from data_algebra.shift_pipe_action import ShiftPipeAction
 from data_algebra.cdata import pivot_rowrecs_to_blocks
 from data_algebra import descr, d_, lit
-from data_algebra.data_ops import ConvertRecordsNode, ViewRepresentation
+from data_algebra.data_ops import ConvertRecordsNode, TableDescription, ViewRepresentation
 import data_algebra.SQLite
 
 
@@ -106,6 +106,31 @@ def test_shift_pipe_dict():
         }
     )
     assert data_algebra.test_util.equivalent_frames(res, expect1)
+
+
+def test_shift_pipe_dict_replace():
+    pd = data_algebra.data_model.default_data_model().pd
+    d1 = pd.DataFrame(
+        {"a": [1, 1, 2], "b": ["x", "x", "y"], "z": [4, 5, 6],}
+    )
+    d2 = pd.DataFrame(
+        {"a": [1, 1, 2], "b": ["x", "y", "y"], "q": [7, 8, 9],}
+    )
+    ops1 = descr(d1=d1).natural_join(
+        b=descr(d2=d2), by=["a"], jointype="inner",
+    )
+    res = {
+        "d1": TableDescription(column_names=["a", "c"], table_name="d1"), 
+        "d2": TableDescription(column_names=["a", "d"], table_name="dZ")
+        } >> ops1
+    expect1 = (
+        TableDescription(table_name="d1", column_names=["a", "c"]).natural_join(
+            b=TableDescription(table_name="dZ", column_names=["a", "d"]),
+            on=["a"],
+            jointype="INNER",
+        )
+    )
+    assert res == expect1
 
 
 def test_shift_pipe_action_db_etc():
