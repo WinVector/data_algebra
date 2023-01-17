@@ -262,6 +262,18 @@ def test_arrow_assoc_guard_table():
     res_wide = ops_b.replace_leaves({"data_frame": ops}).transform(d)  # widens column def
     res_narrow = ops_b.transform(ops.transform(d))  # would want to match this
     assert len(res_wide.columns) != len(res_narrow.columns)
+    # allowed
+    ops_3 = TableDescription(column_names=['x'], table_name="zz").extend({"y": "x + 1"}) >> ops
+    assert isinstance(ops_3, ViewRepresentation)
+    res_3 = pd.DataFrame({"x": [1, 2]}) >> ops_3
+    expect_3 = pd.DataFrame({"x": [1, 2], "y": [2, 3], "z": [3, 5]})
+    assert data_algebra.test_util.equivalent_frames(res_3, expect_3)
+    res_3_a = pd.DataFrame({"x": [1, 2]}) >> TableDescription(column_names=['x'], table_name="zz").extend({"y": "x + 1"}) >> ops
+    assert data_algebra.test_util.equivalent_frames(res_3_a, expect_3)
+    res_3_b = (pd.DataFrame({"x": [1, 2]}) >> TableDescription(column_names=['x'], table_name="zz").extend({"y": "x + 1"})) >> ops
+    assert data_algebra.test_util.equivalent_frames(res_3_b, expect_3)
+    res_3_c = pd.DataFrame({"x": [1, 2]}) >> (TableDescription(column_names=['x'], table_name="zz").extend({"y": "x + 1"}) >> ops)
+    assert data_algebra.test_util.equivalent_frames(res_3_c, expect_3)
 
 
 def test_arrow_table_narrows():
