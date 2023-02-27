@@ -1,5 +1,6 @@
 # data_algebra
 
+
 [data_algebra](https://github.com/WinVector/data_algebra) is a piped data wrangling system
 based on Codd's relational algebra and experience working with data manipulation languages at scale.
 The primary purpose of the package is to support an easy to
