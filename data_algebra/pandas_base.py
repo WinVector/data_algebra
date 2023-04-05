@@ -322,14 +322,14 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
             "as_int64": lambda x: x.astype("int64").copy(),
             "as_str": lambda x: x.astype("str").copy(),
             "trimstr": lambda x, start, stop: x.str.slice(start=start, stop=stop),
-            "datetime_to_date": lambda x: x.dt.date.copy(),
+            "datetime_to_date": lambda x: self.pd.to_datetime(x).dt.date.copy(),
             "parse_datetime": lambda x, format: self.pd.to_datetime(
                 x, format=format
             ),
             "parse_date": lambda x, format: self.pd.to_datetime(
                 x, format=format
             ).dt.date.copy(),
-            "format_datetime": lambda x, format: x.dt.strftime(date_format=format),
+            "format_datetime": lambda x, format: self.pd.to_datetime(x).dt.strftime(date_format=format),
             "format_date": lambda x, format: self.pd.to_datetime(
                 x
             ).dt.strftime(date_format=format),
@@ -343,22 +343,12 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
                 )
                 % 7
             ),
-            "dayofyear": lambda x: self.pd.to_datetime(x)
-            .dt.dayofyear.astype("int64")
-            .copy(),
+            "dayofyear": lambda x: self.pd.to_datetime(x).dt.dayofyear.astype("int64").copy(),
             "weekofyear": lambda x: self._calc_week_of_Year(x),
-            "dayofmonth": lambda x: self.pd.to_datetime(x)
-            .dt.day.astype("int64")
-            .copy(),
-            "month": lambda x: self.pd.to_datetime(x)
-            .dt.month.astype("int64")
-            .copy(),
-            "quarter": lambda x: self.pd.to_datetime(x)
-            .dt.quarter.astype("int64")
-            .copy(),
-            "year": lambda x: self.pd.to_datetime(x)
-            .dt.year.astype("int64")
-            .copy(),
+            "dayofmonth": lambda x: self.pd.to_datetime(x).dt.day.astype("int64").copy(),
+            "month": lambda x: self.pd.to_datetime(x).dt.month.astype("int64").copy(),
+            "quarter": lambda x: self.pd.to_datetime(x).dt.quarter.astype("int64").copy(),
+            "year": lambda x: self.pd.to_datetime(x).dt.year.astype("int64").copy(),
             "timestamp_diff": lambda c1, c2: [
                 self.pd.Timedelta(c1[i] - c2[i]).total_seconds()
                 for i in range(len(c1))
