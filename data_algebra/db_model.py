@@ -859,7 +859,7 @@ class DBModel(ShiftPipeAction):
         else:
             q = str(q)
         assert isinstance(q, str)
-        data_algebra.data_model.default_data_model().pd.io.sql.execute(q, conn)
+        conn.execute(q)
 
     def read_query(self, conn, q):
         """
@@ -873,7 +873,7 @@ class DBModel(ShiftPipeAction):
         else:
             q = str(q)
         assert isinstance(q, str)
-        r = self.local_data_model.pd.io.sql.read_sql(q, conn)
+        r = self.local_data_model.pd.io.sql.read_sql_query(q, conn)
         return r
 
     def table_exists(self, conn, table_name: str) -> bool:

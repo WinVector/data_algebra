@@ -28,7 +28,7 @@ def test_bigquery_user_fns_integrated():
             ),
             "input_datetime_col_1": pd.to_datetime(
                 pd.Series(["2010-01-01 12:11:21", "2030-04-06 14:03:00"]),
-                format=date_format,
+                format=datetime_format,
             ),
             "input_date_col_0": pd.to_datetime(
                 pd.Series(["2000-01-02", "2035-04-05"]), format=date_format

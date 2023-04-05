@@ -124,8 +124,6 @@ def test_cdata1():
 
     waste_str = str(iris)
 
-    
-
     # from:
     #   https://github.com/WinVector/cdata/blob/master/vignettes/control_table_keys.Rmd
 
@@ -163,15 +161,11 @@ def test_cdata1():
     sql = db_model.to_sql(source_table.map_records(blocks_out=record_spec))
     waste_str = str(sql)
 
-    
-
     db_model.insert_table(conn, iris, "iris")
 
     res_blocks = db_model.read_query(conn, sql)
     assert data_algebra.test_util.equivalent_frames(res_blocks, iris_blocks_orig)
     waste_str = str(res_blocks)
-
-    
 
     db_model.insert_table(conn, res_blocks, "res_blocks")
     source_table2 = data_algebra.data_ops.TableDescription(
@@ -182,29 +176,19 @@ def test_cdata1():
     sql_back = db_model.to_sql(source_table2.map_records(blocks_in=record_spec))
     waste_str = str(sql_back)
 
-    
-
     res_rows = db_model.read_query(conn, sql_back)
     assert data_algebra.test_util.equivalent_frames(res_rows, iris_orig)
     waste_str = str(res_rows)
 
-    
-
     conn.close()
 
-    
-
     waste_str = str(iris)
-
-    
 
     mp_to_blocks = RecordMap(blocks_out=record_spec)
     waste_str = str(mp_to_blocks)
     arranged_blocks = mp_to_blocks.transform(iris)
     assert data_algebra.test_util.equivalent_frames(arranged_blocks, iris_blocks_orig)
     # arranged_blocks
-
-    
 
     mp_to_rows = RecordMap(blocks_in=record_spec)
     waste_str = str(mp_to_rows)
@@ -407,3 +391,4 @@ def test_cdata_query_details():
     )
 
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+
