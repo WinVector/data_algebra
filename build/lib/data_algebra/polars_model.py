@@ -637,7 +637,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
     
     def set_col(self, *, d, colname: str, values):
         """set column, return ref"""
-        d2 = d.with_column(pl.Series(values=values).alias(colname))
+        d2 = d.with_columns([pl.Series(values=values).alias(colname)])
         return d2
 
     def table_is_keyed_by_columns(self, table, *, column_names: Iterable[str]) -> bool:
@@ -667,7 +667,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
         mx = (
             table
                 .select(column_names)
-                .with_column(pl.lit(1, pl.Int64).alias("_da_count_tmp"))
+                .with_columns([pl.lit(1, pl.Int64).alias("_da_count_tmp")])
                 .groupby(column_names)
                 .sum()["_da_count_tmp"]
                 .max()
@@ -720,8 +720,8 @@ class PolarsModel(data_algebra.data_model.DataModel):
         assert len(inputs) == 2
         inputs = [input_i.select(common_columns) for input_i in inputs]  # get columns in same order
         if op.id_column is not None:
-            inputs[0] = inputs[0].with_column(_build_lit(op.a_name).alias(op.id_column))
-            inputs[1] = inputs[1].with_column(_build_lit(op.b_name).alias(op.id_column))
+            inputs[0] = inputs[0].with_columns([_build_lit(op.a_name).alias(op.id_column)])
+            inputs[1] = inputs[1].with_columns([_build_lit(op.b_name).alias(op.id_column)])
         res = pl.concat(inputs, how="vertical")
         return res
     
@@ -799,7 +799,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 if c not in partition_set:
                     order_cols.append(c)
             reversed_cols = [True if ci in set(op.reverse) else False for ci in op.order_by]
-            res = res.sort(by=op.order_by, reverse=reversed_cols)
+            res = res.sort(by=op.order_by, descending=reversed_cols)
         res = res.with_columns(produced_columns)
         if len(temp_v_columns) > 0:
             res = res.select(op.columns_produced())
@@ -865,7 +865,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 res = res.collect()
             if res.shape[0] <= 0:
                 # make an all None frame
-                res = pl.DataFrame({c: [None] for c in res.columns}, columns=[(res.columns[j], res.dtypes[j]) for j in range(res.shape[1])])
+                res = pl.DataFrame({c: [None] for c in res.columns}, schema=[(res.columns[j], res.dtypes[j]) for j in range(res.shape[1])])
         # see if we need to convert to lazy type
         if self.use_lazy_eval and isinstance(res, pl.DataFrame):
             res = res.lazy()
@@ -952,7 +952,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
             )
         res = self._compose_polars_ops(op.sources[0], data_map=data_map)
         reversed_cols = [True if ci in set(op.reverse) else False for ci in op.order_columns]
-        res = res.sort(by=op.order_columns, reverse=reversed_cols)
+        res = res.sort(by=op.order_columns, descending=reversed_cols)
         if op.limit is not None:
             res = res.head(op.limit)
         return res
