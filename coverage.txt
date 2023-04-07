@@ -1,5 +1,5 @@
 ============================= test session starts ==============================
-platform darwin -- Python 3.10.10, pytest-7.1.2, pluggy-1.0.0
+platform darwin -- Python 3.11.2, pytest-7.1.2, pluggy-1.0.0
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: anyio-3.5.0, cov-4.0.0
 collected 377 items
@@ -131,7 +131,18 @@ tests/test_window_fns.py .....                                           [ 98%]
 tests/test_with.py ..                                                    [ 99%]
 tests/test_xicor.py ..                                                   [100%]
 
---------- coverage: platform darwin, python 3.10.10-final-0 ----------
+=============================== warnings summary ===============================
+../../../opt/anaconda3/envs/data_algebra_dev_env/lib/python3.11/site-packages/lark/utils.py:116
+  /Users/johnmount/opt/anaconda3/envs/data_algebra_dev_env/lib/python3.11/site-packages/lark/utils.py:116: DeprecationWarning: module 'sre_parse' is deprecated
+    import sre_parse
+
+../../../opt/anaconda3/envs/data_algebra_dev_env/lib/python3.11/site-packages/lark/utils.py:117
+  /Users/johnmount/opt/anaconda3/envs/data_algebra_dev_env/lib/python3.11/site-packages/lark/utils.py:117: DeprecationWarning: module 'sre_constants' is deprecated
+    import sre_constants
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+
+---------- coverage: platform darwin, python 3.11.2-final-0 ----------
 Name                                   Stmts   Miss  Cover   Missing
 --------------------------------------------------------------------
 data_algebra/BigQuery.py                 126     67    47%   22-23, 27, 131-135, 139, 153-160, 169-178, 183-201, 215-244, 248-261, 272-287
@@ -159,7 +170,7 @@ data_algebra/expression_walker.py         11      0   100%
 data_algebra/flow_text.py                 17      0   100%
 data_algebra/near_sql.py                 237      3    99%   41, 256-257
 data_algebra/op_catalog.py                 3      0   100%
-data_algebra/pandas_base.py              696     68    90%   54, 68, 77, 87, 92, 101, 223, 225, 239, 242, 247, 252, 417, 457, 468, 493, 496, 501, 504, 506, 518, 524-531, 538, 572-577, 607, 611, 614, 616, 653, 707, 748, 765, 785, 803, 813, 828, 876, 884, 892, 907, 918, 930, 949, 964, 992, 1007, 1044, 1061, 1064, 1075, 1103, 1135, 1144, 1171, 1188, 1200, 1255, 1269-1271
+data_algebra/pandas_base.py              697     68    90%   54, 68, 77, 87, 92, 101, 223, 225, 239, 242, 247, 252, 417, 457, 468, 493, 496, 501, 504, 506, 518, 524-531, 538, 572-577, 607, 611, 614, 616, 653, 707, 748, 765, 785, 803, 813, 828, 876, 884, 892, 907, 918, 930, 949, 964, 992, 1007, 1044, 1061, 1064, 1075, 1103, 1137, 1146, 1173, 1190, 1202, 1257, 1271-1273
 data_algebra/pandas_model.py              19      2    89%   32-33
 data_algebra/parse_by_lark.py            164     24    85%   71, 93, 108, 129-130, 137, 161, 171, 185-186, 188, 200, 206, 213-217, 245, 253, 263-266
 data_algebra/polars_model.py             597     74    88%   180, 189, 203, 446-452, 458-465, 483-484, 486, 570, 586, 596, 603, 616-620, 628, 630, 655, 658, 663, 666, 715, 733, 749, 816, 832-834, 879, 922, 941, 950, 965, 983, 1001, 1021, 1033-1035, 1038, 1045, 1047, 1054-1066, 1073, 1078, 1109, 1138, 1147, 1175, 1190, 1202
@@ -170,7 +181,6 @@ data_algebra/sql_format_options.py        17      4    76%   61, 68-71
 data_algebra/test_util.py                334     59    82%   28-29, 104, 126, 136, 139, 143, 166, 169, 173, 175-178, 189, 264-269, 273, 285, 295, 332, 334, 345, 353, 364, 371, 377, 389, 400, 414, 469, 473, 524-527, 529-532, 534-537, 539-542, 653-658, 663-664, 666
 data_algebra/util.py                     127     28    78%   26, 59-60, 63-64, 67-68, 71-72, 75-76, 79-80, 83-84, 87-88, 91-92, 95-96, 143, 165, 167, 182, 223, 227, 229
 --------------------------------------------------------------------
-TOTAL                                   6737    912    86%
+TOTAL                                   6738    912    86%
 
-
-======================= 377 passed in 801.16s (0:13:21) ========================
+================= 377 passed, 2 warnings in 800.76s (0:13:20) ==================

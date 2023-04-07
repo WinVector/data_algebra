@@ -4,11 +4,11 @@ channels:
   - conda-forge
 dependencies:
   - numpy
-  - pandas>=1.0.0
+  - pandas
   - lark
   - scipy
   - jupyterlab
-  - python=3.10.*
+  - python
   - scikit-learn
   - seaborn
   - matplotlib
