@@ -32,7 +32,7 @@ def mk_example():
         ),
         "datetime_col_1": data_algebra.data_model.default_data_model().pd.to_datetime(
             data_algebra.data_model.default_data_model().pd.Series(["2010-01-01 12:11:21", "2030-04-06 14:03:00", "2010-01-01 12:11:21", "2030-04-06 14:03:00"]),
-            format=date_format,
+            format=datetime_format,
         ),
         "date_col_0": data_algebra.data_model.default_data_model().pd.to_datetime(
             data_algebra.data_model.default_data_model().pd.Series(["2000-01-02", "2035-04-05", "2000-01-02", "2035-04-05"]),
