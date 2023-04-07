@@ -1108,6 +1108,8 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
             split = [v for k, v in data.groupby(blocks_in.control_table_keys)]
         else:
             split = [v for k, v in data.groupby(blocks_in.control_table_keys[0])]
+        # make sure no row-index bull
+        split = [s.reset_index(drop=True, inplace=False) for s in split]
         # check same number of ids for each block
         # could also double check id columns are identical
         for i in range(1, len(split)):
