@@ -37,14 +37,6 @@ def test_one_row_cdata_convert():
             ],
         }
     )
-    record_out = data_algebra.data_model.default_data_model().pd.DataFrame(
-        {
-            "group_sensor_mean_s1": ["group_sensor_mean_s1"],
-            "group_sensor_mean_s2": ["group_sensor_mean_s2"],
-            "group_sensor_est_var_s1": ["group_sensor_est_var_s1"],
-            "group_sensor_est_var_s2": ["group_sensor_est_var_s2"],
-        }
-    )
 
     # no output row version
     record_map = RecordMap(
