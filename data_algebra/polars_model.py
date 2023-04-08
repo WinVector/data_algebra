@@ -17,6 +17,7 @@ import data_algebra.expr_rep
 import data_algebra.data_ops_types
 import data_algebra.connected_components
 import data_algebra.expression_walker
+import data_algebra.PolarsSQL
 
 
 def _build_lit(v):
@@ -495,8 +496,6 @@ class PolarsExpressionActor(data_algebra.expression_walker.ExpressionWalker):
 class PolarsModel(data_algebra.data_model.DataModel):
     """
     Interface for realizing the data algebra as a sequence of steps over Polars https://www.pola.rs .
-
-    Note: not fully implemented yet.
     """
 
     use_lazy_eval: bool
@@ -508,11 +507,13 @@ class PolarsModel(data_algebra.data_model.DataModel):
     _collect_required: Set[str]
     want_literals_unpacked: Set[str]
     rng: Any
+    sql_model: data_algebra.PolarsSQL.PolarsSQLModel
 
     def __init__(self, *, use_lazy_eval: bool = True):
         data_algebra.data_model.DataModel.__init__(
             self, presentation_model_name="pl", module=pl
         )
+        self.sql_model = data_algebra.PolarsSQL.PolarsSQLModel()
         self.rng = np.random.default_rng()
         assert isinstance(use_lazy_eval, bool)
         self.use_lazy_eval = use_lazy_eval
@@ -690,6 +691,41 @@ class PolarsModel(data_algebra.data_model.DataModel):
         if isinstance(res, pl.LazyFrame):
             res = res.collect()
         assert self.is_appropriate_data_instance(res)
+        return res
+    
+    def to_sql(
+        self,
+        ops: data_algebra.data_ops.ViewRepresentation,
+        *,
+        sql_format_options: Optional[SQLFormatOptions] = None,
+    ) -> str:
+        """
+        Convert ViewRepresentation into SQL string.
+
+        :param ops: ViewRepresentation to convert
+        :param sql_format_options: sql formatting options
+        :return: sql string
+        """
+        assert isinstance(ops, data_algebra.data_ops_types.OperatorPlatform)
+        sql_string = self.sql_model.to_sql(ops, sql_format_options=sql_format_options)
+        return sql_string
+    
+    def eval_as_sql(self, op, *, data_map: Dict[str, Any]):
+        """
+        Implementation of Polars evaluation through Polars SQL interface.
+        https://pola-rs.github.io/polars-book/user-guide/sql.html
+
+        :param op: ViewRepresentation to evaluate
+        :param data_map: dictionary mapping table and view names to data frames or data sources
+        :return: data frame result
+        """
+        assert isinstance(data_map, Dict)
+        assert isinstance(op, data_algebra.data_ops_types.OperatorPlatform)
+        sql_string = self.to_sql(op)
+        sql_context = pl.SQLContext()
+        for k, v in data_map.entries():
+            sql_context.register(k, v)
+        res = sql_context.query(sql_string)
         return res
 
     def _compose_polars_ops(self, op: data_algebra.data_ops_types.OperatorPlatform, *, data_map: Dict[str, Any]):
@@ -1056,7 +1092,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 "op was supposed to be a data_algebra.data_ops.SQLNode"
             )
         db_handle = data_map[op.view_name]
-        # would like (but causes cicrular import) assert isinstance(db_handle, data_algebra.db_model.DBHandle)
+        # would like (but causes circular import) assert isinstance(db_handle, data_algebra.db_model.DBHandle)
         res = db_handle.read_query("\n".join(op.sql))
         res = self.data_frame(res)
         assert self.is_appropriate_data_instance(res)
