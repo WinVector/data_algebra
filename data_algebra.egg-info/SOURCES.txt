@@ -4,6 +4,7 @@ setup.py
 data_algebra/BigQuery.py
 data_algebra/MySQL.py
 data_algebra/OrderedSet.py
+data_algebra/PolarsSQL.py
 data_algebra/PostgreSQL.py
 data_algebra/SQLite.py
 data_algebra/SparkSQL.py
@@ -34,6 +35,7 @@ data_algebra/python3_lark.py
 data_algebra/shift_pipe_action.py
 data_algebra/solutions.py
 data_algebra/sql_format_options.py
+data_algebra/sql_model.py
 data_algebra/test_util.py
 data_algebra/util.py
 data_algebra.egg-info/PKG-INFO
