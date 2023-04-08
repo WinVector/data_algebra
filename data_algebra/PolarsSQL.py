@@ -45,4 +45,5 @@ class PolarsSQLModel(data_algebra.sql_model.SQLModel):
             sql_formatters=PolarsSQL_formatters,
             op_replacements=op_replacements,
             float_type="DOUBLE PRECISION",
+            supports_with=False,
         )

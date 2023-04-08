@@ -18,6 +18,7 @@ import data_algebra.data_ops_types
 import data_algebra.connected_components
 import data_algebra.expression_walker
 import data_algebra.PolarsSQL
+from data_algebra.sql_format_options import SQLFormatOptions
 
 
 def _build_lit(v):
@@ -715,15 +716,18 @@ class PolarsModel(data_algebra.data_model.DataModel):
         Implementation of Polars evaluation through Polars SQL interface.
         https://pola-rs.github.io/polars-book/user-guide/sql.html
 
-        :param op: ViewRepresentation to evaluate
+        :param op: ViewRepresentation to evaluate, or SQL string
         :param data_map: dictionary mapping table and view names to data frames or data sources
         :return: data frame result
         """
         assert isinstance(data_map, Dict)
-        assert isinstance(op, data_algebra.data_ops_types.OperatorPlatform)
-        sql_string = self.to_sql(op)
-        sql_context = pl.SQLContext()
-        for k, v in data_map.entries():
+        if isinstance(op, str):
+            sql_string = op
+        else:
+            assert isinstance(op, data_algebra.data_ops_types.OperatorPlatform)
+            sql_string = self.to_sql(op)
+        sql_context= pl.SQLContext()
+        for k, v in data_map.items():
             sql_context.register(k, v)
         res = sql_context.query(sql_string)
         return res
