@@ -1096,7 +1096,6 @@ class PolarsModel(data_algebra.data_model.DataModel):
                 "op was supposed to be a data_algebra.data_ops.SQLNode"
             )
         db_handle = data_map[op.view_name]
-        # would like (but causes circular import) assert isinstance(db_handle, data_algebra.db_model.DBHandle)
         res = db_handle.read_query("\n".join(op.sql))
         res = self.data_frame(res)
         assert self.is_appropriate_data_instance(res)
