@@ -702,6 +702,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
     ) -> str:
         """
         Convert ViewRepresentation into SQL string.
+        Not at a useful level of development yet.
 
         :param ops: ViewRepresentation to convert
         :param sql_format_options: sql formatting options
@@ -715,6 +716,8 @@ class PolarsModel(data_algebra.data_model.DataModel):
         """
         Implementation of Polars evaluation through Polars SQL interface.
         https://pola-rs.github.io/polars-book/user-guide/sql.html
+        Not at a useful level of development yet.
+        Currently creates non-reentrant pl.SQLContext() in call.
 
         :param op: ViewRepresentation to evaluate, or SQL string
         :param data_map: dictionary mapping table and view names to data frames or data sources
@@ -726,7 +729,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
         else:
             assert isinstance(op, data_algebra.data_ops_types.OperatorPlatform)
             sql_string = self.to_sql(op)
-        sql_context= pl.SQLContext()
+        sql_context = pl.SQLContext()  # currently this is a non-reentrant singleton
         for k, v in data_map.items():
             sql_context.register(k, v)
         res = sql_context.query(sql_string)

@@ -29,7 +29,9 @@ PolarsSQL_formatters = {
 
 
 class PolarsSQLModel(data_algebra.sql_model.SQLModel):
-    """A model of how SQL should be generated for PolarsSQL.
+    """
+    A model of how SQL should be generated for PolarsSQL.
+    Model is just a stand-in for now, as we don't have a good description of Polars SQL dialect yet.
     """
 
     def __init__(self):
