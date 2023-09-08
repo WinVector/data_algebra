@@ -537,10 +537,10 @@ class PolarsModel(data_algebra.data_model.DataModel):
         self.project_expr_impl_map = _populate_expr_impl_map(extend_context=False)
         self.impl_map_arbitrary_arity = {
             "concat": lambda *args: pl.concat_str(args),
-            "fmax": lambda *args: pl.max(args),
-            "fmin": lambda *args: pl.min(args),
-            "maximum": lambda *args: pl.max(args),
-            "minimum": lambda *args: pl.min(args),
+            "fmax": lambda *args: pl.max_horizontal(args),
+            "fmin": lambda *args: pl.min_horizontal(args),
+            "maximum": lambda *args: pl.max_horizontal(args),
+            "minimum": lambda *args: pl.min_horizontal(args),
             "+": _reduce_plus,
             "*": _reduce_times,
             "and": _reduce_and,

@@ -731,3 +731,28 @@ def test_polars_arrow_table_narrows():
         res2 = d[["x"]] >> ops
         assert isinstance(res2, pl.DataFrame)
         assert data_algebra.test_util.equivalent_frames(res2, expect)
+
+
+def test_polars_minimum_1_issue():
+    if have_polars:
+        d = pl.DataFrame({
+            "x": [1, 2, 3, 4, 5, 6], 
+            "g": [1, 1, 1, 2, 2, 2],
+            "x_g_max": [2, 2, 2, 5, 5, 5],
+        })
+        ops = (
+            data_algebra.descr(d=d)
+                .extend({"xl": "x.minimum(x_g_max)"})
+        )
+        expect =pl.DataFrame(
+            {
+                "x": [1, 2, 3, 4, 5, 6],
+                "g": [1, 1, 1, 2, 2, 2],
+                "x_g_max": [2, 2, 2, 5, 5, 5],
+                "xl": [1, 2, 2, 4, 5, 5],
+            }
+        )
+        # was raising "ValueError: could not convert value 'Unknown' as a Literal"
+        res = ops.transform(d)
+        assert isinstance(res, pl.DataFrame)
+        assert np.max(np.abs(np.array(res['xl'] - expect['xl']))) < 1e-8
