@@ -25,7 +25,7 @@ dependencies:
   - pylint
   - pip
   - pip:
-    - pdoc
+    - pdoc3
     - google.cloud
     - google-cloud-bigquery
     - db_dtypes
