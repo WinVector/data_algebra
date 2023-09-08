@@ -318,7 +318,7 @@ def test_polars_project_max_int():
             "g": ["a", "a", "b"],
             "v": [1, 2, 3],
         })
-        # d.groupby(["g"]).agg([pl.col("v").min().alias("v_min"), pl.col("v").max().alias("v_max")])
+        # d.group_by(["g"]).agg([pl.col("v").min().alias("v_min"), pl.col("v").max().alias("v_max")])
         # returns correct answer
         ops = (
             data_algebra.descr(d=d)
@@ -345,7 +345,7 @@ def test_polars_project_max_str():
             "g": ["a", "a", "b"],
             "v": ["x", "y", "x"],
         })
-        # d.groupby(["g"]).agg([pl.col("v").min().alias("v_min"), pl.col("v").max().alias("v_max")])
+        # d.group_by(["g"]).agg([pl.col("v").min().alias("v_min"), pl.col("v").max().alias("v_max")])
         # returns nulls
         # known Polars bug:
         # https://stackoverflow.com/q/74763636/6901725
@@ -454,7 +454,7 @@ def test_polars_group_min_max_example():
             )
         res_polars = (
             d_Polars
-                .groupby(["group"])
+                .group_by(["group"])
                 .agg([
                     pl.col("value").min().alias("min_value"),
                     pl.col("value").max().alias("max_value"),
