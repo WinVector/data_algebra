@@ -15,7 +15,9 @@ def hash_data_frame(d) -> str:
     """
     data_algebra.data_model.default_data_model().is_appropriate_data_instance(d)
     hash_str = hashlib.sha256(
-        data_algebra.data_model.default_data_model().pd.util.hash_pandas_object(d).values
+        data_algebra.data_model.default_data_model()
+        .pd.util.hash_pandas_object(d)
+        .values
     ).hexdigest()
     return f"{d.shape}_{list(d.columns)}_{hash_str}"
 
@@ -44,7 +46,11 @@ def make_cache_key(
     data_map_keys.sort()
     for k in data_map_keys:
         assert isinstance(k, str)
-        assert data_algebra.data_model.default_data_model().is_appropriate_data_instance(data_map[k])
+        assert (
+            data_algebra.data_model.default_data_model().is_appropriate_data_instance(
+                data_map[k]
+            )
+        )
     return EvalKey(
         db_model_name=str(db_model),
         sql=sql,
@@ -74,7 +80,11 @@ class ResultCache:
         """get result from cache, raise KeyError if not present"""
         k = make_cache_key(db_model=db_model, sql=sql, data_map=data_map)
         res = self.result_cache[k]
-        assert data_algebra.data_model.default_data_model().is_appropriate_data_instance(res)
+        assert (
+            data_algebra.data_model.default_data_model().is_appropriate_data_instance(
+                res
+            )
+        )
         return res.copy()
 
     def store(
@@ -86,7 +96,11 @@ class ResultCache:
         res,
     ) -> None:
         """Store result to cache, mark dirty if change."""
-        assert data_algebra.data_model.default_data_model().is_appropriate_data_instance(res)
+        assert (
+            data_algebra.data_model.default_data_model().is_appropriate_data_instance(
+                res
+            )
+        )
         op_key = make_cache_key(db_model=db_model, sql=sql, data_map=data_map)
         try:
             previous = self.result_cache[op_key]

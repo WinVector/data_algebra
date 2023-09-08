@@ -31,11 +31,7 @@ def try_to_merge_ops(ops1, ops2):
             return None
         if len(ops2_common_columns_used.intersection(ops2_columns_produced)) > 0:
             return None
-        new_ops = {
-            k: ops1[k]
-            for k in ops1.keys()
-            if k not in common_produced
-        }
+        new_ops = {k: ops1[k] for k in ops1.keys() if k not in common_produced}
         new_ops.update(ops2)
         return new_ops
     # check required disjointness conditions

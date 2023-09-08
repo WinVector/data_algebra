@@ -351,7 +351,6 @@ class NearSQLTable(NearSQLNamedEntity):
 
 
 class NearSQLUnaryStep(NearSQL):
-
     sub_sql: NearSQLContainer
     mergeable: bool
     suffix: Optional[List]
@@ -426,7 +425,6 @@ class NearSQLUnaryStep(NearSQL):
 
 
 class NearSQLBinaryStep(NearSQL):
-
     sub_sql1: NearSQLContainer
     sub_sql2: NearSQLContainer
     suffix: Optional[List]
@@ -516,7 +514,6 @@ class NearSQLBinaryStep(NearSQL):
 
 
 class NearSQLRawQStep(NearSQL):
-
     prefix: List
     sub_sql: Optional[NearSQLContainer]
     suffix: Optional[List]

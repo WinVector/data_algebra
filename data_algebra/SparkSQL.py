@@ -118,6 +118,7 @@ def _as_int(dbmodel, expression):
         + " AS INT)"
     )
 
+
 # map from op-name to special SQL formatting code
 SparkSQL_formatters = {
     "___": lambda dbmodel, expression: str(expression.to_python()),

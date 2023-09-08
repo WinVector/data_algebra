@@ -39,7 +39,7 @@ def none_mark_scalar_or_length(v) -> Optional[int]:
     except TypeError:
         return None  # len() failed, probably a scalar
 
-        
+
 def promote_scalar_to_array(vi, *, target_len: int) -> List:
     """
     Convert a scalar into a vector. Pass a non-trivial array through.
@@ -145,7 +145,11 @@ def _where_expr(*args):
 
 
 # base class for Pandas-like API realization
-class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression_walker.ExpressionWalker, ABC):
+class PandasModelBase(
+    data_algebra.data_model.DataModel,
+    data_algebra.expression_walker.ExpressionWalker,
+    ABC,
+):
     """
     Base class for implementing the data algebra on pandas-like APIs
     """
@@ -185,7 +189,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
         }
 
     # implementations
-    
+
     def _calc_date_diff(self, x0, x1):
         # x is a pandas Series or list of datetime.date compatible types
         x0 = self.pd.Series(x0)
@@ -233,23 +237,33 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
         if len(value_map) > 0:
             type_a = data_algebra.util.guess_carried_scalar_type(a)
             type_k = {
-                data_algebra.util.map_type_to_canonical(type(v)) for v in value_map.keys()
+                data_algebra.util.map_type_to_canonical(type(v))
+                for v in value_map.keys()
             }
             if not data_algebra.util.compatible_types(type_k):
-                raise TypeError(f"multiple types in dictionary keys: {type_k} in mapv()")
+                raise TypeError(
+                    f"multiple types in dictionary keys: {type_k} in mapv()"
+                )
             type_k = list(type_k)[0]
             if not data_algebra.util.compatible_types([type_a, type_k]):
-                raise TypeError(f"can't map {type_a} from a dict of {type_k}'s in mapv()")
+                raise TypeError(
+                    f"can't map {type_a} from a dict of {type_k}'s in mapv()"
+                )
             type_v = {
-                data_algebra.util.map_type_to_canonical(type(v)) for v in value_map.values()
+                data_algebra.util.map_type_to_canonical(type(v))
+                for v in value_map.values()
             }
             if not data_algebra.util.compatible_types(type_v):
-                raise TypeError(f"multiple types in dictionary values: {type_v} in mapv()")
+                raise TypeError(
+                    f"multiple types in dictionary values: {type_v} in mapv()"
+                )
             type_v = list(type_v)[0]
             if default_value is not None:
                 type_d = data_algebra.util.guess_carried_scalar_type(default_value)
                 if not data_algebra.util.compatible_types([type_d, type_v]):
-                    raise TypeError(f"default is {type_d} for {type_v} values in mapv()'s")
+                    raise TypeError(
+                        f"default is {type_d} for {type_v} values in mapv()'s"
+                    )
         # https://pandas.pydata.org/docs/reference/api/pandas.Series.map.html
         a = self.pd.Series(a)
         a = a.map(value_map, na_action="ignore")
@@ -316,42 +330,41 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
             "co_equalizer": lambda a, b: data_algebra.connected_components.connected_components(
                 a, b
             ),
-            "mapv": lambda a, value_map, default_value=None: self._map_v(a, value_map, default_value),
+            "mapv": lambda a, value_map, default_value=None: self._map_v(
+                a, value_map, default_value
+            ),
             # additonal fns
             # x is a pandas Series
             "as_int64": lambda x: x.astype("int64").copy(),
             "as_str": lambda x: x.astype("str").copy(),
             "trimstr": lambda x, start, stop: x.str.slice(start=start, stop=stop),
             "datetime_to_date": lambda x: self.pd.to_datetime(x).dt.date.copy(),
-            "parse_datetime": lambda x, format: self.pd.to_datetime(
-                x, format=format
-            ),
+            "parse_datetime": lambda x, format: self.pd.to_datetime(x, format=format),
             "parse_date": lambda x, format: self.pd.to_datetime(
                 x, format=format
             ).dt.date.copy(),
-            "format_datetime": lambda x, format: self.pd.to_datetime(x).dt.strftime(date_format=format),
-            "format_date": lambda x, format: self.pd.to_datetime(
-                x
-            ).dt.strftime(date_format=format),
-            "dayofweek": lambda x: 1
-            + (
-                (
-                    self.pd.to_datetime(x).dt.dayofweek.astype(
-                        "int64"
-                    )
-                    + 1
-                )
-                % 7
+            "format_datetime": lambda x, format: self.pd.to_datetime(x).dt.strftime(
+                date_format=format
             ),
-            "dayofyear": lambda x: self.pd.to_datetime(x).dt.dayofyear.astype("int64").copy(),
+            "format_date": lambda x, format: self.pd.to_datetime(x).dt.strftime(
+                date_format=format
+            ),
+            "dayofweek": lambda x: 1
+            + ((self.pd.to_datetime(x).dt.dayofweek.astype("int64") + 1) % 7),
+            "dayofyear": lambda x: self.pd.to_datetime(x)
+            .dt.dayofyear.astype("int64")
+            .copy(),
             "weekofyear": lambda x: self._calc_week_of_Year(x),
-            "dayofmonth": lambda x: self.pd.to_datetime(x).dt.day.astype("int64").copy(),
+            "dayofmonth": lambda x: self.pd.to_datetime(x)
+            .dt.day.astype("int64")
+            .copy(),
             "month": lambda x: self.pd.to_datetime(x).dt.month.astype("int64").copy(),
-            "quarter": lambda x: self.pd.to_datetime(x).dt.quarter.astype("int64").copy(),
+            "quarter": lambda x: self.pd.to_datetime(x)
+            .dt.quarter.astype("int64")
+            .copy(),
             "year": lambda x: self.pd.to_datetime(x).dt.year.astype("int64").copy(),
             "timestamp_diff": lambda c1, c2: [
-                self.pd.Timedelta(c1[i] - c2[i]).total_seconds()
-                for i in range(len(c1))
+                self.pd.Timedelta(c1[i] - c2[i]).total_seconds() for i in range(len(c1))
             ],
             "date_diff": lambda x0, x1: self._calc_date_diff(x0, x1),
             "base_Sunday": lambda x: self._calc_base_Sunday(x),
@@ -379,20 +392,20 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
         """
         # noinspection PyUnresolvedReferences
         return isinstance(df, self.pd.DataFrame)
-    
+
     def clean_copy(self, df):
         """
         Copy of data frame without indices.
         """
         assert self.is_appropriate_data_instance(df)
         return df.reset_index(drop=True, inplace=False)
-    
+
     def to_pandas(self, df):
         """
         Convert to Pandas
         """
         return self.clean_copy(df)
-    
+
     def drop_indices(self, df) -> None:
         """
         Drop indices in place.
@@ -446,7 +459,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
                 self.pd.isnull(x), numpy.logical_or(numpy.isnan(x), numpy.isinf(x))
             )
         return self.pd.isnull(x)
-    
+
     def concat_rows(self, frame_list: List):
         """
         Concatenate rows from frame_list
@@ -468,11 +481,11 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
             return self.clean_copy(frame_list[0])
         res = self.pd.concat(frame_list, axis=1)
         return res
-    
+
     def get_cell(self, *, d, row: int, colname: str):
         """get a value from a cell"""
         return d.loc[row, colname]
-    
+
     def set_col(self, *, d, colname: str, values):
         """set column, return ref"""
         d.loc[:, colname] = values
@@ -489,7 +502,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
         # get rid of some corner cases
         if table.shape[0] < 2:
             return True
-        if (column_names is None):
+        if column_names is None:
             return False
         # check for ill-condition
         if isinstance(column_names, str):
@@ -552,7 +565,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
         assert self.is_appropriate_data_instance(res)
         return res
 
-    def columns_to_frame_(self, cols: Dict[str, Any], *, target_rows: Optional[int] = None):
+    def columns_to_frame_(
+        self, cols: Dict[str, Any], *, target_rows: Optional[int] = None
+    ):
         """
         Convert a dictionary of column names to series-like objects and scalars into a Pandas data frame.
         Deal with special cases, such as some columns coming in as scalars (often from Panda aggregation).
@@ -587,14 +602,22 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
             if target_rows is None:
                 target_rows = 1
             # all scalars, so nothing carrying index information
-            promoted_cols = {k: promote_scalar_to_array(v, target_len=target_rows) for (k, v) in cols.items()}
-            return self.clean_copy(self.pd.DataFrame(promoted_cols, index=range(target_rows)))
+            promoted_cols = {
+                k: promote_scalar_to_array(v, target_len=target_rows)
+                for (k, v) in cols.items()
+            }
+            return self.clean_copy(
+                self.pd.DataFrame(promoted_cols, index=range(target_rows))
+            )
         assert target_rows is not None
         if target_rows < 1:
             # no rows, so presuming no index information (shouldn't have come from an aggregation)
             return self.pd.DataFrame({k: [] for k in cols.keys()})
         # agg can return scalars, which then can't be made into a self.pd.DataFrame
-        promoted_cols = {k: promote_scalar_to_array(v, target_len=target_rows) for (k, v) in cols.items()}
+        promoted_cols = {
+            k: promote_scalar_to_array(v, target_len=target_rows)
+            for (k, v) in cols.items()
+        }
         return self.pd.DataFrame(promoted_cols)
 
     def add_data_frame_columns_to_data_frame_(self, res, transient_new_frame):
@@ -640,9 +663,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
         """
         Evaluate an incoming (or value source) node.
         """
-        return self._method_dispatch_table[s.node_name](
-            op=s, data_map=data_map
-        )
+        return self._method_dispatch_table[s.node_name](op=s, data_map=data_map)
 
     def _extend_step(self, op, *, data_map):
         """
@@ -671,7 +692,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
                 warnings.simplefilter(
                     "ignore"
                 )  # out of range things like arccosh were warning
-                new_cols = {k: opk.act_on(res, expr_walker=self) for k, opk in op.ops.items()}
+                new_cols = {
+                    k: opk.act_on(res, expr_walker=self) for k, opk in op.ops.items()
+                }
             new_frame = self.columns_to_frame_(new_cols, target_rows=res.shape[0])
             res = self.add_data_frame_columns_to_data_frame_(res, new_frame)
         else:
@@ -685,7 +708,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
                     col_list.append(c)
                     col_set.add(c)
             order_cols = [c for c in col_list]  # must be partition by followed by order
-            for (k, opk) in op.ops.items():
+            for k, opk in op.ops.items():
                 # assumes all args are column names or values, enforce this earlier
                 if len(opk.args) > 0:
                     if isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference):
@@ -708,9 +731,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
             subframe = self.clean_copy(res[col_list])
             subframe["_data_algebra_orig_index"] = subframe.index
             if len(order_cols) > 0:
-                subframe = self.clean_copy(subframe.sort_values(
-                    by=col_list, ascending=ascending
-                ))
+                subframe = self.clean_copy(
+                    subframe.sort_values(by=col_list, ascending=ascending)
+                )
             subframe[standin_name] = 1
             if len(op.partition_by) > 0:
                 opframe = subframe.groupby(op.partition_by, observed=True)
@@ -719,7 +742,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
             else:
                 opframe = subframe.groupby([standin_name], observed=True)
             # perform calculations
-            for (k, opk) in op.ops.items():
+            for k, opk in op.ops.items():
                 # work on a slice of the data frame
                 # Availability roughly documented in:
                 # https://github.com/WinVector/data_algebra/blob/main/Examples/Methods/data_algebra_catalog.ipynb
@@ -807,7 +830,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
         # https://www.shanelynn.ie/summarising-aggregation-and-grouping-data-in-python-pandas/
         data_algebra_temp_cols = {}
         res = self._eval_value_source(op.sources[0], data_map=data_map)
-        for (k, opk) in op.ops.items():
+        for k, opk in op.ops.items():
             if len(opk.args) > 1:
                 raise ValueError(
                     "non-trivial aggregation expression: " + str(k) + ": " + str(opk)
@@ -934,7 +957,12 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
             ascending = [
                 False if ci in set(op.reverse) else True for ci in op.order_columns
             ]
-            res = res.sort_values(by=op.order_columns, ascending=ascending, ignore_index=True, inplace=False)
+            res = res.sort_values(
+                by=op.order_columns,
+                ascending=ascending,
+                ignore_index=True,
+                inplace=False,
+            )
             self.drop_indices(res)
         if (op.limit is not None) and (res.shape[0] > op.limit):
             res = self.clean_copy(res.iloc[range(op.limit), :])
@@ -1076,7 +1104,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
             )
         res = self._eval_value_source(op.sources[0], data_map=data_map)
         return op.record_map.transform(res, local_data_model=self)
-    
+
     # cdata record conversion steps
 
     def blocks_to_rowrecs(self, data, *, blocks_in):
@@ -1091,7 +1119,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
         assert blocks_in is not None
         assert blocks_in.control_table.shape[0] > 0
         assert len(blocks_in.control_table_keys) > 0
-        data = data.loc[:, blocks_in.block_columns].reset_index(drop=True, inplace=False)
+        data = data.loc[:, blocks_in.block_columns].reset_index(
+            drop=True, inplace=False
+        )
         assert set(data.columns) == set(blocks_in.block_columns)
         # table must be keyed by record_keys + control_table_keys
         if data.shape[0] < 1:
@@ -1116,22 +1146,34 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
         sk = None
         if (blocks_in.record_keys is not None) and (len(blocks_in.record_keys) > 0):
             # ensure sorted in record order
-            split = [s.sort_values(by=blocks_in.record_keys, inplace=False, ignore_index=True) for s in split]
+            split = [
+                s.sort_values(
+                    by=blocks_in.record_keys, inplace=False, ignore_index=True
+                )
+                for s in split
+            ]
             # capture the record keys
             sk = split[0][blocks_in.record_keys]
         # limit and rename columns
 
         def limit_and_rename_cols(s):
             # get keying
-            keying = s.loc[[0], blocks_in.control_table_keys].reset_index(inplace=False, drop=True)
+            keying = s.loc[[0], blocks_in.control_table_keys].reset_index(
+                inplace=False, drop=True
+            )
             keys = keying.merge(
                 self.data_frame(blocks_in.control_table),
                 on=blocks_in.control_table_keys,
-                how="left")
+                how="left",
+            )
             assert keys.shape[0] == 1
             keys = keys.drop(blocks_in.control_table_keys, axis=1, inplace=False)
             if (blocks_in.record_keys is not None) and (len(blocks_in.record_keys) > 0):
-                s = s.drop(blocks_in.record_keys + blocks_in.control_table_keys, axis=1, inplace=False)
+                s = s.drop(
+                    blocks_in.record_keys + blocks_in.control_table_keys,
+                    axis=1,
+                    inplace=False,
+                )
             else:
                 s = s.drop(blocks_in.control_table_keys, axis=1, inplace=False)
             assert keys.shape[1] == s.shape[1]
@@ -1144,9 +1186,11 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
         else:
             res = self.pd.concat(split, axis=1)
         if (blocks_in.record_keys is not None) and (len(blocks_in.record_keys) > 0):
-            res = res.sort_values(by=blocks_in.record_keys, inplace=False, ignore_index=True)
+            res = res.sort_values(
+                by=blocks_in.record_keys, inplace=False, ignore_index=True
+            )
         return res
-    
+
     def rowrecs_to_blocks(
         self,
         data,
@@ -1168,42 +1212,59 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
         assert set(data.columns) == set(blocks_out.row_columns)
         if data.shape[0] < 1:
             return self.pd.DataFrame({c: [] for c in blocks_out.block_columns})
-        if not self.table_is_keyed_by_columns(data, column_names=blocks_out.record_keys):
-            raise ValueError(
-                "table is not keyed by blocks_out.record_keys"
-            )
+        if not self.table_is_keyed_by_columns(
+            data, column_names=blocks_out.record_keys
+        ):
+            raise ValueError("table is not keyed by blocks_out.record_keys")
         ct = self.data_frame(blocks_out.control_table)
-        new_names = [ct.columns[j] for j in range(ct.shape[1]) if ct.columns[j] not in set(blocks_out.control_table_keys)]
+        new_names = [
+            ct.columns[j]
+            for j in range(ct.shape[1])
+            if ct.columns[j] not in set(blocks_out.control_table_keys)
+        ]
 
         def extract_rows(i):
-            ct_keys = ct.loc[[i], blocks_out.control_table_keys].reset_index(drop=True, inplace=False)
-            col_names = [ct.iloc[i, j] for j in range(ct.shape[1]) 
-                if ct.columns[j] not in set(blocks_out.control_table_keys)]
+            ct_keys = ct.loc[[i], blocks_out.control_table_keys].reset_index(
+                drop=True, inplace=False
+            )
+            col_names = [
+                ct.iloc[i, j]
+                for j in range(ct.shape[1])
+                if ct.columns[j] not in set(blocks_out.control_table_keys)
+            ]
             new_dat = data.loc[:, col_names].reset_index(inplace=False, drop=True)
             new_dat.columns = new_names
-            if (blocks_out.record_keys is not None) and (len(blocks_out.record_keys) > 0):
-                row = data.loc[:, blocks_out.record_keys].reset_index(inplace=False, drop=True)
+            if (blocks_out.record_keys is not None) and (
+                len(blocks_out.record_keys) > 0
+            ):
+                row = data.loc[:, blocks_out.record_keys].reset_index(
+                    inplace=False, drop=True
+                )
                 for c in ct_keys.columns:
                     row[c] = ct_keys.loc[0, c]
             else:
-                row = self.pd.DataFrame({c: [ct_keys.loc[0, c]] * data.shape[0] for c in ct_keys.columns})
-            row = self.pd.concat([
-                row, new_dat],
-                axis=1
-            )
+                row = self.pd.DataFrame(
+                    {c: [ct_keys.loc[0, c]] * data.shape[0] for c in ct_keys.columns}
+                )
+            row = self.pd.concat([row, new_dat], axis=1)
             return row
 
         rows = [extract_rows(i) for i in range(ct.shape[0])]
         res = self.pd.concat(rows, axis=0, ignore_index=True, sort=False)
         if (blocks_out.record_keys is not None) and (len(blocks_out.record_keys) > 0):
-            res = res.sort_values(by=blocks_out.record_keys + blocks_out.control_table_keys, inplace=False, ignore_index=True)
+            res = res.sort_values(
+                by=blocks_out.record_keys + blocks_out.control_table_keys,
+                inplace=False,
+                ignore_index=True,
+            )
         else:
-            res = res.sort_values(by=blocks_out.control_table_keys, inplace=False, ignore_index=True)
+            res = res.sort_values(
+                by=blocks_out.control_table_keys, inplace=False, ignore_index=True
+            )
         return res
-    
 
     # expression helpers
-    
+
     def act_on_literal(self, *, value):
         """
         Action for a literal/constant in an expression.
@@ -1212,7 +1273,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
         :return: converted result
         """
         return value
-    
+
     def act_on_column_name(self, *, arg, value):
         """
         Action for a column name.
@@ -1222,7 +1283,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, data_algebra.expression
         :return: arg acted on
         """
         return arg[value]
-    
+
     def act_on_expression(self, *, arg, values: List, op):
         """
         Action for a column name.

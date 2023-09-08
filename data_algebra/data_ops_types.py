@@ -203,7 +203,7 @@ class OperatorPlatform(ShiftPipeAction):
         jointype: str,
         check_all_common_keys_in_equi_spec: bool = False,
         by: Optional[Iterable[str]] = None,
-        check_all_common_keys_in_by: bool = False
+        check_all_common_keys_in_by: bool = False,
     ):
         """
         Join self (left) results with b (right).

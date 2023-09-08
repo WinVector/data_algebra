@@ -1,4 +1,3 @@
-
 import data_algebra.data_model
 
 pd = data_algebra.data_model.default_data_model().pd

@@ -1197,6 +1197,7 @@ def enc_value(value):
 
 class ColumnReference(Term):
     """class to represent referring to a column"""
+
     column_name: str
 
     def __init__(self, column_name):
@@ -1259,7 +1260,9 @@ def _can_find_method_by_name(op):
         return True
     # check user fns
     # first check chosen mappings
-    data_model = data_algebra.data_model.default_data_model()  # just use default for checking defs
+    data_model = (
+        data_algebra.data_model.default_data_model()
+    )  # just use default for checking defs
     try:
         _ = data_model.user_fun_map[op]  # for KeyError
         return True
@@ -1361,7 +1364,7 @@ class Expression(Term):
         """
         Convert parsed expression into a string
 
-        :param want_inline_parens: bool, 
+        :param want_inline_parens: bool,
                 if True put parens around complex expressions that don't already have a grouper.
         :return: PythonText
         """
@@ -1467,11 +1470,13 @@ one = lit(1)
 
 class ColumnNamer:
     """class to generate column names using dot/attribute notation"""
+
     def __init__(self) -> None:
         pass
 
     def __getattr__(self, key):
         assert isinstance(key, str)
         return col(key)
+
 
 d_ = ColumnNamer()

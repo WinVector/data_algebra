@@ -37,19 +37,19 @@ class DataModel(abc.ABC):
         """
         Check if df is our type of data frame.
         """
-    
+
     @abc.abstractmethod
     def clean_copy(self, df):
         """
         Copy of data frame without indices.
         """
-    
+
     @abc.abstractmethod
     def to_pandas(self, df):
         """
         Convert to Pandas
         """
-    
+
     @abc.abstractmethod
     def drop_indices(self, df) -> None:
         """
@@ -83,11 +83,11 @@ class DataModel(abc.ABC):
         """
         Concatenate columns from frame_list
         """
-    
+
     @abc.abstractmethod
     def get_cell(self, *, d, row: int, colname: str):
         """get a value from a cell"""
-    
+
     @abc.abstractmethod
     def set_col(self, *, d, colname: str, values):
         """set column, return ref"""
@@ -103,7 +103,7 @@ class DataModel(abc.ABC):
         :param data_map: dictionary mapping table and view names to data frames
         :return: data frame result
         """
-    
+
     # cdata transform methods
 
     @abc.abstractmethod
@@ -115,7 +115,7 @@ class DataModel(abc.ABC):
         :param blocks_in: cdata record specification
         :return: transformed data frame
         """
-    
+
     @abc.abstractmethod
     def rowrecs_to_blocks(
         self,
@@ -131,32 +131,57 @@ class DataModel(abc.ABC):
         :return: transformed data frame
         """
 
+
 # map type name strings to data models
 data_model_type_map = dict()
+
 
 def default_data_model() -> DataModel:
     """Get the default (Pandas) data model"""
     global data_model_type_map
     return data_model_type_map["default_data_model"]
 
+
 pandas_regexp = re.compile(r".*[^a-zA-Z]pandas[^a-zA-Z].*[^a-zA-z]dataframe[^a-zA-Z].*")
 assert pandas_regexp.match("<class 'pandas.core.frame.DataFrame'>".lower()) is not None
 polars_regexp = re.compile(r".*[^a-zA-Z]polars[^a-zA-Z].*[^a-zA-z]dataframe[^a-zA-Z].*")
-assert polars_regexp.match("<class 'polars.internals.dataframe.frame.DataFrame'>".lower()) is not None
-polars_regexp_lazy = re.compile(r".*[^a-zA-Z]polars[^a-zA-Z].*[^a-zA-z]lazyframe[^a-zA-Z].*")
-assert polars_regexp_lazy.match("<class 'polars.internals.lazyframe.frame.LazyFrame'>".lower()) is not None
+assert (
+    polars_regexp.match("<class 'polars.internals.dataframe.frame.DataFrame'>".lower())
+    is not None
+)
+polars_regexp_lazy = re.compile(
+    r".*[^a-zA-Z]polars[^a-zA-Z].*[^a-zA-z]lazyframe[^a-zA-Z].*"
+)
+assert (
+    polars_regexp_lazy.match(
+        "<class 'polars.internals.lazyframe.frame.LazyFrame'>".lower()
+    )
+    is not None
+)
+
 
 def lookup_data_model_for_key(key: str) -> DataModel:
     global data_model_type_map
     assert isinstance(key, str)
     key_lower = key.lower()
-    if (key == "default_data_model") or (key == "default_Pandas_model") or (pandas_regexp.match(key_lower) is not None):
+    if (
+        (key == "default_data_model")
+        or (key == "default_Pandas_model")
+        or (pandas_regexp.match(key_lower) is not None)
+    ):
         import data_algebra.pandas_model  # delayed import
+
         data_algebra.pandas_model.register_pandas_model(key)
-    elif (key == "default_Polars_model") or (polars_regexp.match(key_lower) is not None) or (polars_regexp_lazy.match(key_lower) is not None):
+    elif (
+        (key == "default_Polars_model")
+        or (polars_regexp.match(key_lower) is not None)
+        or (polars_regexp_lazy.match(key_lower) is not None)
+    ):
         import data_algebra.polars_model  # delayed import
+
         data_algebra.polars_model.register_polars_model(key)
     return data_model_type_map[key]
+
 
 def lookup_data_model_for_dataframe(d) -> DataModel:
     key = str(type(d))
