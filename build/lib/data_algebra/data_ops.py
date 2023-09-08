@@ -79,7 +79,7 @@ def _convert_on_clause_to_parallel_lists(on) -> Tuple[List[str], List[str]]:
                 on = list(on.items())
             else:
                 on = list(on)
-            for v in on :
+            for v in on:
                 if isinstance(v, str):
                     on_a.append(v)
                     on_b.append(v)
@@ -103,14 +103,14 @@ def _convert_parallel_lists_to_on_clause(on_a: Iterable[str], on_b: Iterable[str
     assert len(on_a) == len(on_b)
     if len(on_a) <= 0:
         return []
-    
+
     def enc_i(v_a, v_b):
         if v_a == v_b:
             return v_a
         return (v_a, v_b)
-    
+
     return [enc_i(v_a, v_b) for v_a, v_b in zip(on_a, on_b)]
- 
+
 
 def _work_col_group_arg(arg, *, arg_name: str, columns: Iterable[str]):
     """convert column list to standard form"""
@@ -133,7 +133,6 @@ def _work_col_group_arg(arg, *, arg_name: str, columns: Iterable[str]):
 class ViewRepresentation(OperatorPlatform, abc.ABC):
     """Structure to represent the columns of a query or a table.
     Abstract base class."""
-
 
     column_names: Tuple[str, ...]
     sources: Tuple[
@@ -267,7 +266,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
     def columns_produced(self) -> List[str]:
         """Return list of columns produced by operator dag."""
         return list(self.column_names)
-    
+
     def cod(self, *, table_name: Optional[str] = None):
         """
         Description of operator co-domain, a table description.
@@ -277,8 +276,8 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         """
         assert isinstance(table_name, (str, type(None)))
         return TableDescription(
-                table_name=table_name,
-                column_names=self.columns_produced(),
+            table_name=table_name,
+            column_names=self.columns_produced(),
         )
 
     def columns_used_implementation_(
@@ -320,15 +319,21 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             vi = columns_currently_using_records[ti.merged_rep_id()]
             columns_used[k] = vi.copy()
         return columns_used
-    
+
     def dom(self):
         """
         Description of domain.
-        
+
         :return: map of tables names to table descriptions
         """
         tb_map = self.get_tables()
-        res = {k: TableDescription(table_name=k if t.table_name_was_set_by_user else None, column_names=t.column_names) for k, t in tb_map.items()}
+        res = {
+            k: TableDescription(
+                table_name=k if t.table_name_was_set_by_user else None,
+                column_names=t.column_names,
+            )
+            for k, t in tb_map.items()
+        }
         return res
 
     # printing
@@ -370,7 +375,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
 
     def __str__(self):
         return self.to_python(strict=True, pretty=True)
-    
+
     def _repr_pretty_(self, p, cycle):
         """
         IPython pretty print
@@ -380,7 +385,6 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
             p.text("ViewRepresentation()")
         else:
             p.text(self.to_python(strict=True, pretty=True))
-
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
     @abc.abstractmethod
@@ -409,7 +413,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
 
     def __ne__(self, other):
         return not self.__eq__(other)
-    
+
     # composition
 
     def act_on(self, b, *, correct_ordered_first_call: bool = False):
@@ -431,7 +435,9 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
                 key = b.key
             assert isinstance(key, str)
             old = tables[key]
-            assert set(b.column_names) == set(old.column_names)  # this is defending associativity of composition against table narrowing
+            assert set(b.column_names) == set(
+                old.column_names
+            )  # this is defending associativity of composition against table narrowing
             return self.replace_leaves({key: b})
         if isinstance(b, dict):
             if len(b) <= 0:
@@ -550,9 +556,13 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
                 if not isinstance(v, OperatorPlatform):
                     all_op_platforms = False
                     if data_model is None:
-                        data_model = data_algebra.data_model.lookup_data_model_for_dataframe(v)
+                        data_model = (
+                            data_algebra.data_model.lookup_data_model_for_dataframe(v)
+                        )
                     if not data_model.is_appropriate_data_instance(v):
-                        raise ValueError(f"data_map[{k}] type {type(v)} not appropriate for data model {data_model}")
+                        raise ValueError(
+                            f"data_map[{k}] type {type(v)} not appropriate for data model {data_model}"
+                        )
             if all_op_platforms:
                 # apply self to replacement leaf definitions
                 return self.replace_leaves(data_map)
@@ -759,10 +769,10 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         self,
         b,
         *,
-        on = None,
+        on=None,
         jointype: str,
         check_all_common_keys_in_equi_spec: bool = False,
-        by = None,
+        by=None,
         check_all_common_keys_in_by: bool = False,
     ) -> "ViewRepresentation":
         """
@@ -1011,7 +1021,10 @@ class TableDescription(ViewRepresentation):
             table_name = "data_frame"
         assert isinstance(table_name, str)
         ViewRepresentation.__init__(
-            self, column_names=column_names, node_name="TableDescription", key=table_name,
+            self,
+            column_names=column_names,
+            node_name="TableDescription",
+            key=table_name,
         )
         self.table_name_was_set_by_user = table_name_was_set_by_user
         self.table_name = table_name
@@ -1203,7 +1216,9 @@ def describe_table(
     assert not isinstance(d, ViewRepresentation)
     assert isinstance(keep_sample, bool)
     assert isinstance(keep_all, bool)
-    assert isinstance(table_name, (str, type(None)))  # TODO: see if we can change this to never None
+    assert isinstance(
+        table_name, (str, type(None))
+    )  # TODO: see if we can change this to never None
     # confirm our data model is loaded
     data_model = data_algebra.data_model.lookup_data_model_for_dataframe(d)
     assert data_model.is_appropriate_data_instance(d)
@@ -1325,7 +1340,7 @@ class ExtendNode(ViewRepresentation):
         self.reverse = reverse
         column_names = list(source.column_names)
         consumed_cols = set()
-        for (k, o) in parsed_ops.items():
+        for k, o in parsed_ops.items():
             o.get_column_names(consumed_cols)
         unknown_cols = consumed_cols - set(source.column_names)
         if len(unknown_cols) > 0:
@@ -1357,7 +1372,7 @@ class ExtendNode(ViewRepresentation):
         # check op arguments are very simple: all arguments are column names
         if windowed_situation:
             source_col_set = set(source.column_names)
-            for (k, opk) in parsed_ops.items():
+            for k, opk in parsed_ops.items():
                 if not isinstance(opk, data_algebra.expr_rep.Expression):
                     raise ValueError(
                         "non-aggregated expression in windowed/partitioned extend: "
@@ -1428,9 +1443,7 @@ class ExtendNode(ViewRepresentation):
         :return: new operator DAG
         """
         assert isinstance(replacement_map, dict)
-        new_sources = [
-            s.replace_leaves(replacement_map) for s in self.sources
-        ]
+        new_sources = [s.replace_leaves(replacement_map) for s in self.sources]
         return new_sources[0].extend_parsed_(
             parsed_ops=self.ops,
             partition_by=self.partition_by,
@@ -1485,7 +1498,7 @@ class ExtendNode(ViewRepresentation):
         window_situation = (len(self.partition_by) > 0) or (len(self.order_by) > 0)
         if window_situation:
             # check these are forms we are prepared to work with
-            for (k, opk) in self.ops.items():
+            for k, opk in self.ops.items():
                 if len(opk.args) > 0:
                     if len(opk.args) > 1:
                         for i in range(1, len(opk.args)):
@@ -1521,7 +1534,7 @@ class ExtendNode(ViewRepresentation):
             return [OrderedSet(self.sources[0].column_names)]
         columns_we_take = using.union(self.partition_by, self.order_by, self.reverse)
         columns_we_take = columns_we_take - subops.keys()
-        for (k, o) in subops.items():
+        for k, o in subops.items():
             o.get_column_names(columns_we_take)
         return [
             OrderedSet(
@@ -1598,7 +1611,7 @@ class ProjectNode(ViewRepresentation):
         consumed_cols = set()
         for c in group_by:
             consumed_cols.add(c)
-        for (k, o) in parsed_ops.items():
+        for k, o in parsed_ops.items():
             o.get_column_names(consumed_cols)
         unknown_cols = consumed_cols - set(source.column_names)
         if len(unknown_cols) > 0:
@@ -1615,7 +1628,7 @@ class ProjectNode(ViewRepresentation):
         ViewRepresentation.__init__(
             self, column_names=column_names, sources=[source], node_name="ProjectNode"
         )
-        for (k, opk) in self.ops.items():
+        for k, opk in self.ops.items():
             if isinstance(opk, data_algebra.expr_rep.Expression):
                 if len(opk.args) > 1:
                     raise ValueError(
@@ -1675,9 +1688,7 @@ class ProjectNode(ViewRepresentation):
         :return: new operator DAG
         """
         assert isinstance(replacement_map, dict)
-        new_sources = [
-            s.replace_leaves(replacement_map) for s in self.sources
-        ]
+        new_sources = [s.replace_leaves(replacement_map) for s in self.sources]
         return new_sources[0].project_parsed_(
             parsed_ops=self.ops, group_by=self.group_by
         )
@@ -1706,7 +1717,7 @@ class ProjectNode(ViewRepresentation):
         else:
             subops = {k: op for (k, op) in self.ops.items() if k in using}
         columns_we_take = set(self.group_by)
-        for (k, o) in subops.items():
+        for k, o in subops.items():
             o.get_column_names(columns_we_take)
         return [columns_we_take]
 
@@ -1814,9 +1825,7 @@ class SelectRowsNode(ViewRepresentation):
         :return: new operator DAG
         """
         assert isinstance(replacement_map, dict)
-        new_sources = [
-            s.replace_leaves(replacement_map) for s in self.sources
-        ]
+        new_sources = [s.replace_leaves(replacement_map) for s in self.sources]
         return new_sources[0].select_rows_parsed_(parsed_ops=self.ops)
 
     def _equiv_nodes(self, other):
@@ -1915,9 +1924,7 @@ class SelectColumnsNode(ViewRepresentation):
         :return: new operator DAG
         """
         assert isinstance(replacement_map, dict)
-        new_sources = [
-            s.replace_leaves(replacement_map) for s in self.sources
-        ]
+        new_sources = [s.replace_leaves(replacement_map) for s in self.sources]
         return new_sources[0].select_columns(columns=self.column_selection)
 
     def _equiv_nodes(self, other):
@@ -2013,9 +2020,7 @@ class DropColumnsNode(ViewRepresentation):
         :return: new operator DAG
         """
         assert isinstance(replacement_map, dict)
-        new_sources = [
-            s.replace_leaves(replacement_map) for s in self.sources
-        ]
+        new_sources = [s.replace_leaves(replacement_map) for s in self.sources]
         return new_sources[0].drop_columns(column_deletions=self.column_deletions)
 
     def _equiv_nodes(self, other):
@@ -2115,9 +2120,7 @@ class OrderRowsNode(ViewRepresentation):
         :return: new operator DAG
         """
         assert isinstance(replacement_map, dict)
-        new_sources = [
-            s.replace_leaves(replacement_map) for s in self.sources
-        ]
+        new_sources = [s.replace_leaves(replacement_map) for s in self.sources]
         return new_sources[0].order_rows(
             columns=self.order_columns, reverse=self.reverse, limit=self.limit
         )
@@ -2206,7 +2209,9 @@ class MapColumnsNode(ViewRepresentation):
     column_deletions: List[str]
 
     def __init__(self, source, column_remapping):
-        self.column_remapping = {k: v for (k, v) in column_remapping.items() if v is not None}
+        self.column_remapping = {
+            k: v for (k, v) in column_remapping.items() if v is not None
+        }
         self.column_deletions = [k for (k, v) in column_remapping.items() if v is None]
         new_cols = [v for (k, v) in column_remapping.items() if v is not None]
         orig_cols = [k for k in column_remapping.keys()]
@@ -2225,7 +2230,8 @@ class MapColumnsNode(ViewRepresentation):
             )
         column_names = [
             (k if k not in self.column_remapping.keys() else self.column_remapping[k])
-            for k in source.column_names if k not in set(self.column_deletions)
+            for k in source.column_names
+            if k not in set(self.column_deletions)
         ]
         self.new_columns = set(new_cols) - set(orig_cols)
         ViewRepresentation.__init__(
@@ -2244,9 +2250,7 @@ class MapColumnsNode(ViewRepresentation):
         :return: new operator DAG
         """
         assert isinstance(replacement_map, dict)
-        new_sources = [
-            s.replace_leaves(replacement_map) for s in self.sources
-        ]
+        new_sources = [s.replace_leaves(replacement_map) for s in self.sources]
         return new_sources[0].map_columns(column_remapping=self.column_remapping)
 
     def _equiv_nodes(self, other):
@@ -2269,12 +2273,11 @@ class MapColumnsNode(ViewRepresentation):
             using_tuple = self.column_names
         else:
             using_tuple = tuple(using)
-        cols = [k for k in using_tuple if k ]
+        cols = [k for k in using_tuple if k]
         reverse_mapping = {v: k for k, v in self.column_remapping.items()}
         rev_keys = set(reverse_mapping.keys())
         cols = [
-            (k if k not in rev_keys else reverse_mapping[k])
-            for k in using_tuple
+            (k if k not in rev_keys else reverse_mapping[k]) for k in using_tuple
         ] + self.column_deletions
         return [OrderedSet(cols)]
 
@@ -2365,9 +2368,7 @@ class RenameColumnsNode(ViewRepresentation):
         :return: new operator DAG
         """
         assert isinstance(replacement_map, dict)
-        new_sources = [
-            s.replace_leaves(replacement_map) for s in self.sources
-        ]
+        new_sources = [s.replace_leaves(replacement_map) for s in self.sources]
         return new_sources[0].rename_columns(column_remapping=self.column_remapping)
 
     def _equiv_nodes(self, other):
@@ -2480,9 +2481,9 @@ class NaturalJoinNode(ViewRepresentation):
         if len(missing_right) > 0:
             raise KeyError("right table missing join keys: " + str(missing_right))
         if check_all_common_keys_in_equi_spec:
-            missing_common = (
-                set(a.column_names).intersection(set(b.column_names)) - set(on_a).intersection(on_b)
-            )
+            missing_common = set(a.column_names).intersection(
+                set(b.column_names)
+            ) - set(on_a).intersection(on_b)
             if len(missing_common) > 0:
                 raise KeyError(
                     "check_all_common_keys_in_equi_spec set, and the following common keys are are not in the on-clause: "
@@ -2519,11 +2520,11 @@ class NaturalJoinNode(ViewRepresentation):
         :return: new operator DAG
         """
         assert isinstance(replacement_map, dict)
-        new_sources = [
-            s.replace_leaves(replacement_map) for s in self.sources
-        ]
+        new_sources = [s.replace_leaves(replacement_map) for s in self.sources]
         return new_sources[0].natural_join(
-            b=new_sources[1], on=[(va, vb) for (va, vb) in zip(self.on_a, self.on_b)], jointype=self.jointype
+            b=new_sources[1],
+            on=[(va, vb) for (va, vb) in zip(self.on_a, self.on_b)],
+            jointype=self.jointype,
         )
 
     def _equiv_nodes(self, other):
@@ -2647,9 +2648,7 @@ class ConcatRowsNode(ViewRepresentation):
         :return: new operator DAG
         """
         assert isinstance(replacement_map, dict)
-        new_sources = [
-            s.replace_leaves(replacement_map) for s in self.sources
-        ]
+        new_sources = [s.replace_leaves(replacement_map) for s in self.sources]
         return new_sources[0].concat_rows(
             b=new_sources[1],
             id_column=self.id_column,
@@ -2762,9 +2761,7 @@ class ConvertRecordsNode(ViewRepresentation):
         :return: new operator DAG
         """
         assert isinstance(replacement_map, dict)
-        new_sources = [
-            s.replace_leaves(replacement_map) for s in self.sources
-        ]
+        new_sources = [s.replace_leaves(replacement_map) for s in self.sources]
         return new_sources[0].convert_records(record_map=self.record_map)
 
     def _equiv_nodes(self, other):
@@ -2901,7 +2898,7 @@ class SQLNode(ViewRepresentation):
         r = SQLNode(
             sql=self.sql.copy(),
             column_names=self.column_names.copy(),
-            view_name=self.view_name
+            view_name=self.view_name,
         )
         return r
 
@@ -2984,6 +2981,4 @@ def ex(d, *, data_model=None, allow_limited_tables: bool = False):
     :param allow_limited_tables: logical, if True allow execution on non-complete tables
     :return: table result
     """
-    return d.ex(
-        data_model=data_model, allow_limited_tables=allow_limited_tables
-    )
+    return d.ex(data_model=data_model, allow_limited_tables=allow_limited_tables)

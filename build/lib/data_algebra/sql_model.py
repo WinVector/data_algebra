@@ -753,8 +753,9 @@ def _annotated_method_catalogue(
     return known_method_uses, recommended_method_uses
 
 
-class SQLModel():
+class SQLModel:
     """A model of how SQL should be generated for a given database."""
+
     identifier_quote: str
     string_quote: str
     on_start: str
@@ -1062,7 +1063,7 @@ class SQLModel():
             extend_node.partition_by, extend_node.order_by, extend_node.reverse
         )
         subops = OrderedDict()
-        for (k, op) in extend_node.ops.items():
+        for k, op in extend_node.ops.items():
             if k in using:
                 subops[k] = op
         if len(subops) <= 0:
@@ -1107,7 +1108,7 @@ class SQLModel():
         for k in origcols:
             terms[k] = None
             declared_term_dependencies[k] = {k}
-        for (ci, oi) in subops.items():
+        for ci, oi in subops.items():
             terms[ci] = self.expr_to_sql(oi) + window_term
             cols_used_in_term: Set[str] = set()
             oi.get_column_names(cols_used_in_term)
@@ -1418,7 +1419,10 @@ class SQLModel():
         view_name = "map_columns_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         unchanged_columns = subusing - (
-            set(map_columns_node.column_remapping.values()).union(map_columns_node.column_remapping.keys()).union(map_columns_node.column_deletions))
+            set(map_columns_node.column_remapping.values())
+            .union(map_columns_node.column_remapping.keys())
+            .union(map_columns_node.column_deletions)
+        )
         terms = {
             ki: self.quote_identifier(vi)
             for (vi, ki) in map_columns_node.column_remapping.items()
@@ -1458,7 +1462,10 @@ class SQLModel():
         view_name = "rename_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         unchanged_columns = subusing - (
-            set(rename_node.column_remapping.values()).union(rename_node.column_remapping.keys()))
+            set(rename_node.column_remapping.values()).union(
+                rename_node.column_remapping.keys()
+            )
+        )
         terms = {
             ki: self.quote_identifier(vi)
             for (ki, vi) in rename_node.column_remapping.items()
@@ -1796,7 +1803,6 @@ class SQLModel():
         sql_str_list = [v.rstrip() for v in sql_str_list]
         sql_str_list = [v for v in sql_str_list if len(v) > 0]
         return "\n".join(sql_str_list) + "\n"
-    
 
     def row_recs_to_blocks_query_str_list_pair(
         self, record_spec
@@ -1808,9 +1814,7 @@ class SQLModel():
         dm = data_algebra.data_model.lookup_data_model_for_dataframe(ct)
         ct = dm.to_pandas(ct)
         control_value_cols = [
-            c
-            for c in ct.columns
-            if c not in record_spec.control_table_keys
+            c for c in ct.columns if c not in record_spec.control_table_keys
         ]
         control_cols = [
             "a." + self.quote_identifier(c) for c in record_spec.record_keys
@@ -1902,9 +1906,7 @@ class SQLModel():
             sql_suffix = [" ) a"]
             return sql_prefix, sql_suffix
         control_value_cols = [
-            c
-            for c in ct.columns
-            if c not in record_spec.control_table_keys
+            c for c in ct.columns if c not in record_spec.control_table_keys
         ]
         control_cols = [self.quote_identifier(c) for c in record_spec.record_keys]
         seen = set()

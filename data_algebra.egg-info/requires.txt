@@ -1,5 +1,5 @@
-numpy
-pandas>=1.0.0
+numpy>=1.25.2
+pandas>=2.0.3
 lark
 
 [BigQuery]
@@ -13,7 +13,7 @@ sqlalchemy
 pymysql
 
 [Polars]
-polars>=0.15.3
+polars>=0.19.2
 pyarrow
 
 [PostgreSQL]

@@ -41,9 +41,7 @@ class DataOpArrow(Arrow):
 
     """
 
-    def __init__(
-        self, pipeline, *, free_table_key=None
-    ):
+    def __init__(self, pipeline, *, free_table_key=None):
         assert isinstance(pipeline, data_algebra.data_ops.ViewRepresentation)
         self.pipeline = pipeline
         t_used = pipeline.get_tables()
@@ -71,7 +69,7 @@ class DataOpArrow(Arrow):
     def act_on(self, b, *, correct_ordered_first_call: bool = False):
         """
         Apply self onto b.
-        
+
         :param b: item to act on, or item that has been sent to self.
         :param correct_ordered_first_call: if True indicates this call is from __rshift__ or __rrshift__ and not the fallback paths.
         """
@@ -86,7 +84,9 @@ class DataOpArrow(Arrow):
             excess = set(b.outgoing_columns) - set(self.incoming_columns)
             if len(excess) > 0:
                 raise ValueError("extra incoming columns: " + str(excess))
-            new_pipeline = self.pipeline.replace_leaves({self.free_table_key: b.pipeline})
+            new_pipeline = self.pipeline.replace_leaves(
+                {self.free_table_key: b.pipeline}
+            )
             new_pipeline.get_tables()  # check tables are compatible
             res = DataOpArrow(
                 pipeline=new_pipeline,
@@ -148,9 +148,7 @@ class DataOpArrow(Arrow):
         return self.incoming_columns.copy()
 
     # noinspection PyMethodMayBeStatic
-    def format_end_description(
-        self, *, required_cols, align_right=70, sep_width=2
-    ):
+    def format_end_description(self, *, required_cols, align_right=70, sep_width=2):
         in_rep = [str(c) for c in required_cols]
         in_rep = data_algebra.flow_text.flow_text(
             in_rep, align_right=align_right, sep_width=sep_width

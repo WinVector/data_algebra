@@ -1,5 +1,3 @@
-
-
 import abc
 from typing import Any, Callable, Dict, Iterable, List, Optional
 
@@ -28,7 +26,7 @@ class ExpressionWalker(abc.ABC):
         :param value: column name
         :return: arg acted on
         """
-    
+
     @abc.abstractmethod
     def act_on_expression(self, *, arg, values: List, op):
         """

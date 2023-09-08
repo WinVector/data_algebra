@@ -69,7 +69,7 @@ class DBModel(ShiftPipeAction, SQLModel):
         :param db_engine: optional sqlalchemy style engine (for closing)
         """
         return DBHandle(db_model=self, conn=conn, db_engine=db_engine)
-    
+
     def prepare_connection(self, conn):
         """
         Do any augmentation or preparation of a database connection. Example: adding stored procedures.
@@ -186,7 +186,7 @@ class DBModel(ShiftPipeAction, SQLModel):
         return self.read_table(
             conn=conn, table_name=table.table_name, qualifiers=table.qualifiers
         )
-    
+
     def act_on(self, b, *, correct_ordered_first_call: bool = False):
         if isinstance(b, data_algebra.data_ops.ViewRepresentation):
             return self.to_sql(b)
@@ -241,8 +241,8 @@ class DBHandle(ShiftPipeAction):
         if correct_ordered_first_call and isinstance(b, ShiftPipeAction):
             return b.act_on(self, correct_ordered_first_call=False)  # fall back
         raise TypeError(f"inappropriate type to DBHandle.act_on(): {type(b)}")
-    
-    def read_table(self, table_name:str):
+
+    def read_table(self, table_name: str):
         """
         Return table as a Pandas data frame.
 
@@ -250,8 +250,8 @@ class DBHandle(ShiftPipeAction):
         """
         tn = self.db_model.quote_table_name(table_name)
         return self.read_query(f"SELECT * FROM {tn}")
-    
-    def create_table(self, *, table_name:str, q):
+
+    def create_table(self, *, table_name: str, q):
         """
         Create table from query.
 
@@ -295,7 +295,9 @@ class DBHandle(ShiftPipeAction):
         """
         self.db_model.drop_table(self.conn, table_name)
 
-    def insert_table(self, d, *, table_name: str, allow_overwrite: bool = False) -> data_algebra.data_ops.TableDescription:
+    def insert_table(
+        self, d, *, table_name: str, allow_overwrite: bool = False
+    ) -> data_algebra.data_ops.TableDescription:
         """
         Insert a table into the database.
         """
@@ -306,7 +308,7 @@ class DBHandle(ShiftPipeAction):
         )
         res = self.describe_table(table_name)
         return res
-    
+
     def to_sql(
         self,
         ops: data_algebra.data_ops.ViewRepresentation,

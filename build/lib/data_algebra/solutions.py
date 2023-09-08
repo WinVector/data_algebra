@@ -237,20 +237,23 @@ def xicor_score_variables_plan(
         ),
         strict=False,
     )
-    rep_frame = data_algebra.data_model.default_data_model().data_frame({"rep": range(n_rep)})
+    rep_frame = data_algebra.data_model.default_data_model().data_frame(
+        {"rep": range(n_rep)}
+    )
     grouped_calc = (
         xicor_query(
-            d
-                .extend({"_da_xicor_tmp_order": "1"})
-                .extend({"_da_xicor_tmp_index": "(1).cumsum()"}, order_by=["_da_xicor_tmp_order"])
-                .convert_records(
-                    record_map
-                ).natural_join(  # cross join rows to get experiment repetitions
-                    b=descr(rep_frame=rep_frame),
-                    on=[],
-                    jointype="cross",
-                ),
-                var_keys=["variable_name", "rep"],
+            d.extend({"_da_xicor_tmp_order": "1"})
+            .extend(
+                {"_da_xicor_tmp_index": "(1).cumsum()"},
+                order_by=["_da_xicor_tmp_order"],
+            )
+            .convert_records(record_map)
+            .natural_join(  # cross join rows to get experiment repetitions
+                b=descr(rep_frame=rep_frame),
+                on=[],
+                jointype="cross",
+            ),
+            var_keys=["variable_name", "rep"],
         )
         .project(
             {

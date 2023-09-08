@@ -137,7 +137,9 @@ def guess_carried_scalar_type(col) -> type:
     }:
         return ct
     # look at a list or Series
-    if isinstance(col, data_algebra.data_model.default_data_model().pd.core.series.Series):
+    if isinstance(
+        col, data_algebra.data_model.default_data_model().pd.core.series.Series
+    ):
         col = col.values
     if len(col) < 1:
         return type(None)

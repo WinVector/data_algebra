@@ -1,4 +1,3 @@
-
 from typing import Optional, Set
 import data_algebra.data_model
 import data_algebra.data_ops
@@ -9,10 +8,11 @@ class DataModelSpace(data_algebra.data_space.DataSpace):
     """
     A data space as a map of mapped data_model data frames.
     """
+
     def __init__(
-        self, 
+        self,
         data_model: Optional[data_algebra.data_model.DataModel] = None,
-        ) -> None:
+    ) -> None:
         """
         Build an isolated execution space. Good for enforcing different data model adaptors or alternatives.
 
@@ -26,7 +26,9 @@ class DataModelSpace(data_algebra.data_space.DataSpace):
         self.data_map = dict()
         self.n_tmp = 0
 
-    def insert(self, *, key: Optional[str] = None, value, allow_overwrite: bool = True) -> data_algebra.data_ops.TableDescription:
+    def insert(
+        self, *, key: Optional[str] = None, value, allow_overwrite: bool = True
+    ) -> data_algebra.data_ops.TableDescription:
         """
         Insert value into data space for key.
 
@@ -45,7 +47,7 @@ class DataModelSpace(data_algebra.data_space.DataSpace):
             assert key not in self.data_map.keys()
         self.data_map[key] = value
         return self.describe(key)
-    
+
     def remove(self, key: str) -> None:
         """
         Remove value from data space.
@@ -60,7 +62,7 @@ class DataModelSpace(data_algebra.data_space.DataSpace):
         Return keys
         """
         return set(self.data_map.keys())
-    
+
     def retrieve(self, key: str):
         """
         Retrieve a table value from the DataSpace.
@@ -73,12 +75,12 @@ class DataModelSpace(data_algebra.data_space.DataSpace):
         return res
 
     def execute(
-        self, 
-        ops: data_algebra.data_ops.ViewRepresentation, 
-        *, 
+        self,
+        ops: data_algebra.data_ops.ViewRepresentation,
+        *,
         key: Optional[str] = None,
         allow_overwrite: bool = False,
-        ) -> data_algebra.data_ops.TableDescription:
+    ) -> data_algebra.data_ops.TableDescription:
         """
         Execute ops in data space, saving result as a side effect and returning a reference.
 

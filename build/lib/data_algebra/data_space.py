@@ -1,4 +1,3 @@
-
 import abc
 from typing import Optional, Set
 import data_algebra.data_model
@@ -9,11 +8,14 @@ class DataSpace(abc.ABC):
     """
     Class modeling a space of data keyed by strings, with specified semantics.
     """
+
     def __init__(self) -> None:
         pass
 
     @abc.abstractmethod
-    def insert(self, *, key: Optional[str] = None, value, allow_overwrite: bool = True) -> data_algebra.data_ops.TableDescription:
+    def insert(
+        self, *, key: Optional[str] = None, value, allow_overwrite: bool = True
+    ) -> data_algebra.data_ops.TableDescription:
         """
         Insert value into data space for key.
 
@@ -22,7 +24,7 @@ class DataSpace(abc.ABC):
         :param allow_overwrite: if True, allow table replacement
         :return: table description
         """
-    
+
     @abc.abstractmethod
     def remove(self, key: str) -> None:
         """
@@ -30,13 +32,13 @@ class DataSpace(abc.ABC):
 
         :param key: key to remove
         """
-    
+
     @abc.abstractmethod
     def keys(self) -> Set[str]:
         """
         Return keys
         """
-    
+
     @abc.abstractmethod
     def retrieve(self, key: str):
         """
@@ -48,12 +50,12 @@ class DataSpace(abc.ABC):
 
     @abc.abstractmethod
     def execute(
-        self, 
-        ops: data_algebra.data_ops.ViewRepresentation, 
-        *, 
+        self,
+        ops: data_algebra.data_ops.ViewRepresentation,
+        *,
         key: Optional[str] = None,
         allow_overwrite: bool = False,
-        ) -> data_algebra.data_ops.TableDescription:
+    ) -> data_algebra.data_ops.TableDescription:
         """
         Execute ops in data space, saving result as a side effect and returning a reference.
 

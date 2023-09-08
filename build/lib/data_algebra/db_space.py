@@ -1,4 +1,3 @@
-
 from typing import Optional, Set
 import data_algebra.data_model
 import data_algebra.data_ops
@@ -11,12 +10,13 @@ class DBSpace(data_algebra.data_space.DataSpace):
     """
     A data space implemented in a database.
     """
+
     def __init__(
-        self, 
+        self,
         db_handle: Optional[data_algebra.db_model.DBHandle] = None,
         *,
-        drop_tables_on_close: bool = False
-        ) -> None:
+        drop_tables_on_close: bool = False,
+    ) -> None:
         super().__init__()
         assert isinstance(drop_tables_on_close, bool)
         self.drop_tables_on_close = drop_tables_on_close
@@ -30,8 +30,10 @@ class DBSpace(data_algebra.data_space.DataSpace):
         self.n_tmp = 0
         self.description_map = dict()
         self.eligable_for_auto_drop_list = set()
-    
-    def model_table(self, key: str, *, eligible_for_auto_drop: bool = False) -> data_algebra.data_ops.TableDescription:
+
+    def model_table(
+        self, key: str, *, eligible_for_auto_drop: bool = False
+    ) -> data_algebra.data_ops.TableDescription:
         """
         Insert existing table record into data space model.
 
@@ -45,7 +47,9 @@ class DBSpace(data_algebra.data_space.DataSpace):
             self.eligable_for_auto_drop_list.add(key)
         return descr
 
-    def insert(self, *, key: Optional[str] = None, value, allow_overwrite: bool = True) -> data_algebra.data_ops.TableDescription:
+    def insert(
+        self, *, key: Optional[str] = None, value, allow_overwrite: bool = True
+    ) -> data_algebra.data_ops.TableDescription:
         """
         Insert value into data space for key.
 
@@ -61,9 +65,11 @@ class DBSpace(data_algebra.data_space.DataSpace):
         assert isinstance(allow_overwrite, bool)
         if not allow_overwrite:
             assert key not in self.description_map.keys()
-        self.db_handle.insert_table(value, table_name=key, allow_overwrite=allow_overwrite)
+        self.db_handle.insert_table(
+            value, table_name=key, allow_overwrite=allow_overwrite
+        )
         return self.model_table(key, eligible_for_auto_drop=True)
-    
+
     def remove(self, key: str) -> None:
         """
         Remove value from data space.
@@ -75,13 +81,13 @@ class DBSpace(data_algebra.data_space.DataSpace):
         if key in self.eligable_for_auto_drop_list:
             self.eligable_for_auto_drop_list.remove(key)
         self.db_handle.drop_table(key)
-    
+
     def keys(self) -> Set[str]:
         """
         Return keys
         """
         return set(self.description_map.keys())
-    
+
     def retrieve(self, key: str):
         """
         Retrieve a table value from the DataSpace.
@@ -95,12 +101,12 @@ class DBSpace(data_algebra.data_space.DataSpace):
         return d
 
     def execute(
-        self, 
-        ops: data_algebra.data_ops.ViewRepresentation, 
-        *, 
+        self,
+        ops: data_algebra.data_ops.ViewRepresentation,
+        *,
         key: Optional[str] = None,
         allow_overwrite: bool = False,
-        ) -> data_algebra.data_ops.TableDescription:
+    ) -> data_algebra.data_ops.TableDescription:
         """
         Execute ops in data space, saving result as a side effect and returning a reference.
 

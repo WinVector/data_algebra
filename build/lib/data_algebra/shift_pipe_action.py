@@ -1,12 +1,12 @@
-
 import abc
 
 
 class ShiftPipeAction(abc.ABC):
     """
-    Class representing mapping a >> b to b.act_on(a). 
+    Class representing mapping a >> b to b.act_on(a).
     This is read as "sending a to b".
     """
+
     def __init__(self) -> None:
         pass
 
@@ -15,7 +15,7 @@ class ShiftPipeAction(abc.ABC):
         """
         Apply self onto b.
         This is read as "self acting on b."
-        
+
         :param b: item to act on, or item that has been sent to self.
         :param correct_ordered_first_call: if True indicates this is from not the fallback paths.
         """

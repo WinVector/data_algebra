@@ -24,6 +24,7 @@ from data_algebra.data_ops import *
 have_polars = False
 try:
     import data_algebra.polars_model  # conditional import
+
     have_polars = True
 except ModuleNotFoundError:
     pass
@@ -50,7 +51,7 @@ def _re_parse(ops, *, data_model_map: Dict[str, Any]):
         str1,
         globals(),
         data_model_map,  # make our definition of data module available
-            # cdata uses this
+        # cdata uses this
     )
     return ops2
 
@@ -66,10 +67,10 @@ def formats_to_self(ops, *, data_model_map: Optional[Dict[str, Any]] = None) -> 
     """
     if data_model_map is None:
         local_data_model = data_algebra.data_model.default_data_model()
-        data_model_map = {local_data_model.presentation_model_name: local_data_model.module}
-    ops2 = _re_parse(
-        ops, 
-        data_model_map=data_model_map)
+        data_model_map = {
+            local_data_model.presentation_model_name: local_data_model.module
+        }
+    ops2 = _re_parse(ops, data_model_map=data_model_map)
     ops_match = ops == ops2
     assert ops_match
     pickle_string = pickle.dumps(ops)
@@ -239,7 +240,7 @@ def _run_handle_experiments(
     if need_to_run:
         to_del = set()
         caught: Optional[Any] = None
-        for (k, v) in data.items():
+        for k, v in data.items():
             db_handle.insert_table(v, table_name=k, allow_overwrite=True)
             to_del.add(k)
         try:
@@ -329,7 +330,9 @@ def check_transform_on_data_model(
     assert isinstance(data, dict)
     assert expect is not None
     if local_data_model is None:
-        local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(expect)
+        local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(
+            expect
+        )
     if not local_data_model.is_appropriate_data_instance(expect):
         raise TypeError("expected expect to be a DataFrame")
     assert isinstance(ops, ViewRepresentation)
@@ -337,9 +340,13 @@ def check_transform_on_data_model(
     n_tables = len(data)
     assert n_tables > 0
     data_model_map = {local_data_model.presentation_model_name: local_data_model.module}
-    def_pd_data_model = data_algebra.data_model.lookup_data_model_for_key("default_Pandas_model")
+    def_pd_data_model = data_algebra.data_model.lookup_data_model_for_key(
+        "default_Pandas_model"
+    )
     if def_pd_data_model.presentation_model_name not in data_model_map.keys():
-        data_model_map[def_pd_data_model.presentation_model_name] = def_pd_data_model.module
+        data_model_map[
+            def_pd_data_model.presentation_model_name
+        ] = def_pd_data_model.module
     cols_used = ops.columns_used()
     if len(cols_used) < 1:
         raise ValueError("no tables used")
@@ -350,9 +357,7 @@ def check_transform_on_data_model(
     # try pandas path
     res = ops.eval(data_map=data)
     if not local_data_model.is_appropriate_data_instance(res):
-        raise ValueError(
-            "expected res to be DataFrame, got: " + str(type(res))
-        )
+        raise ValueError("expected res to be DataFrame, got: " + str(type(res)))
     if not equivalent_frames(
         res,
         expect,
@@ -369,14 +374,11 @@ def check_transform_on_data_model(
     if check_parse:
         if not formats_to_self(ops, data_model_map=data_model_map):
             raise ValueError("ops did not round-trip format")
-        ops_2 = _re_parse(
-            ops, 
-            data_model_map=data_model_map)
+        ops_2 = _re_parse(ops, data_model_map=data_model_map)
         res_2 = ops_2.eval(data_map=data)
         if not local_data_model.is_appropriate_data_instance(res_2):
             raise ValueError(
-                "(reparse) expected res to be DataFrame, got: "
-                + str(type(res_2))
+                "(reparse) expected res to be DataFrame, got: " + str(type(res_2))
             )
         if not equivalent_frames(
             res_2,
@@ -404,10 +406,7 @@ def check_transform_on_data_model(
             assert equivalent_frames(v, v2)
     if valid_for_empty:
         # try on empty inputs
-        empty_map = {
-            k: local_data_model.clean_copy(v.head(0))
-            for k, v in data.items()
-        }
+        empty_map = {k: local_data_model.clean_copy(v.head(0)) for k, v in data.items()}
         empty_res = ops.eval(empty_map)
         assert local_data_model.is_appropriate_data_instance(empty_res)
         if set(empty_res.columns) != set(res.columns):
@@ -466,7 +465,9 @@ def _check_transform_on_handles(
     assert expect is not None
     assert isinstance(ops, ViewRepresentation)
     if local_data_model is None:
-        local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(expect)
+        local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(
+            expect
+        )
     n_tables = len(data)
     assert n_tables > 0
     if not local_data_model.is_appropriate_data_instance(expect):
@@ -558,7 +559,7 @@ def check_transform(
     models_to_skip: Optional[Iterable] = None,
     valid_for_empty: bool = True,
     empty_produces_empty: bool = True,
-    local_data_model = None,
+    local_data_model=None,
     try_on_Polars: bool = True,
 ) -> None:
     """
@@ -590,7 +591,9 @@ def check_transform(
     assert isinstance(try_on_Polars, bool)
     assert expect is not None
     if local_data_model is None:
-        local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(expect)
+        local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(
+            expect
+        )
     assert local_data_model.is_appropriate_data_instance(expect)
     check_transform_on_data_model(
         ops=ops,
@@ -606,7 +609,9 @@ def check_transform(
         local_data_model=local_data_model,
     )
     if try_on_Polars and have_polars:
-        polars_data_model = data_algebra.data_model.lookup_data_model_for_key("default_Polars_model")
+        polars_data_model = data_algebra.data_model.lookup_data_model_for_key(
+            "default_Polars_model"
+        )
         pl = polars_data_model.module
         expect_polars = pl.DataFrame(expect)
         data_polars = {k: pl.DataFrame(d) for k, d in data.items()}
@@ -638,7 +643,9 @@ def check_transform(
             db_handles = db_handles + test_dbs
             if models_to_skip is not None:
                 models_to_skip = {str(m) for m in models_to_skip}
-                db_handles = [h for h in db_handles if str(h.db_model) not in models_to_skip]
+                db_handles = [
+                    h for h in db_handles if str(h.db_model) not in models_to_skip
+                ]
             _check_transform_on_handles(
                 ops=ops,
                 data=data,

@@ -22,6 +22,7 @@ from data_algebra.data_ops import *
 
 # map from op-name to special SQL formatting code
 
+
 # Standard SQL code for checking isbad doesn't work in SQLlite, so
 # at least capture to is_bad, which appears to not be implemented
 # unless we call prepare connection
@@ -82,6 +83,7 @@ def _sqlite_remainder_expr(dbmodel, expression):
         + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
         + ")"
     )
+
 
 def _sqlite_logical_or_expr(dbmodel, expression):
     """
