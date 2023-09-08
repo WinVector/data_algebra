@@ -4,7 +4,7 @@ channels:
   - conda-forge
 dependencies:
   - numpy
-  - pandas
+  - pandas>=2.0.3
   - lark
   - scipy
   - jupyterlab
@@ -29,5 +29,5 @@ dependencies:
     - google.cloud
     - google-cloud-bigquery
     - db_dtypes
-    - polars>=0.15.3
+    - polars>=0.19.2
 

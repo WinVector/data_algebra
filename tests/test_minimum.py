@@ -23,5 +23,9 @@ def test_minimum_1():
         }
     )
 
-    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect,
+    data_algebra.test_util.check_transform(
+        ops=ops, 
+        data=d, 
+        expect=expect,
+        valid_for_empty=False,
     )

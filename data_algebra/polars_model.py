@@ -334,8 +334,8 @@ def _populate_expr_impl_map(extend_context: bool) -> Dict[int, Dict[str, Callabl
         "~": lambda x: x == False,
         "!": lambda x: x == False,
         # datetime parsing from https://stackoverflow.com/a/71759536/6901725
-        "parse_date": lambda x, format : x.cast(str).str.strptime(pl.Date, fmt=format, strict=False).cast(pl.Date),
-        "parse_datetime": lambda x, format : x.cast(str).str.strptime(pl.Datetime, fmt=format, strict=False).cast(pl.Datetime),
+        "parse_date": lambda x, format : x.cast(str).str.strptime(pl.Date, format=format, strict=False).cast(pl.Date),
+        "parse_datetime": lambda x, format : x.cast(str).str.strptime(pl.Datetime, format=format, strict=False).cast(pl.Datetime),
     }
     impl_map_3 = {
         "if_else": lambda a, b, c: pl.when(a.is_null()).then(pl.lit(None)).otherwise(pl.when(a).then(b).otherwise(c)),

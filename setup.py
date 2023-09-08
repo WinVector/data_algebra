@@ -27,8 +27,8 @@ setuptools.setup(
     url='https://github.com/WinVector/data_algebra',
     packages=setuptools.find_packages(exclude=['tests', 'Examples']),
     install_requires=[
-        "numpy",
-        "pandas>=1.0.0",
+        "numpy>=1.25.2",
+        "pandas>=2.0.3",
         "lark"
     ],
     extras_require={
@@ -38,7 +38,7 @@ setuptools.setup(
         'MySQL': ['sqlalchemy', 'pymysql'],
         'Spark': ['pyspark'],
         'Polars': [
-            'polars>=0.15.3',
+            'polars>=0.19.2',
             'pyarrow'
             ],
         'all': ['black',
