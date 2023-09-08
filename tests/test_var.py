@@ -42,7 +42,7 @@ def test_var_extend_1():
                 "x": [2, 1, 2, 3, 4],
                 "g": ["a", "b", "a", "c", "b"],
                 "mean": [2.0, 2.5, 2.0, 3.0, 2.5],
-                "var": [0.0, 4.5, 0.0, 0.0, 4.5],  # sample variance, except for size 1 groups, TODO: fix
+                "var": [0.0, 4.5, 0.0, numpy.nan, 4.5],  # sample variance
                 })
                 .with_columns([pl.col("var").sqrt().alias("std")])
         )
@@ -82,7 +82,7 @@ def test_var_project_1():
             pl.DataFrame({
                 "g": ["a", "b", "c"],
                 "mean": [2.0, 2.5, 3.0],
-                "var": [0.0, 4.5, 0.0],  # sample variance, except for size 1 groups, TODO: fix
+                "var": [0.0, 4.5, numpy.nan],  # sample variance
                 })
             .with_columns([pl.col("var").sqrt().alias("std")])
         )
