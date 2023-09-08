@@ -3,7 +3,7 @@ Represent data processing expressions.
 """
 
 import abc
-from typing import Any, List, Optional, Set, Union
+from typing import List, Set, Union
 
 import data_algebra.util
 from data_algebra.expression_walker import ExpressionWalker
@@ -91,7 +91,6 @@ fn_names_that_imply_ordered_windowed_situation = {
     "cummin",
     "cumprod",
     "cumsum",
-    "row_number",
     "shift",
     "lag",
     "lead",
@@ -262,7 +261,7 @@ class Term(PreTerm, abc.ABC):
             obvious_type_problem = _check_expr_incompatible_types(self, other)
             if obvious_type_problem is not None:
                 raise TypeError(
-                    f"trying to combine incompatible values:"
+                    "trying to combine incompatible values:"
                     + f" {self}:{obvious_type_problem[0]}"
                     + f" and {other}:{obvious_type_problem[0]} with {op}"
                 )
@@ -281,7 +280,7 @@ class Term(PreTerm, abc.ABC):
             obvious_type_problem = _check_expr_incompatible_types(self, other)
             if obvious_type_problem is not None:
                 raise TypeError(
-                    f"trying to combine incompatible values:"
+                    "trying to combine incompatible values:"
                     + f" {other}:{obvious_type_problem[0]}"
                     + f" and {self}:{obvious_type_problem[0]} with {op}"
                 )
@@ -1262,15 +1261,13 @@ def _can_find_method_by_name(op):
     # first check chosen mappings
     data_model = data_algebra.data_model.default_data_model()  # just use default for checking defs
     try:
-        # noinspection PyUnusedLocal
-        check_val = data_model.user_fun_map[op]  # for KeyError
+        _ = data_model.user_fun_map[op]  # for KeyError
         return True
     except KeyError:
         pass
     # check chosen mappings
     try:
-        # noinspection PyUnusedLocal
-        check_val = data_model.impl_map[op]  # for KeyError
+        _ = data_model.impl_map[op]  # for KeyError
         return True
     except KeyError:
         pass
@@ -1364,7 +1361,8 @@ class Expression(Term):
         """
         Convert parsed expression into a string
 
-        :param want_inline_parens: bool, if True put parens around complex expressions that don't already have a grouper.
+        :param want_inline_parens: bool, 
+                if True put parens around complex expressions that don't already have a grouper.
         :return: PythonText
         """
         n_args = len(self.args)
