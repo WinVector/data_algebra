@@ -22,5 +22,8 @@ import data_algebra.data_ops
 from data_algebra.data_ops import TableDescription, SQLNode, describe_table, descr, data, ex
 from data_algebra.expr_rep import lit, col, d_, one
 import data_algebra.pandas_model
+import data_algebra.data_schema
+
+
 
 data_algebra.pandas_model.register_pandas_model()

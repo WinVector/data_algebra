@@ -450,7 +450,7 @@ class PolarsExpressionActor(data_algebra.expression_walker.ExpressionWalker):
                 if arg.shape[0] > 0:
                     n_groups = 1
                     if len(self.partition_by) > 0:
-                        s_groups = arg.groupby(self.partition_by).apply(lambda x: x.head(1)).shape[0]
+                        s_groups = arg.group_by(self.partition_by).apply(lambda x: x.head(1)).shape[0]
                 return PolarsTerm(
                     polars_term=pl.lit(s_groups),
                     lit_value=n_groups,
@@ -463,7 +463,7 @@ class PolarsExpressionActor(data_algebra.expression_walker.ExpressionWalker):
                     n_groups = [0] * arg.shape[0]
                     if len(self.partition_by) > 0:
                         # TODO: number the groups, not size them
-                        n_groups = arg.groupby(self.partition_by).apply(lambda x: x.head(1)).shape[0]
+                        n_groups = arg.group_by(self.partition_by).apply(lambda x: x.head(1)).shape[0]
                 return PolarsTerm(
                     polars_term=pl.Series(
                         values=group_labels,
@@ -670,7 +670,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
             table
                 .select(column_names)
                 .with_columns([pl.lit(1, pl.Int64).alias("_da_count_tmp")])
-                .groupby(column_names)
+                .group_by(column_names)
                 .sum()["_da_count_tmp"]
                 .max()
         )
@@ -899,7 +899,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
             produced_columns.append(fld_k.alias(k))
         if len(temp_v_columns) > 0:
             res = res.with_columns(temp_v_columns)
-        res = res.groupby(group_by).agg(produced_columns)
+        res = res.group_by(group_by).agg(produced_columns)
         if len(temp_v_columns) > 0:
             res = res.select(op.columns_produced())
         if (op.group_by is None) or (len(op.group_by) == 0):
