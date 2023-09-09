@@ -1,7 +1,6 @@
 """
 Adapter to use Polars ( https://www.pola.rs ) in the data algebra.
 
-Note: fully not implemented yet.
 """
 
 from typing import Any, Callable, Dict, Iterable, List, Optional, Set
@@ -771,7 +770,7 @@ class PolarsModel(data_algebra.data_model.DataModel):
         sql_context = pl.SQLContext()  # currently this is a non-reentrant singleton
         for k, v in data_map.items():
             sql_context.register(k, v)
-        res = sql_context.query(sql_string)
+        res = sql_context.execute(sql_string)
         return res
 
     def _compose_polars_ops(

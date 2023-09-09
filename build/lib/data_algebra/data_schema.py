@@ -9,6 +9,13 @@ import pprint
 import numpy as np
 import pandas as pd
 
+have_polars = False
+try:
+    import polars as pl  # conditional import
+    have_polars = True
+except ModuleNotFoundError:
+    pass
+
 
 def _prep_schema_specification(v) -> Optional[Union[Type, Set, Dict]]:
     """
@@ -42,14 +49,19 @@ def _type_name(t) -> str:
     return t.__name__
 
 
-def non_null_types_in_frame(d: pd.DataFrame) -> Dict[str, Optional[Set[Type]]]:
+def _is_null(v) -> bool:
+    return pd.isnull(v)
+
+
+def non_null_types_in_frame(d) -> Dict[str, Optional[Set[Type]]]:
     """
     Return dictionary of non-null types seen in dataframe columns.
+
+    :param d: Pandas or Polars data frame.
     """
-    assert isinstance(d, pd.DataFrame)
     result = dict()
     for col_name in d.columns:
-        types_seen = {type(vi) for vi in d[col_name].values if not pd.isnull(vi)}
+        types_seen = {type(vi) for vi in d[col_name] if not _is_null(vi)}
         if len(types_seen) < 1:
             result[col_name] = None
         else:
@@ -93,7 +105,7 @@ class SchemaBase(object):
         self, arg_specs: Optional[Dict[str, Any]] = None, *, return_spec=None
     ) -> None:
         """
-        Pandas data frames must have at least declared columns and no unexpected types in columns.
+        Pandas or Polars data frames must have at least declared columns and no unexpected types in columns.
         Nulls/Nones/NaNs values are not considered to have type (treating them as missingness).
         None as type constraints are considered no-type (unfailable).
 
@@ -109,6 +121,39 @@ class SchemaRaises(SchemaBase):
     Input and output schema decorator.
     Raises TypeError on schema violations.
     """
+
+    def _check_data_frame_matches_schema(self, *, d, expected_type: Optional[Dict]) -> Optional[str]:
+        assert isinstance(expected_type, (type(None), Dict))
+        # check that this is a data frame, so we can raise a legible error
+        # instead of having an non-existent attribute error raising
+        is_pandas_frame = isinstance(d, pd.DataFrame)
+        is_recognized_polars_frame = False
+        if have_polars:
+            is_recognized_polars_frame = isinstance(d, pl.DataFrame)
+        if not (is_pandas_frame or is_recognized_polars_frame):
+            return f"expected a Pandas or Polars data frame, had {_type_name(type(d))}"
+        if expected_type is None:
+            # no constraint, no further check
+            return None
+        msgs = []
+        col_set = set(d.columns)
+        for col_name, spec_i in expected_type.items():
+            if col_name not in col_set:
+                msgs.append(f"missing required column '{col_name}'")
+            else:
+                if (spec_i is not None) and (d.shape[0] > 0):
+                    for vi in d[col_name]:
+                        if not _is_null(vi):
+                            msg_i = self._check_spec(
+                                expected_type=spec_i, observed_value=vi
+                            )
+                            if msg_i is not None:
+                                msgs.append(f" column '{col_name}' {msg_i}")
+                                break
+        if len(msgs) < 1:
+            return None
+        else:
+            return " ,".join(msgs)
 
     def _check_spec(
         self, *, expected_type: Optional[Union[Type, Set, Dict]], observed_value
@@ -132,25 +177,9 @@ class SchemaRaises(SchemaBase):
                 )
                 return f"expected type one of {type_names}, found type {_type_name(observed_type)}"
         elif isinstance(expected_type, dict):
-            if not isinstance(observed_value, pd.DataFrame):
-                observed_type = type(observed_value)
-                return f"expected type pandas.DataFrame, found type {_type_name(observed_type)}"
-            msgs = []
-            for col_name, spec_i in expected_type.items():
-                if col_name not in observed_value.columns:
-                    msgs.append(f"missing required column '{col_name}'")
-                else:
-                    if (spec_i is not None) and (observed_value.shape[0] > 0):
-                        for vi in observed_value[col_name]:
-                            if not pd.isnull(vi):
-                                msg_i = self._check_spec(
-                                    expected_type=spec_i, observed_value=vi
-                                )
-                                if msg_i is not None:
-                                    msgs.append(f" column '{col_name}' {msg_i}")
-                                    break
-            if len(msgs) > 0:
-                return ", ".join(msgs)
+            schema_issue = self._check_data_frame_matches_schema(d=observed_value, expected_type=expected_type)
+            if schema_issue is not None:
+                return schema_issue
         else:
             # should not be reached
             raise ValueError(f"expected type of type {type(expected_type)} unexpected")
