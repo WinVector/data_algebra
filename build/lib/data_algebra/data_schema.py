@@ -53,12 +53,29 @@ def _is_null(v) -> bool:
     return pd.isnull(v)
 
 
+def is_data_frame(d) -> bool:
+    """
+    Check if d is a Pandas or Polars data frame
+    """
+    if d is not None:
+        if isinstance(d, pd.DataFrame):
+            return True
+        if have_polars:
+            if isinstance(d, pl.DataFrame):
+                return True
+    return False
+
+
 def non_null_types_in_frame(d) -> Dict[str, Optional[Set[Type]]]:
     """
     Return dictionary of non-null types seen in dataframe columns.
 
     :param d: Pandas or Polars data frame.
     """
+    # check that this is a data frame, so we can raise a legible error
+    # instead of having an non-existent attribute error raising
+    if not is_data_frame(d):
+        raise TypeError(f"expected a Pandas or Polars data frame, had {_type_name(type(d))}")
     result = dict()
     for col_name in d.columns:
         types_seen = {type(vi) for vi in d[col_name] if not _is_null(vi)}
@@ -126,11 +143,7 @@ class SchemaRaises(SchemaBase):
         assert isinstance(expected_type, (type(None), Dict))
         # check that this is a data frame, so we can raise a legible error
         # instead of having an non-existent attribute error raising
-        is_pandas_frame = isinstance(d, pd.DataFrame)
-        is_recognized_polars_frame = False
-        if have_polars:
-            is_recognized_polars_frame = isinstance(d, pl.DataFrame)
-        if not (is_pandas_frame or is_recognized_polars_frame):
+        if not is_data_frame(d):
             return f"expected a Pandas or Polars data frame, had {_type_name(type(d))}"
         if expected_type is None:
             # no constraint, no further check
