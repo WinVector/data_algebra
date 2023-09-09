@@ -268,7 +268,7 @@ class PandasModelBase(
         a = self.pd.Series(a)
         a = a.map(value_map, na_action="ignore")
         a[self.bad_column_positions(a)] = default_value
-        return numpy.array(a.values)
+        return a.to_numpy()
 
     def _if_else_expr(self, *args):
         """

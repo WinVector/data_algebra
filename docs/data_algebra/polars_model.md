@@ -2,8 +2,6 @@ Module data_algebra.polars_model
 ================================
 Adapter to use Polars ( https://www.pola.rs ) in the data algebra.
 
-Note: fully not implemented yet.
-
 Functions
 ---------
 

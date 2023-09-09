@@ -140,7 +140,7 @@ def guess_carried_scalar_type(col) -> type:
     if isinstance(
         col, data_algebra.data_model.default_data_model().pd.core.series.Series
     ):
-        col = col.values
+        col = col.to_numpy()
     if len(col) < 1:
         return type(None)
     good_idx = numpy.where(

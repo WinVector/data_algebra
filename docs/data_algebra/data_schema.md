@@ -6,8 +6,14 @@ Functions
 ---------
 
     
-`non_null_types_in_frame(d: pandas.core.frame.DataFrame) ‑> Dict[str, Optional[Set[Type]]]`
+`is_data_frame(d) ‑> bool`
+:   Check if d is a Pandas or Polars data frame
+
+    
+`non_null_types_in_frame(d) ‑> Dict[str, Optional[Set[Type]]]`
 :   Return dictionary of non-null types seen in dataframe columns.
+    
+    :param d: Pandas or Polars data frame.
 
 Classes
 -------
@@ -15,7 +21,7 @@ Classes
 `SchemaBase(arg_specs: Optional[Dict[str, Any]] = None, *, return_spec=None)`
 :   Input and output schema decorator.
     
-    Pandas data frames must have at least declared columns and no unexpected types in columns.
+    Pandas or Polars data frames must have at least declared columns and no unexpected types in columns.
     Nulls/Nones/NaNs values are not considered to have type (treating them as missingness).
     None as type constraints are considered no-type (unfailable).
     
@@ -44,7 +50,7 @@ Classes
 `SchemaMock(arg_specs: Optional[Dict[str, Any]] = None, *, return_spec=None)`
 :   Build schema, but do not enforce or attach to fn
     
-    Pandas data frames must have at least declared columns and no unexpected types in columns.
+    Pandas or Polars data frames must have at least declared columns and no unexpected types in columns.
     Nulls/Nones/NaNs values are not considered to have type (treating them as missingness).
     None as type constraints are considered no-type (unfailable).
     
@@ -59,7 +65,7 @@ Classes
 :   Input and output schema decorator.
     Raises TypeError on schema violations.
     
-    Pandas data frames must have at least declared columns and no unexpected types in columns.
+    Pandas or Polars data frames must have at least declared columns and no unexpected types in columns.
     Nulls/Nones/NaNs values are not considered to have type (treating them as missingness).
     None as type constraints are considered no-type (unfailable).
     

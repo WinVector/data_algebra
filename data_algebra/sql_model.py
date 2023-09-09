@@ -745,7 +745,7 @@ def _annotated_method_catalogue(
         if len(matches) > 0:
             good_use = (
                 model_name in data_algebra.op_catalog.methods_table.columns
-            ) and (data_algebra.op_catalog.methods_table[model_name].values[i] == "y")
+            ) and (data_algebra.op_catalog.methods_table[model_name][i] == "y")
             for m in matches:
                 known_method_uses.add(m)
                 if good_use:
