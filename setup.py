@@ -27,8 +27,8 @@ setuptools.setup(
     url='https://github.com/WinVector/data_algebra',
     packages=setuptools.find_packages(exclude=['tests', 'Examples']),
     install_requires=[
-        "numpy>=1.25.2",
-        "pandas>=2.0.3",
+        "numpy>=1.25.0",
+        "pandas>=2.0.0",
         "lark"
     ],
     extras_require={
