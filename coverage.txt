@@ -1,7 +1,7 @@
 ============================= test session starts ==============================
-platform darwin -- Python 3.11.4, pytest-7.4.0, pluggy-1.0.0
+platform darwin -- Python 3.11.5, pytest-7.4.0, pluggy-1.0.0
 rootdir: /Users/johnmount/Documents/work/data_algebra
-plugins: anyio-3.5.0, cov-4.0.0
+plugins: anyio-3.5.0, cov-4.1.0
 collected 383 items
 
 tests/test_OrderedSet.py ......                                          [  1%]
@@ -188,7 +188,7 @@ tests/test_xicor.py ..                                                   [100%]
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
 
----------- coverage: platform darwin, python 3.11.4-final-0 ----------
+---------- coverage: platform darwin, python 3.11.5-final-0 ----------
 Name                                   Stmts   Miss  Cover   Missing
 --------------------------------------------------------------------
 data_algebra/BigQuery.py                 126     67    47%   22-23, 27, 131-135, 139, 153-160, 169-178, 183-201, 215-244, 248-261, 272-287
@@ -232,4 +232,4 @@ data_algebra/util.py                     127     20    84%   26, 59-60, 71-72, 7
 --------------------------------------------------------------------
 TOTAL                                   6949    936    87%
 
-================= 383 passed, 16 warnings in 758.88s (0:12:38) =================
+================= 383 passed, 16 warnings in 966.94s (0:16:06) =================
