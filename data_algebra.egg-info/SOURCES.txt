@@ -103,6 +103,7 @@ tests/test_join_effects.py
 tests/test_join_multi_key.py
 tests/test_join_opt.py
 tests/test_join_variations.py
+tests/test_kdd2009_example.py
 tests/test_lark_parser.py
 tests/test_locf.py
 tests/test_logistic_example.py
