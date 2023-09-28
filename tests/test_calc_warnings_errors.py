@@ -1,7 +1,7 @@
 import pytest
 
 import data_algebra
-from data_algebra.data_ops import *
+from data_algebra.data_ops import data, descr, describe_table, ex
 
 
 def test_calc_warnings_errors():

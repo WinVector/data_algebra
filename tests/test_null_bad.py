@@ -7,7 +7,8 @@ import pytest
 import data_algebra
 import data_algebra.util
 import data_algebra.test_util
-from data_algebra.data_ops import *
+from data_algebra.view_representations import TableDescription, ViewRepresentation
+from data_algebra.data_ops import data, descr, describe_table, ex
 
 
 def test_null_bad():

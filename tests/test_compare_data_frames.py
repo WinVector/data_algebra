@@ -4,8 +4,9 @@ import numpy
 import numpy.random
 
 import data_algebra
-from data_algebra.data_ops import *
-from data_algebra.cdata import *
+from data_algebra.view_representations import TableDescription, ViewRepresentation
+from data_algebra.data_ops import data, descr, describe_table, ex
+from data_algebra.cdata import pivot_blocks_to_rowrecs,  pivot_rowrecs_to_blocks, pivot_specification, unpivot_specification, RecordMap, RecordSpecification 
 import data_algebra.test_util
 import data_algebra.util
 import data_algebra.SQLite

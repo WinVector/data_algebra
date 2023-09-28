@@ -3,7 +3,7 @@ import numpy
 import data_algebra.db_model
 import data_algebra.sql_format_options
 import data_algebra.test_util
-from data_algebra.data_ops import *
+from data_algebra.data_ops import data, descr, describe_table, ex
 
 import data_algebra
 import data_algebra.util

@@ -1,7 +1,7 @@
 
 
 
-from data_algebra.data_ops import *
+from data_algebra.data_ops import data, descr, describe_table, ex
 import data_algebra.SQLite
 import data_algebra.BigQuery
 import data_algebra.PostgreSQL

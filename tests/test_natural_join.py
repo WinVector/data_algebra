@@ -4,7 +4,7 @@ import pytest
 import data_algebra
 import data_algebra.test_util
 import data_algebra.util
-from data_algebra.data_ops import *
+from data_algebra.data_ops import data, descr, describe_table, ex
 
 
 def test_natural_join_columns_on():

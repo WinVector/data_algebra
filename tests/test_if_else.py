@@ -2,7 +2,8 @@
 import numpy
 
 import data_algebra.test_util
-from data_algebra.data_ops import *
+from data_algebra.view_representations import ViewRepresentation, TableDescription, ExtendNode
+from data_algebra.data_ops import data, descr, describe_table, ex
 from data_algebra.SQLite import SQLiteModel
 
 import data_algebra

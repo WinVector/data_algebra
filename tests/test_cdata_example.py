@@ -3,8 +3,8 @@ import re
 
 import data_algebra
 import data_algebra.test_util
-from data_algebra.data_ops import *
-from data_algebra.cdata import *
+from data_algebra.data_ops import data, descr, describe_table, ex
+from data_algebra.cdata import pivot_blocks_to_rowrecs,  pivot_rowrecs_to_blocks, pivot_specification, unpivot_specification, RecordMap, RecordSpecification 
 import data_algebra.util
 
 

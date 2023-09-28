@@ -4,7 +4,7 @@ import pickle
 import gzip
 
 import data_algebra
-from data_algebra.data_ops import *
+from data_algebra.data_ops import data, descr, describe_table, ex
 import data_algebra.SQLite
 import data_algebra.test_util
 

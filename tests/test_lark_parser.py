@@ -3,7 +3,7 @@ import pytest
 import data_algebra
 import data_algebra.expr_rep
 import data_algebra.parse_by_lark
-from data_algebra.data_ops import *
+from data_algebra.data_ops import data, descr, describe_table, ex
 
 
 def test_lark_1():

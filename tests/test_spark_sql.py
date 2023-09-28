@@ -2,8 +2,9 @@ import pytest
 import numpy
 
 import data_algebra
-from data_algebra.data_ops_types import *
-from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
+from data_algebra.data_ops_types import OperatorPlatform
+from data_algebra.view_representations import ViewRepresentation, TableDescription, ExtendNode, MethodUse
+from data_algebra.data_ops import data, descr, describe_table, ex  # https://github.com/WinVector/data_algebra
 import data_algebra.SparkSQL
 import data_algebra.util
 import data_algebra.test_util

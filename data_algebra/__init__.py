@@ -16,23 +16,29 @@ the same transforms for Pandas and Polars DataFrames.
 the `rquery`<https://github.com/WinVector/rquery> and `rqdatatable`<https://github.com/WinVector/rqdatatable> packages.
 """
 
+
 import data_algebra.data_model
 import data_algebra.data_ops
-
 # import for easy access for package users
 from data_algebra.data_ops import (
     describe_table,
     descr,
     data,
-    ex
+    ex,
+    table
 )
+import data_algebra.view_representations
 from data_algebra.view_representations import (
     TableDescription,
+    ViewRepresentation,
     SQLNode
 )
+import data_algebra.expr_rep
 from data_algebra.expr_rep import lit, col, d_, one
-import data_algebra.pandas_model
+
 import data_algebra.data_schema
 
+import data_algebra.pandas_model
 
+# do this last so everything is loaded/define
 data_algebra.pandas_model.register_pandas_model()

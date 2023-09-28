@@ -1,8 +1,8 @@
 import data_algebra
 import data_algebra.util
 import data_algebra.test_util
-from data_algebra.data_ops import *
-from data_algebra.cdata import *
+from data_algebra.data_ops import data, descr, describe_table, ex
+from data_algebra.cdata import pivot_blocks_to_rowrecs,  pivot_rowrecs_to_blocks, pivot_specification, unpivot_specification, RecordMap, RecordSpecification 
 
 
 def test_one_row_cdata_convert():

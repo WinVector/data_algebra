@@ -3,7 +3,8 @@ import sqlite3
 import numpy
 
 import data_algebra
-from data_algebra.data_ops import *
+from data_algebra.view_representations import TableDescription, ViewRepresentation
+from data_algebra.data_ops import data, descr, describe_table, ex
 import data_algebra.test_util
 import data_algebra.db_model
 import data_algebra.MySQL

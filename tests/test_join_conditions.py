@@ -2,7 +2,7 @@
 import data_algebra
 import data_algebra.test_util
 import data_algebra.data_ops
-from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
+from data_algebra.data_ops import data, descr, describe_table, ex  # https://github.com/WinVector/data_algebra
 import data_algebra.view_representations
 import data_algebra.util
 

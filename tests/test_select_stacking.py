@@ -1,5 +1,6 @@
 import data_algebra
-from data_algebra.data_ops import *
+from data_algebra.view_representations import ViewRepresentation, TableDescription, ExtendNode
+from data_algebra.data_ops import data, descr, describe_table, ex
 
 
 def test_select_stacking():

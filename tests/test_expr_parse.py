@@ -1,7 +1,8 @@
 import data_algebra
 
 import data_algebra.test_util
-from data_algebra.data_ops import *
+from data_algebra.view_representations import TableDescription, ViewRepresentation
+from data_algebra.data_ops import data, descr, describe_table, ex
 from data_algebra.test_util import formats_to_self
 import data_algebra.util
 

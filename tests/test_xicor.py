@@ -5,8 +5,8 @@ import numpy as np
 import data_algebra.BigQuery
 import yaml
 
-from data_algebra.data_ops import *
-from data_algebra.view_representations import *
+from data_algebra.data_ops import data, descr, describe_table, ex
+from data_algebra.view_representations import ViewRepresentation, TableDescription
 import data_algebra.solutions
 import data_algebra.test_util
 import data_algebra.data_model

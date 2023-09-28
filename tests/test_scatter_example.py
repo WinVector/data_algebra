@@ -1,7 +1,7 @@
 import data_algebra
 import data_algebra.test_util
 import data_algebra.util
-from data_algebra.cdata import *
+from data_algebra.cdata import pivot_blocks_to_rowrecs,  pivot_rowrecs_to_blocks, pivot_specification, unpivot_specification, RecordMap, RecordSpecification 
 import pytest
 
 # https://github.com/WinVector/cdata
