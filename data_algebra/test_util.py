@@ -17,8 +17,9 @@ import data_algebra.PostgreSQL
 import data_algebra.MySQL
 import data_algebra.SparkSQL
 from data_algebra.sql_format_options import SQLFormatOptions
-
-from data_algebra.data_ops import *
+import data_algebra.view_representations
+from data_algebra.data_ops import *  # for globals() in _re_parse()
+from data_algebra.view_representations import *  # for globals() in _re_parse()
 
 
 have_polars = False
@@ -47,12 +48,15 @@ def _re_parse(ops, *, data_model_map: Dict[str, Any]):
     Return copy of object made by dumping to string via repr() and then evaluating that string.
     """
     str1 = repr(ops)
-    ops2 = eval(
-        str1,
-        globals(),
-        data_model_map,  # make our definition of data module available
-        # cdata uses this
-    )
+    try:
+        ops2 = eval(
+            str1,
+            globals(),
+            data_model_map,  # make our definition of data module available
+            # cdata uses this
+        )
+    except Exception:
+        print("problem with " + str1)
     return ops2
 
 

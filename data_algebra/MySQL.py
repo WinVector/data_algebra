@@ -4,6 +4,7 @@ Partial adapter of data algebra for MySQL. Not all data algebra operations are s
 
 
 import data_algebra.data_ops
+import data_algebra.sql_model
 import data_algebra.db_model
 
 
@@ -60,7 +61,7 @@ class MySQLModel(data_algebra.db_model.DBModel):
     """
 
     def __init__(self):
-        op_replacements = data_algebra.db_model.db_default_op_replacements.copy()
+        op_replacements = data_algebra.sql_model.db_default_op_replacements.copy()
         op_replacements["std"] = "STDDEV_SAMP"
         op_replacements["var"] = "VAR_SAMP"
         data_algebra.db_model.DBModel.__init__(

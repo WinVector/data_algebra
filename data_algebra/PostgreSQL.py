@@ -3,6 +3,7 @@ PostgreSQL database adapter for data algebra.
 """
 
 import data_algebra.data_ops
+import data_algebra.sql_model
 import data_algebra.db_model
 
 
@@ -45,7 +46,7 @@ class PostgreSQLModel(data_algebra.db_model.DBModel):
     """
 
     def __init__(self):
-        op_replacements = data_algebra.db_model.db_default_op_replacements.copy()
+        op_replacements = data_algebra.sql_model.db_default_op_replacements.copy()
         op_replacements["log"] = "LN"
         op_replacements["_uniform"] = "RANDOM"
         op_replacements["std"] = "STDDEV_SAMP"

@@ -960,7 +960,7 @@ class TableDescription(ViewRepresentation):
      Describe columns, and qualifiers, of a table.
 
     Example:
-        from data_algebra.data_ops import *
+        from data_algebra.view_representation import TableDescription
         d = TableDescription(table_name='d', column_names=['x', 'y'])
         print(d)
     """

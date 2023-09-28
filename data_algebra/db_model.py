@@ -13,7 +13,7 @@ import data_algebra.data_ops_types
 import data_algebra.data_ops
 from data_algebra.sql_format_options import SQLFormatOptions
 from data_algebra.shift_pipe_action import ShiftPipeAction
-from data_algebra.sql_model import *
+from data_algebra.sql_model import SQLModel
 
 
 class DBModel(ShiftPipeAction, SQLModel):

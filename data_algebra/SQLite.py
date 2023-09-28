@@ -17,7 +17,6 @@ import data_algebra.db_model
 import data_algebra.data_ops
 
 import data_algebra.near_sql
-from data_algebra.data_ops import *
 
 
 # map from op-name to special SQL formatting code
