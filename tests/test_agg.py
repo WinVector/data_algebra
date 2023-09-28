@@ -1,5 +1,5 @@
 import data_algebra
-from data_algebra.data_ops import *
+from data_algebra.data_ops import describe_table
 import data_algebra.test_util
 import data_algebra.SQLite
 

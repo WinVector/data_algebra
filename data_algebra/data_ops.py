@@ -8,10 +8,10 @@ import data_algebra.expr_parse
 import data_algebra.flow_text
 import data_algebra.data_model
 import data_algebra.expr_rep
-from data_algebra.data_ops_types import MethodUse, OperatorPlatform
 import data_algebra.data_ops_utils
 import data_algebra.near_sql
 import data_algebra.util
+from data_algebra.data_ops_types import OperatorPlatform
 from data_algebra.view_representations import ViewRepresentation, TableDescription
 
 
