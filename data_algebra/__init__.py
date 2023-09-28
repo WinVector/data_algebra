@@ -21,12 +21,14 @@ import data_algebra.data_ops
 
 # import for easy access for package users
 from data_algebra.data_ops import (
-    TableDescription,
-    SQLNode,
     describe_table,
     descr,
     data,
-    ex,
+    ex
+)
+from data_algebra.view_representations import (
+    TableDescription,
+    SQLNode
 )
 from data_algebra.expr_rep import lit, col, d_, one
 import data_algebra.pandas_model

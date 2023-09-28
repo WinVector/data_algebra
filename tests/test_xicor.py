@@ -6,6 +6,7 @@ import data_algebra.BigQuery
 import yaml
 
 from data_algebra.data_ops import *
+from data_algebra.view_representations import *
 import data_algebra.solutions
 import data_algebra.test_util
 import data_algebra.data_model
@@ -34,13 +35,13 @@ def test_xicor():
         return res_frame['xicor'].values[0]
 
     x1 = xicor([1, 2, 3], [1, 2, 3])  # expect 0.25
-    assert numpy.abs(x1 - 0.25) < 1e-5
+    assert np.abs(x1 - 0.25) < 1e-5
 
     x2 = xicor([1, 2, 3], [3, 2, 1])  # expect 0.25
-    assert numpy.abs(x2 - 0.25) < 1e-5
+    assert np.abs(x2 - 0.25) < 1e-5
 
     x3 = xicor([1, 2, 3], [1, 3, 2])  # expect -0.125
-    assert numpy.abs(x3 - -.125) < 1e-5
+    assert np.abs(x3 - -.125) < 1e-5
 
     def example_to_frame(ei):
         "encode an example into a data frame"

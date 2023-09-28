@@ -1,4 +1,5 @@
 import pytest
+import numpy
 
 import data_algebra
 from data_algebra.data_ops_types import *

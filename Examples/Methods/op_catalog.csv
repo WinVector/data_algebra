@@ -1,125 +1,125 @@
-op,expression,op_class,Pandas,SQLiteModel,BigQueryModel,PostgreSQLModel,SparkSQLModel,MySQLModel,version
-!=,x != y,e,y,y,y,y,y,y,1.4.1
-%,row_id % q,e,y,y,y,y,y,y,1.4.1
-%/%,x %/% y,e,y,y,y,y,y,y,1.4.1
-*,x * y,e,y,y,y,y,y,y,1.4.1
-**,x ** y,e,y,y,y,y,y,y,1.4.1
-+,x + y,e,y,y,y,y,y,y,1.4.1
--,-x,e,y,y,y,y,y,y,1.4.1
--,x - y,e,y,y,y,y,y,y,1.4.1
-/,x / y,e,y,y,y,y,y,y,1.4.1
-//,row_id // q,e,y,y,y,y,y,y,1.4.1
-<,x < y,e,y,y,y,y,y,y,1.4.1
-<=,x <= y,e,y,y,y,y,y,y,1.4.1
-==,not a,e,y,y,y,y,y,y,1.4.1
-==,x == y,e,y,y,y,y,y,y,1.4.1
->,x > y,e,y,y,y,y,y,y,1.4.1
->=,x >= y,e,y,y,y,y,y,y,1.4.1
-abs,z.abs(),e,y,y,y,y,y,y,1.4.1
-and,a and b,e,y,y,y,y,y,y,1.4.1
-arccos,x.arccos(),e,y,y,n,n,n,n,1.4.1
-arccosh,x.arccosh(),e,y,y,n,n,n,n,1.4.1
-arcsin,x.arcsin(),e,y,y,n,n,n,n,1.4.1
-arcsinh,x.arcsinh(),e,y,y,n,n,n,n,1.4.1
-arctan,x.arctan(),e,y,y,n,n,n,n,1.4.1
-arctan2,x.arctan2(y),e,y,n,n,n,n,n,1.4.1
-arctanh,x.arctanh(),e,y,y,n,n,n,n,1.4.1
-around,y.around(2),e,y,y,y,y,y,y,1.4.1
-as_int64,y.as_int64(),e,y,y,y,y,n,n,1.4.1
-as_str,y.as_str(),e,y,y,y,y,y,y,1.4.1
-base_Sunday,date_col_1.base_Sunday(),e,y,n,y,n,n,n,1.4.1
-ceil,y.ceil(),e,y,y,y,y,y,y,1.4.1
-ceil,z.ceil(),e,y,y,y,y,w,y,1.4.1
-coalesce,z %?% 2,e,y,y,y,y,y,y,1.4.1
-coalesce,z.coalesce(2),e,y,y,y,y,y,y,1.4.1
-coalesce,z.coalesce_0(),e,y,y,y,y,y,y,1.4.1
-concat,"g %+% ""_"" %+% s2",e,y,y,y,y,y,y,1.4.1
-concat,g.concat(s2),e,y,y,y,y,y,y,1.4.1
-cos,x.cos(),e,y,y,y,y,y,y,1.4.1
-cosh,x.cosh(),e,y,y,y,y,y,n,1.4.1
-date_diff,date_col_0.date_diff(date_col_1),e,y,n,y,n,n,n,1.4.1
-datetime_to_date,datetime_col_0.datetime_to_date(),e,y,w,y,y,y,y,1.4.1
-dayofmonth,date_col_0.dayofmonth(),e,y,n,y,y,y,y,1.4.1
-dayofweek,date_col_0.dayofweek(),e,y,n,y,n,y,n,1.4.1
-dayofyear,date_col_0.dayofyear(),e,y,n,y,n,n,n,1.4.1
-exp,x.exp(),e,y,y,y,y,y,y,1.4.1
-expm1,y.expm1(),e,y,y,n,n,y,n,1.4.1
-floor,y.floor(),e,y,y,y,y,y,y,1.4.1
-floor,z.floor(),e,y,y,y,y,w,y,1.4.1
-fmax,row_id.fmax(x),e,y,y,y,y,y,y,1.4.1
-fmin,row_id.fmin(x),e,y,y,y,y,y,y,1.4.1
-format_date,date_col_0.format_date(),e,y,n,y,n,n,n,1.4.1
-format_datetime,datetime_col_0.format_datetime(),e,y,n,y,n,n,n,1.4.1
-if_else,"a.if_else(x, y)",e,y,y,y,y,y,y,1.4.1
-is_bad,z.is_bad(),e,y,y,y,y,y,y,1.4.1
-is_in,"row_id.is_in({1, 3})",e,y,y,y,y,y,y,1.4.1
-is_inf,y.is_inf(),e,y,y,y,y,y,n,1.4.1
-is_nan,y.is_nan(),e,y,y,y,y,y,y,1.4.1
-is_null,z.is_null(),e,y,y,y,y,w,y,1.4.1
-log,x.log(),e,y,y,y,y,y,y,1.4.1
-log10,x.log10(),e,y,y,y,y,y,y,1.4.1
-log1p,x.log1p(),e,y,y,n,n,y,n,1.4.1
-mapv,"g.mapv({""a"": 1, ""b"": 2, ""z"": 26}, 0)",e,y,y,y,y,y,y,1.4.1
-maximum,row_id.maximum(x),e,y,y,y,y,y,y,1.4.1
-minimum,row_id.minimum(x),e,y,y,y,y,y,y,1.4.1
-mod,row_id.mod(2),e,y,y,y,y,y,y,1.4.1
-month,date_col_0.month(),e,y,n,y,y,y,y,1.4.1
-or,a or b,e,y,y,y,y,y,y,1.4.1
-parse_date,str_date_col.parse_date(),e,y,n,y,n,n,n,1.4.1
-parse_datetime,str_datetime_col.parse_datetime(),e,y,n,y,n,n,n,1.4.1
-quarter,date_col_0.quarter(),e,y,n,y,y,y,y,1.4.1
-remainder,row_id.remainder(2),e,y,y,y,y,y,y,1.4.1
-round,y.round(),e,y,y,y,y,y,y,1.4.1
-sign,z.sign(),e,y,y,y,y,y,y,1.4.1
-sin,x.sin(),e,y,y,y,y,y,y,1.4.1
-sinh,x.sinh(),e,y,y,y,y,y,n,1.4.1
-sqrt,x.sqrt(),e,y,y,y,y,y,y,1.4.1
-sum,x.sum(),e,y,y,y,y,y,y,1.4.1
-tanh,x.tanh(),e,y,y,y,y,y,n,1.4.1
-timestamp_diff,datetime_col_0.timestamp_diff(datetime_col_1),e,y,n,y,n,n,n,1.4.1
-trimstr,"g.trimstr(0, 2)",e,y,y,y,y,y,y,1.4.1
-weekofyear,date_col_0.weekofyear(),e,y,n,y,w,w,y,1.4.1
-where,"a.where(x, y)",e,y,y,y,y,y,y,1.4.1
-year,date_col_0.year(),e,y,n,y,y,y,y,1.4.1
-_count,_count(),g,y,w,w,w,w,w,1.4.1
-_ngroup,_ngroup(),g,y,n,n,n,n,n,1.4.1
-_size,_size(),g,y,y,y,y,y,y,1.4.1
-count,z.count(),g,y,y,y,y,w,y,1.4.1
-max,x.max(),g,y,y,y,y,y,y,1.4.1
-mean,x.mean(),g,y,y,y,y,y,y,1.4.1
-median,x.median(),g,y,n,y,n,n,n,1.4.1
-min,x.min(),g,y,y,y,y,y,y,1.4.1
-nunique,x.nunique(),g,y,n,y,n,n,n,1.4.1
-size,x.size(),g,y,y,y,y,y,y,1.4.1
-std,x.std(),g,y,n,y,y,y,y,1.4.1
-sum,(1).sum(),g,y,y,y,y,y,y,1.4.1
-sum,x.sum(),g,y,y,y,y,y,y,1.4.1
-var,x.var(),g,y,n,y,y,y,y,1.4.1
-_size,_size(),p,y,y,y,y,y,y,1.4.1
-all,a.all(),p,y,y,y,y,y,y,1.4.1
-any,a.any(),p,y,y,y,y,y,y,1.4.1
-count,z.count(),p,y,y,y,y,w,y,1.4.1
-max,x.max(),p,y,y,y,y,y,y,1.4.1
-mean,x.mean(),p,y,y,y,y,y,y,1.4.1
-median,x.median(),p,y,y,n,n,n,n,1.4.1
-min,x.min(),p,y,y,y,y,y,y,1.4.1
-nunique,x.nunique(),p,y,y,y,y,y,y,1.4.1
-size,x.size(),p,y,y,y,y,y,y,1.4.1
-std,x.std(),p,y,y,y,y,y,y,1.4.1
-sum,(1).sum(),p,y,y,y,y,y,y,1.4.1
-sum,x.sum(),p,y,y,y,y,y,y,1.4.1
-var,x.var(),p,y,y,y,y,y,y,1.4.1
-_uniform,_uniform(),u,y,y,y,y,y,y,1.4.1
-any_value,x.any_value(),up,y,y,y,y,y,y,1.4.1
-_row_number,_row_number(),w,y,y,y,y,y,y,1.4.1
-bfill,z.bfill(),w,y,n,n,n,n,n,1.4.1
-cumcount,z.cumcount(),w,y,w,w,w,w,w,1.4.1
-cummax,x.cummax(),w,y,y,y,y,y,y,1.4.1
-cummin,x.cummin(),w,y,y,y,y,y,y,1.4.1
-cumprod,x.cumprod(),w,y,n,n,n,n,n,1.4.1
-cumsum,x.cumsum(),w,y,y,y,y,y,y,1.4.1
-ffill,z.ffill(),w,y,n,n,n,n,n,1.4.1
-first,x.first(),w,y,n,n,n,y,n,1.4.1
-last,x.last(),w,y,n,n,n,w,n,1.4.1
-rank,x.rank(),w,y,n,n,n,y,n,1.4.1
-shift,x.shift(),w,y,y,y,y,y,y,1.4.1
+op,expression,op_class,Pandas,SQLiteModel,version
+!=,x != y,e,y,y,1.6.10
+%,row_id % q,e,y,y,1.6.10
+%/%,x %/% y,e,y,y,1.6.10
+*,x * y,e,y,y,1.6.10
+**,x ** y,e,y,y,1.6.10
++,x + y,e,y,y,1.6.10
+-,-x,e,y,y,1.6.10
+-,x - y,e,y,y,1.6.10
+/,x / y,e,y,y,1.6.10
+//,row_id // q,e,y,y,1.6.10
+<,x < y,e,y,y,1.6.10
+<=,x <= y,e,y,y,1.6.10
+==,not a,e,y,y,1.6.10
+==,x == y,e,y,y,1.6.10
+>,x > y,e,y,y,1.6.10
+>=,x >= y,e,y,y,1.6.10
+abs,z.abs(),e,y,y,1.6.10
+and,a and b,e,y,y,1.6.10
+arccos,x.arccos(),e,y,y,1.6.10
+arccosh,x.arccosh(),e,y,y,1.6.10
+arcsin,x.arcsin(),e,y,y,1.6.10
+arcsinh,x.arcsinh(),e,y,y,1.6.10
+arctan,x.arctan(),e,y,y,1.6.10
+arctan2,x.arctan2(y),e,y,n,1.6.10
+arctanh,x.arctanh(),e,y,y,1.6.10
+around,y.around(2),e,y,y,1.6.10
+as_int64,y.as_int64(),e,y,y,1.6.10
+as_str,y.as_str(),e,y,y,1.6.10
+base_Sunday,date_col_1.base_Sunday(),e,y,n,1.6.10
+ceil,y.ceil(),e,y,y,1.6.10
+ceil,z.ceil(),e,y,y,1.6.10
+coalesce,z %?% 2,e,y,y,1.6.10
+coalesce,z.coalesce(2),e,y,y,1.6.10
+coalesce,z.coalesce_0(),e,y,y,1.6.10
+concat,"g %+% ""_"" %+% s2",e,y,y,1.6.10
+concat,g.concat(s2),e,y,y,1.6.10
+cos,x.cos(),e,y,y,1.6.10
+cosh,x.cosh(),e,y,y,1.6.10
+date_diff,date_col_0.date_diff(date_col_1),e,y,n,1.6.10
+datetime_to_date,datetime_col_0.datetime_to_date(),e,y,w,1.6.10
+dayofmonth,date_col_0.dayofmonth(),e,y,n,1.6.10
+dayofweek,date_col_0.dayofweek(),e,y,n,1.6.10
+dayofyear,date_col_0.dayofyear(),e,y,n,1.6.10
+exp,x.exp(),e,y,y,1.6.10
+expm1,y.expm1(),e,y,y,1.6.10
+floor,y.floor(),e,y,y,1.6.10
+floor,z.floor(),e,y,y,1.6.10
+fmax,row_id.fmax(x),e,y,y,1.6.10
+fmin,row_id.fmin(x),e,y,y,1.6.10
+format_date,date_col_0.format_date(),e,y,n,1.6.10
+format_datetime,datetime_col_0.format_datetime(),e,y,n,1.6.10
+if_else,"a.if_else(x, y)",e,y,y,1.6.10
+is_bad,z.is_bad(),e,y,y,1.6.10
+is_in,"row_id.is_in({1, 3})",e,y,y,1.6.10
+is_inf,y.is_inf(),e,y,y,1.6.10
+is_nan,y.is_nan(),e,y,y,1.6.10
+is_null,z.is_null(),e,y,y,1.6.10
+log,x.log(),e,y,y,1.6.10
+log10,x.log10(),e,y,y,1.6.10
+log1p,x.log1p(),e,y,y,1.6.10
+mapv,"g.mapv({""a"": 1, ""b"": 2, ""z"": 26}, 0)",e,y,y,1.6.10
+maximum,row_id.maximum(x),e,y,y,1.6.10
+minimum,row_id.minimum(x),e,y,y,1.6.10
+mod,row_id.mod(2),e,y,y,1.6.10
+month,date_col_0.month(),e,y,n,1.6.10
+or,a or b,e,y,y,1.6.10
+parse_date,str_date_col.parse_date(),e,y,n,1.6.10
+parse_datetime,str_datetime_col.parse_datetime(),e,y,n,1.6.10
+quarter,date_col_0.quarter(),e,y,n,1.6.10
+remainder,row_id.remainder(2),e,y,y,1.6.10
+round,y.round(),e,y,y,1.6.10
+sign,z.sign(),e,y,y,1.6.10
+sin,x.sin(),e,y,y,1.6.10
+sinh,x.sinh(),e,y,y,1.6.10
+sqrt,x.sqrt(),e,y,y,1.6.10
+sum,x.sum(),e,y,y,1.6.10
+tanh,x.tanh(),e,y,y,1.6.10
+timestamp_diff,datetime_col_0.timestamp_diff(datetime_col_1),e,y,n,1.6.10
+trimstr,"g.trimstr(0, 2)",e,y,y,1.6.10
+weekofyear,date_col_0.weekofyear(),e,y,n,1.6.10
+where,"a.where(x, y)",e,y,y,1.6.10
+year,date_col_0.year(),e,y,n,1.6.10
+_count,_count(),g,y,w,1.6.10
+_ngroup,_ngroup(),g,y,n,1.6.10
+_size,_size(),g,y,y,1.6.10
+count,z.count(),g,y,y,1.6.10
+max,x.max(),g,y,y,1.6.10
+mean,x.mean(),g,y,y,1.6.10
+median,x.median(),g,y,n,1.6.10
+min,x.min(),g,y,y,1.6.10
+nunique,x.nunique(),g,y,n,1.6.10
+size,x.size(),g,y,y,1.6.10
+std,x.std(),g,y,n,1.6.10
+sum,(1).sum(),g,y,y,1.6.10
+sum,x.sum(),g,y,y,1.6.10
+var,x.var(),g,y,n,1.6.10
+_size,_size(),p,y,y,1.6.10
+all,a.all(),p,y,y,1.6.10
+any,a.any(),p,y,y,1.6.10
+count,z.count(),p,y,y,1.6.10
+max,x.max(),p,y,y,1.6.10
+mean,x.mean(),p,y,y,1.6.10
+median,x.median(),p,y,y,1.6.10
+min,x.min(),p,y,y,1.6.10
+nunique,x.nunique(),p,y,y,1.6.10
+size,x.size(),p,y,y,1.6.10
+std,x.std(),p,y,y,1.6.10
+sum,(1).sum(),p,y,y,1.6.10
+sum,x.sum(),p,y,y,1.6.10
+var,x.var(),p,y,y,1.6.10
+_uniform,_uniform(),u,y,y,1.6.10
+any_value,x.any_value(),up,y,y,1.6.10
+_row_number,_row_number(),w,y,y,1.6.10
+bfill,z.bfill(),w,y,n,1.6.10
+cumcount,z.cumcount(),w,y,w,1.6.10
+cummax,x.cummax(),w,y,y,1.6.10
+cummin,x.cummin(),w,y,y,1.6.10
+cumprod,x.cumprod(),w,y,n,1.6.10
+cumsum,x.cumsum(),w,y,y,1.6.10
+ffill,z.ffill(),w,y,n,1.6.10
+first,x.first(),w,y,n,1.6.10
+last,x.last(),w,y,n,1.6.10
+rank,x.rank(),w,y,n,1.6.10
+shift,x.shift(),w,y,y,1.6.10

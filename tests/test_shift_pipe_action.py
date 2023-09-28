@@ -4,7 +4,7 @@ import data_algebra.test_util
 from data_algebra.shift_pipe_action import ShiftPipeAction
 from data_algebra.cdata import pivot_rowrecs_to_blocks
 from data_algebra import descr, d_, lit
-from data_algebra.data_ops import ConvertRecordsNode, TableDescription, ViewRepresentation
+from data_algebra.view_representations import ConvertRecordsNode, TableDescription, ViewRepresentation
 import data_algebra.SQLite
 
 

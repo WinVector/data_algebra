@@ -1,4 +1,5 @@
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
+from data_algebra.view_representations import *
 import data_algebra.test_util
 
 import data_algebra.MySQL
@@ -19,9 +20,9 @@ def test_sql_extend_shortening_1():
     )
 
     # show op-chain is non shortened, as we don't do that in for the Pandas path
-    assert isinstance(ops, data_algebra.data_ops.ExtendNode)
-    assert isinstance(ops.sources[0], data_algebra.data_ops.ExtendNode)
-    assert isinstance(ops.sources[0].sources[0], data_algebra.data_ops.ExtendNode)
+    assert isinstance(ops, ExtendNode)
+    assert isinstance(ops.sources[0], ExtendNode)
+    assert isinstance(ops.sources[0].sources[0], ExtendNode)
 
     # show the SQL is shortened
     db_handle = data_algebra.MySQL.MySQLModel().db_handle(conn=None)
@@ -48,9 +49,9 @@ def test_sql_extend_shortening_1():
 
     ops_2 = eval(str(ops))
 
-    assert isinstance(ops_2, data_algebra.data_ops.ExtendNode)
-    assert isinstance(ops_2.sources[0], data_algebra.data_ops.ExtendNode)
-    assert isinstance(ops_2.sources[0].sources[0], data_algebra.data_ops.ExtendNode)
+    assert isinstance(ops_2, ExtendNode)
+    assert isinstance(ops_2.sources[0], ExtendNode)
+    assert isinstance(ops_2.sources[0].sources[0], ExtendNode)
 
     sql_2 = db_handle.to_sql(ops_2)
     assert isinstance(sql_2, str)
@@ -74,8 +75,8 @@ def test_ops_extend_shortening_1():
     )
 
     # show op-chain is shortened
-    assert isinstance(ops, data_algebra.data_ops.ExtendNode)
-    assert isinstance(ops.sources[0], data_algebra.data_ops.TableDescription)
+    assert isinstance(ops, ExtendNode)
+    assert isinstance(ops.sources[0], TableDescription)
 
     expect = data_algebra.data_model.default_data_model().pd.DataFrame(
         {

@@ -4,7 +4,7 @@ Utils that help with testing. This module is allowed to import many other module
 
 import pickle
 import traceback
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Iterable, Optional
 
 import numpy
 

@@ -466,7 +466,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             .natural_join(b=left_descr, on=join_columns, jointype="left")
             .natural_join(b=right_descr, on=join_columns, jointype="left")
         )
-        assert isinstance(ops_simulate, NaturalJoinNode)
+        assert ops_simulate.node_name == "NaturalJoinNode"
         simulate_near_sql = self.natural_join_to_near_sql(
             join_node=ops_simulate,
             using=using,

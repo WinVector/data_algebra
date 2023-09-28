@@ -2,6 +2,7 @@ import data_algebra
 import data_algebra.test_util
 import data_algebra.util
 from data_algebra.data_ops import *
+from data_algebra.view_representations import *
 from data_algebra.test_util import formats_to_self
 import data_algebra.SQLite
 import pytest

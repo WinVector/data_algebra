@@ -1,4 +1,4 @@
-from data_algebra.data_ops import TableDescription, SQLNode
+from data_algebra.view_representations import TableDescription, SQLNode
 import data_algebra.SQLite
 import data_algebra.test_util
 
