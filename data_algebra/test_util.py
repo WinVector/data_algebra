@@ -17,9 +17,8 @@ import data_algebra.PostgreSQL
 import data_algebra.MySQL
 import data_algebra.SparkSQL
 from data_algebra.sql_format_options import SQLFormatOptions
-import data_algebra.view_representations
-from data_algebra.data_ops import *  # for globals() in _re_parse()
-from data_algebra.view_representations import *  # for globals() in _re_parse()
+from data_algebra.view_representations import ViewRepresentation
+from data_algebra.expr_parse_fn import eval_da_ops
 
 
 have_polars = False
@@ -43,21 +42,12 @@ run_direct_ops_path_tests = False
 global_test_result_cache: Optional[data_algebra.eval_cache.ResultCache] = None
 
 
-def _re_parse(ops, *, data_model_map: Dict[str, Any]):
+def _re_parse(ops: ViewRepresentation, *, data_model_map: Dict[str, Any]) -> ViewRepresentation:
     """
     Return copy of object made by dumping to string via repr() and then evaluating that string.
     """
     str1 = repr(ops)
-    try:
-        ops2 = eval(
-            str1,
-            globals(),
-            data_model_map,  # make our definition of data module available
-            # cdata uses this
-        )
-    except Exception:
-        print("problem with " + str1)
-    return ops2
+    return eval_da_ops(str1, data_model_map=data_model_map)
 
 
 def formats_to_self(ops, *, data_model_map: Optional[Dict[str, Any]] = None) -> bool:
