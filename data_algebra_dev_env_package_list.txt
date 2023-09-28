@@ -43,7 +43,7 @@ contourpy=1.0.5=py311ha357a0b_0
 coverage=7.2.2=py311h6c40b1e_0
 cryptography=41.0.3=py311h30e54ef_0
 cycler=0.11.0=pyhd3eb1b0_0
-data-algebra=1.7.0=dev_0
+data-algebra=1.7.1=dev_0
 db-dtypes=1.1.1=pypi_0
 debugpy=1.6.7=py311hcec6c5f_0
 decorator=5.1.1=pyhd3eb1b0_0
