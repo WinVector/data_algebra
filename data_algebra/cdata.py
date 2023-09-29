@@ -299,7 +299,6 @@ class RecordSpecification:
 
         :return: RecordMap
         """
-
         return RecordMap(blocks_in=self, strict=self.strict)
 
     def map_from_rows(self):
@@ -308,7 +307,6 @@ class RecordSpecification:
 
         :return: RecordMap
         """
-
         return RecordMap(blocks_out=self, strict=self.strict)
     
     def map_to_keyed_column(self, *, key_column_name: str = "measure", value_column_name: str = "value"):
@@ -322,7 +320,6 @@ class RecordSpecification:
         :param value_column_name: name for value column
         :return: Record map
         """
-
         return RecordMap(blocks_in=self, blocks_out=self.value_column_form(), strict=self.strict)
     
     def map_from_keyed_column(self, *, key_column_name: str = "measure", value_column_name: str = "value"):
@@ -334,8 +331,8 @@ class RecordSpecification:
         :param value_column_name: name for value column
         :return: Record map
         """
-
         return RecordMap(blocks_in=self.value_column_form(), blocks_out=self, strict=self.strict)
+
 
 class RecordMap(ShiftPipeAction):
     """
