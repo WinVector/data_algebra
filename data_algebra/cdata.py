@@ -95,9 +95,18 @@ class RecordSpecification:
             raise ValueError("control table should have at least 1 row")
         if len(control_table.columns) != len(set(control_table.columns)):
             raise ValueError("control table columns should be unique")
+        if control_table_keys is None:
+            if self.control_table.shape[0] > 1:
+                control_table_keys = [self.control_table.columns[0]]
+            else:
+                control_table_keys = []  # single row records don't need to be keyed
+        if isinstance(control_table_keys, str):
+            control_table_keys = [control_table_keys]
+        else:
+            control_table_keys = list(control_table_keys)
+        assert isinstance(control_table_keys, List)
         if strict:
             if control_table.shape[0] > 1:
-                assert control_table_keys is not None
                 assert len(control_table_keys) > 0
                 assert local_data_model.table_is_keyed_by_columns(
                     control_table, column_names=control_table_keys
@@ -106,14 +115,12 @@ class RecordSpecification:
         assert self.control_table.shape[0] > 0
         if record_keys is None:
             record_keys = []
-        if isinstance(record_keys, str):
+        elif isinstance(record_keys, str):
             record_keys = [record_keys]
-        self.record_keys = list(record_keys)
-        if control_table_keys is None:
-            if self.control_table.shape[0] > 1:
-                control_table_keys = [self.control_table.columns[0]]
-            else:
-                control_table_keys = []  # single row records don't need to be keyed
+        else:
+            record_keys = list(record_keys)
+        assert isinstance(record_keys, list)
+        self.record_keys = record_keys
         if isinstance(control_table_keys, str):
             control_table_keys = [control_table_keys]
         if self.control_table.shape[0] > 1:
