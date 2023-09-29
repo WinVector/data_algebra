@@ -23,7 +23,7 @@ def _format_table(
     record_id_cols: Iterable[str],
     control_id_cols: Iterable[str],
     add_style: bool = True,
-):
+) -> str:
     local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(d)
     d = local_data_model.to_pandas(d)
     pd = data_algebra.data_model.lookup_data_model_for_dataframe(d).pd
@@ -52,7 +52,7 @@ def _format_table(
         d = d.style.set_properties(
             **{"background-color": "#FFE4C4"}, subset=record_id_col_pairs
         ).set_properties(**{"background-color": "#7FFFD4"}, subset=control_id_col_pairs)
-    return d
+    return d._repr_html_()
 
 
 class RecordSpecification:
@@ -301,7 +301,12 @@ class RecordSpecification:
             + _str_list_to_html(self.control_table_keys)
             + "</li>\n"
             + "<li>control_table:<br>\n"
-            + self.control_table._repr_html_()
+            + _format_table(
+                self.control_table,
+                record_id_cols=self.record_keys,
+                control_id_cols=self.control_table_keys,
+                add_style=True,
+            )
             + "</li>\n"
             + "</ul>"
             + "</p>\n"
@@ -744,9 +749,9 @@ class RecordMap(ShiftPipeAction):
         )
         s = (
             "RecordMap: transforming records of the form:<br>\n"
-            + example_input_formatted._repr_html_()
+            + example_input_formatted
             + "<br>\nto records of the form:<br>\n"
-            + example_output_formatted._repr_html_()
+            + example_output_formatted
         )
         return s
 
