@@ -5,6 +5,7 @@ Flow text around a margin for presentation.
 
 def flow_text(tokens, *, align_right=70, sep_width=1):
     """
+    Flow text around a margin for presentation.
 
     :param tokens: list or tuple of strings
     :param align_right: integer, right alignment margin

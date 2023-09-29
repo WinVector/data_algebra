@@ -2,6 +2,7 @@
 
 """
 Parse expresion to data ops in a medium environment. Uses eval() (don't run on untrusted expressions).
+Used for confirming repr() is reversible.
 """
 
 
@@ -11,8 +12,7 @@ import numpy as np  # for globals() in eval_da_ops()
 from data_algebra.data_ops import describe_table, table, descr, data  # for globals() in eval_da_ops()
 from data_algebra.view_representations import ViewRepresentation, TableDescription  # for globals() in eval_da_ops()
 pd = data_algebra.data_model.default_data_model().pd  # for globals() in eval_da_ops()
-
-g_env = globals()
+g_env = {k: v for k, v in globals().items()}
 
 from typing import Any, Dict, Optional
 
@@ -20,6 +20,7 @@ from typing import Any, Dict, Optional
 def eval_da_ops(ops_str: str, *, data_model_map: Optional[Dict[str, Any]]) -> ViewRepresentation:
     """
     Parse ops_str into a ViewRepresentation. Uses eval() (don't run on untrusted expressions).
+    Used for confirming repr() is reversible.
 
     :param ops_str: text representation of a data algebra pipeline or expression.
     :param data_model_map: tables
