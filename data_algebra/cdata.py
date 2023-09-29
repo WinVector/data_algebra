@@ -199,6 +199,13 @@ class RecordSpecification:
         return cols
 
     def value_column_form(self, *, key_column_name: str = "measure", value_column_name: str = "value"):
+        """
+        Return specification of the matching value column form.
+        Note: for type safety prefer map_to_rows() to map_to_keyed_column().
+
+        :param key_column_name: name for additional keying column
+        :param value_column_name: name for value column
+        """
         assert isinstance(key_column_name, str)
         assert isinstance(value_column_name, str)
         local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(self.control_table)
@@ -308,7 +315,9 @@ class RecordSpecification:
         """
         Build a RecordMap mapping this RecordSpecification to a table
         where only one column holds values.
+        Note: for type safety prefer map_to_rows() to map_to_keyed_column().
 
+        
         :param key_column_name: name for additional keying column
         :param value_column_name: name for value column
         :return: Record map
