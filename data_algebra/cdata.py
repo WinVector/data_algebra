@@ -99,8 +99,8 @@ class RecordSpecification:
         if len(control_table.columns) != len(set(control_table.columns)):
             raise ValueError("control table columns should be unique")
         if control_table_keys is None:
-            if self.control_table.shape[0] > 1:
-                control_table_keys = [self.control_table.columns[0]]
+            if control_table.shape[0] > 1:
+                control_table_keys = [control_table.columns[0]]
             else:
                 control_table_keys = []  # single row records don't need to be keyed
         if isinstance(control_table_keys, str):
