@@ -20,6 +20,7 @@ def test_cdata_value_column_1():
         )
     assert rs.row_version() == ['x', 'treatment', 'control', 'treatment_tail', 'control_tail']
     assert rs.value_column_form() == rs.value_column_form().value_column_form()
+    assert isinstance(rs.value_column_form(), RecordSpecification)
     map_from_rows = rs.map_from_rows()
     assert isinstance(map_from_rows, RecordMap)
     map_to_rows = rs.map_to_rows()
@@ -41,3 +42,23 @@ def test_cdata_value_column_1():
     d_rows_back = map_to_rows(d_records)
     assert data_algebra.test_util.equivalent_frames(d_row_form, d_rows_back)
     assert data_algebra.test_util.equivalent_frames(d_records, d_back)
+    s2 = rs.row_record_form()
+    assert isinstance(s2, RecordSpecification)
+    s2_map_from_keyed_column = s2.map_from_keyed_column()
+    assert isinstance(s2_map_from_keyed_column, RecordMap)
+    s2_map_to_keyed_column = s2.map_to_keyed_column()
+    assert isinstance(s2_map_to_keyed_column, RecordMap)
+    d_column_s2 = s2_map_to_keyed_column(d_row_form)
+    assert data_algebra.test_util.equivalent_frames(d_column, d_column_s2)
+    d_rows_back_d2 = s2_map_from_keyed_column(d_column)
+    assert data_algebra.test_util.equivalent_frames(d_row_form, d_rows_back_d2)
+    for obj in [
+        rs, 
+        map_from_rows, map_to_rows,
+        map_from_keyed_column, map_to_keyed_column,
+        s2, 
+        s2_map_from_keyed_column, s2_map_to_keyed_column]:
+        assert isinstance(str(obj), str)
+        assert isinstance(repr(obj), str)
+        assert isinstance(obj.fmt(), str)
+        assert isinstance(obj._repr_html_(), str)
