@@ -129,7 +129,8 @@ Classes
         :return: transformed data frame.
 
 `RecordSpecification(control_table, *, record_keys=None, control_table_keys=None, strict: bool = True, local_data_model=None)`
-:   Class to represent a multi-row data record.
+:   Class to represent a data record. 
+    For single row data records use None as the specification.
     
     :param control_table: data.frame describing record layout
     :param record_keys: array of record key column names
@@ -157,18 +158,47 @@ Classes
         
         :return: multi line string representation.
 
+    `map_from_keyed_column(self, *, key_column_name: str = 'measure', value_column_name: str = 'value')`
+    :   Build a RecordMap mapping this RecordSpecification from a table
+        where only one column holds values.
+        
+        :param key_column_name: name for additional keying column
+        :param value_column_name: name for value column
+        :return: Record map
+
     `map_from_rows(self)`
     :   Build a RecordMap mapping this RecordSpecification from rowrecs
         
         :return: RecordMap
+
+    `map_to_keyed_column(self, *, key_column_name: str = 'measure', value_column_name: str = 'value')`
+    :   Build a RecordMap mapping this RecordSpecification to a table
+        where only one column holds values.
+        Note: for type safety prefer map_to_rows() to map_to_keyed_column().
+        
+        
+        :param key_column_name: name for additional keying column
+        :param value_column_name: name for value column
+        :return: Record map
 
     `map_to_rows(self)`
     :   Build a RecordMap mapping this RecordSpecification to rowrecs
         
         :return: RecordMap
 
+    `row_record_form(self)`
+    :   Return specification of matching row record form.
+        Note: prefer using None to specify row records specs.
+
     `row_version(self, *, include_record_keys: bool = True) ‑> List[str]`
     :   Return copy of record as a row record.
         
         :param include_record_keys: logical, if True include record keys as columns
         :return: column list
+
+    `value_column_form(self, *, key_column_name: str = 'measure', value_column_name: str = 'value')`
+    :   Return specification of the matching value column form.
+        Note: for type safety prefer map_to_rows() to map_to_keyed_column().
+        
+        :param key_column_name: name for additional keying column
+        :param value_column_name: name for value column

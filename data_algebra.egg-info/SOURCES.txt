@@ -61,6 +61,7 @@ tests/test_cdata1.py
 tests/test_cdata_convenience.py
 tests/test_cdata_example.py
 tests/test_cdata_tr6_example.py
+tests/test_cdata_value_column.py
 tests/test_cdata_wvpy_case.py
 tests/test_coalesce.py
 tests/test_cols_used.py

@@ -23,7 +23,7 @@ def _format_table(
     record_id_cols: Iterable[str],
     control_id_cols: Iterable[str],
     add_style: bool = True,
-):
+) -> str:
     local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(d)
     d = local_data_model.to_pandas(d)
     pd = data_algebra.data_model.lookup_data_model_for_dataframe(d).pd
@@ -52,12 +52,13 @@ def _format_table(
         d = d.style.set_properties(
             **{"background-color": "#FFE4C4"}, subset=record_id_col_pairs
         ).set_properties(**{"background-color": "#7FFFD4"}, subset=control_id_col_pairs)
-    return d
+    return d._repr_html_()
 
 
 class RecordSpecification:
     """
-    Class to represent a multi-row data record.
+    Class to represent a data record. 
+    For single row data records use None as the specification.
     """
 
     row_columns: List[str]  # columns when in row form
@@ -93,11 +94,22 @@ class RecordSpecification:
         control_table = local_data_model.clean_copy(control_table)
         if control_table.shape[0] < 1:
             raise ValueError("control table should have at least 1 row")
+        if control_table.shape[1] < 2:
+            raise ValueError("control table must have at least 2 columns")
         if len(control_table.columns) != len(set(control_table.columns)):
             raise ValueError("control table columns should be unique")
+        if control_table_keys is None:
+            if control_table.shape[0] > 1:
+                control_table_keys = [control_table.columns[0]]
+            else:
+                control_table_keys = []  # single row records don't need to be keyed
+        if isinstance(control_table_keys, str):
+            control_table_keys = [control_table_keys]
+        else:
+            control_table_keys = list(control_table_keys)
+        assert isinstance(control_table_keys, List)
         if strict:
             if control_table.shape[0] > 1:
-                assert control_table_keys is not None
                 assert len(control_table_keys) > 0
                 assert local_data_model.table_is_keyed_by_columns(
                     control_table, column_names=control_table_keys
@@ -106,14 +118,12 @@ class RecordSpecification:
         assert self.control_table.shape[0] > 0
         if record_keys is None:
             record_keys = []
-        if isinstance(record_keys, str):
+        elif isinstance(record_keys, str):
             record_keys = [record_keys]
-        self.record_keys = list(record_keys)
-        if control_table_keys is None:
-            if self.control_table.shape[0] > 1:
-                control_table_keys = [self.control_table.columns[0]]
-            else:
-                control_table_keys = []  # single row records don't need to be keyed
+        else:
+            record_keys = list(record_keys)
+        assert isinstance(record_keys, list)
+        self.record_keys = record_keys
         if isinstance(control_table_keys, str):
             control_table_keys = [control_table_keys]
         if self.control_table.shape[0] > 1:
@@ -182,12 +192,55 @@ class RecordSpecification:
         :param include_record_keys: logical, if True include record keys as columns
         :return: column list
         """
+        assert isinstance(include_record_keys, bool)
         cols: List[str] = []
         if include_record_keys:
             cols = cols + self.record_keys
         cols = cols + self.content_keys
         return cols
+    
+    def row_record_form(self):
+        """
+        Return specification of matching row record form.
+        Note: prefer using None to specify row records specs.
+        """
+        local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(self.control_table)
+        row_vals = self.row_version(include_record_keys=False)
+        ct = local_data_model.data_frame({
+            k: [k] for k in row_vals
+        })
+        v_set = set(self.row_version(include_record_keys=False))
+        return RecordSpecification(
+            ct,
+            record_keys=self.record_keys,
+            control_table_keys=[],
+            strict=self.strict,
+            local_data_model=local_data_model,
+        )
 
+    def value_column_form(self, *, key_column_name: str = "measure", value_column_name: str = "value"):
+        """
+        Return specification of the matching value column form.
+        Note: for type safety prefer map_to_rows() to map_to_keyed_column().
+
+        :param key_column_name: name for additional keying column
+        :param value_column_name: name for value column
+        """
+        assert isinstance(key_column_name, str)
+        assert isinstance(value_column_name, str)
+        local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(self.control_table)
+        ct = local_data_model.data_frame({
+            key_column_name: self.row_version(include_record_keys=False),
+            value_column_name: self.row_version(include_record_keys=False),
+        })
+        return RecordSpecification(
+            ct,
+            record_keys=self.record_keys,
+            control_table_keys=[key_column_name],
+            strict=self.strict,
+            local_data_model=local_data_model,
+        )
+        
     def __repr__(self):
         s = (
             "data_algebra.cdata.RecordSpecification(\n"
@@ -248,7 +301,12 @@ class RecordSpecification:
             + _str_list_to_html(self.control_table_keys)
             + "</li>\n"
             + "<li>control_table:<br>\n"
-            + self.control_table._repr_html_()
+            + _format_table(
+                self.control_table,
+                record_id_cols=self.record_keys,
+                control_id_cols=self.control_table_keys,
+                add_style=True,
+            )
             + "</li>\n"
             + "</ul>"
             + "</p>\n"
@@ -266,7 +324,8 @@ class RecordSpecification:
 
         :return: RecordMap
         """
-
+        if self.control_table.shape[0] <= 1:
+            raise ValueError("already in row record format")
         return RecordMap(blocks_in=self, strict=self.strict)
 
     def map_from_rows(self):
@@ -275,8 +334,33 @@ class RecordSpecification:
 
         :return: RecordMap
         """
-
+        if self.control_table.shape[0] <= 1:
+            raise ValueError("already in row record format")
         return RecordMap(blocks_out=self, strict=self.strict)
+    
+    def map_to_keyed_column(self, *, key_column_name: str = "measure", value_column_name: str = "value"):
+        """
+        Build a RecordMap mapping this RecordSpecification to a table
+        where only one column holds values.
+        Note: for type safety prefer map_to_rows() to map_to_keyed_column().
+
+        
+        :param key_column_name: name for additional keying column
+        :param value_column_name: name for value column
+        :return: Record map
+        """
+        return RecordMap(blocks_in=self, blocks_out=self.value_column_form(), strict=self.strict)
+    
+    def map_from_keyed_column(self, *, key_column_name: str = "measure", value_column_name: str = "value"):
+        """
+        Build a RecordMap mapping this RecordSpecification from a table
+        where only one column holds values.
+
+        :param key_column_name: name for additional keying column
+        :param value_column_name: name for value column
+        :return: Record map
+        """
+        return RecordMap(blocks_in=self.value_column_form(), blocks_out=self, strict=self.strict)
 
 
 class RecordMap(ShiftPipeAction):
@@ -309,16 +393,23 @@ class RecordMap(ShiftPipeAction):
             assert isinstance(blocks_in, RecordSpecification)
             if strict:
                 assert blocks_in.strict
+            if blocks_in.control_table.shape[0] <= 1:
+                blocks_in = None
+        if blocks_in is not None:
             ck = [k for k in blocks_in.content_keys if k is not None]
             if len(ck) != len(set(ck)):
                 raise ValueError("blocks_in can not have duplicate content keys")
+            if blocks_in.control_table.shape[0] <= 1:
+                raise ValueError("for row records use None specification")
         if blocks_out is not None:
             assert isinstance(blocks_out, RecordSpecification)
             if strict:
                 assert blocks_out.strict
+            if blocks_out.control_table.shape[0] <= 1:
+                blocks_out = None
         if (blocks_in is None) and (blocks_out is None):
             raise ValueError(
-                "At least one of blocks_in or blocks_out should not be None"
+                "At least one of blocks_in or blocks_out should not be None or a non-row record"
             )
         if (blocks_in is not None) and (blocks_out is not None):
             unknown = set(blocks_out.record_keys) - set(blocks_in.record_keys)
@@ -658,9 +749,9 @@ class RecordMap(ShiftPipeAction):
         )
         s = (
             "RecordMap: transforming records of the form:<br>\n"
-            + example_input_formatted._repr_html_()
+            + example_input_formatted
             + "<br>\nto records of the form:<br>\n"
-            + example_output_formatted._repr_html_()
+            + example_output_formatted
         )
         return s
 
