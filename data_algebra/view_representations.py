@@ -308,6 +308,7 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
 
     # printing
 
+    @abc.abstractmethod
     def to_python_src_(self, *, indent=0, strict=True, print_sources=True) -> str:
         """
         Return text representing operations. Internal method, allows skipping of sources.
@@ -316,7 +317,6 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         :param strict: if False allow eliding of columns names and other long structures.
         :param print_sources: logical, print children.
         """
-        return "ViewRepresentation(" + self.column_names.__repr__() + ")"
 
     # noinspection PyBroadException
     def to_python(self, *, indent=0, strict=True, pretty=False, black_mode=None) -> str:
