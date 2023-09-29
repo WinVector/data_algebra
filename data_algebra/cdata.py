@@ -189,12 +189,29 @@ class RecordSpecification:
         :param include_record_keys: logical, if True include record keys as columns
         :return: column list
         """
+        assert isinstance(include_record_keys, bool)
         cols: List[str] = []
         if include_record_keys:
             cols = cols + self.record_keys
         cols = cols + self.content_keys
         return cols
 
+    def value_column_form(self, *, key_column_name: str = "measure", value_column_name: str = "value"):
+        assert isinstance(key_column_name, str)
+        assert isinstance(value_column_name, str)
+        local_data_model = data_algebra.data_model.lookup_data_model_for_dataframe(self.control_table)
+        ct = local_data_model.data_frame({
+            key_column_name: self.row_version(include_record_keys=False),
+            value_column_name: self.row_version(include_record_keys=False),
+        })
+        return RecordSpecification(
+            ct,
+            record_keys=self.record_keys,
+            control_table_keys=[key_column_name],
+            strict=self.strict,
+            local_data_model=local_data_model,
+        )
+        
     def __repr__(self):
         s = (
             "data_algebra.cdata.RecordSpecification(\n"
@@ -284,7 +301,30 @@ class RecordSpecification:
         """
 
         return RecordMap(blocks_out=self, strict=self.strict)
+    
+    def map_to_keyed_column(self, *, key_column_name: str = "measure", value_column_name: str = "value"):
+        """
+        Build a RecordMap mapping this RecordSpecification to a table
+        where only one column holds values.
 
+        :param key_column_name: name for additional keying column
+        :param value_column_name: name for value column
+        :return: Record map
+        """
+
+        return RecordMap(blocks_in=self, blocks_out=self.value_column_form(), strict=self.strict)
+    
+    def map_from_keyed_column(self, *, key_column_name: str = "measure", value_column_name: str = "value"):
+        """
+        Build a RecordMap mapping this RecordSpecification from a table
+        where only one column holds values.
+
+        :param key_column_name: name for additional keying column
+        :param value_column_name: name for value column
+        :return: Record map
+        """
+
+        return RecordMap(blocks_in=self.value_column_form(), blocks_out=self, strict=self.strict)
 
 class RecordMap(ShiftPipeAction):
     """
