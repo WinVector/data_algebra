@@ -1,4 +1,3 @@
-
 _have_black = False
 try:
     # noinspection PyUnresolvedReferences

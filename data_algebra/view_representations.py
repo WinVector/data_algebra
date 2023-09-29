@@ -1,4 +1,3 @@
-
 """
 Realization of data operation classes.
 """
@@ -954,7 +953,6 @@ class ViewRepresentation(OperatorPlatform, abc.ABC):
         return ConvertRecordsNode(source=self, record_map=record_map)
 
 
-
 class TableDescription(ViewRepresentation):
     """
      Describe columns, and qualifiers, of a table.
@@ -1161,8 +1159,6 @@ class TableDescription(ViewRepresentation):
 
     def __hash__(self):
         return self.key.__hash__()
-
-
 
 
 class ExtendNode(ViewRepresentation):

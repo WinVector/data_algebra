@@ -19,19 +19,14 @@ the `rquery`<https://github.com/WinVector/rquery> and `rqdatatable`<https://gith
 
 import data_algebra.data_model
 import data_algebra.data_ops
+
 # import for easy access for package users
-from data_algebra.data_ops import (
-    describe_table,
-    descr,
-    data,
-    ex,
-    table
-)
+from data_algebra.data_ops import describe_table, descr, data, ex, table
 import data_algebra.view_representations
 from data_algebra.view_representations import (
     TableDescription,
     ViewRepresentation,
-    SQLNode
+    SQLNode,
 )
 import data_algebra.expr_rep
 from data_algebra.expr_rep import lit, col, d_, one

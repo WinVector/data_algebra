@@ -12,6 +12,7 @@ import pandas as pd
 have_polars = False
 try:
     import polars as pl  # conditional import
+
     have_polars = True
 except ModuleNotFoundError:
     pass
@@ -75,7 +76,9 @@ def non_null_types_in_frame(d) -> Dict[str, Optional[Set[Type]]]:
     # check that this is a data frame, so we can raise a legible error
     # instead of having an non-existent attribute error raising
     if not is_data_frame(d):
-        raise TypeError(f"expected a Pandas or Polars data frame, had {_type_name(type(d))}")
+        raise TypeError(
+            f"expected a Pandas or Polars data frame, had {_type_name(type(d))}"
+        )
     result = dict()
     for col_name in d.columns:
         types_seen = {type(vi) for vi in d[col_name] if not _is_null(vi)}
@@ -139,7 +142,9 @@ class SchemaRaises(SchemaBase):
     Raises TypeError on schema violations.
     """
 
-    def _check_data_frame_matches_schema(self, *, d, expected_type: Optional[Dict]) -> Optional[str]:
+    def _check_data_frame_matches_schema(
+        self, *, d, expected_type: Optional[Dict]
+    ) -> Optional[str]:
         assert isinstance(expected_type, (type(None), Dict))
         # check that this is a data frame, so we can raise a legible error
         # instead of having an non-existent attribute error raising
@@ -190,7 +195,9 @@ class SchemaRaises(SchemaBase):
                 )
                 return f"expected type one of {type_names}, found type {_type_name(observed_type)}"
         elif isinstance(expected_type, dict):
-            schema_issue = self._check_data_frame_matches_schema(d=observed_value, expected_type=expected_type)
+            schema_issue = self._check_data_frame_matches_schema(
+                d=observed_value, expected_type=expected_type
+            )
             if schema_issue is not None:
                 return schema_issue
         else:

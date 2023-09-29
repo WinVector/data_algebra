@@ -42,7 +42,9 @@ run_direct_ops_path_tests = False
 global_test_result_cache: Optional[data_algebra.eval_cache.ResultCache] = None
 
 
-def _re_parse(ops: ViewRepresentation, *, data_model_map: Dict[str, Any]) -> ViewRepresentation:
+def _re_parse(
+    ops: ViewRepresentation, *, data_model_map: Dict[str, Any]
+) -> ViewRepresentation:
     """
     Return copy of object made by dumping to string via repr() and then evaluating that string.
     """
