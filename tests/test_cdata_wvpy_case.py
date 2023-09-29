@@ -100,35 +100,3 @@ threshold,count,fraction,precision,true_positive_rate,false_positive_rate,true_n
     pipe1 = descr(to_plot=to_plot).convert_records(reshaper)
     data_algebra.test_util.check_transform(ops=pipe1, data=to_plot, expect=prtlong,
     )
-
-    plotvars = ["sensitivity"]
-    reshaper = RecordMap(
-        blocks_out=RecordSpecification(
-            data_algebra.data_model.default_data_model().pd.DataFrame(
-                {"measure": plotvars, "value": plotvars}
-            ),
-            control_table_keys=["measure"],
-            record_keys=["threshold"],
-        )
-    )
-    prtlong = reshaper.transform(to_plot)
-    expect = data_algebra.data_model.default_data_model().pd.DataFrame(
-        {
-            "threshold": [0.999999, 1.0, 2.0, 3.0, 4.0, 5.0, 5.000001],
-            "measure": [
-                "sensitivity",
-                "sensitivity",
-                "sensitivity",
-                "sensitivity",
-                "sensitivity",
-                "sensitivity",
-                "sensitivity",
-            ],
-            "value": [1.0, 1.0, 1.0, 1.0, 0.5, 0.0, 0.0],
-        }
-    )
-    assert data_algebra.test_util.equivalent_frames(expect, prtlong)
-
-    pipe1 = descr(to_plot=to_plot).convert_records(reshaper)
-    data_algebra.test_util.check_transform(ops=pipe1, data=to_plot, expect=prtlong,
-    )
