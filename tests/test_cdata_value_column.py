@@ -18,6 +18,8 @@ def test_cdata_value_column_1():
         record_keys=['x'],
         control_table_keys=['group'],
         )
+    assert rs.row_version() == ['x', 'treatment', 'control', 'treatment_tail', 'control_tail']
+    assert rs.value_column_form() == rs.value_column_form().value_column_form()
     map_from_rows = rs.map_from_rows()
     assert isinstance(map_from_rows, RecordMap)
     map_to_rows = rs.map_to_rows()

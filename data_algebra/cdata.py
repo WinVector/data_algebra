@@ -93,6 +93,8 @@ class RecordSpecification:
         control_table = local_data_model.clean_copy(control_table)
         if control_table.shape[0] < 1:
             raise ValueError("control table should have at least 1 row")
+        if control_table.shape[1] < 2:
+            raise ValueError("control table must have at least 2 columns")
         if len(control_table.columns) != len(set(control_table.columns)):
             raise ValueError("control table columns should be unique")
         if control_table_keys is None:
