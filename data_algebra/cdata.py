@@ -384,7 +384,7 @@ class RecordMap(ShiftPipeAction):
 
         :param blocks_in: incoming record specification, None for row-records.
         :param blocks_out: outgoing record specification, None for row-records.
-        :param strict: if True insist block be strict, and in and out blocks agree on row-form columns.∂
+        :param strict: if True insist block be strict, and in and out blocks agree on row-form columns.
         """
         ShiftPipeAction.__init__(self)
         assert isinstance(strict, bool)
