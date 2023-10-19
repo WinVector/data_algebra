@@ -763,7 +763,7 @@ def pivot_blocks_to_rowrecs(
     record_keys,
     record_value_columns,
     local_data_model=None,
-):
+) -> RecordMap:
     """
     Build a block records to row records map. This is very similar to a SQL pivot.
 
@@ -800,7 +800,7 @@ def pivot_rowrecs_to_blocks(
     record_keys,
     record_value_columns,
     local_data_model=None,
-):
+) -> RecordMap:
     """
     Build a row records to block records map. This is very similar to a SQL unpivot.
 
